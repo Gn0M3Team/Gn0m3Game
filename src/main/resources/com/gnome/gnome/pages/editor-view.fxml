@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="542.0" prefWidth="618.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gnome.gnome.editor.controller.EditorPageController">
+    <center>
+        <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="NEVER" BorderPane.alignment="CENTER">
+            <StackPane fx:id="container" />
+        </ScrollPane>
+    </center>
+    <top>
+        <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+    </top>
+    <bottom>
+        <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <children>
+                <Button mnemonicParsing="false" onAction="#onBackButtonClick" text="Go Back" />
+            </children>
+            <children>
+                <Button onAction="#onLoadMapButtonClick" text="Load Map" />
+            </children>
+            <children>
+                <Button onAction="#onLoadMapFromDatabase" text="Load From Db" />
+            </children>
+            <children>
+                <Button onAction="#onSaveToLocalDevice" text="Save to local device" />
+            </children>
+            <children>
+                <Button onAction="#onSaveToDatabase" text="Save to database" />
+            </children>
+        </HBox>
+    </bottom>
+    <left>
+        <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER" style="-fx-padding: 10;">
+            <children>
+                <!--Monsters Category-->
+                <TitledPane fx:id="monsterPane" text="Monsters" expanded="false">
+                    <content>
+                        <VBox spacing="5" style="-fx-padding: 5;">
+                            <children>
+                                <Label text="Goblin" style="-fx-text-fill: black;" />
+                                <Label text="Dragon" style="-fx-text-fill: black;" />
+                            </children>
+                        </VBox>
+                    </content>
+                </TitledPane>
+                <!-- Props Category -->
+                <TitledPane fx:id="propPane" text="Props" expanded="false">
+                    <content>
+                        <VBox spacing="5" style="-fx-padding: 5;">
+                            <children>
+                                <Label text="Tree" style="-fx-text-fill: black;" />
+                                <Label text="Rock" style="-fx-text-fill: black;" />
+                            </children>
+                        </VBox>
+                    </content>
+                </TitledPane>
+                <!-- NPCs Category -->
+                <TitledPane fx:id="npcPane" text="NPCs" expanded="false">
+                    <content>
+                        <VBox spacing="5" style="-fx-padding: 5;">
+                            <children>
+                                <Label text="Villager" style="-fx-text-fill: black;" />
+                                <Label text="Merchant" style="-fx-text-fill: black;" />
+                            </children>
+                        </VBox>
+                    </content>
+                </TitledPane>
+                <!-- Environment Category -->
+                <TitledPane fx:id="environmentPane" text="Environment" expanded="false">
+                    <content>
+                        <VBox spacing="5" style="-fx-padding: 5;">
+                            <children>
+                                <Label text="Mountain" style="-fx-text-fill: black;" />
+                                <Label text="River" style="-fx-text-fill: black;" />
+                            </children>
+                        </VBox>
+                    </content>
+                </TitledPane>
+            </children>
+        </VBox>
+    </left>
+</BorderPane>
