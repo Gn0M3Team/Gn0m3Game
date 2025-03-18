@@ -23,4 +23,16 @@ module com.gnome.gnome {
     exports com.gnome.gnome.editor.javafxobj;
     opens com.gnome.gnome.editor.utils to javafx.fxml;
     exports com.gnome.gnome.editor.utils;
+
+    opens com.gnome.gnome.registration.controller to javafx.fxml;
+    exports com.gnome.gnome.registration.controller;
+
+    opens com.gnome.gnome.switcher.controller to javafx.fxml;
+    exports com.gnome.gnome.switcher.controller;
+
+    opens com.gnome.gnome.login.controller to javafx.fxml;
+    exports com.gnome.gnome.login.controller;
+
+    opens com.gnome.gnome.account.controller to javafx.fxml;
+    exports com.gnome.gnome.account.controller;
 }
