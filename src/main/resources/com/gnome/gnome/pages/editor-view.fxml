@@ -10,7 +10,100 @@
         </ScrollPane>
     </center>
     <top>
-        <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+        <VBox alignment="CENTER" spacing="10" BorderPane.alignment="CENTER"
+              style="-fx-padding: 10 0 20 0;">
+            <children>
+                <!-- Main category buttons row -->
+                <HBox fx:id="mainButtonsBox" alignment="CENTER" spacing="10"
+                      style="-fx-background-color: #f0f0f0; -fx-padding: 10;">
+                    <children>
+                        <Button text="Monsters"
+                                onAction="#onCategoryButtonClick"
+                                userData="Monsters"
+                                style="
+                    -fx-background-color: linear-gradient(to bottom, #f9f9f9, #e6e6e6);
+                    -fx-text-fill: #333;
+                    -fx-font-size: 14px;
+                    -fx-padding: 6 12;
+                    -fx-background-radius: 4;
+                    -fx-border-color: #ccc;
+                    -fx-border-radius: 4;
+                    -fx-border-width: 1;
+                "/>
+
+                        <Button text="Props"
+                                onAction="#onCategoryButtonClick"
+                                userData="Props"
+                                style="
+                    -fx-background-color: linear-gradient(to bottom, #f9f9f9, #e6e6e6);
+                    -fx-text-fill: #333;
+                    -fx-font-size: 14px;
+                    -fx-padding: 6 12;
+                    -fx-background-radius: 4;
+                    -fx-border-color: #ccc;
+                    -fx-border-radius: 4;
+                    -fx-border-width: 1;
+                "/>
+
+                        <Button text="NPCs"
+                                onAction="#onCategoryButtonClick"
+                                userData="NPCs"
+                                style="
+                    -fx-background-color: linear-gradient(to bottom, #f9f9f9, #e6e6e6);
+                    -fx-text-fill: #333;
+                    -fx-font-size: 14px;
+                    -fx-padding: 6 12;
+                    -fx-background-radius: 4;
+                    -fx-border-color: #ccc;
+                    -fx-border-radius: 4;
+                    -fx-border-width: 1;
+                "/>
+
+                        <Button text="Environment"
+                                onAction="#onCategoryButtonClick"
+                                userData="Environment"
+                                style="
+                    -fx-background-color: linear-gradient(to bottom, #f9f9f9, #e6e6e6);
+                    -fx-text-fill: #333;
+                    -fx-font-size: 14px;
+                    -fx-padding: 6 12;
+                    -fx-background-radius: 4;
+                    -fx-border-color: #ccc;
+                    -fx-border-radius: 4;
+                    -fx-border-width: 1;
+                "/>
+                    </children>
+                </HBox>
+
+                <!-- Container HBox to center the ScrollPane horizontally -->
+                <HBox alignment="CENTER">
+                    <children>
+                        <!-- Inline buttons row wrapped in a ScrollPane (initially hidden) -->
+                        <ScrollPane fx:id="inlineScrollPane"
+                                    visible="false" managed="false"
+                                    hbarPolicy="AS_NEEDED" vbarPolicy="NEVER"
+                                    fitToHeight="true"
+                                    style="
+                                    -fx-background-color: transparent;
+                                    -fx-border-color: black;
+                                    -fx-border-width: 2;
+                                    -fx-border-radius: 15;
+                                    -fx-background-radius: 15;
+                                    -fx-padding: 5;">
+                            <content>
+                                <HBox fx:id="inlineButtonsBox"
+                                      alignment="CENTER"
+                                      spacing="10"
+                                      style="
+                                      -fx-padding: 10;
+                                      -fx-background-color: #fafafa;"
+                                />
+                            </content>
+                        </ScrollPane>
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
     </top>
     <bottom>
         <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
@@ -31,54 +124,4 @@
             </children>
         </HBox>
     </bottom>
-    <left>
-        <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER" style="-fx-padding: 10;">
-            <children>
-                <!--Monsters Category-->
-                <TitledPane fx:id="monsterPane" text="Monsters" expanded="false">
-                    <content>
-                        <VBox spacing="5" style="-fx-padding: 5;">
-                            <children>
-                                <Label text="Goblin" style="-fx-text-fill: black;" />
-                                <Label text="Dragon" style="-fx-text-fill: black;" />
-                            </children>
-                        </VBox>
-                    </content>
-                </TitledPane>
-                <!-- Props Category -->
-                <TitledPane fx:id="propPane" text="Props" expanded="false">
-                    <content>
-                        <VBox spacing="5" style="-fx-padding: 5;">
-                            <children>
-                                <Label text="Tree" style="-fx-text-fill: black;" />
-                                <Label text="Rock" style="-fx-text-fill: black;" />
-                            </children>
-                        </VBox>
-                    </content>
-                </TitledPane>
-                <!-- NPCs Category -->
-                <TitledPane fx:id="npcPane" text="NPCs" expanded="false">
-                    <content>
-                        <VBox spacing="5" style="-fx-padding: 5;">
-                            <children>
-                                <Label text="Villager" style="-fx-text-fill: black;" />
-                                <Label text="Merchant" style="-fx-text-fill: black;" />
-                            </children>
-                        </VBox>
-                    </content>
-                </TitledPane>
-                <!-- Environment Category -->
-                <TitledPane fx:id="environmentPane" text="Environment" expanded="false">
-                    <content>
-                        <VBox spacing="5" style="-fx-padding: 5;">
-                            <children>
-                                <Label text="Mountain" style="-fx-text-fill: black;" />
-                                <Label text="River" style="-fx-text-fill: black;" />
-                            </children>
-                        </VBox>
-                    </content>
-                </TitledPane>
-            </children>
-        </VBox>
-    </left>
 </BorderPane>

@@ -20,44 +20,6 @@ public class GenerateGrid {
     /** 2D grid representing the game state */
     private int [][] mapGrid;
 
-    private enum TileType {
-        EMPTY(Color.GREEN, 0),
-        MOUNTAIN(Color.RED, 1),
-        GOBLIN(Color.BLUE, 2),
-        DRAGON(Color.BEIGE, 3),
-        TREE(Color.BISQUE, 4),
-        ROCK(Color.GRAY, 5),
-        RIVER(Color.BLANCHEDALMOND, 6),
-        VILLAGER(Color.BLUEVIOLET, 7),
-        MERCHANT(Color.BROWN, 8);
-
-        @Getter
-        private final Color color;
-        private final int value;
-
-        TileType(Color color, int value) {
-            this.color = color;
-            this.value = value;
-        }
-
-        /** Finds a tile type by its integer value */
-        public static TileType fromValue(int value) {
-            return switch (value) {
-                case 0 -> EMPTY;
-                case 1 -> MOUNTAIN;
-                case 2 -> GOBLIN;
-                case 3 -> DRAGON;
-                case 4 -> TREE;
-                case 5 -> ROCK;
-                case 6 -> RIVER;
-                case 7 -> VILLAGER;
-                case 8 -> MERCHANT;
-                default -> EMPTY;
-            };
-        }
-
-    }
-
     private GenerateGrid(int [][] mapGrid) {
         this.mapGrid = mapGrid.clone();
     }
@@ -122,7 +84,7 @@ public class GenerateGrid {
      */
     private Rectangle createTile(int row, int col) {
         Rectangle tile = new Rectangle(TILE_SIZE, TILE_SIZE);
-        AtomicReference<TileType> tileType = new AtomicReference<>(TileType.fromValue(mapGrid[row][col]));
+        AtomicReference<TypeOfObjects> tileType = new AtomicReference<>(TypeOfObjects.fromValue(mapGrid[row][col]));
 
         updateTileColor(tile, tileType.get());
 
@@ -135,7 +97,7 @@ public class GenerateGrid {
      * @param tile The tile rectangle.
      * @param type The type of the tile.
      */
-    private void updateTileColor(Rectangle tile, TileType type) {
+    private void updateTileColor(Rectangle tile, TypeOfObjects type) {
         tile.setFill(type.getColor());
         tile.setStroke(javafx.scene.paint.Color.BLACK);
     }

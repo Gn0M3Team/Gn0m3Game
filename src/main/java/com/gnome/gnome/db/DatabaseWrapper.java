@@ -1,19 +1,30 @@
 package com.gnome.gnome.db;
 
+import com.gnome.gnome.annotations.config.Value;
+import com.gnome.gnome.utils.annotation.MyValueInjection;
 import lombok.Getter;
 
 import java.sql.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Getter
 public class DatabaseWrapper {
-    private static final String URL = "jdbc:postgresql://trolley.proxy.rlwy.net:49768/railway";
-    private static final String USER = "postgres";
-    private static final String PASSWORD = "HAbrSBnCGAspMNgomaOkXxNHwGZLHgVP";
+    private final String URL;
+    private final String USER;
+    private final String PASSWORD;
+
+    private static final Logger logger = Logger.getLogger(DatabaseWrapper.class.getName());
 
     private static DatabaseWrapper instance;
     private final Connection connection;
 
-    private DatabaseWrapper() {
+    private DatabaseWrapper(@Value("app.url") String url,
+                            @Value("app.user") String user,
+                            @Value("app.password") String password) {
+        URL = url;
+        USER = user;
+        PASSWORD = password;
         try {
             this.connection = DriverManager.getConnection(URL, USER, PASSWORD);
         } catch (SQLException e) {
@@ -23,7 +34,7 @@ public class DatabaseWrapper {
 
     public static synchronized DatabaseWrapper getInstance() {
         if (instance == null) {
-            instance = new DatabaseWrapper();
+            instance = MyValueInjection.getInstance().createInstance(DatabaseWrapper.class);
         }
         return instance;
     }
@@ -51,6 +62,42 @@ public class DatabaseWrapper {
             stmt.setObject(i + 1, params[i]);
         }
         return stmt;
+    }
+
+    /**
+     * method for starting transaction in manual transaction management invoked from
+     * AOP class before any database update is done
+     */
+    public void beginTransaction() {
+        try {
+            connection.setAutoCommit(false);
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Cannot begin transaction");
+        }
+    }
+
+    /**
+     * method for commit transaction in manual transaction management invoked from
+     * AOP class after all database update is done
+     */
+    public void commitTransaction() {
+        try {
+            connection.commit();
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Cannot commit transaction: ", e.getCause().toString());
+        }
+    }
+
+    /**
+     * method for rollback transaction in manual transaction management invoked from
+     * AOP class if there is any exception while database update is done
+     */
+    public void rollBackTransaction() {
+        try {
+            connection.rollback();
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Cannot rollback transaction: " + e.getCause().toString());
+        }
     }
 
     public void close() {
