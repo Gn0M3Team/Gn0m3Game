@@ -51,10 +51,14 @@ public class EditorLogger {
         // Filter out logs coming from JavaFX internal loggers.
         consoleHandler.setFilter(record -> {
             String loggerName = record.getLoggerName();
-            return loggerName == null || !loggerName.startsWith("javafx");
+
+            if (loggerName != null && loggerName.contains("jdk.internal.event.EventHelper")) {
+                return false;
+            }
+            return record.getLevel().intValue() >= Level.INFO.intValue();
         });
 
-        // Create a FileHandler for logging warnings and errors.
+        // Create a FileHandler for logging warnings and errors
         // The file is located at "logs/error.log" and new messages are appended.
         FileHandler errorFileHandler = new FileHandler("logs/error.log", true);
         errorFileHandler.setLevel(Level.WARNING);
