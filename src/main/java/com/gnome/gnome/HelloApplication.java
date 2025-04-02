@@ -11,12 +11,17 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.util.Objects;
 
 public class HelloApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("pages/hello-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
+        scene.getStylesheets().add(
+                Objects.requireNonNull(getClass().getResource("/com/gnome/gnome/pages/css/style.css")).toExternalForm()
+        );
+
         stage.setFullScreen(true);
         stage.setTitle("Hello!");
         stage.setScene(scene);
