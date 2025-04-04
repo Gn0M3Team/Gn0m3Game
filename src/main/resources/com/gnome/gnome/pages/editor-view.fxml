@@ -111,6 +111,9 @@
                 <Button mnemonicParsing="false" onAction="#onBackButtonClick" text="Go Back" />
             </children>
             <children>
+                <Button onAction="#onClearButtonClick" text="Clear" />
+            </children>
+            <children>
                 <Button onAction="#onLoadMapButtonClick" text="Load Map" />
             </children>
             <children>

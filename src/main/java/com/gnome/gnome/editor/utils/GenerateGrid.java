@@ -39,6 +39,10 @@ public class GenerateGrid {
                     instance = new GenerateGrid(mapGrid);
             }
         }
+        else {
+            // update map if the instance already exists
+            instance.setMapGrid(mapGrid.clone());
+        }
 
         return instance;
     }
@@ -84,10 +88,27 @@ public class GenerateGrid {
      */
     private Rectangle createTile(int row, int col) {
         Rectangle tile = new Rectangle(TILE_SIZE, TILE_SIZE);
-        AtomicReference<TypeOfObjects> tileType = new AtomicReference<>(TypeOfObjects.fromValue(mapGrid[row][col]));
+        // cord of the elements to track the state
+        tile.setUserData(new int[]{row, col});
 
+        AtomicReference<TypeOfObjects> tileType = new AtomicReference<>(TypeOfObjects.fromValue(mapGrid[row][col]));
         updateTileColor(tile, tileType.get());
 
+        tile.setOnMouseClicked(event -> {
+                    // when left mouse button clicked, reset state of the cell to default
+                    if (event.getButton() == javafx.scene.input.MouseButton.PRIMARY) {
+                        // get cord of the cells
+                        int[] indices = (int[]) tile.getUserData();
+                        int r = indices[0], c = indices[1];
+
+                        // update state on cord
+                        mapGrid[r][c] = 0;
+                        tileType.set(TypeOfObjects.fromValue(0));
+
+                        // reset color
+                        updateTileColor(tile, tileType.get());
+                    }
+        });
         return tile;
     }
 

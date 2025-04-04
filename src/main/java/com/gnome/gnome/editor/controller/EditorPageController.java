@@ -32,6 +32,7 @@ import javafx.scene.transform.Scale;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.scene.Group;
 
 import java.io.File;
 import java.io.IOException;
@@ -111,6 +112,7 @@ public class EditorPageController {
 
         initializeGrid();
         setupContainerDragAndDrop();
+        setupGridFunctionalities();
     }
 
     /**
@@ -408,18 +410,16 @@ public class EditorPageController {
     private void loadMapFromFile(File file) {
         try {
             List<String> lines = Files.readAllLines(file.toPath());
-
             int rows = lines.size();
-            int cols = lines.getFirst().split(" ").length;
+            int cols = lines.get(0).split(" ").length;
 
-            int [] [] levelGrid = new int[rows][cols];
-            for (int row = 0; row < rows;row++) {
+            int[][] levelGrid = new int[rows][cols];
+            for (int row = 0; row < rows; row++) {
                 String[] values = lines.get(row).split(" ");
-                for (int col = 0; col < cols; col++)
+                for (int col = 0; col < cols; col++) {
                     levelGrid[row][col] = Integer.parseInt(values[col]);
+                }
             }
-
-
             setupGrid(levelGrid, cols, rows);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error occurred during reading the lines from file", e);
@@ -449,14 +449,16 @@ public class EditorPageController {
         gridPane.getTransforms().clear();
         gridPane.getTransforms().add(scaleTransform);
 
+        Group zoomGroup = new Group(gridPane);
+
         container.getChildren().clear();
-        container.getChildren().add(gridPane);
+        container.getChildren().add(zoomGroup);
         container.setAlignment(Pos.CENTER);
 //        container.setPrefSize(gridWidth, gridHeight);
 
         calculateMinScale();
         centerGrid();
-//        setupGridFunctionalities();
+        setupGridFunctionalities();
         scrollPane.setPannable(true);
 
         logger.info("Map loaded successfully.");
@@ -531,6 +533,7 @@ public class EditorPageController {
                                     .mapToObj(String::valueOf)
                                     .collect(Collectors.joining(" ")))
                             .collect(Collectors.toList());
+//                    lines.forEach(System.out::println);
                     Files.write(fileToSave.toPath(), lines);
                     logger.info("Map successfully saved to local device.");
                 } catch (IOException e) {
@@ -550,5 +553,14 @@ public class EditorPageController {
         SaveMapDialogBox mapDialog = new SaveMapDialogBox();
         Optional<String> result = mapDialog.showDialog(primaryStage);
         result.ifPresent(fileName -> logger.info("Save to DB requested for: " + fileName));
+    }
+
+    /**
+     * Clear current map by clicking.
+     *
+     */
+    @FXML
+    private void onClearButtonClick(ActionEvent event) {
+        createAndSetEmptyGrid();
     }
 }
