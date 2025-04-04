@@ -28,10 +28,8 @@
 
     <center>
         <VBox alignment="CENTER" spacing="20" BorderPane.alignment="CENTER">
-            <!-- Cards Section -->
             <Label text="Your Completed Cards:" styleClass="cards-title"/>
             <ListView fx:id="cardListView" styleClass="card-list" prefHeight="200"/>
-            <!-- Maps Section -->
             <Label text="Your Maps:" styleClass="maps-title"/>
             <ListView fx:id="mapListView" styleClass="map-list" prefHeight="200"/>
         </VBox>

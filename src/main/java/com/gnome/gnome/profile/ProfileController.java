@@ -4,10 +4,7 @@ import javafx.animation.FadeTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.control.ChoiceDialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ScrollBar;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 import javafx.scene.Node;
 import javafx.event.ActionEvent;
@@ -18,8 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Supplier;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ProfileController {
+
+    private static final Logger logger = Logger.getLogger(ProfileController.class.getName());
 
     @FXML private Label nameLabel;
     @FXML private Label recordLabel;
@@ -37,44 +39,43 @@ public class ProfileController {
     private final int mapPageSize = 5;
     private boolean mapLoading = false;
 
+    private String selectedPlayer;
+
     /**
-     * Called by LeaderBoardView to initialize this profile page with the selected player's data.
-     * @param playerData the selected player's identifier (e.g., "bot3 - 12357")
+     * Initializes the profile page with data for the selected player.
+     * This method is called when navigating from the leaderboard.
      */
     public void setPlayer(String playerData) {
+        this.selectedPlayer = playerData;
+        logger.info("Loading profile for: " + playerData);
+
         nameLabel.setText("Profile of " + playerData);
         recordLabel.setText("Record: 12345");
-
         gamesPlayedLabel.setText("Games Played: 100");
         winRateLabel.setText("Win Rate: 75%");
-        roleLabel.setText("Role: User");  // default role
+        roleLabel.setText("Role: User");
 
         cardListView.setPlaceholder(new Label("No cards available"));
         mapListView.setPlaceholder(new Label("No maps available"));
 
         loadMoreCards();
         loadMoreMaps();
+        setupScrollPagination(cardListView, this::loadMoreCards, () -> cardLoading);
+        setupScrollPagination(mapListView, this::loadMoreMaps, () -> mapLoading);
+    }
 
-        cardListView.skinProperty().addListener((obs, oldSkin, newSkin) -> {
+    /**
+     * Adds lazy-loading behavior to a ListView by monitoring its vertical scroll bar.
+     * When user scrolls to the bottom, new data is fetched if not already loading.
+     */
+    private void setupScrollPagination(ListView<String> listView, Runnable loader, Supplier<Boolean> isLoading) {
+        listView.skinProperty().addListener((obs, oldSkin, newSkin) -> {
             if (newSkin != null) {
-                ScrollBar scrollBar = (ScrollBar) cardListView.lookup(".scroll-bar:vertical");
+                ScrollBar scrollBar = (ScrollBar) listView.lookup(".scroll-bar:vertical");
                 if (scrollBar != null) {
-                    scrollBar.valueProperty().addListener((observable, oldValue, newValue) -> {
-                        if (newValue.doubleValue() >= scrollBar.getMax() && !cardLoading) {
-                            loadMoreCards();
-                        }
-                    });
-                }
-            }
-        });
-
-        mapListView.skinProperty().addListener((obs, oldSkin, newSkin) -> {
-            if (newSkin != null) {
-                ScrollBar mapScrollBar = (ScrollBar) mapListView.lookup(".scroll-bar:vertical");
-                if (mapScrollBar != null) {
-                    mapScrollBar.valueProperty().addListener((observable, oldValue, newValue) -> {
-                        if (newValue.doubleValue() >= mapScrollBar.getMax() && !mapLoading) {
-                            loadMoreMaps();
+                    scrollBar.valueProperty().addListener((o, oldVal, newVal) -> {
+                        if (newVal.doubleValue() >= scrollBar.getMax() && !isLoading.get()) {
+                            loader.run();
                         }
                     });
                 }
@@ -83,7 +84,7 @@ public class ProfileController {
     }
 
     /**
-     * Loads additional card items (simulating pagination) and appends them to the cardListView.
+     * Loads a new page of cards into the card list.
      */
     private void loadMoreCards() {
         cardLoading = true;
@@ -96,7 +97,7 @@ public class ProfileController {
     }
 
     /**
-     * Loads additional map items (simulating pagination) and appends them to mapListView.
+     * Loads a new page of maps into the map list.
      */
     private void loadMoreMaps() {
         mapLoading = true;
@@ -109,16 +110,17 @@ public class ProfileController {
     }
 
     /**
-     * Handles the Back button action to return to the main page.
+     * Handles the "Back" button click to return to the main menu (hello-view.fxml).
+     * Adds a fade transition effect during scene switch.
      */
     @FXML
     private void handleBack(ActionEvent event) {
         try {
-            Parent mainRoot = FXMLLoader.load(
+            FXMLLoader loader = new FXMLLoader(
                     Objects.requireNonNull(getClass().getResource("/com/gnome/gnome/pages/hello-view.fxml"))
             );
-            Stage stage = (Stage)((Node) event.getSource()).getScene().getWindow();
-
+            Parent mainRoot = loader.load();
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 
             FadeTransition fade = new FadeTransition(Duration.millis(300), mainRoot);
             fade.setFromValue(0.0);
@@ -127,35 +129,41 @@ public class ProfileController {
 
             stage.getScene().setRoot(mainRoot);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error returning to hello-view.fxml", e);
         }
     }
 
     /**
-     * Handles the Ban User button action.
-     * (For demonstration, this prints a message. Replace with real functionality.)
+     * Simulates banning a user.
+     * Currently displays an alert and logs the action.
      */
     @FXML
     private void handleBanUser(ActionEvent event) {
-        System.out.println("Ban User clicked! Implement admin functionality here.");
+        logger.warning("Ban user requested for: " + selectedPlayer);
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Ban User");
+        alert.setHeaderText(null);
+        alert.setContentText("User '" + selectedPlayer + "' has been banned (simulated).");
+        alert.showAndWait();
     }
 
+    /**
+     * Opens a dialog box to allow an admin to change the role of the user.
+     * Updates the UI and logs the role change.
+     */
     @FXML
     private void handleEditRole(ActionEvent event) {
-        List<String> choices = new ArrayList<>();
-        choices.add("User");
-        choices.add("ProUser");
-        choices.add("Admin");
+        List<String> choices = List.of("User", "ProUser", "Admin");
 
         ChoiceDialog<String> dialog = new ChoiceDialog<>("User", choices);
         dialog.setTitle("Edit Role");
-        dialog.setHeaderText("Select a role for the user:");
+        dialog.setHeaderText("Select a new role for the user:");
         dialog.setContentText("Role:");
 
         Optional<String> result = dialog.showAndWait();
-        result.ifPresent(selectedRole -> {
-            roleLabel.setText("Role: " + selectedRole);
-            System.out.println("Selected role: " + selectedRole);
+        result.ifPresent(role -> {
+            roleLabel.setText("Role: " + role);
+            logger.info("Role changed to " + role + " for " + selectedPlayer);
         });
     }
 }

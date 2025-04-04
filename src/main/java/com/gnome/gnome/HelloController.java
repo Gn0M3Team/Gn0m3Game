@@ -25,6 +25,9 @@ public class HelloController {
     @FXML private BorderPane rootPane;
     private LeaderBoardView leaderboard;
 
+    /**
+     * Initializes the controller and sets the music icon image.
+     */
     @FXML
     public void initialize() {
         musicIcon.setImage(
@@ -36,6 +39,9 @@ public class HelloController {
         );
     }
 
+    /**
+     * Navigates to the editor page when "Create a map" is clicked.
+     */
     @FXML
     protected void onEditorButtonClick(ActionEvent event) throws IOException {
         Parent editorRoot = FXMLLoader.
@@ -43,6 +49,10 @@ public class HelloController {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.getScene().setRoot(editorRoot);
     }
+
+    /**
+     * Navigates to the registration/switcher page.
+     */
     @FXML
     protected void onRegistrationButtonClick(ActionEvent event) throws IOException {
         Parent editorRoot = FXMLLoader.
@@ -51,14 +61,24 @@ public class HelloController {
         stage.getScene().setRoot(editorRoot);
     }
 
+    /**
+     * Placeholder for handling continue game logic (to be implemented).
+     */
     @FXML
     public void onContinueGameButtonClick(ActionEvent event) {
     }
 
+    /**
+     * Placeholder for settings logic (to be implemented).
+     */
     @FXML
     public void onSettingsButtonClick(ActionEvent event) {
     }
 
+    /**
+     * Opens the leaderboard panel on the left side of the screen with fade-in animation.
+     * Clicking the "X" inside the panel triggers fade-out and removes the panel.
+     */
     @FXML
     public void onLeaderBoardButtonClick(ActionEvent event) {
         this.leaderboard = new LeaderBoardView(() -> {
@@ -79,6 +99,9 @@ public class HelloController {
         fadeIn.play();
     }
 
+    /**
+     * Closes the application.
+     */
     @FXML
     public void onExitButtonClick(ActionEvent event) {
         Platform.exit();
