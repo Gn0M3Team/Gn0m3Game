@@ -44,4 +44,6 @@ module com.gnome.gnome {
 
     opens com.gnome.gnome.account.controller to javafx.fxml;
     exports com.gnome.gnome.account.controller;
+    exports com.gnome.gnome.dao.userDAO;
+    opens com.gnome.gnome.dao.userDAO to javafx.fxml;
 }
