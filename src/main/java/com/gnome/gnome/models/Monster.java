@@ -8,7 +8,9 @@ import lombok.Data;
 public class Monster {
     private int id;
     private String name;
+    private String name_sk;
     private String details;
+    private String details_sk;
     private double health;
     private double attack;
     private double radius;
