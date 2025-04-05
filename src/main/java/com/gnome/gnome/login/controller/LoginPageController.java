@@ -3,14 +3,14 @@ package com.gnome.gnome.login.controller;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import javafx.fxml.FXML;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 
 import java.io.IOException;
 
 public class LoginPageController {
 
     @FXML
-    private AnchorPane loginPage;
+    private BorderPane loginPage;
     private PageSwitcherInterface pageSwitch;
 
     @FXML

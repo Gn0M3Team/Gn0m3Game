@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
+<AnchorPane fx:id="loginRegistretion" prefHeight="400.0" prefWidth="600.0"
+            xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.gnome.gnome.loginRegistretion.LoginRegistrationController">
+
+    <TabPane fx:id="tabPane" prefWidth="600.0" prefHeight="400.0">
+        <Tab text="Login" closable="false">
+            <VBox alignment="CENTER" spacing="20" style="-fx-padding: 20">
+                <Label text="Login to System" style="-fx-font-size: 20px"/>
+                <TextField fx:id="loginUsername" promptText="Username"/>
+                <PasswordField fx:id="loginPassword" promptText="Password"/>
+                <Button fx:id="loginButton" text="Login" onAction="#handleLogin"/>
+                <Label fx:id="loginMessage" text="" style="-fx-text-fill: red"/>
+            </VBox>
+        </Tab>
+
+        <Tab text="Register" closable="false">
+            <VBox alignment="CENTER" spacing="20" style="-fx-padding: 20">
+                <Label text="Registration" style="-fx-font-size: 20px"/>
+                <TextField fx:id="regUsername" promptText="Username"/>
+                <PasswordField fx:id="regPassword" promptText="Password"/>
+                <ComboBox fx:id="roleComboBox" promptText="Select Role">
+                    <items>
+                        <FXCollections fx:factory="observableArrayList">
+                            <String fx:value="User"/>
+                            <String fx:value="Admin"/>
+                        </FXCollections>
+                    </items>
+                </ComboBox>
+                <Button fx:id="registerButton" text="Register" onAction="#handleRegister"/>
+                <Label fx:id="registerMessage" text="" style="-fx-text-fill: red"/>
+            </VBox>
+        </Tab>
+    </TabPane>
+</AnchorPane>

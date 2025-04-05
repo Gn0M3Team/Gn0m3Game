@@ -1,40 +1,38 @@
 package com.gnome.gnome.switcher.switcherPage.component;
 
-import com.gnome.gnome.login.controller.LoginPageController;
-import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.layout.AnchorPane;
-
-
+import javafx.scene.Scene;
 import java.io.IOException;
+import javafx.scene.layout.BorderPane;
+
 /**
  * The SceneSwitch class is responsible for switching the content of the current scene (AnchorPane)
  * by loading a new FXML-based layout and setting it as the new content.
  */
 public class SceneSwitch {
-    public SceneSwitch(AnchorPane curAnchorPane, String fxml) {
+    public SceneSwitch(BorderPane curBorderPane, String fxml) {
         try {
             if (getClass().getResource(fxml) == null) {
                 throw new IOException("FXML file not found: " + fxml);
             }
-//            FXMLLoader loader=new FXMLLoader(Application.class.getResource(fxml));
+//            System.out.println(fxml);
+
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
-            AnchorPane nextAnchorPane=loader.load();
+            BorderPane nextBorderPane = loader.load();
+
+            Scene scene = curBorderPane.getScene();
+            if (scene != null) {
+                scene.setRoot(nextBorderPane);
+//                System.out.println("Scene root updated to: " + fxml);
+            } else {
+//                System.err.println("No scene found for the current BorderPane");
+            }
 
 
-//        if (nextAnchorPane!=null && nextAnchorPane.getId().equals("loginAnchor")){
-//            LoginPageController loginPageController=loader.getController();
-//        }
-
-            Component.resize(nextAnchorPane,curAnchorPane.getPrefWidth(), curAnchorPane.getPrefHeight());
-            curAnchorPane.getChildren().clear();
-            curAnchorPane.getChildren().add(nextAnchorPane);
-        }catch (IOException e){
+        } catch (IOException e) {
             System.err.println("Error switching to the page: " + fxml);
             System.err.println("Detailed error: " + e.getMessage());
             e.printStackTrace();
         }
-
     }
-
 }

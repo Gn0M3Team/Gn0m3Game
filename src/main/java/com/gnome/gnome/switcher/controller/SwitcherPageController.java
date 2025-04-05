@@ -8,6 +8,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -17,18 +18,15 @@ public class SwitcherPageController {
 
     private PageSwitcherInterface pageSwitch;
     @FXML
-    public AnchorPane switcherPage;
+    public BorderPane switcherPage;
 
     @FXML
     public void initialize() {
         pageSwitch = new SwitchPage();
     }
     @FXML
-    protected void onHelloViewButtonClick(ActionEvent event) throws IOException {
-        Parent editorRoot = FXMLLoader.
-                load(Objects.requireNonNull(getClass().getResource("/com/gnome/gnome/pages/hello-view.fxml")));
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.getScene().setRoot(editorRoot);
+    protected void onHelloViewButtonClick(ActionEvent event) {
+        pageSwitch.goHello(switcherPage);
     }
 
 
