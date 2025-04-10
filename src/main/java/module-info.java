@@ -33,6 +33,9 @@ module com.gnome.gnome {
     opens com.gnome.gnome.editor.utils to javafx.fxml;
     exports com.gnome.gnome.editor.utils;
 
+    opens com.gnome.gnome.profile to javafx.fxml;
+    exports com.gnome.gnome.profile;
+
     opens com.gnome.gnome.registration.controller to javafx.fxml;
     exports com.gnome.gnome.registration.controller;
 

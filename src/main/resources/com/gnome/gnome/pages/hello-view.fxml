@@ -5,11 +5,18 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane prefHeight="600" prefWidth="800" styleClass="root-pane" stylesheets="css/style.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gnome.gnome.HelloController">
+<BorderPane fx:id = "rootPane"
+            prefHeight="600"
+            prefWidth="800"
+            styleClass="root-pane"
+            stylesheets="css/style.css"
+            xmlns="http://javafx.com/javafx/17.0.2-ea"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gnome.gnome.HelloController">
 
     <top>
         <HBox alignment="CENTER_LEFT" spacing="10" styleClass="top-bar">
-            <Button styleClass="top-button" text="Lider board">
+            <Button onAction="#onLeaderBoardButtonClick" styleClass="top-button" text="Leader board">
             </Button>
 
             <Label styleClass="top-label" text="Admin" />
