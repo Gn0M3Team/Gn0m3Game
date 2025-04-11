@@ -7,11 +7,18 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
 public class SelectorMapDialogBox {
     private static final Logger logger = Logger.getLogger(SelectorMapDialogBox.class.getName());
+    private final List<String> mapNames;
+
+    public SelectorMapDialogBox(List<String> mapNames) {
+        this.mapNames = mapNames != null ? mapNames : List.of(); // Default to empty list if null
+        logger.info("Initialized with map names: " + this.mapNames);
+    }
 
     public Optional<String> showDialog(Stage stage) {
         Dialog<String> dialog = new Dialog<>();
@@ -26,10 +33,7 @@ public class SelectorMapDialogBox {
         TextField searchField = new TextField();
         searchField.setPromptText("Search...");
 
-        FilteredList<String> items = new FilteredList<>(FXCollections.observableArrayList(
-                "MAP1", "MAP2", "MAP3", "MAP4", "MAP5"
-        ), s -> true);
-
+        FilteredList<String> items = new FilteredList<>(FXCollections.observableArrayList(mapNames), s -> true);
         logger.info("List details: " + items);
         items.forEach((item) -> logger.info("Item: " + item));
 

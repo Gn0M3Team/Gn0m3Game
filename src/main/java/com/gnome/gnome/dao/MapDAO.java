@@ -74,8 +74,33 @@ public class MapDAO extends BaseDAO<Map> {
      * @throws DataAccessException if retrieval fails
      */
     public Map getMapById(int id) {
-        String sql = "SELECT * FROM \"map\" WHERE map_id = ?";
+        String sql = "SELECT * FROM \"Maps\" WHERE map_id = ?";
         List<Map> maps = findAll(sql, id);
+        return maps.isEmpty() ? null : maps.get(0);
+    }
+
+    /**
+     * Retrieves all Maps from the database created by the specified username.
+     *
+     * @param username the username of the map creator
+     * @return a list of Map objects created by the user
+     * @throws DataAccessException if retrieval fails
+     */
+    public List<Map> getMapsByUsername(String username) {
+        String sql = "SELECT * FROM \"Maps\" WHERE username = ?";
+        return findAll(sql, username);
+    }
+
+    /**
+     * Retrieves a Map from the database by its name (either map_name_eng or map_name_sk).
+     *
+     * @param mapName the name of the map to retrieve (English or Slovak)
+     * @return the Map object, or null if not found
+     * @throws DataAccessException if retrieval fails
+     */
+    public Map getMapByName(String mapName) {
+        String sql = "SELECT * FROM \"Maps\" WHERE map_name_eng = ? OR map_name_sk = ?";
+        List<Map> maps = findAll(sql, mapName, mapName);
         return maps.isEmpty() ? null : maps.get(0);
     }
 
@@ -86,7 +111,7 @@ public class MapDAO extends BaseDAO<Map> {
      * @throws DataAccessException if retrieval fails
      */
     public List<Map> getAllMaps() {
-        String sql = "SELECT * FROM \"map\"";
+        String sql = "SELECT * FROM \"Maps\"";
         return findAll(sql);
     }
 
