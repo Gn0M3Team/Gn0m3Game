@@ -1,10 +1,13 @@
 package com.gnome.gnome.editor.controller;
 
+import com.gnome.gnome.dao.MapDAO;
+import com.gnome.gnome.models.Map;
 import com.gnome.gnome.editor.javafxobj.SaveMapDialogBox;
 import com.gnome.gnome.editor.javafxobj.SelectorMapDialogBox;
 import com.gnome.gnome.editor.utils.CategoryGenerator;
 import com.gnome.gnome.editor.utils.GenerateGrid;
 import com.gnome.gnome.editor.utils.GridManager;
+import com.gnome.gnome.exceptions.DataAccessException;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -70,6 +73,8 @@ public class EditorPageController {
     @FXML private HBox mainButtonsBox;
     @FXML private ScrollPane inlineScrollPane;
     @FXML private HBox inlineButtonsBox;
+
+    private final MapDAO mapDAO = new MapDAO();
 
     /** Default zoom level */
     private final double scale = 1.0;
@@ -552,7 +557,27 @@ public class EditorPageController {
         Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         SaveMapDialogBox mapDialog = new SaveMapDialogBox();
         Optional<String> result = mapDialog.showDialog(primaryStage);
-        result.ifPresent(fileName -> logger.info("Save to DB requested for: " + fileName));
+        result.ifPresent(fileName -> {
+            try {
+                int[][] mapGrid = GenerateGrid.getInstance().getMapGrid();
+                if (mapGrid == null || mapGrid.length == 0) {
+                    return;
+                }
+
+                Map map = new Map(
+                        "Admin", // Using Admin for now
+                        mapGrid,
+                        0,
+                        fileName,
+                        fileName,
+                        1
+                );
+                mapDAO.insertMap(map);
+                logger.info("Map saved to database successfully for username: " + fileName);
+            } catch (DataAccessException e) {
+                logger.log(Level.SEVERE, "Failed to save map to database", e);
+            }
+        });
     }
 
     /**
