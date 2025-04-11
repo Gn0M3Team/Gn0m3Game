@@ -28,7 +28,7 @@
     </top>
 
     <center>
-        <StackPane alignment="CENTER">
+        <StackPane>
             <VBox alignment="CENTER" maxWidth="400" spacing="20">
                 <Label styleClass="menu-title" text="MENU" />
 

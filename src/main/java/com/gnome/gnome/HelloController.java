@@ -65,7 +65,13 @@ public class HelloController {
      * Placeholder for handling continue game logic (to be implemented).
      */
     @FXML
-    public void onContinueGameButtonClick(ActionEvent event) {
+    public void onContinueGameButtonClick(ActionEvent event) throws IOException {
+        Parent continueGameRoot = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/com/gnome/gnome/pages/continueGame.fxml")));
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.getScene().getStylesheets().add(
+                Objects.requireNonNull(getClass().getResource("/com/gnome/gnome/pages/css/continueGame.css")).toExternalForm()
+        );
+        stage.getScene().setRoot(continueGameRoot);
     }
 
     /**
