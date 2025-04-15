@@ -4,6 +4,7 @@ import com.gnome.gnome.config.EditorLogger;
 import com.gnome.gnome.dao.MonsterDAO;
 import com.gnome.gnome.db.DatabaseWrapper;
 import com.gnome.gnome.models.Monster;
+import com.gnome.gnome.utils.ImageParser;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -37,11 +38,20 @@ public class HelloApplication extends Application {
 
         Monster monster = monsterDAO.getMonsterById(1);
         System.out.println(monster);
+
+        // ✅ Parser starter
+//        try {
+//            ImageParser.splitImage("com/gnome/gnome/images/colored_packed.png");
+//            System.out.println("✅ Image parsed successfully!");
+//        } catch (IOException e) {
+//            System.out.println("❌ Failed to parse image: " + e.getMessage());
+//            e.printStackTrace();
+//        }
     }
 
     @Override
     public void stop() {
-        DatabaseWrapper.getInstance().close();
+//        DatabaseWrapper.getInstance().close();
     }
 
 
