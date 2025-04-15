@@ -10,8 +10,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -93,13 +91,13 @@ public class HelloController {
             FadeTransition fadeOut = new FadeTransition(Duration.millis(500), this.leaderboard);
             fadeOut.setFromValue(1.0);
             fadeOut.setToValue(0.0);
-            fadeOut.setOnFinished(e -> rootPane.setLeft(null));
+            fadeOut.setOnFinished(e -> helloPage.setLeft(null));
             fadeOut.play();
         });
 
         this.leaderboard.setOpacity(0.0);
 
-        rootPane.setLeft(this.leaderboard);
+        helloPage.setLeft(this.leaderboard);
 
         FadeTransition fadeIn = new FadeTransition(Duration.millis(300), this.leaderboard);
         fadeIn.setFromValue(0.0);
