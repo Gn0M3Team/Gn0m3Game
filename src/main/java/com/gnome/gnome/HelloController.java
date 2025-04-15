@@ -1,5 +1,7 @@
 package com.gnome.gnome;
 
+import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
+import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import com.gnome.gnome.components.LeaderBoardView;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
@@ -22,7 +24,9 @@ import java.util.Objects;
 public class HelloController {
 
     @FXML private ImageView musicIcon;
-    @FXML private BorderPane rootPane;
+    @FXML
+    private BorderPane helloPage;
+    private PageSwitcherInterface pageSwitch;
     private LeaderBoardView leaderboard;
 
     /**
@@ -30,6 +34,7 @@ public class HelloController {
      */
     @FXML
     public void initialize() {
+        pageSwitch=new SwitchPage();
         musicIcon.setImage(
                 new Image(
                         Objects.requireNonNull(
@@ -54,11 +59,8 @@ public class HelloController {
      * Navigates to the registration/switcher page.
      */
     @FXML
-    protected void onRegistrationButtonClick(ActionEvent event) throws IOException {
-        Parent editorRoot = FXMLLoader.
-                load(Objects.requireNonNull(getClass().getResource("/com/gnome/gnome/pages/switchingPage/switcher-page.fxml")));
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.getScene().setRoot(editorRoot);
+    protected void onSwitcherButtonClick(ActionEvent event) throws IOException {
+        pageSwitch.goSwitch(helloPage);
     }
 
     /**
