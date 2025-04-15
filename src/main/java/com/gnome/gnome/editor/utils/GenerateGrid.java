@@ -1,12 +1,13 @@
 package com.gnome.gnome.editor.utils;
 
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.layout.StackPane;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Objects;
 
 import static com.gnome.gnome.editor.utils.EditorConstants.TILE_SIZE;
 
@@ -18,29 +19,28 @@ public class GenerateGrid {
     private static volatile GenerateGrid instance;
 
     /** 2D grid representing the game state */
-    private int [][] mapGrid;
+    private int[][] mapGrid;
 
-    private GenerateGrid(int [][] mapGrid) {
+    private GenerateGrid(int[][] mapGrid) {
         this.mapGrid = mapGrid.clone();
     }
 
     private GenerateGrid() {}
 
     /**
-     * Provides a thread-safe singleton instance.
+     * Returns the singleton instance of GenerateGrid with the specified grid.
+     * If an instance already exists, it updates the existing mapGrid.
      *
-     * @param mapGrid The initial level grid.
-     * @return Singleton instance of GenerateGrid.
+     * @param mapGrid the grid to initialize or update the instance with
+     * @return the singleton instance of GenerateGrid
      */
-    public static GenerateGrid getInstance(int [][] mapGrid) {
+    public static GenerateGrid getInstance(int[][] mapGrid) {
         if (instance == null) {
             synchronized (GenerateGrid.class) {
                 if (instance == null)
                     instance = new GenerateGrid(mapGrid);
             }
-        }
-        else {
-            // update map if the instance already exists
+        } else {
             instance.setMapGrid(mapGrid.clone());
         }
 
@@ -48,9 +48,10 @@ public class GenerateGrid {
     }
 
     /**
-     * Provides a thread-safe singleton instance.
+     * Returns the singleton instance of GenerateGrid without initializing the grid.
+     * If it does not exist, it creates a new empty instance.
      *
-     * @return Singleton instance of GenerateGrid.
+     * @return the singleton instance of GenerateGrid
      */
     public static GenerateGrid getInstance() {
         if (instance == null) {
@@ -64,62 +65,79 @@ public class GenerateGrid {
     }
 
     /**
-     * Generates a GridPane representing the level.
+     * Generates a GridPane representation of the current mapGrid.
+     * Each cell is converted into a visual tile with an image.
      *
-     * @return GridPane containing tiles.
+     * @return the generated GridPane
      */
     public GridPane generateGrid() {
         GridPane gridPane = new GridPane();
         gridPane.setGridLinesVisible(false);
 
-        for (int row = 0; row < mapGrid.length; row++)
-            for (int col = 0; col < mapGrid[row].length; col++)
+        for (int row = 0; row < mapGrid.length; row++) {
+            for (int col = 0; col < mapGrid[row].length; col++) {
                 gridPane.add(createTile(row, col), col, row);
+            }
+        }
 
         return gridPane;
     }
 
     /**
-     * Creates an interactive tile for the grid.
+     * Creates a single tile for the grid based on the provided coordinates.
+     * Sets the tile's style, image, and click behavior.
      *
-     * @param row The row index.
-     * @param col The column index.
-     * @return A Rectangle representing the tile.
+     * @param row the row index of the tile
+     * @param col the column index of the tile
+     * @return a StackPane representing the tile
      */
-    private Rectangle createTile(int row, int col) {
-        Rectangle tile = new Rectangle(TILE_SIZE, TILE_SIZE);
-        // cord of the elements to track the state
-        tile.setUserData(new int[]{row, col});
+    private StackPane createTile(int row, int col) {
+        StackPane tilePane = new StackPane();
+        tilePane.setPrefSize(TILE_SIZE, TILE_SIZE);
+        tilePane.setStyle(
+                "-fx-border-color: black; " +
+                        "-fx-border-width: 1; " +
+                        "-fx-border-style: solid; " +
+                        "-fx-border-insets: 0; " +
+                        "-fx-padding: 0;" +
+                        "-fx-background-color: transparent;"
+        );
+        tilePane.setUserData(new int[]{row, col});
 
-        AtomicReference<TypeOfObjects> tileType = new AtomicReference<>(TypeOfObjects.fromValue(mapGrid[row][col]));
-        updateTileColor(tile, tileType.get());
+        TypeOfObjects tileType = TypeOfObjects.fromValue(mapGrid[row][col]);
+        updateTileImage(tilePane, tileType);
 
-        tile.setOnMouseClicked(event -> {
-                    // when left mouse button clicked, reset state of the cell to default
-                    if (event.getButton() == javafx.scene.input.MouseButton.PRIMARY) {
-                        // get cord of the cells
-                        int[] indices = (int[]) tile.getUserData();
-                        int r = indices[0], c = indices[1];
+        tilePane.setOnMouseClicked(event -> {
+            if (event.getButton() == javafx.scene.input.MouseButton.PRIMARY) {
+                int[] indices = (int[]) tilePane.getUserData();
+                int r = indices[0];
+                int c = indices[1];
 
-                        // update state on cord
-                        mapGrid[r][c] = 0;
-                        tileType.set(TypeOfObjects.fromValue(0));
-
-                        // reset color
-                        updateTileColor(tile, tileType.get());
-                    }
+                mapGrid[r][c] = 0;
+                updateTileImage(tilePane, TypeOfObjects.EMPTY);
+            }
         });
-        return tile;
+
+        return tilePane;
     }
 
     /**
-     * Updates the tile color based on its type.
+     * Updates the tile image for the given type.
+     * Made static to be callable from outside (e.g., GridManager)
      *
-     * @param tile The tile rectangle.
-     * @param type The type of the tile.
+     * @param tilePane the StackPane representing the tile
+     * @param type     the TypeOfObjects that determines the image
      */
-    private void updateTileColor(Rectangle tile, TypeOfObjects type) {
-        tile.setFill(type.getColor());
-        tile.setStroke(javafx.scene.paint.Color.BLACK);
+    public static void updateTileImage(StackPane tilePane, TypeOfObjects type) {
+        tilePane.getChildren().clear();
+        ImageView icon = new ImageView(
+                new Image(Objects.requireNonNull(
+                        GenerateGrid.class.getResourceAsStream(type.getImagePath())
+                ))
+        );
+        icon.setFitWidth(TILE_SIZE);
+        icon.setFitHeight(TILE_SIZE);
+        icon.setPreserveRatio(true);
+        tilePane.getChildren().add(icon);
     }
 }
