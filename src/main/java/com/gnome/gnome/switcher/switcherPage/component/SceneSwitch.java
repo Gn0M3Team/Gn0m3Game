@@ -3,13 +3,17 @@ package com.gnome.gnome.switcher.switcherPage.component;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import java.io.IOException;
+import java.util.Objects;
+
 import javafx.scene.layout.BorderPane;
+import java.util.Objects;
 
 /**
  * The SceneSwitch class is responsible for switching the content of the current scene (AnchorPane)
  * by loading a new FXML-based layout and setting it as the new content.
  */
 public class SceneSwitch {
+
     public SceneSwitch(BorderPane curBorderPane, String fxml) {
         try {
             if (getClass().getResource(fxml) == null) {
@@ -22,6 +26,12 @@ public class SceneSwitch {
 
             Scene scene = curBorderPane.getScene();
             if (scene != null) {
+
+                if (fxml=="/com/gnome/gnome/pages/hello-view.fxml"){
+                    scene.getStylesheets().add(
+                        Objects.requireNonNull(getClass().getResource("/com/gnome/gnome/pages/css/style.css")).toExternalForm()
+                    );
+                }
                 scene.setRoot(nextBorderPane);
 //                System.out.println("Scene root updated to: " + fxml);
             } else {

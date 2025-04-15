@@ -15,6 +15,7 @@ module com.gnome.gnome {
     requires software.amazon.awssdk.services.omics;
     requires software.amazon.awssdk.http.nio.netty;
     requires software.amazon.awssdk.awscore;
+    requires jbcrypt;
 
 
     opens com.gnome.gnome to javafx.fxml;
@@ -47,6 +48,6 @@ module com.gnome.gnome {
     exports com.gnome.gnome.dao.userDAO;
     opens com.gnome.gnome.dao.userDAO to javafx.fxml;
 
-    opens com.gnome.gnome.loginRegistretion to javafx.fxml;
-    exports com.gnome.gnome.loginRegistretion;
+    opens com.gnome.gnome.loginRegistration to javafx.fxml;
+    exports com.gnome.gnome.loginRegistration;
 }

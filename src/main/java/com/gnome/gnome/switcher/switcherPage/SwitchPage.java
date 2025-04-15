@@ -3,7 +3,6 @@ package com.gnome.gnome.switcher.switcherPage;
 import com.gnome.gnome.switcher.switcherPage.component.SceneSwitch;
 import javafx.scene.layout.BorderPane;
 
-import java.io.IOException;
 
 /**
  * The SwitchPage class implements the PageSwitcherInterface interface and provides
@@ -39,9 +38,5 @@ public class SwitchPage implements PageSwitcherInterface {
         new SceneSwitch(anchorPane, "/com/gnome/gnome/pages/hello-view.fxml");
     }
 
-//    @Override
-//    public void goHello(AnchorPane anchorPane) {
-//        new SceneSwitch(anchorPane, "/com/gnome/gnome/pages/hello-view.fxml");
-//    }
 
 }
