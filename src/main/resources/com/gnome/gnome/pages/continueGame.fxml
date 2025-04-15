@@ -3,7 +3,15 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane fx:id="rootBorder" prefHeight="600.0" prefWidth="800.0" styleClass="root-pane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gnome.gnome.continueGame.ContinueGameController">
+<BorderPane
+        fx:id="rootBorder"
+        prefHeight="600.0"
+        prefWidth="800.0"
+        styleClass="root-pane"
+        xmlns="http://javafx.com/javafx/17.0.2-ea"
+        xmlns:fx="http://javafx.com/fxml/1"
+        fx:controller="com.gnome.gnome.continueGame.ContinueGameController"
+>
     <top>
         <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 10;">
             <Button fx:id="centerMenuButton" styleClass="menu-button" text="Show Menu" />
