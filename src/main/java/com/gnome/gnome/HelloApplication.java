@@ -41,7 +41,7 @@ public class HelloApplication extends Application {
 
         // ✅ Parser starter
 //        try {
-//            ImageParser.splitImage("com/gnome/gnome/images/colored_packed.png");
+//            ImageParser.splitImage("com/gnome/gnome/images/colored_pagit cked.png");
 //            System.out.println("✅ Image parsed successfully!");
 //        } catch (IOException e) {
 //            System.out.println("❌ Failed to parse image: " + e.getMessage());

@@ -3,7 +3,13 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane prefHeight="542.0" prefWidth="618.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gnome.gnome.editor.controller.EditorPageController">
+<BorderPane prefHeight="542.0"
+            prefWidth="618.0"
+            xmlns="http://javafx.com/javafx/17.0.2-ea"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gnome.gnome.editor.controller.EditorPageController"
+            stylesheets="@./css/mapEditor.css"
+>
     <center>
         <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="NEVER" BorderPane.alignment="CENTER">
             <StackPane fx:id="container" />
