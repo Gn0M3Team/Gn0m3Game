@@ -44,7 +44,7 @@ public class CategoryGenerator {
 
     // Local categories for test = true
     private final Map<String, List<String>> localCategoryMap = Map.of(
-            "Monsters",     List.of("Goblin", "Dragon"),
+            "Monsters",     List.of("Demon", "Butterfly", "Goblin", "Scorpion", "Skeleton"),
             "Props",        List.of("Tree", "Rock", "Hatch"),
             "NPCs",         List.of("Villager", "Merchant"),
             "Environment",  List.of("Mountain", "River", "Floor", "WallOne", "WallTwo")

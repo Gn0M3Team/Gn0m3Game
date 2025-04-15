@@ -1,11 +1,15 @@
 package com.gnome.gnome.editor.utils;
 
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.gnome.gnome.editor.utils.EditorConstants.TILE_SIZE;
@@ -80,46 +84,60 @@ public class GenerateGrid {
     }
 
     /**
-     * Creates an interactive tile for the grid.
+     * Creates a single tile for the grid based on the provided coordinates.
+     * Sets the tile's style, image, and click behavior.
      *
-     * @param row The row index.
-     * @param col The column index.
-     * @return A Rectangle representing the tile.
+     * @param row the row index of the tile
+     * @param col the column index of the tile
+     * @return a StackPane representing the tile
      */
-    private Rectangle createTile(int row, int col) {
-        Rectangle tile = new Rectangle(TILE_SIZE, TILE_SIZE);
-        // cord of the elements to track the state
-        tile.setUserData(new int[]{row, col});
+    private StackPane createTile(int row, int col) {
+        StackPane tilePane = new StackPane();
+        tilePane.setPrefSize(TILE_SIZE, TILE_SIZE);
+        tilePane.setStyle(
+                "-fx-border-color: black; " +
+                        "-fx-border-width: 1; " +
+                        "-fx-border-style: solid; " +
+                        "-fx-border-insets: 0; " +
+                        "-fx-padding: 0;" +
+                        "-fx-background-color: transparent;"
+        );
+        tilePane.setUserData(new int[]{row, col});
 
-        AtomicReference<TypeOfObjects> tileType = new AtomicReference<>(TypeOfObjects.fromValue(mapGrid[row][col]));
-        updateTileColor(tile, tileType.get());
+        TypeOfObjects tileType = TypeOfObjects.fromValue(mapGrid[row][col]);
+        updateTileImage(tilePane, tileType);
 
-        tile.setOnMouseClicked(event -> {
-                    // when left mouse button clicked, reset state of the cell to default
-                    if (event.getButton() == javafx.scene.input.MouseButton.PRIMARY) {
-                        // get cord of the cells
-                        int[] indices = (int[]) tile.getUserData();
-                        int r = indices[0], c = indices[1];
+        tilePane.setOnMouseClicked(event -> {
+            if (event.getButton() == javafx.scene.input.MouseButton.PRIMARY) {
+                int[] indices = (int[]) tilePane.getUserData();
+                int r = indices[0];
+                int c = indices[1];
 
-                        // update state on cord
-                        mapGrid[r][c] = 0;
-                        tileType.set(TypeOfObjects.fromValue(0));
-
-                        // reset color
-                        updateTileColor(tile, tileType.get());
-                    }
+                mapGrid[r][c] = 0;
+                updateTileImage(tilePane, TypeOfObjects.EMPTY);
+            }
         });
-        return tile;
+
+        return tilePane;
     }
 
     /**
-     * Updates the tile color based on its type.
+     * Updates the tile image for the given type.
+     * Made static to be callable from outside (e.g., GridManager)
      *
-     * @param tile The tile rectangle.
-     * @param type The type of the tile.
+     * @param tilePane the StackPane representing the tile
+     * @param type     the TypeOfObjects that determines the image
      */
-    private void updateTileColor(Rectangle tile, TypeOfObjects type) {
-        tile.setFill(type.getColor());
-        tile.setStroke(javafx.scene.paint.Color.BLACK);
+    public static void updateTileImage(StackPane tilePane, TypeOfObjects type) {
+        tilePane.getChildren().clear();
+        ImageView icon = new ImageView(
+                new Image(Objects.requireNonNull(
+                        GenerateGrid.class.getResourceAsStream(type.getImagePath())
+                ))
+        );
+        icon.setFitWidth(TILE_SIZE);
+        icon.setFitHeight(TILE_SIZE);
+        icon.setPreserveRatio(true);
+        tilePane.getChildren().add(icon);
     }
 }

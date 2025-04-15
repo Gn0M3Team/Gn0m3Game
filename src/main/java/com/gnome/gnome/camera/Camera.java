@@ -1,37 +1,55 @@
 package com.gnome.gnome.camera;
 
 import com.gnome.gnome.editor.utils.TypeOfObjects;
+import com.gnome.gnome.player.Player;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import lombok.AllArgsConstructor;
+import lombok.Data;
+
+import java.util.Objects;
 
 import static com.gnome.gnome.editor.utils.EditorConstants.TILE_SIZE;
 
 /**
- * A camera that displays a 10×10 viewport and supports a margin (outside cells)
- * and highlights the player's cell in yellow.
+ * The Camera class is responsible for rendering a 15x15 viewport of the map,
+ * centered around a specific point, typically the player's position.
+ * It only shows a portion of the full map to simulate a camera view.
  */
-@AllArgsConstructor
+@Data
 public class Camera {
+    // The full map represented as a 2D array of integers (object types).
     private int[][] mapGrid;
 
-    // Camera center.
+    // Current center coordinates of the camera (map coordinates).
     private int cameraCenterX;
     private int cameraCenterY;
 
-    // Player's position on the map.
-    private int playerX;
-    private int playerY;
-
-    // Fixed viewport size: 15x15
+    // Size of the viewport (15x15 tiles).
     private final int viewportSize = 15;
 
+    // Calculated starting row and column of the visible viewport.
+    private int startRow;
+    private int startCol;
+
+    // Reference to the player (used to track his position).
+    private Player player;
+
+    public Camera(int[][] fieldMap, int cameraCenterX, int cameraCenterY, Player player) {
+        this.mapGrid = fieldMap;
+        this.cameraCenterX = cameraCenterX;
+        this.cameraCenterY = cameraCenterY;
+        this.player = player;
+    }
 
     /**
-     * Returns a 10×10 GridPane representing the current viewport.
-     * Cells outside the map boundaries will use DARKGRAY.
-     * The player's tile is highlighted in yellow.
+     * Builds and returns a GridPane that represents the visible part of the map
+     * based on the current camera center.
+     * Highlights the player's tile with a yellow border.
      */
     public GridPane getViewport() {
         GridPane viewport = new GridPane();
@@ -39,89 +57,59 @@ public class Camera {
         int totalCols = mapGrid[0].length;
         int half = viewportSize / 2;
 
-        // Compute the starting row and column for the viewport based on the camera center.
-        int startRow = Math.max(0, Math.min(cameraCenterY - half, totalRows - viewportSize));
-        int startCol = Math.max(0, Math.min(cameraCenterX - half, totalCols - viewportSize));
-
+        // Calculate top-left corner of the viewport while keeping it inside map bounds.
+        startRow = Math.max(0, Math.min(cameraCenterY - half, totalRows - viewportSize));
+        startCol = Math.max(0, Math.min(cameraCenterX - half, totalCols - viewportSize));
 
         for (int i = 0; i < viewportSize; i++) {
             for (int j = 0; j < viewportSize; j++) {
                 int row = startRow + i;
                 int col = startCol + j;
-                Rectangle tile = new Rectangle(TILE_SIZE, TILE_SIZE);
 
+                StackPane tilePane = new StackPane();
+                tilePane.setPrefSize(TILE_SIZE, TILE_SIZE);
+
+                // Only add image if the tile is within map bounds.
                 if (row >= 0 && row < totalRows && col >= 0 && col < totalCols) {
-                    tile.setFill(TypeOfObjects.fromValue(mapGrid[row][col]).getColor());
+                    TypeOfObjects type = TypeOfObjects.fromValue(mapGrid[row][col]);
+                    ImageView icon = new ImageView(new Image(
+                            Objects.requireNonNull(TypeOfObjects.class.getResourceAsStream(type.getImagePath()))
+                    ));
+                    icon.setFitWidth(TILE_SIZE);
+                    icon.setFitHeight(TILE_SIZE);
+                    icon.setPreserveRatio(true);
+                    tilePane.getChildren().add(icon);
                 } else {
-                    tile.setFill(Color.DARKGRAY);
+                    tilePane.setStyle("-fx-background-color: darkgray;");
                 }
-                tile.setStroke(Color.BLACK);
-                tile.setStrokeWidth(1);
 
-                // Highlight the player's cell.
-                if (row == playerY && col == playerX) {
-                    tile.setStroke(Color.YELLOW);
+                // Add black border to each tile.
+                tilePane.setStyle(tilePane.getStyle() + "-fx-border-color: black; -fx-border-width: 1;");
+
+                // Highlight player
+                if (row == player.getY() && col == player.getX()) {
+                    tilePane.setStyle(tilePane.getStyle() + "-fx-border-color: yellow; -fx-border-width: 2;");
                 }
-                viewport.add(tile, j, i);
+
+                viewport.add(tilePane, j, i);
             }
         }
         return viewport;
     }
 
-    // --- Movement methods; these make the camera follow the player ---
-    public void movePlayerLeft() {
-        playerX--;
-        clampPlayer();
-        followPlayer();
-    }
-
-    public void movePlayerRight() {
-        playerX++;
-        clampPlayer();
-        followPlayer();
-    }
-
-    public void movePlayerUp() {
-        playerY--;
-        clampPlayer();
-        followPlayer();
-    }
-
-    public void movePlayerDown() {
-        playerY++;
-        clampPlayer();
-        followPlayer();
-    }
-
-    public void movePlayer(int dx, int dy) {
-        playerX += dx;
-        playerY += dy;
-        clampPlayer();
-        followPlayer();
-    }
-
     /**
-     * Clamps the player's position so that it does not exceed the map boundaries.
+     * Updates the camera's center based on the player's current position.
+     * Should be called after the player moves.
      */
-    private void clampPlayer() {
-        int maxX = mapGrid[0].length - 1;
-        int maxY = mapGrid.length - 1;
-        playerX = Math.max(0, Math.min(playerX, maxX));
-        playerY = Math.max(0, Math.min(playerY, maxY));
-        System.out.println("Player position: " + playerX + ", " + playerY);
-    }
-
-    /**
-     * Updates the camera center to follow the player.
-     */
-    private void followPlayer() {
-        cameraCenterX = playerX;
-        cameraCenterY = playerY;
+    public void updateCameraCenter() {
+        cameraCenterX = player.getX();
+        cameraCenterY = player.getY();
         clampCameraCenter();
     }
 
     /**
-     * Clamps the camera center so the viewport fits within the map boundaries.
+     * Ensures the camera's center stays within the valid map area
+     * so that the viewport doesn't go out of bounds.
      */
     private void clampCameraCenter() {
         int half = viewportSize / 2;
@@ -129,6 +117,6 @@ public class Camera {
         int totalRows = mapGrid.length;
         cameraCenterX = Math.max(half, Math.min(cameraCenterX, totalCols - viewportSize + half));
         cameraCenterY = Math.max(half, Math.min(cameraCenterY, totalRows - viewportSize + half));
-        System.out.println("Camera center: " + cameraCenterX + ", " + cameraCenterY);
     }
+
 }

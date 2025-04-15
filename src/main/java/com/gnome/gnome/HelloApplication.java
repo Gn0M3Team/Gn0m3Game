@@ -27,18 +27,18 @@ public class HelloApplication extends Application {
         stage.setScene(scene);
         stage.show();
 
-        Connection conn = DatabaseWrapper.getInstance().getConnection();
-
-        if (conn != null) {
-            System.out.println("✅ Database connection successful!");
-        } else {
-            System.out.println("❌ Failed to connect to database.");
-        }
-
-        MonsterDAO monsterDAO = new MonsterDAO();
-
-        Monster monster = monsterDAO.getMonsterById(1);
-        System.out.println(monster);
+//        Connection conn = DatabaseWrapper.getInstance().getConnection();
+//
+//        if (conn != null) {
+//            System.out.println("✅ Database connection successful!");
+//        } else {
+//            System.out.println("❌ Failed to connect to database.");
+//        }
+//
+//        MonsterDAO monsterDAO = new MonsterDAO();
+//
+//        Monster monster = monsterDAO.getMonsterById(1);
+//        System.out.println(monster);
     }
 
     @Override

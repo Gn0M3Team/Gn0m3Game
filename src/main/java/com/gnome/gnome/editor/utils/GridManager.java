@@ -3,6 +3,7 @@ package com.gnome.gnome.editor.utils;
 import javafx.scene.Node;
 import javafx.scene.input.DragEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Scale;
@@ -107,8 +108,11 @@ public class GridManager {
      */
     private int getValueForType(String type) {
         return switch (type) {
+            case "Demon"     -> TypeOfObjects.DEMON.getValue();
+            case "Butterfly" -> TypeOfObjects.BUTTERFLY.getValue();
             case "Goblin"    -> TypeOfObjects.GOBLIN.getValue();
-            case "Dragon"    -> TypeOfObjects.DRAGON.getValue();
+            case "Scorpion"  -> TypeOfObjects.SCORPION.getValue();
+            case "Skeleton"  -> TypeOfObjects.SKELETON.getValue();
             case "Tree"      -> TypeOfObjects.TREE.getValue();
             case "Rock"      -> TypeOfObjects.ROCK.getValue();
             case "River"     -> TypeOfObjects.RIVER.getValue();
@@ -124,42 +128,34 @@ public class GridManager {
     }
 
     /**
-     * Updates the cell at the specified row and column by setting its fill color
-     * based on the new value.
+     * Updates a single cell in the grid with a new object type image.
      *
-     * @param row      the row index.
-     * @param col      the column index.
-     * @param newValue the new value for the cell.
+     * @param row      the row index of the cell
+     * @param col      the column index of the cell
+     * @param newValue the new value to be placed in the cell
      */
     public void updateGridCell(int row, int col, int newValue) {
         var children = gridPane.getChildren();
         logger.info("Updating cell at (" + row + ", " + col + ") with new value: " + newValue);
         boolean found = false;
+
         for (Node node : children) {
             Integer nodeRow = GridPane.getRowIndex(node);
             Integer nodeCol = GridPane.getColumnIndex(node);
             nodeRow = (nodeRow == null) ? 0 : nodeRow;
             nodeCol = (nodeCol == null) ? 0 : nodeCol;
-            logger.info("Checking node: " + node + " at (" + nodeRow + ", " + nodeCol + ")");
-            if (nodeRow == row && nodeCol == col && node instanceof Rectangle rect) {
-                rect.setFill(getColorForValue(newValue));
+
+            if (nodeRow == row && nodeCol == col && node instanceof StackPane pane) {
+                TypeOfObjects newType = TypeOfObjects.fromValue(newValue);
+                GenerateGrid.updateTileImage(pane, newType);
                 found = true;
                 break;
             }
         }
+
         if (!found) {
             logger.warning("No cell found at (" + row + ", " + col + ") to update.");
         }
-    }
-
-    /**
-     * Returns the {@link Color} corresponding to the specified tile value.
-     *
-     * @param value the numeric tile value.
-     * @return the corresponding Color.
-     */
-    private Color getColorForValue(int value) {
-        return TypeOfObjects.fromValue(value).getColor();
     }
 
     /**

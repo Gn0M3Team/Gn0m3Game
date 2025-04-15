@@ -1,39 +1,91 @@
 package com.gnome.gnome.editor.utils;
 
 import javafx.scene.paint.Color;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
+@AllArgsConstructor
 public enum TypeOfObjects {
-    EMPTY(Color.GREEN, 0),
-    MOUNTAIN(Color.RED, 1),
-    GOBLIN(Color.BLUE, -1),
-    DRAGON(Color.BEIGE, -2),
-    TREE(Color.BISQUE, 2),
-    ROCK(Color.GRAY, 3),
-    RIVER(Color.BLANCHEDALMOND, 4),
-    VILLAGER(Color.BLUEVIOLET, 5),
-    MERCHANT(Color.BROWN, 6),
-    FLOOR(Color.SADDLEBROWN, 7),
-    WALL_ONE(Color.CHARTREUSE, 8),
-    WALL_TWO(Color.CORNSILK, 9),
-    HATCH(Color.ALICEBLUE, 10);
+    /** Empty tile */
+    EMPTY("tile_0.png", 0),
 
-    private final Color color;
+    /** Mountain tile */
+    MOUNTAIN("tile_2.png", 1),
+
+    /** Demon enemy tile (uses negative ID) */
+    DEMON("tile_125.png", -1),
+
+    /** Butterfly enemy tile (uses negative ID) */
+    BUTTERFLY("tile_125.png", -2),
+
+    /** Goblin enemy tile (uses negative ID) */
+    GOBLIN("tile_123.png", -3),
+
+    /** Scorpion enemy tile (uses negative ID) */
+    SCORPION("tile_125.png", -4),
+
+    /** Skeleton enemy tile (uses negative ID) */
+    SKELETON("tile_125.png", -5),
+
+    /** Tree tile */
+    TREE("tile_54.png", 2),
+
+    /** Rock tile (uses same image as mountain) */
+    ROCK("tile_2.png", 3),
+
+    /** River tile */
+    RIVER("tile_207.png", 4),
+
+    /** Villager character tile */
+    VILLAGER("tile_126.png", 5),
+
+    /** Merchant character tile */
+    MERCHANT("tile_129.png", 6),
+
+    /** Dungeon floor tile */
+    FLOOR("tile_60.png", 7),
+
+    /** First variant of dungeon wall */
+    WALL_ONE("tile_742.png", 8),
+
+    /** Second variant of dungeon wall */
+    WALL_TWO("tile_797.png", 9),
+
+    /** Hatch or exit tile */
+    HATCH("tile_297.png", 10);
+
+    /** File name of the image representing the object */
+    private final String imageName;
+
+    /** Integer value associated with the object type */
     private final int value;
 
-    TypeOfObjects(Color color, int value) {
-        this.color = color;
-        this.value = value;
+    /**
+     * Returns the full image path of the tile image for this object type.
+     *
+     * @return the path to the image resource
+     */
+    public String getImagePath() {
+        return "/com/gnome/gnome/images/tiles/" + imageName;
     }
 
-    /** Finds a tile type by its integer value */
+    /**
+     * Returns the corresponding TypeOfObjects based on the given integer value.
+     * Defaults to {@link #EMPTY} if the value does not match any known type.
+     *
+     * @param value the integer value from the map grid
+     * @return the matching TypeOfObjects enum constant
+     */
     public static TypeOfObjects fromValue(int value) {
         return switch (value) {
             case 0 -> EMPTY;
             case 1 -> MOUNTAIN;
-            case -1 -> GOBLIN;
-            case -2 -> DRAGON;
+            case -1 -> DEMON;
+            case -2 -> BUTTERFLY;
+            case -3 -> GOBLIN;
+            case -4 -> SCORPION;
+            case -5 -> SKELETON;
             case 2 -> TREE;
             case 3 -> ROCK;
             case 4 -> RIVER;
