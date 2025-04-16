@@ -2,6 +2,8 @@ package com.gnome.gnome.continueGame;
 
 import com.gnome.gnome.camera.Camera;
 import com.gnome.gnome.components.PlayerHealthBar;
+import com.gnome.gnome.continueGame.component.Coin;
+import com.gnome.gnome.editor.utils.TypeOfObjects;
 import com.gnome.gnome.monsters.Monster;
 import com.gnome.gnome.monsters.MonsterFactory;
 import com.gnome.gnome.monsters.MonsterFactory.MonsterType;
@@ -49,6 +51,8 @@ public class ContinueGameController implements Initializable {
     @FXML private Button centerMenuButton;
     @FXML private StackPane healthBarContainer;
 
+    @FXML private Label coinCountLabel;
+
     // Game map
     private int[][] baseMap;
     private int[][] fieldMap;
@@ -60,7 +64,9 @@ public class ContinueGameController implements Initializable {
     private Popup centerMenuPopup;
 
     // List of monsters on the map
-    private List<Monster> monsterList = new ArrayList<>();
+    private final List<Monster> monsterList = new ArrayList<>();
+    // List of coins on the map
+    private final List<Coin> coinsOnMap = new ArrayList<>();
 
     private static final Logger logger = Logger.getLogger(ContinueGameController.class.getName());
 
@@ -101,6 +107,11 @@ public class ContinueGameController implements Initializable {
 
         // Pane for dynamic objects (e.g. arrows)
         gameObjectsPane = new Pane();
+        gameObjectsPane.setLayoutX(0);
+        gameObjectsPane.setLayoutY(0);
+        gameObjectsPane.setTranslateX(0);
+        gameObjectsPane.setTranslateY(0);
+        gameObjectsPane.setPrefSize(15 * TILE_SIZE, 15 * TILE_SIZE);
         gameObjectsPane.setPickOnBounds(false);
 
         updateMapWithMonsters();
@@ -123,6 +134,11 @@ public class ContinueGameController implements Initializable {
         });
 
         startMonsterMovement();
+
+        Coin coin = new Coin(9, 9, 100);
+        coin.updateScreenPosition(camera.getStartCol(), camera.getStartRow());
+        coinsOnMap.add(coin);
+        gameObjectsPane.getChildren().add(coin.getImageView());
     }
 
      /* Initializes a map of given size filled with random values and surrounded by a border of mountains.
@@ -189,15 +205,55 @@ public class ContinueGameController implements Initializable {
                 case DOWN, S -> player.moveDown();
                 case SPACE -> {
                     List<Monster> eliminated = player.attack(monsterList, 1, 20);
-                    monsterList.removeAll(eliminated);
+                    removeMonsters(eliminated);
                 }
                 default -> {}
             }
-
+            checkCoinPickup();
             camera.updateCameraCenter();
             updateCameraViewport();
         });
         scene.getRoot().requestFocus();
+    }
+
+    private void checkCoinPickup() {
+        int px = player.getX();
+        int py = player.getY();
+
+        List<Coin> collected = new ArrayList<>();
+
+        for (Coin coin : coinsOnMap) {
+            if (coin.getGridX() == px && coin.getGridY() == py) {
+                player.addCoin(coin.getValue());
+                gameObjectsPane.getChildren().remove(coin.getImageView());
+                collected.add(coin);
+            }
+        }
+
+        coinsOnMap.removeAll(collected);
+        updateCoinLabel();
+    }
+
+    private void updateCoinLabel() {
+        if (coinCountLabel != null) {
+            coinCountLabel.setText("Coins: " + player.getPlayerCoins());
+        }
+    }
+
+    private void removeMonsters(List<Monster> eliminated) {
+        for (Monster monster : eliminated) {
+            int x = monster.getX();
+            int y = monster.getY();
+
+            baseMap[y][x] = TypeOfObjects.FLOOR.getValue();
+
+            Coin coin = new Coin(x, y, monster.getCost());
+            coin.updateScreenPosition(camera.getStartCol(), camera.getStartRow());
+            coinsOnMap.add(coin);
+            gameObjectsPane.getChildren().add(coin.getImageView());
+        }
+
+        monsterList.removeAll(eliminated);
     }
 
 
@@ -206,10 +262,28 @@ public class ContinueGameController implements Initializable {
      */
     private void updateCameraViewport() {
         GridPane cameraViewport = camera.getViewport();
+
+        int startCol = camera.getStartCol();
+        int startRow = camera.getStartRow();
+
+        gameObjectsPane.getChildren().clear();
+
+        for (Coin coin : coinsOnMap) {
+            if (coin.getGridX() >= startCol && coin.getGridX() < startCol + 15 &&
+                    coin.getGridY() >= startRow && coin.getGridY() < startRow + 15) {
+
+                coin.updateScreenPosition(startCol, startRow);
+                gameObjectsPane.getChildren().add(coin.getImageView());
+            }
+        }
+
         if (centerStack.getChildren().isEmpty()) {
             centerStack.getChildren().addAll(cameraViewport, gameObjectsPane);
         } else {
             centerStack.getChildren().set(0, cameraViewport);
+            if (!centerStack.getChildren().contains(gameObjectsPane)) {
+                centerStack.getChildren().add(gameObjectsPane);
+            }
         }
     }
 
@@ -269,6 +343,7 @@ public class ContinueGameController implements Initializable {
      * Skeleton attack logic (should be moved to Skeleton class).
      */
     private void handleSkeletonAttacks() {
+        // tile_92.png  arrow
         for (Monster monster : monsterList) {
             // TODO: My shit code is below, don't touch it, I'll fix it. I can't do without it now, so help me God
             if (monster instanceof Skeleton skeleton) {

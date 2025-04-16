@@ -1,6 +1,7 @@
 package com.gnome.gnome.camera;
 import com.gnome.gnome.editor.utils.TypeOfObjects;
 import com.gnome.gnome.player.Player;
+import javafx.geometry.Insets;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -48,6 +49,9 @@ public class Camera {
      */
     public GridPane getViewport() {
         GridPane viewport = new GridPane();
+        viewport.setHgap(0);
+        viewport.setVgap(0);
+        viewport.setPadding(Insets.EMPTY);
         int totalRows = mapGrid.length;
         int totalCols = mapGrid[0].length;
         int half = viewportSize / 2;
@@ -63,6 +67,8 @@ public class Camera {
 
                 StackPane tilePane = new StackPane();
                 tilePane.setPrefSize(TILE_SIZE, TILE_SIZE);
+                tilePane.setMinSize(TILE_SIZE, TILE_SIZE);
+                tilePane.setMaxSize(TILE_SIZE, TILE_SIZE);
 
                 // Only add image if the tile is within map bounds.
                 if (row >= 0 && row < totalRows && col >= 0 && col < totalCols) {
@@ -72,7 +78,7 @@ public class Camera {
                     ));
                     icon.setFitWidth(TILE_SIZE);
                     icon.setFitHeight(TILE_SIZE);
-                    icon.setPreserveRatio(true);
+                    icon.setPreserveRatio(false); // Here maybe needed to change to true
                     tilePane.getChildren().add(icon);
                 } else {
                     tilePane.setStyle("-fx-background-color: darkgray;");
