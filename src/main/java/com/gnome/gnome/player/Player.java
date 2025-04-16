@@ -5,7 +5,6 @@ import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import lombok.Getter;
-
 import static com.gnome.gnome.editor.utils.EditorConstants.TILE_SIZE;
 import java.util.ArrayList;
 import java.util.List;
