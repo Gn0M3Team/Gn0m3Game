@@ -91,7 +91,7 @@ public class EditorPageController {
     private final Scale scaleTransform;
 
     /** GridManager instance that now holds the grid pane internally. */
-    private final GridManager gridManager;
+    private GridManager gridManager;
 
     /** Instance of CategoryGenerator to dynamically create inline buttons. */
     private CategoryGenerator categoryGenerator = new CategoryGenerator();
@@ -455,6 +455,8 @@ public class EditorPageController {
         gridPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         gridPane.getTransforms().clear();
         gridPane.getTransforms().add(scaleTransform);
+
+        gridManager = new GridManager(gridPane);
 
         Group zoomGroup = new Group(gridPane);
 
