@@ -29,13 +29,23 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.Random;
 
 import static com.gnome.gnome.editor.utils.EditorConstants.TILE_SIZE;
 
+/**
+ * Controller class for the "Continue Game" scene.
+ * Manages player movement, the camera viewport, and an in-game popup menu.
+ */
 public class ContinueGameController implements Initializable {
 
+    /** Root layout of the scene. */
     @FXML private BorderPane rootBorder;
+
+    /** StackPane container for the camera viewport. */
     @FXML private StackPane centerStack;
+
+    /** Button that opens the center menu popup. */
     @FXML private Button centerMenuButton;
     @FXML private StackPane healthBarContainer;
 
@@ -70,7 +80,13 @@ public class ContinueGameController implements Initializable {
     private PlayerHealthBar healthBar;
     private Pane gameObjectsPane;
     private VBox gameOverOverlay;
-
+    /**
+     * Called to initialize the controller after its root element has been completely processed.
+     * Initializes the game map, camera, viewport rendering, button handlers, and key listeners.
+     *
+     * @param location  The location used to resolve relative paths for the root object.
+     * @param resources The resources used to localize the root object.
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // Create and copy map
@@ -109,24 +125,21 @@ public class ContinueGameController implements Initializable {
         startMonsterMovement();
     }
 
-    /**
-     * Creates the base map (terrain) as a rows x cols array.
-     * Cells are filled with 0, and a border (value 1) is set around the edge.
+     * Initializes a map of given size filled with random values and surrounded by a border of mountains.
+     *
+     * @param rows number of rows in the map
+     * @param cols number of columns in the map
+     * @return a 2D integer array representing the initialized map
      */
-    private int[][] initBaseMap(int rows, int cols) {
+    private int[][] initMap(int rows, int cols) {
+        Random random = new Random();
         int[][] map = new int[rows][cols];
+
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
-                map[row][col] = 0;
+                int[] possibleValues = {0, 1, 2, 3, 4, 5}; // EMPTY, MOUNTAIN, TREE, ROCK, RIVER, VILLAGER
+                map[row][col] = possibleValues[random.nextInt(possibleValues.length)];
             }
-        }
-        for (int i = 0; i < rows; i++) {
-            map[i][0] = 1;
-            map[i][cols - 1] = 1;
-        }
-        for (int j = 0; j < cols; j++) {
-            map[0][j] = 1;
-            map[rows - 1][j] = 1;
         }
 
         // Add monsters to the list
@@ -312,6 +325,9 @@ public class ContinueGameController implements Initializable {
 
     /**
      * Shows the center menu with sample buttons.
+     * Shows the center menu popup at the center of the scene.
+     * The popup displays a title and two buttons: "Option 1" and "Go Back".
+     * "Go Back" loads the main menu scene.
      */
     private void showCenterMenu() {
         if (centerMenuPopup == null) {

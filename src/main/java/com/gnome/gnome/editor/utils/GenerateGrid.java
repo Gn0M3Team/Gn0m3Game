@@ -22,29 +22,28 @@ public class GenerateGrid {
     private static volatile GenerateGrid instance;
 
     /** 2D grid representing the game state */
-    private int [][] mapGrid;
+    private int[][] mapGrid;
 
-    private GenerateGrid(int [][] mapGrid) {
+    private GenerateGrid(int[][] mapGrid) {
         this.mapGrid = mapGrid.clone();
     }
 
     private GenerateGrid() {}
 
     /**
-     * Provides a thread-safe singleton instance.
+     * Returns the singleton instance of GenerateGrid with the specified grid.
+     * If an instance already exists, it updates the existing mapGrid.
      *
-     * @param mapGrid The initial level grid.
-     * @return Singleton instance of GenerateGrid.
+     * @param mapGrid the grid to initialize or update the instance with
+     * @return the singleton instance of GenerateGrid
      */
-    public static GenerateGrid getInstance(int [][] mapGrid) {
+    public static GenerateGrid getInstance(int[][] mapGrid) {
         if (instance == null) {
             synchronized (GenerateGrid.class) {
                 if (instance == null)
                     instance = new GenerateGrid(mapGrid);
             }
-        }
-        else {
-            // update map if the instance already exists
+        } else {
             instance.setMapGrid(mapGrid.clone());
         }
 
@@ -52,9 +51,10 @@ public class GenerateGrid {
     }
 
     /**
-     * Provides a thread-safe singleton instance.
+     * Returns the singleton instance of GenerateGrid without initializing the grid.
+     * If it does not exist, it creates a new empty instance.
      *
-     * @return Singleton instance of GenerateGrid.
+     * @return the singleton instance of GenerateGrid
      */
     public static GenerateGrid getInstance() {
         if (instance == null) {
@@ -68,17 +68,20 @@ public class GenerateGrid {
     }
 
     /**
-     * Generates a GridPane representing the level.
+     * Generates a GridPane representation of the current mapGrid.
+     * Each cell is converted into a visual tile with an image.
      *
-     * @return GridPane containing tiles.
+     * @return the generated GridPane
      */
     public GridPane generateGrid() {
         GridPane gridPane = new GridPane();
         gridPane.setGridLinesVisible(false);
 
-        for (int row = 0; row < mapGrid.length; row++)
-            for (int col = 0; col < mapGrid[row].length; col++)
+        for (int row = 0; row < mapGrid.length; row++) {
+            for (int col = 0; col < mapGrid[row].length; col++) {
                 gridPane.add(createTile(row, col), col, row);
+            }
+        }
 
         return gridPane;
     }

@@ -1,5 +1,7 @@
 package com.gnome.gnome;
 
+import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
+import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import com.gnome.gnome.components.LeaderBoardView;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
@@ -8,8 +10,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -22,7 +22,9 @@ import java.util.Objects;
 public class HelloController {
 
     @FXML private ImageView musicIcon;
-    @FXML private BorderPane rootPane;
+    @FXML
+    private BorderPane helloPage;
+    private PageSwitcherInterface pageSwitch;
     private LeaderBoardView leaderboard;
 
     /**
@@ -30,6 +32,7 @@ public class HelloController {
      */
     @FXML
     public void initialize() {
+        pageSwitch=new SwitchPage();
         musicIcon.setImage(
                 new Image(
                         Objects.requireNonNull(
@@ -54,11 +57,8 @@ public class HelloController {
      * Navigates to the registration/switcher page.
      */
     @FXML
-    protected void onRegistrationButtonClick(ActionEvent event) throws IOException {
-        Parent editorRoot = FXMLLoader.
-                load(Objects.requireNonNull(getClass().getResource("/com/gnome/gnome/pages/switchingPage/switcher-page.fxml")));
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.getScene().setRoot(editorRoot);
+    protected void onSwitcherButtonClick(ActionEvent event) throws IOException {
+        pageSwitch.goSwitch(helloPage);
     }
 
     /**
@@ -91,13 +91,13 @@ public class HelloController {
             FadeTransition fadeOut = new FadeTransition(Duration.millis(500), this.leaderboard);
             fadeOut.setFromValue(1.0);
             fadeOut.setToValue(0.0);
-            fadeOut.setOnFinished(e -> rootPane.setLeft(null));
+            fadeOut.setOnFinished(e -> helloPage.setLeft(null));
             fadeOut.play();
         });
 
         this.leaderboard.setOpacity(0.0);
 
-        rootPane.setLeft(this.leaderboard);
+        helloPage.setLeft(this.leaderboard);
 
         FadeTransition fadeIn = new FadeTransition(Duration.millis(300), this.leaderboard);
         fadeIn.setFromValue(0.0);

@@ -28,20 +28,19 @@ public class GridManager {
 
     private static final Logger logger = Logger.getLogger(GridManager.class.getName());
 
-    // The GridPane instance that this manager operates on.
+    /** The GridPane instance that this manager operates on. */
     private GridPane gridPane;
 
     /**
-     * Default constructor. Initially, no grid pane is set.
-     * You can set the grid pane later via {@link #setGridPane(GridPane)} or by using createEmptyGrid().
+     * Default constructor.
+     * Use {@link #setGridPane(GridPane)} and {@link #attachDragAndDrop()} to configure.
      */
-    public GridManager() {
-    }
+    public GridManager() {}
 
     /**
-     * Constructor that accepts a GridPane instance.
+     * Constructs a GridManager with the given GridPane and immediately attaches drag-and-drop events.
      *
-     * @param gridPane the GridPane to manage.
+     * @param gridPane the GridPane to manage
      */
     public GridManager(GridPane gridPane) {
         this.gridPane = gridPane;
@@ -49,12 +48,10 @@ public class GridManager {
     }
 
     /**
-     * Handles a drag-and-drop event on the managed grid pane.
-     * <p>
-     * It determines the drop cell based on the event's coordinates,
-     * updates the underlying grid data, and updates the cell color.
+     * Handles the drop event when an object is dragged onto the grid.
+     * Converts the object type to a numeric value and updates the grid cell accordingly.
      *
-     * @param event the drag event.
+     * @param event the drag event
      */
     public void handleDragDrop(DragEvent event) {
         var db = event.getDragboard();
@@ -72,7 +69,6 @@ public class GridManager {
                 for (int rowTwo = 0; rowTwo < GRID_SIZE; rowTwo++) {
                     Arrays.fill(emptyGrid[rowTwo], 0);
                 }
-                // Reinitialize GenerateGrid with the new grid.
                 GenerateGrid newGridInstance = GenerateGrid.getInstance(emptyGrid);
                 mapGrid = newGridInstance.getMapGrid();
             }
@@ -89,22 +85,22 @@ public class GridManager {
     }
 
     /**
-     * Checks if the given cell coordinates are within the bounds of the grid.
+     * Checks if the given coordinates are within the bounds of the grid.
      *
-     * @param grid the underlying grid array.
-     * @param row  the row index.
-     * @param col  the column index.
-     * @return true if valid; false otherwise.
+     * @param grid the map grid
+     * @param row  the row index
+     * @param col  the column index
+     * @return true if the cell is valid, false otherwise
      */
-    private boolean isValidCell(int [][] grid, int row, int col) {
+    private boolean isValidCell(int[][] grid, int row, int col) {
         return row >= 0 && row < grid.length && col >= 0 && col < grid[0].length;
     }
 
     /**
-     * Returns the numeric value corresponding to the specified tile type.
+     * Returns the numeric value corresponding to a given object type name.
      *
-     * @param type the tile type (e.g., "Goblin", "Dragon").
-     * @return the corresponding numeric value.
+     * @param type the name of the object type (e.g., "Goblin", "Tree")
+     * @return the corresponding integer value for the map grid
      */
     private int getValueForType(String type) {
         return switch (type) {
@@ -159,7 +155,7 @@ public class GridManager {
     }
 
     /**
-     * Attaches drag-and-drop functionality to the grid pane.
+     * Attaches drag-and-drop event handlers to the current GridPane.
      */
     public void attachDragAndDrop() {
         if (gridPane == null) {
@@ -175,11 +171,11 @@ public class GridManager {
     }
 
     /**
-     * Applies zoom functionality based on scroll input.
+     * Applies zoom transformation to the grid using the provided scale object.
      *
-     * @param scaleTransform The scale transformation applied to the grid.
-     * @param deltaY         The delta from the scroll event.
-     * @param minScale       The minimum allowed scale.
+     * @param scaleTransform the scale transform applied to the grid
+     * @param deltaY         the mouse scroll direction (positive to zoom in, negative to zoom out)
+     * @param minScale       the minimum scale allowed
      */
     public void zoom(Scale scaleTransform, double deltaY, double minScale) {
         double zoomFactor = (deltaY > 0) ? 1.1 : 0.9;
@@ -196,23 +192,22 @@ public class GridManager {
     }
 
     /**
-     * Clamps a value between a minimum and maximum.
+     * Clamps a value to ensure it falls within the given range.
      *
-     * @param value the value to clamp.
-     * @param min   the minimum allowed value.
-     * @param max   the maximum allowed value.
-     * @return the clamped value.
+     * @param value the value to clamp
+     * @param min   the minimum allowed value
+     * @param max   the maximum allowed value
+     * @return the clamped value
      */
     public double clamp(double value, double min, double max) {
         return Math.min(Math.max(value, min), max);
     }
 
     /**
-     * Creates an empty grid pane with default settings.
-     * <p>
-     * The created grid is stored in this manager and drag-and-drop functionality is attached.
+     * Creates a new empty grid and initializes the {@link GenerateGrid} singleton with it.
+     * Also sets this grid as the current one and attaches drag-and-drop events.
      *
-     * @return the newly created GridPane.
+     * @return a new empty GridPane
      */
     public GridPane createEmptyGrid() {
         int[][] emptyGrid = new int[GRID_SIZE][GRID_SIZE];
@@ -222,9 +217,7 @@ public class GridManager {
         GenerateGrid gridGen = GenerateGrid.getInstance(emptyGrid);
         GridPane newGrid = gridGen.generateGrid();
         newGrid.getTransforms().clear();
-        // Set the new grid into the manager.
         setGridPane(newGrid);
-        // Attach drag-and-drop functionality to the new grid.
         attachDragAndDrop();
         return newGrid;
     }

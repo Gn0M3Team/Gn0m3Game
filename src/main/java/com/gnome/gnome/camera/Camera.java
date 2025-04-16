@@ -8,8 +8,11 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
+
+import java.util.Objects;
 
 import java.util.Objects;
 
@@ -24,9 +27,9 @@ import static com.gnome.gnome.editor.utils.EditorConstants.TILE_SIZE;
 public class Camera {
     // The full map represented as a 2D array of integers (object types).
     private int[][] mapGrid;
-
-    // Current center coordinates of the camera (map coordinates).
     private int cameraCenterX;
+
+    /** Y coordinate of the camera's center */
     private int cameraCenterY;
 
     // Size of the viewport (15x15 tiles).
@@ -47,9 +50,10 @@ public class Camera {
     }
 
     /**
-     * Builds and returns a GridPane that represents the visible part of the map
-     * based on the current camera center.
-     * Highlights the player's tile with a yellow border.
+     * Returns a GridPane representing the current 15x15 viewport with image tiles.
+     * The player's current cell is highlighted with a yellow border.
+     *
+     * @return the GridPane containing the viewport tiles
      */
     public GridPane getViewport() {
         GridPane viewport = new GridPane();
@@ -83,23 +87,89 @@ public class Camera {
                     tilePane.setStyle("-fx-background-color: darkgray;");
                 }
 
-                // Add black border to each tile.
+                // Border
                 tilePane.setStyle(tilePane.getStyle() + "-fx-border-color: black; -fx-border-width: 1;");
 
                 // Highlight player
-                if (row == player.getY() && col == player.getX()) {
+                if (row == playerY && col == playerX) {
                     tilePane.setStyle(tilePane.getStyle() + "-fx-border-color: yellow; -fx-border-width: 2;");
                 }
 
                 viewport.add(tilePane, j, i);
             }
         }
+
         return viewport;
     }
 
     /**
      * Updates the camera's center based on the player's current position.
      * Should be called after the player moves.
+    // ------------------- Player movement methods -------------------
+
+    /**
+     * Moves the player one tile to the left and updates the camera position accordingly.
+     */
+    public void movePlayerLeft() {
+        playerX--;
+        clampPlayer();
+        followPlayer();
+    }
+
+    /**
+     * Moves the player one tile to the right and updates the camera position accordingly.
+     */
+    public void movePlayerRight() {
+        playerX++;
+        clampPlayer();
+        followPlayer();
+    }
+
+    /**
+     * Moves the player one tile up and updates the camera position accordingly.
+     */
+    public void movePlayerUp() {
+        playerY--;
+        clampPlayer();
+        followPlayer();
+    }
+
+    /**
+     * Moves the player one tile down and updates the camera position accordingly.
+     */
+    public void movePlayerDown() {
+        playerY++;
+        clampPlayer();
+        followPlayer();
+    }
+
+    /**
+     * Moves the player by a specified offset in both x and y directions.
+     *
+     * @param dx horizontal offset
+     * @param dy vertical offset
+     */
+    public void movePlayer(int dx, int dy) {
+        playerX += dx;
+        playerY += dy;
+        clampPlayer();
+        followPlayer();
+    }
+
+    // ------------------- Internal logic -------------------
+
+    /**
+     * Clamps the player's coordinates to ensure they remain within the map boundaries.
+     */
+    private void clampPlayer() {
+        int maxX = mapGrid[0].length - 1;
+        int maxY = mapGrid.length - 1;
+        playerX = Math.max(0, Math.min(playerX, maxX));
+        playerY = Math.max(0, Math.min(playerY, maxY));
+    }
+
+    /**
+     * Updates the camera center to follow the player's position.
      */
     public void updateCameraCenter() {
         cameraCenterX = player.getX();

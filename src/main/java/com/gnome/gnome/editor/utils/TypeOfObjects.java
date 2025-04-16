@@ -4,6 +4,11 @@ import javafx.scene.paint.Color;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+
+/**
+ * Enum representing different types of objects that can appear on the map grid.
+ * Each type is associated with a tile image and an integer value.
+ */
 @Getter
 @AllArgsConstructor
 public enum TypeOfObjects {
@@ -60,6 +65,16 @@ public enum TypeOfObjects {
 
     /** Integer value associated with the object type */
     private final int value;
+
+     * Constructor for object type.
+     *
+     * @param imageName the filename of the tile image
+     * @param value     the numeric value representing this type in the map grid
+     */
+    TypeOfObjects(String imageName, int value) {
+        this.imageName = imageName;
+        this.value = value;
+    }
 
     /**
      * Returns the full image path of the tile image for this object type.

@@ -508,10 +508,44 @@ public class EditorPageController {
     @FXML
     protected void onLoadMapFromDatabase(ActionEvent event) {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        SelectorMapDialogBox mapDialog = new SelectorMapDialogBox();
-        Optional<String> result = mapDialog.showDialog(stage);
+        MapDAO mapDAO = new MapDAO();
+//        String currentUsername = getCurrentUsername(); // Implement this method to get the logged-in user
+        String currentUsername = "Admin"; // Admin for now
 
-        result.ifPresent(selectedItem -> System.out.println("Selected map: " + selectedItem));
+        try {
+            List<Map> userMaps = mapDAO.getMapsByUsername(currentUsername);
+            if (userMaps.isEmpty()) {
+                logger.info("No maps have been created by user: " + currentUsername);
+                return;
+            }
+            List<String> mapNames = userMaps.stream()
+                    .map(Map::getMapNameEng)
+                    .collect(Collectors.toList());
+
+            SelectorMapDialogBox mapDialog = new SelectorMapDialogBox(mapNames);
+            Optional<String> result = mapDialog.showDialog(stage);
+
+            result.ifPresent(selectedItem -> {
+                logger.info("Selected map: " + selectedItem);
+
+                Map selectedMap = userMaps.stream()
+                        .filter(map -> (map.getMapNameEng()).equals(selectedItem))
+                        .findFirst()
+                        .orElse(null);
+
+                if (selectedMap != null) {
+                    int[][] levelGrid = selectedMap.getMapData();
+
+                    setupGrid(levelGrid, levelGrid[0].length, levelGrid.length);
+                    logger.info("Map loaded successfully: " + selectedItem);
+                } else {
+                    logger.log(Level.SEVERE,"Error", "Selected map not found in user maps.");
+                }
+            });
+
+        } catch (DataAccessException e) {
+            logger.log(Level.SEVERE, "Error loading maps from database", e);
+        }
     }
 
     /**

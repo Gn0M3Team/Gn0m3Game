@@ -4,14 +4,14 @@ import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 
 import java.io.IOException;
 
 public class RegistretionPageController {
 
     @FXML
-    private AnchorPane registrationPage;
+    private BorderPane registrationPage;
     private PageSwitcherInterface pageSwitch;
 
     @FXML

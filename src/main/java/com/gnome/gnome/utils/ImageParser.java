@@ -35,9 +35,10 @@ public class ImageParser {
      */
     public static void splitImage(String imageName) throws IOException {
         // Open the image resource as an InputStream using this class's resource loader.
-        try (InputStream stream = ImageParser.class.getResourceAsStream(imageName)) {
+        try (InputStream stream = ImageParser.class.getResourceAsStream("/com/gnome/gnome/images/colored_packed.png")) {
             if (stream == null) {
                 logger.warning("Image not found:" + imageName);
+                System.out.println("❌ Image not found: " + imageName);
                 return;
             }
 
@@ -46,6 +47,7 @@ public class ImageParser {
             int imageHeight = source.getHeight();
 
             logger.info("Loaded image size: " + imageWidth + "x" + imageHeight);
+            System.out.println("Loaded image size: " + imageWidth + "x" + imageHeight);
 
             int cols = imageWidth / TILE_WIDTH;
             int rows = imageHeight / TILE_HEIGHT;
@@ -74,6 +76,11 @@ public class ImageParser {
                 }
             }
             logger.info("Splitting done! Total tiles: " + idx);
+            System.out.println("Splitting done! Total tiles: " + idx);
+        }
+        catch (Exception e) {
+            System.out.println("❌ Failed to parse image: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }
