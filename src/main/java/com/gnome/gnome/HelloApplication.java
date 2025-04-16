@@ -51,7 +51,7 @@ public class HelloApplication extends Application {
 
     @Override
     public void stop() {
-//        DatabaseWrapper.getInstance().close();
+       DatabaseWrapper.getInstance().close();
     }
 
 

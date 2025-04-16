@@ -1,6 +1,7 @@
 package com.gnome.gnome.editor.utils;
 
 import javafx.scene.paint.Color;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 
@@ -9,6 +10,7 @@ import lombok.Getter;
  * Each type is associated with a tile image and an integer value.
  */
 @Getter
+@AllArgsConstructor
 public enum TypeOfObjects {
     /** Empty tile */
     EMPTY("tile_0.png", 0),
@@ -16,11 +18,20 @@ public enum TypeOfObjects {
     /** Mountain tile */
     MOUNTAIN("tile_2.png", 1),
 
-    /** Goblin enemy tile (uses negative ID) */
-    GOBLIN("tile_123.png", -1),
+    /** Demon enemy tile (uses negative ID) */
+    DEMON("tile_125.png", -1),
 
-    /** Dragon enemy tile (uses negative ID) */
-    DRAGON("tile_125.png", -2),
+    /** Butterfly enemy tile (uses negative ID) */
+    BUTTERFLY("tile_125.png", -2),
+
+    /** Goblin enemy tile (uses negative ID) */
+    GOBLIN("tile_123.png", -3),
+
+    /** Scorpion enemy tile (uses negative ID) */
+    SCORPION("tile_125.png", -4),
+
+    /** Skeleton enemy tile (uses negative ID) */
+    SKELETON("tile_125.png", -5),
 
     /** Tree tile */
     TREE("tile_54.png", 2),
@@ -55,7 +66,6 @@ public enum TypeOfObjects {
     /** Integer value associated with the object type */
     private final int value;
 
-    /**
      * Constructor for object type.
      *
      * @param imageName the filename of the tile image
@@ -86,8 +96,11 @@ public enum TypeOfObjects {
         return switch (value) {
             case 0 -> EMPTY;
             case 1 -> MOUNTAIN;
-            case -1 -> GOBLIN;
-            case -2 -> DRAGON;
+            case -1 -> DEMON;
+            case -2 -> BUTTERFLY;
+            case -3 -> GOBLIN;
+            case -4 -> SCORPION;
+            case -5 -> SKELETON;
             case 2 -> TREE;
             case 3 -> ROCK;
             case 4 -> RIVER;
