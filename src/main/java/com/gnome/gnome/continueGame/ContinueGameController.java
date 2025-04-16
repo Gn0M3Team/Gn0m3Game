@@ -90,7 +90,7 @@ public class ContinueGameController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // Create and copy map
-        baseMap = initBaseMap(30, 30);
+        baseMap = initMap(30, 30);
         fieldMap = copyMap(baseMap);
 
         // Create player
@@ -125,7 +125,7 @@ public class ContinueGameController implements Initializable {
         startMonsterMovement();
     }
 
-     * Initializes a map of given size filled with random values and surrounded by a border of mountains.
+     /* Initializes a map of given size filled with random values and surrounded by a border of mountains.
      *
      * @param rows number of rows in the map
      * @param cols number of columns in the map
@@ -349,7 +349,7 @@ public class ContinueGameController implements Initializable {
 
             goBackButton.setOnAction(e -> {
                 try {
-                    URL fxmlUrl = getClass().getResource("/com/gnome/gnome/pages/hello-view.fxml");
+                    URL fxmlUrl = getClass().getResource("/com/gnome/gnome/pages/main-menu.fxml");
                     Parent mainRoot = FXMLLoader.load(Objects.requireNonNull(fxmlUrl));
                     Stage stage = (Stage) centerMenuButton.getScene().getWindow();
                     stage.getScene().setRoot(mainRoot);

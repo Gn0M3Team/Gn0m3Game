@@ -40,7 +40,7 @@ public class LoginRegistrationController {
         LoginResult result = LoginRegistrationService.loginOrRegisterUser(username,password);
 
         if (result.getUser() != null) {
-            pageSwitch.goHello(loginRegistretion);
+            pageSwitch.mainMenu(loginRegistretion);
         } else {
             loginMessage.setText(result.getMessage());
         }

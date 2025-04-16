@@ -34,8 +34,8 @@ public class SwitchPage implements PageSwitcherInterface {
     }
 
     @Override
-    public void goHello(BorderPane anchorPane) {
-        new SceneSwitch(anchorPane, "/com/gnome/gnome/pages/hello-view.fxml");
+    public void mainMenu(BorderPane anchorPane) {
+        new SceneSwitch(anchorPane, "/com/gnome/gnome/pages/main-menu.fxml");
     }
 
 

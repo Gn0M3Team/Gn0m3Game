@@ -5,7 +5,16 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane prefHeight="600" prefWidth="800" styleClass="root-pane" stylesheets="css/style.css" xmlns="http://javafx.com/javafx/17.0.2-ea" fx:id="helloPage" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gnome.gnome.HelloController">
+<BorderPane
+        prefHeight="600"
+        prefWidth="800"
+        styleClass="root-pane"
+        xmlns="http://javafx.com/javafx/17.0.2-ea"
+        fx:id="helloPage"
+        xmlns:fx="http://javafx.com/fxml/1"
+        fx:controller="com.gnome.gnome.HelloController"
+        stylesheets="@./css/main_menu.css"
+>
 
     <top>
         <HBox alignment="CENTER_LEFT" spacing="10" styleClass="top-bar">
