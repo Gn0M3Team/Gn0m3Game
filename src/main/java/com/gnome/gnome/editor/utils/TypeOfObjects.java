@@ -10,7 +10,6 @@ import lombok.Getter;
  * Each type is associated with a tile image and an integer value.
  */
 @Getter
-@AllArgsConstructor
 public enum TypeOfObjects {
     /** Empty tile */
     EMPTY("tile_0.png", 0),
@@ -66,11 +65,6 @@ public enum TypeOfObjects {
     /** Integer value associated with the object type */
     private final int value;
 
-     * Constructor for object type.
-     *
-     * @param imageName the filename of the tile image
-     * @param value     the numeric value representing this type in the map grid
-     */
     TypeOfObjects(String imageName, int value) {
         this.imageName = imageName;
         this.value = value;
