@@ -4,7 +4,6 @@ import com.gnome.gnome.config.EditorLogger;
 import com.gnome.gnome.dao.MonsterDAO;
 import com.gnome.gnome.db.DatabaseWrapper;
 import com.gnome.gnome.models.Monster;
-import com.gnome.gnome.utils.ImageParser;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -12,6 +11,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.util.Objects;
 
 public class HelloApplication extends Application {
     @Override
@@ -20,7 +20,9 @@ public class HelloApplication extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("pages/login-registration.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
 
-
+        scene.getStylesheets().add(
+                Objects.requireNonNull(getClass().getResource("/com/gnome/gnome/pages/css/style.css")).toExternalForm()
+        );
         stage.setFullScreen(true);
         stage.setTitle("Hello!");
         stage.setScene(scene);

@@ -31,6 +31,24 @@
     -fx-font-weight: bold;
     -fx-font-family: "Press Start 2P", -apple-system;
 }
+.menu-error {
+    -fx-font-size: 12px;
+    -fx-text-fill: red;
+    -fx-font-family: "Press Start 2P", -apple-system;
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+    -fx-max-width: 500;
+}
+.input-field {
+    -fx-text-fill: #000000;
+    -fx-font-size: 14px;
+    -fx-font-family: "Press Start 2P", -apple-system;
+    -fx-pref-height: 30px;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-color: #000000;
+    -fx-padding: 8px;
+}
 
 .menu-button {
     -fx-background-color: #C0C0C0;

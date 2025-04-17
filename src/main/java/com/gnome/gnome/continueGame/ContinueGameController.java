@@ -10,6 +10,8 @@ import com.gnome.gnome.monsters.types.missels.Arrow;
 import com.gnome.gnome.player.Player;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
+import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
+import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -52,6 +54,10 @@ public class ContinueGameController implements Initializable {
     // Game map
     private int[][] baseMap;
     private int[][] fieldMap;
+    private PageSwitcherInterface pageSwitch;
+
+    /** The full 30x30 map grid representing the game world. */
+    private int[][] field30x30;
 
     // Camera to view part of the map
     private Camera camera;
@@ -89,9 +95,8 @@ public class ContinueGameController implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Create and copy map
-        baseMap = initBaseMap(30, 30);
-        fieldMap = copyMap(baseMap);
+        pageSwitch=new SwitchPage();
+        field30x30 = initMap(30, 30);
 
         // Create player
         player = new Player(15, 15, PLAYER_MAX_HEALTH);
@@ -125,12 +130,6 @@ public class ContinueGameController implements Initializable {
         startMonsterMovement();
     }
 
-     * Initializes a map of given size filled with random values and surrounded by a border of mountains.
-     *
-     * @param rows number of rows in the map
-     * @param cols number of columns in the map
-     * @return a 2D integer array representing the initialized map
-     */
     private int[][] initMap(int rows, int cols) {
         Random random = new Random();
         int[][] map = new int[rows][cols];
@@ -348,16 +347,9 @@ public class ContinueGameController implements Initializable {
             option1.setOnAction(e -> centerMenuPopup.hide());
 
             goBackButton.setOnAction(e -> {
-                try {
-                    URL fxmlUrl = getClass().getResource("/com/gnome/gnome/pages/hello-view.fxml");
-                    Parent mainRoot = FXMLLoader.load(Objects.requireNonNull(fxmlUrl));
-                    Stage stage = (Stage) centerMenuButton.getScene().getWindow();
-                    stage.getScene().setRoot(mainRoot);
-                } catch (IOException ex) {
-                    logger.severe("Failed to load main page: " + ex.getMessage());
-                    ex.printStackTrace();
-                }
+                logger.info("Go Back clicked. Redirecting to main page.");
                 centerMenuPopup.hide();
+                pageSwitch.goHello(rootBorder);
             });
 
             menuBox.getChildren().addAll(title, option1, goBackButton);

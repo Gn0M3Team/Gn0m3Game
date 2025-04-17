@@ -1,10 +1,14 @@
 package com.gnome.gnome.profile;
 
+import com.gnome.gnome.dao.userDAO.UserSession;
+import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
+import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import javafx.animation.FadeTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.scene.Node;
 import javafx.event.ActionEvent;
@@ -30,6 +34,9 @@ public class ProfileController {
     @FXML private Label winRateLabel;
     @FXML private ListView<String> cardListView;
     @FXML private ListView<String> mapListView;
+    @FXML
+    private BorderPane profilePage;
+    private PageSwitcherInterface pageSwitch;
 
     private int currentCardPage = 1;
     private final int cardPageSize = 10;
@@ -41,6 +48,11 @@ public class ProfileController {
 
     private String selectedPlayer;
 
+    @FXML
+    public void initialize() {
+        pageSwitch = new SwitchPage();
+    }
+
     /**
      * Initializes the profile page with data for the selected player.
      * This method is called when navigating from the leaderboard.
@@ -49,6 +61,7 @@ public class ProfileController {
         this.selectedPlayer = playerData;
         logger.info("Loading profile for: " + playerData);
 
+        System.out.println(playerData);
         nameLabel.setText("Profile of " + playerData);
         recordLabel.setText("Record: 12345");
         gamesPlayedLabel.setText("Games Played: 100");
@@ -115,22 +128,7 @@ public class ProfileController {
      */
     @FXML
     private void handleBack(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(
-                    Objects.requireNonNull(getClass().getResource("/com/gnome/gnome/pages/hello-view.fxml"))
-            );
-            Parent mainRoot = loader.load();
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-            FadeTransition fade = new FadeTransition(Duration.millis(300), mainRoot);
-            fade.setFromValue(0.0);
-            fade.setToValue(1.0);
-            fade.play();
-
-            stage.getScene().setRoot(mainRoot);
-        } catch (IOException e) {
-            logger.log(Level.SEVERE, "Error returning to hello-view.fxml", e);
-        }
+        pageSwitch.goHello(profilePage);
     }
 
     /**

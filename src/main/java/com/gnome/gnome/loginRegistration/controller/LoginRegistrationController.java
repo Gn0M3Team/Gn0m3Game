@@ -1,12 +1,21 @@
-package com.gnome.gnome.loginRegistration;
+package com.gnome.gnome.loginRegistration.controller;
 
 import com.gnome.gnome.loginRegistration.service.LoginRegistrationService;
 import com.gnome.gnome.loginRegistration.service.LoginResult;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+
+/**
+ * Controller class for the Login and Registration view.
+ *
+ * Handles user input for logging in or registering a new user,
+ * provides feedback messages, and transitions to the main menu upon success.
+ */
 public class LoginRegistrationController {
 
     @FXML private TextField loginUsername;
@@ -16,12 +25,21 @@ public class LoginRegistrationController {
     @FXML
     public BorderPane loginRegistretion;
     private PageSwitcherInterface pageSwitch;
-
+    /**
+     * Initializes the controller.
+     * Called automatically after the FXML file is loaded.
+     * Sets up the page switcher instance.
+     */
     @FXML
     private void initialize() {
         pageSwitch = new SwitchPage();
     }
 
+    /**
+     * Handles the login or registration action.
+     * Validates the input, attempts to log in or register the user via {@link LoginRegistrationService},
+     * and navigates to the main menu upon success. Displays appropriate error messages otherwise.
+     */
     @FXML
     private void handleLogin() {
         String username = loginUsername.getText();
@@ -31,13 +49,12 @@ public class LoginRegistrationController {
             loginMessage.setText("Fill in all fields!");
             return;
         }
-        if (username.length()>32) {
+        if (username.length() > 32) {
             loginMessage.setText("The name must be less than 32 characters!");
             return;
         }
 
-
-        LoginResult result = LoginRegistrationService.loginOrRegisterUser(username,password);
+        LoginResult result = LoginRegistrationService.loginOrRegisterUser(username, password);
 
         if (result.getUser() != null) {
             pageSwitch.goHello(loginRegistretion);
@@ -45,4 +62,15 @@ public class LoginRegistrationController {
             loginMessage.setText(result.getMessage());
         }
     }
+
+    /**
+     * Handles the action of exiting the application.
+     *
+     * @param event the action event triggered by the exit button
+     */
+    @FXML
+    public void onExitButtonClick(ActionEvent event) {
+        Platform.exit();
+    }
+
 }

@@ -25,7 +25,7 @@
             <VBox alignment="CENTER" maxWidth="400" spacing="20">
                 <Label styleClass="menu-title" text="MENU" />
 
-                <Button maxWidth="Infinity" onAction="#onSwitcherButtonClick" styleClass="menu-button" text="New game" />
+                <Button maxWidth="Infinity" onAction="#onNewGameButtonClick" styleClass="menu-button" text="New game" />
 
                 <Button maxWidth="Infinity" onAction="#onContinueGameButtonClick" styleClass="menu-button" text="Continue the game" />
 
