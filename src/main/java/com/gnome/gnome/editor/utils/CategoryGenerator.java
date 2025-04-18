@@ -1,5 +1,6 @@
 package com.gnome.gnome.editor.utils;
 
+import com.gnome.gnome.annotations.config.Value;
 import com.gnome.gnome.s3.S3Actions;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -40,11 +41,12 @@ public class CategoryGenerator {
     private static final Logger logger = Logger.getLogger(CategoryGenerator.class.getName());
 
     // Flag to determine whether to use test data (strings) or real S3 images.
-    private boolean test = true;
+    @Value("app.is_test")
+    private boolean test;
 
     // Local categories for test = true
     private final Map<String, List<String>> localCategoryMap = Map.of(
-            "Monsters",     List.of("Goblin", "Dragon"),
+            "Monsters",     List.of("Demon", "Butterfly", "Goblin", "Scorpion", "Skeleton"),
             "Props",        List.of("Tree", "Rock", "Hatch"),
             "NPCs",         List.of("Villager", "Merchant"),
             "Environment",  List.of("Mountain", "River", "Floor", "WallOne", "WallTwo")

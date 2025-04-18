@@ -14,19 +14,13 @@
 >
     <top>
         <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 10;">
-            <Button fx:id="centerMenuButton" styleClass="menu-button" text="Show Menu" />
+            <StackPane fx:id="healthBarContainer" alignment="CENTER_LEFT" />
+            <Pane HBox.hgrow="ALWAYS" />
+            <Label fx:id="coinCountLabel"/>
+            <Button fx:id="centerMenuButton" text="Show Menu" styleClass="menu-button"/>
         </HBox>
     </top>
     <center>
         <StackPane fx:id="centerStack" maxHeight="-1" maxWidth="-1" BorderPane.alignment="CENTER" />
     </center>
-<!--   <left>-->
-<!--      <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER" />-->
-<!--   </left>-->
-<!--   <right>-->
-<!--      <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER" />-->
-<!--   </right>-->
-<!--   <bottom>-->
-<!--      <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER" />-->
-<!--   </bottom>-->
 </BorderPane>

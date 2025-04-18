@@ -4,6 +4,8 @@ import javafx.scene.Node;
 import javafx.scene.input.DragEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Scale;
 import lombok.Getter;
 import lombok.Setter;
@@ -102,8 +104,11 @@ public class GridManager {
      */
     private int getValueForType(String type) {
         return switch (type) {
+            case "Demon"     -> TypeOfObjects.DEMON.getValue();
+            case "Butterfly" -> TypeOfObjects.BUTTERFLY.getValue();
             case "Goblin"    -> TypeOfObjects.GOBLIN.getValue();
-            case "Dragon"    -> TypeOfObjects.DRAGON.getValue();
+            case "Scorpion"  -> TypeOfObjects.SCORPION.getValue();
+            case "Skeleton"  -> TypeOfObjects.SKELETON.getValue();
             case "Tree"      -> TypeOfObjects.TREE.getValue();
             case "Rock"      -> TypeOfObjects.ROCK.getValue();
             case "River"     -> TypeOfObjects.RIVER.getValue();

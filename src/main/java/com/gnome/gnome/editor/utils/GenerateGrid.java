@@ -4,10 +4,13 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static com.gnome.gnome.editor.utils.EditorConstants.TILE_SIZE;
 
