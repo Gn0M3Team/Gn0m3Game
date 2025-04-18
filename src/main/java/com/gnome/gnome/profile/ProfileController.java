@@ -128,7 +128,7 @@ public class ProfileController {
      */
     @FXML
     private void handleBack(ActionEvent event) {
-        pageSwitch.goHello(profilePage);
+        pageSwitch.goMainMenu(profilePage);
     }
 
     /**

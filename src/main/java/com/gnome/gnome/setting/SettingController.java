@@ -55,6 +55,6 @@ public class SettingController {
      */
     @FXML
     public void meinMenuButtonClick(ActionEvent e) {
-        pageSwitch.goHello(settingPage);
+        pageSwitch.goMainMenu(settingPage);
     }
 }

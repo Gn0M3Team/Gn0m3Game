@@ -35,57 +35,20 @@ public class SceneSwitch {
 
             Scene scene = curBorderPane.getScene();
             if (scene != null) {
-                scene.getStylesheets().clear();
-                if (fxml.equals("/com/gnome/gnome/pages/hello-view.fxml")){
-                    scene.getStylesheets().add(
-                        Objects.requireNonNull(getClass().getResource("/com/gnome/gnome/pages/css/style.css")).toExternalForm()
-                    );
-                }
-                if (fxml.equals("/com/gnome/gnome/pages/continueGame.fxml")){
-                    scene.getStylesheets().add(
-                            Objects.requireNonNull(getClass().getResource("/com/gnome/gnome/pages/css/continueGame.css")).toExternalForm()
-                    );
-                }
-                if (fxml.equals("/com/gnome/gnome/pages/new-game.fxml")){
-                    scene.getStylesheets().add(
-                            Objects.requireNonNull(getClass().getResource("/com/gnome/gnome/pages/css/new-game.css")).toExternalForm()
-                    );
-                }
-                if (fxml.equals("/com/gnome/gnome/pages/shop-pop-up.fxml")){
-                    scene.getStylesheets().add(
-                            Objects.requireNonNull(getClass().getResource("/com/gnome/gnome/pages/css/shop-pop-up.css")).toExternalForm()
-                    );
-                }
-                if (fxml.equals("/com/gnome/gnome/pages/setting.fxml")){
-                    scene.getStylesheets().add(
-                            Objects.requireNonNull(getClass().getResource("/com/gnome/gnome/pages/css/setting.css")).toExternalForm()
-                    );
-                }
-                if (fxml.equals("/com/gnome/gnome/pages/login-registration.fxml")){
-                    scene.getStylesheets().add(
-                            Objects.requireNonNull(getClass().getResource("/com/gnome/gnome/pages/css/style.css")).toExternalForm()
-                    );
-                }
-
-
 
                 if (fxml.endsWith("profile-page.fxml")){
-                    scene.getStylesheets().add(
-                            Objects.requireNonNull(getClass().getResource("/com/gnome/gnome/pages/css/profile.css")).toExternalForm()
-                    );
                     ProfileController controller = loader.getController();
                     if (dataToPass instanceof String) {
                         controller.setPlayer((String) dataToPass);
                     }
 
                 }
-
                 if (dataToPass!=null){
                     dataToPass=null;
                 }
 
-                applyFadeIn(nextBorderPane);
                 scene.setRoot(nextBorderPane);
+                applyFadeIn(nextBorderPane);
             } else {
                 System.err.println("No scene found for the current BorderPane");
             }
@@ -101,7 +64,7 @@ public class SceneSwitch {
      * Applies a fade-in transition to the new root node.
      */
     private void applyFadeIn(Parent root) {
-        FadeTransition fade = new FadeTransition(Duration.millis(500), root);
+        FadeTransition fade = new FadeTransition(Duration.millis(300), root);
         fade.setFromValue(0.0);
         fade.setToValue(1.0);
         fade.play();

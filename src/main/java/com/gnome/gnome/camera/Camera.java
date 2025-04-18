@@ -1,21 +1,13 @@
 package com.gnome.gnome.camera;
-
 import com.gnome.gnome.editor.utils.TypeOfObjects;
 import com.gnome.gnome.player.Player;
+import javafx.geometry.Insets;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-
-import lombok.AllArgsConstructor;
 import lombok.Data;
-
 import java.util.Objects;
-
-import java.util.Objects;
-
 import static com.gnome.gnome.editor.utils.EditorConstants.TILE_SIZE;
 
 /**
@@ -57,6 +49,9 @@ public class Camera {
      */
     public GridPane getViewport() {
         GridPane viewport = new GridPane();
+        viewport.setHgap(0);
+        viewport.setVgap(0);
+        viewport.setPadding(Insets.EMPTY);
         int totalRows = mapGrid.length;
         int totalCols = mapGrid[0].length;
         int half = viewportSize / 2;
@@ -72,6 +67,8 @@ public class Camera {
 
                 StackPane tilePane = new StackPane();
                 tilePane.setPrefSize(TILE_SIZE, TILE_SIZE);
+                tilePane.setMinSize(TILE_SIZE, TILE_SIZE);
+                tilePane.setMaxSize(TILE_SIZE, TILE_SIZE);
 
                 // Only add image if the tile is within map bounds.
                 if (row >= 0 && row < totalRows && col >= 0 && col < totalCols) {
@@ -81,7 +78,7 @@ public class Camera {
                     ));
                     icon.setFitWidth(TILE_SIZE);
                     icon.setFitHeight(TILE_SIZE);
-                    icon.setPreserveRatio(true);
+                    icon.setPreserveRatio(false); // Here maybe needed to change to true
                     tilePane.getChildren().add(icon);
                 } else {
                     tilePane.setStyle("-fx-background-color: darkgray;");
@@ -91,7 +88,7 @@ public class Camera {
                 tilePane.setStyle(tilePane.getStyle() + "-fx-border-color: black; -fx-border-width: 1;");
 
                 // Highlight player
-                if (row == playerY && col == playerX) {
+                if (row == player.getY() && col == player.getX()) {
                     tilePane.setStyle(tilePane.getStyle() + "-fx-border-color: yellow; -fx-border-width: 2;");
                 }
 
@@ -102,71 +99,7 @@ public class Camera {
         return viewport;
     }
 
-    /**
-     * Updates the camera's center based on the player's current position.
-     * Should be called after the player moves.
-    // ------------------- Player movement methods -------------------
 
-    /**
-     * Moves the player one tile to the left and updates the camera position accordingly.
-     */
-    public void movePlayerLeft() {
-        playerX--;
-        clampPlayer();
-        followPlayer();
-    }
-
-    /**
-     * Moves the player one tile to the right and updates the camera position accordingly.
-     */
-    public void movePlayerRight() {
-        playerX++;
-        clampPlayer();
-        followPlayer();
-    }
-
-    /**
-     * Moves the player one tile up and updates the camera position accordingly.
-     */
-    public void movePlayerUp() {
-        playerY--;
-        clampPlayer();
-        followPlayer();
-    }
-
-    /**
-     * Moves the player one tile down and updates the camera position accordingly.
-     */
-    public void movePlayerDown() {
-        playerY++;
-        clampPlayer();
-        followPlayer();
-    }
-
-    /**
-     * Moves the player by a specified offset in both x and y directions.
-     *
-     * @param dx horizontal offset
-     * @param dy vertical offset
-     */
-    public void movePlayer(int dx, int dy) {
-        playerX += dx;
-        playerY += dy;
-        clampPlayer();
-        followPlayer();
-    }
-
-    // ------------------- Internal logic -------------------
-
-    /**
-     * Clamps the player's coordinates to ensure they remain within the map boundaries.
-     */
-    private void clampPlayer() {
-        int maxX = mapGrid[0].length - 1;
-        int maxY = mapGrid.length - 1;
-        playerX = Math.max(0, Math.min(playerX, maxX));
-        playerY = Math.max(0, Math.min(playerY, maxY));
-    }
 
     /**
      * Updates the camera center to follow the player's position.

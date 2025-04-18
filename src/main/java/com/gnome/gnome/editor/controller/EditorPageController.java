@@ -11,6 +11,7 @@ import com.gnome.gnome.editor.utils.GridManager;
 import com.gnome.gnome.exceptions.DataAccessException;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
+import com.gnome.gnome.utils.annotation.MyValueInjection;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -89,7 +90,7 @@ public class EditorPageController {
     private final GridManager gridManager;
 
     /** Instance of CategoryGenerator to dynamically create inline buttons. */
-    private final CategoryGenerator categoryGenerator = new CategoryGenerator();
+    private CategoryGenerator categoryGenerator = new CategoryGenerator();
 
     private boolean autoCenterEnabled = true;
 
@@ -99,6 +100,7 @@ public class EditorPageController {
     public EditorPageController() {
         scaleTransform = new Scale(scale, scale);
         gridManager = new GridManager();
+        categoryGenerator = MyValueInjection.getInstance().createInstance(CategoryGenerator.class);
     }
 
     /**
@@ -380,7 +382,7 @@ public class EditorPageController {
      */
     @FXML
     protected void onBackButtonClick(ActionEvent event) {
-        pageSwitch.goHello(editorPage);
+        pageSwitch.goMainMenu(editorPage);
     }
 
     @FXML

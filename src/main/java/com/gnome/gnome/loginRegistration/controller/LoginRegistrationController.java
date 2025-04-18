@@ -1,5 +1,6 @@
 package com.gnome.gnome.loginRegistration.controller;
 
+import com.gnome.gnome.dao.userDAO.UserSession;
 import com.gnome.gnome.loginRegistration.service.LoginRegistrationService;
 import com.gnome.gnome.loginRegistration.service.LoginResult;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
@@ -56,8 +57,9 @@ public class LoginRegistrationController {
 
         LoginResult result = LoginRegistrationService.loginOrRegisterUser(username, password);
 
-        if (result.getUser() != null) {
-            pageSwitch.goHello(loginRegistretion);
+        if (result.getUser()!=(null)) {
+            UserSession.getInstance().setCurrentUser(result.getUser());
+            pageSwitch.goMainMenu(loginRegistretion);
         } else {
             loginMessage.setText(result.getMessage());
         }

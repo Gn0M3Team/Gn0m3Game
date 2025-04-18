@@ -53,7 +53,7 @@ public class NewGameController {
     }
     @FXML
     public void onMeinMenuButtonClick(ActionEvent e){
-        pageSwitch.goHello(newGamePage);
+        pageSwitch.goMainMenu(newGamePage);
     }
 
 
@@ -69,6 +69,7 @@ public class NewGameController {
             centerMenuPopup.setAutoHide(true);
 
             VBox menuBox = new VBox(20);
+            menuBox.getStylesheets().add(getClass().getResource("/com/gnome/gnome/pages/css/new-game.css").toExternalForm());
             menuBox.setAlignment(Pos.CENTER);
             menuBox.getStyleClass().add("menu-popup");
             menuBox.setStyle("-fx-background-color: #C0C0C0; -fx-padding: 20; -fx-background-radius: 20;");

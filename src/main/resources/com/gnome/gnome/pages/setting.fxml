@@ -8,6 +8,7 @@
                 xmlns:fx="http://javafx.com/fxml"
                 fx:id="settingPage"
                 styleClass="root-pane"
+                stylesheets="@./css/setting.css"
                 fx:controller="com.gnome.gnome.setting.SettingController"
                 prefHeight="400.0" prefWidth="600.0">
 

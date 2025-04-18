@@ -5,6 +5,7 @@ import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import lombok.Getter;
+import lombok.Setter;
 
 import static com.gnome.gnome.editor.utils.EditorConstants.TILE_SIZE;
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ public class Player {
     private final int maxHealth;
     private int currentHealth;
     private final Node representation;
+    private int playerCoins = 0;
 
     public Player(int startX, int startY, int maxHealth) {
         this.x = startX;
@@ -85,5 +87,9 @@ public class Player {
         this.x = startX;
         this.y = startY;
         this.currentHealth = maxHealth;
+    }
+
+    public void addCoin(int coin) {
+        playerCoins += coin;
     }
 }

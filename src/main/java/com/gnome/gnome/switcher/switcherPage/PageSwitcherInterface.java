@@ -17,7 +17,7 @@ public interface PageSwitcherInterface {
      *
      * @param anchorPane the current root pane from which the scene will switch
      */
-    void goHello(BorderPane anchorPane);
+    void goMainMenu(BorderPane anchorPane);
 
     /**
      * Navigates to the Continue Game page.
