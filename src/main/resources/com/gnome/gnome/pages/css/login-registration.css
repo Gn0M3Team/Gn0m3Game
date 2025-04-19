@@ -26,6 +26,7 @@
 /* Center VBox styling */
 .center-vbox {
     -fx-padding: 20; /* Match FXML */
+    /*-fx-background-color: #2a1a2a;*/
 }
 
 /* Section label styling ("Login to System") */

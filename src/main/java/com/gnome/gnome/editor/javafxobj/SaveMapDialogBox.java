@@ -48,8 +48,11 @@ public class SaveMapDialogBox {
                 button == processButtonType ? mapNameField.getText().trim() : null
         );
 
+        dialog.getDialogPane().getStylesheets().add(getClass().getResource("/com/gnome/gnome/pages/css/dialogs/dialog_save_map.css").toExternalForm());
+
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(name -> logger.info("Map name entered: " + name));
+
         return result;
     }
 }
