@@ -10,7 +10,8 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.gnome.gnome.profile.ProfileController"
-            stylesheets="css/profile.css"
+            fx:id="profilePage"
+            stylesheets="@./css/profile.css"
             styleClass="profile-root">
 
     <top>

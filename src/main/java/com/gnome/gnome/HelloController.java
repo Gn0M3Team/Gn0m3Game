@@ -1,22 +1,17 @@
 package com.gnome.gnome;
 
+import com.gnome.gnome.dao.userDAO.UserSession;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import com.gnome.gnome.components.LeaderBoardView;
 import javafx.animation.FadeTransition;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
-import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import java.io.IOException;
 import java.util.Objects;
 
 public class HelloController {
@@ -32,6 +27,7 @@ public class HelloController {
      */
     @FXML
     public void initialize() {
+        System.out.println("Currently logged in: " + UserSession.getInstance().getCurrentUser());
         pageSwitch=new SwitchPage();
         musicIcon.setImage(
                 new Image(
@@ -46,32 +42,24 @@ public class HelloController {
      * Navigates to the editor page when "Create a map" is clicked.
      */
     @FXML
-    protected void onEditorButtonClick(ActionEvent event) throws IOException {
-        Parent editorRoot = FXMLLoader.
-                load(Objects.requireNonNull(getClass().getResource("/com/gnome/gnome/pages/editor-view.fxml")));
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.getScene().setRoot(editorRoot);
+    protected void onEditorButtonClick(ActionEvent event){
+        pageSwitch.goEditor(helloPage);
     }
 
     /**
      * Navigates to the registration/switcher page.
      */
     @FXML
-    protected void onSwitcherButtonClick(ActionEvent event) throws IOException {
-        pageSwitch.goSwitch(helloPage);
+    protected void onNewGameButtonClick(ActionEvent event){
+        pageSwitch.goNewGame(helloPage);
     }
 
     /**
      * Placeholder for handling continue game logic (to be implemented).
      */
     @FXML
-    public void onContinueGameButtonClick(ActionEvent event) throws IOException {
-        Parent continueGameRoot = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/com/gnome/gnome/pages/continueGame.fxml")));
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.getScene().getStylesheets().add(
-                Objects.requireNonNull(getClass().getResource("/com/gnome/gnome/pages/css/continueGame.css")).toExternalForm()
-        );
-        stage.getScene().setRoot(continueGameRoot);
+    public void onContinueGameButtonClick(ActionEvent event) {
+        pageSwitch.goContinueGame(helloPage);
     }
 
     /**
@@ -79,6 +67,17 @@ public class HelloController {
      */
     @FXML
     public void onSettingsButtonClick(ActionEvent event) {
+        pageSwitch.goSetting(helloPage);
+    }
+
+    /**
+     * Returns the main layout container (BorderPane) of the Hello page.
+     *
+     * @return the BorderPane representing the Hello page UI.
+     */
+    @FXML
+    public BorderPane getHelloPage() {
+        return helloPage;
     }
 
     /**
@@ -87,7 +86,7 @@ public class HelloController {
      */
     @FXML
     public void onLeaderBoardButtonClick(ActionEvent event) {
-        this.leaderboard = new LeaderBoardView(() -> {
+        this.leaderboard = new LeaderBoardView(this,() -> {
             FadeTransition fadeOut = new FadeTransition(Duration.millis(500), this.leaderboard);
             fadeOut.setFromValue(1.0);
             fadeOut.setToValue(0.0);
@@ -110,6 +109,7 @@ public class HelloController {
      */
     @FXML
     public void onExitButtonClick(ActionEvent event) {
-        Platform.exit();
+//        Platform.exit();
+        pageSwitch.goLogin(helloPage);
     }
 }

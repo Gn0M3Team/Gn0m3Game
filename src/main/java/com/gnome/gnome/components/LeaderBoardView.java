@@ -1,13 +1,18 @@
 package com.gnome.gnome.components;
 
+import com.gnome.gnome.HelloController;
 import com.gnome.gnome.profile.ProfileController;
+import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
+import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import javafx.animation.FadeTransition;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -37,13 +42,18 @@ public class LeaderBoardView extends VBox {
     private int currentPage = 1;
     private final int pageSize = 17;
     private boolean loading = false;
-
+    private final HelloController parentController;
+    private PageSwitcherInterface pageSwitch;
     /**
      * Constructs a LeaderBoardView.
      *
      * @param onCloseAction a Runnable to be executed when the close button is pressed.
      */
-    public LeaderBoardView(Runnable onCloseAction) {
+    public LeaderBoardView(HelloController parentController,Runnable onCloseAction) {
+
+        this.parentController=parentController;
+        pageSwitch=new SwitchPage();
+
         // Set style and load the external css
         this.getStyleClass().add("leaderboard-view");
         this.getStylesheets().add(
@@ -186,23 +196,8 @@ public class LeaderBoardView extends VBox {
             String selected = listView.getSelectionModel().getSelectedItem();
             if (selected != null) {
                 logger.info("Opening profile for: " + selected);
-                try {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/gnome/gnome/pages/profile-page.fxml"));
-                    Parent profileRoot = loader.load();
-
-                    profileRoot.getStylesheets().add(
-                            Objects.requireNonNull(getClass().getResource("/com/gnome/gnome/pages/css/profile.css"))
-                                    .toExternalForm()
-                    );
-
-                    ProfileController profileController = loader.getController();
-                    profileController.setPlayer(selected);
-
-                    Stage stage = (Stage) listView.getScene().getWindow();
-                    stage.getScene().setRoot(profileRoot);
-                } catch (IOException e) {
-                    logger.log(Level.SEVERE, "Failed to load profile-page.fxml", e);
-                }
+                BorderPane helloPage = parentController.getHelloPage();
+                pageSwitch.goProfile(helloPage,selected);
             }
         }
     }

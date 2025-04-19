@@ -7,6 +7,7 @@
             prefWidth="618.0"
             xmlns="http://javafx.com/javafx/17.0.2-ea"
             xmlns:fx="http://javafx.com/fxml/1"
+            fx:id="editorPage"
             fx:controller="com.gnome.gnome.editor.controller.EditorPageController"
             stylesheets="@./css/mapEditor.css"
 >

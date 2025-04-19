@@ -8,6 +8,7 @@
         prefHeight="600.0"
         prefWidth="800.0"
         styleClass="root-pane"
+        stylesheets="@./css/continueGame.css"
         xmlns="http://javafx.com/javafx/17.0.2-ea"
         xmlns:fx="http://javafx.com/fxml/1"
         fx:controller="com.gnome.gnome.continueGame.ContinueGameController"

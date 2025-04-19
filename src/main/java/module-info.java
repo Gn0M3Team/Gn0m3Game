@@ -37,23 +37,21 @@ module com.gnome.gnome {
     opens com.gnome.gnome.profile to javafx.fxml;
     exports com.gnome.gnome.profile;
 
-    opens com.gnome.gnome.registration.controller to javafx.fxml;
-    exports com.gnome.gnome.registration.controller;
-
-    opens com.gnome.gnome.switcher.controller to javafx.fxml;
-    exports com.gnome.gnome.switcher.controller;
-
-    opens com.gnome.gnome.login.controller to javafx.fxml;
-    exports com.gnome.gnome.login.controller;
-
     opens com.gnome.gnome.continueGame to javafx.fxml;
     exports com.gnome.gnome.continueGame;
 
-    opens com.gnome.gnome.account.controller to javafx.fxml;
-    exports com.gnome.gnome.account.controller;
     exports com.gnome.gnome.dao.userDAO;
     opens com.gnome.gnome.dao.userDAO to javafx.fxml;
 
-    opens com.gnome.gnome.loginRegistration to javafx.fxml;
-    exports com.gnome.gnome.loginRegistration;
+    opens com.gnome.gnome.loginRegistration.controller to javafx.fxml;
+    exports com.gnome.gnome.loginRegistration.controller;
+
+    opens com.gnome.gnome.newGame to javafx.fxml;
+    exports com.gnome.gnome.newGame;
+
+    opens com.gnome.gnome.setting to javafx.fxml;
+    exports com.gnome.gnome.setting;
+
+    opens com.gnome.gnome.shopPopUp to javafx.fxml;
+    exports com.gnome.gnome.shopPopUp;
 }
