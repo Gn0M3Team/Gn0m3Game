@@ -1,0 +1,90 @@
+/* Load the Press Start 2P font */
+@font-face {
+    font-family: 'Press Start 2P';
+    src: url('../fonts/PressStart2P-Regular.ttf') format('truetype');
+}
+
+/* Root styling for the login and registration page */
+.login-registration-page {
+    -fx-background-image: url('../../images/background-2.jpg');
+    -fx-background-size: cover;
+    -fx-background-color: rgba(42, 26, 42, 0.5);
+    -fx-background-position: center;
+    -fx-background-repeat: no-repeat;
+}
+
+/* Top label styling */
+.top-label {
+    -fx-text-fill: #ffffff; /* White text from main menu */
+    -fx-font-family: "Press Start 2P", -apple-system;
+    -fx-font-size: 20px; /* Match FXML */
+    -fx-font-weight: bold;
+    -fx-padding: 10; /* Match FXML */
+    -fx-alignment: center;
+}
+
+/* Center VBox styling */
+.center-vbox {
+    -fx-padding: 20; /* Match FXML */
+}
+
+/* Section label styling ("Login to System") */
+.section-label {
+    -fx-text-fill: #ffffff; /* White text */
+    -fx-font-family: "Press Start 2P", -apple-system;
+    -fx-font-size: 20px; /* Match FXML */
+    -fx-font-weight: bold;
+}
+
+/* Input fields (TextField and PasswordField) */
+.input-field {
+    -fx-background-color: #4a3a4a; /* Matches leaderboard search-field */
+    -fx-border-color: #6a5a6a;
+    -fx-border-radius: 5;
+    -fx-padding: 5 10;
+    -fx-font-family: "Press Start 2P", -apple-system;
+    -fx-text-fill: #ffffff; /* White text */
+    -fx-font-size: 14px;
+    -fx-prompt-text-fill: #8a6a8a; /* Lighter purple for prompt text */
+    -fx-max-width: 350.0; /* Match FXML */
+}
+
+.input-field:hover {
+    -fx-border-color: #8a6a8a; /* Lighter border on hover */
+}
+
+.input-field:focused {
+    -fx-border-color: #6a4a6a; /* Slightly darker border when focused */
+}
+
+/* Login button styling */
+.action-button {
+    -fx-background-color: transperent;
+    -fx-background-image: url('../../images/button-background.png');
+    -fx-background-size: cover;
+    -fx-text-fill: #ffffff; /* White text */
+    -fx-font-family: "Press Start 2P", -apple-system;
+    -fx-font-size: 16px;
+    -fx-padding: 15px;
+    -fx-max-width: 300.0; /* Match FXML */
+    -fx-pref-height: 50px; /* Consistent with main menu buttons */
+    -fx-alignment: center;
+    -fx-cursor: hand;
+    -fx-border-color: black;
+    -fx-border-width: 2px;
+}
+
+.action-button:hover {
+    -fx-background-image: url('../../images/button-background-05.jpg');
+}
+
+.action-button:pressed {
+    -fx-background-color: linear-gradient(to bottom, #4a3a4a, #2a1a2a); /* Pressed gradient from main menu */
+}
+
+/* Message label styling */
+.message-label {
+    -fx-text-fill: #ff0000; /* Red as specified in FXML */
+    -fx-font-family: "Press Start 2P", -apple-system;
+    -fx-font-size: 12px;
+}
