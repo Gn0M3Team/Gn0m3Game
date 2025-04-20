@@ -60,7 +60,7 @@
 
 /* Login button styling */
 .action-button {
-    -fx-background-color: transperent;
+    -fx-background-color: transparent;
     -fx-background-image: url('../../images/button-background.png');
     -fx-background-size: cover;
     -fx-text-fill: #ffffff; /* White text */
