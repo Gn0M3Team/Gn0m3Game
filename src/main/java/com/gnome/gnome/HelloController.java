@@ -1,5 +1,6 @@
 package com.gnome.gnome;
 
+import com.gnome.gnome.music.MusicWizard;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import com.gnome.gnome.components.LeaderBoardView;
@@ -10,6 +11,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -23,16 +25,21 @@ public class HelloController {
 
     @FXML private ImageView musicIcon;
     @FXML
+    private Button musicButton;
+    @FXML
     private BorderPane helloPage;
     private PageSwitcherInterface pageSwitch;
     private LeaderBoardView leaderboard;
 
     /**
-     * Initializes the controller and sets the music icon image.
+     * Initializes the controller and sets the music icon for the button.
      */
     @FXML
     public void initialize() {
         pageSwitch=new SwitchPage();
+
+        musicButton = new Button();
+
         musicIcon.setImage(
                 new Image(
                         Objects.requireNonNull(
@@ -40,6 +47,9 @@ public class HelloController {
                         )
                 )
         );
+
+        musicButton.setGraphic(musicIcon);
+
     }
 
     /**
@@ -79,6 +89,7 @@ public class HelloController {
      */
     @FXML
     public void onSettingsButtonClick(ActionEvent event) {
+
     }
 
     /**
@@ -106,10 +117,28 @@ public class HelloController {
     }
 
     /**
+     * Starts and ends music by fading
+     */
+    @FXML
+    public void onMusicIconClick(ActionEvent event) {
+        //System.out.println("Music");
+        if (!MusicWizard.musicRunning){
+            MusicWizard.start_music_loop();
+            MusicWizard.start_ambient();
+        }
+
+        else{
+            MusicWizard.stop = true;
+            MusicWizard.stop_ambient();
+        }
+    }
+
+    /**
      * Closes the application.
      */
     @FXML
     public void onExitButtonClick(ActionEvent event) {
+        MusicWizard.stop = true;
         Platform.exit();
     }
 }
