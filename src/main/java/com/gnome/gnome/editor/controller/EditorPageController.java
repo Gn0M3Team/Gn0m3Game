@@ -3,6 +3,7 @@ package com.gnome.gnome.editor.controller;
 import com.gnome.gnome.dao.MapDAO;
 import com.gnome.gnome.editor.javafxobj.TemplateMapDialog;
 import com.gnome.gnome.editor.utils.BotType;
+import com.gnome.gnome.dao.userDAO.UserSession;
 import com.gnome.gnome.models.Map;
 import com.gnome.gnome.editor.javafxobj.SaveMapDialogBox;
 import com.gnome.gnome.editor.javafxobj.SelectorMapDialogBox;
@@ -10,17 +11,18 @@ import com.gnome.gnome.editor.utils.CategoryGenerator;
 import com.gnome.gnome.editor.utils.GenerateGrid;
 import com.gnome.gnome.editor.utils.GridManager;
 import com.gnome.gnome.exceptions.DataAccessException;
+import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
+import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import com.gnome.gnome.utils.annotation.MyValueInjection;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.ScrollEvent;
@@ -33,7 +35,6 @@ import javafx.scene.Group;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -68,6 +69,10 @@ public class EditorPageController {
     @FXML private HBox mainButtonsBox;
     @FXML private ScrollPane inlineScrollPane;
     @FXML private HBox inlineButtonsBox;
+
+    @FXML
+    private BorderPane editorPage;
+    private PageSwitcherInterface pageSwitch;
 
     private final MapDAO mapDAO = new MapDAO();
 
@@ -106,6 +111,8 @@ public class EditorPageController {
      */
     @FXML
     public void initialize() {
+        pageSwitch=new SwitchPage();
+
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         scrollPane.setFitToWidth(false);
@@ -380,16 +387,10 @@ public class EditorPageController {
      * Handles returning to the main menu when the back button is clicked.
      *
      * @param event Button click event.
-     * @throws IOException If the FXML file cannot be loaded.
      */
     @FXML
-    protected void onBackButtonClick(ActionEvent event) throws IOException {
-        URL fxmlUrl = getClass().getResource("/com/gnome/gnome/pages/main-menu.fxml");
-        Objects.requireNonNull(fxmlUrl, "FXML file not found!");
-
-        Parent mainRoot = FXMLLoader.load(fxmlUrl);
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.getScene().setRoot(mainRoot);
+    protected void onBackButtonClick(ActionEvent event) {
+        pageSwitch.goMainMenu(editorPage);
     }
 
     @FXML
