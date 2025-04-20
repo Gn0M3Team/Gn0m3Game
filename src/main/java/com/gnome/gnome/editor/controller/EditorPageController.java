@@ -1,6 +1,8 @@
 package com.gnome.gnome.editor.controller;
 
 import com.gnome.gnome.dao.MapDAO;
+import com.gnome.gnome.editor.javafxobj.TemplateMapDialog;
+import com.gnome.gnome.editor.utils.BotType;
 import com.gnome.gnome.dao.userDAO.UserSession;
 import com.gnome.gnome.models.Map;
 import com.gnome.gnome.editor.javafxobj.SaveMapDialogBox;
@@ -39,6 +41,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
 
 import static com.gnome.gnome.editor.utils.EditorConstants.*;
 import static javafx.scene.input.TransferMode.COPY;
@@ -170,14 +173,12 @@ public class EditorPageController {
             Platform.runLater(() -> {
                 // Loop through the retrieved items.
                 for (Object item : items) {
-                    if (item instanceof String s) {
-                        createInlineButton(s);
-                    } else if (item instanceof ImageView iv) {
-                        iv.setFitWidth(64);
-                        iv.setPreserveRatio(true);
-                        inlineButtonsBox.getChildren().add(iv);
+                    if (item instanceof BotType botType) {
+                        createInlineButton(botType);
                     }
                 }
+
+
                 // Add a "Back" button to allow returning to the main category row.
                 Button backButton = new Button("Back");
 
@@ -194,6 +195,7 @@ public class EditorPageController {
             logger.log(Level.SEVERE, "Failed to retrieve category items", ex);
             return null;
         });
+
     }
 
     /**
@@ -231,18 +233,43 @@ public class EditorPageController {
     }
 
     /**
-     * Dynamically creates an inline button with the given text and applies styling.
+     * Creates an inline button for a given {@link BotType} and adds it to the {@link HBox} container.
      * <p>
-     * The created button is also configured to be draggable.
+     * This method dynamically generates a button with the name of the bot type as its text. It also sets the
+     * background image of the button based on the image path provided by the {@link BotType}. The button is
+     * styled with CSS properties, including background image, size, text color, and border radius.
+     * Additionally, the button is made draggable using the {@link #setupDragForButton(Button)} method.
      *
-     * @param text the text for the inline button
+     * @param botType the {@link BotType} object containing the name and image path for the button
+     * @throws NullPointerException if the {@link BotType} object is null or its image path cannot be found
+     * @see BotType
      */
-    private void createInlineButton(String text) {
-        Button subButton = new Button(text);
+    private void createInlineButton(BotType botType) {
+        Button subButton = new Button(botType.getName());
+
+        // Dynamically set background image for each button
+        String imagePath = botType.getImagePath();
+        URL resource = getClass().getResource(imagePath);
+
+        if (resource != null) {
+            String imageUrl = resource.toExternalForm();
+            subButton.setStyle("-fx-background-image: url(" + imageUrl + ");"
+                    + "-fx-background-repeat: no-repeat;"
+                    + "-fx-background-size: cover;"
+                    + "-fx-background-position: center;"
+                    + "-fx-text-fill: white;"
+                    + "-fx-font-size: 10px;"
+                    + "-fx-border-radius: 5px;"
+                    + "-fx-border-color: transparent;");
+
+            // Set button size
+            subButton.setPrefSize(100, 100); // Set button size
+        }
 
         setupDragForButton(subButton);
         inlineButtonsBox.getChildren().add(subButton);
     }
+
 
 
     /**
@@ -599,4 +626,62 @@ public class EditorPageController {
     private void onClearButtonClick(ActionEvent event) {
         createAndSetEmptyGrid();
     }
+
+
+    /**
+     * Handles the event when the user selects a map from the list of available maps in the resources.
+     * <p>
+     * This method opens a dialog where the user can choose a map. Once the map is selected, the method
+     * checks if the map exists in the resources directory (`com/gnome/gnome/maps`). If the map file
+     * is found with the specified name and ends with `.map`, it is loaded into the game using the
+     * `loadMapFromFile()` method.
+     * </p>
+     *
+     * @param event the {@link ActionEvent} triggered when the user selects a map.
+     */
+    @FXML
+    protected void onLoadMapFromResources(ActionEvent event) {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+        TemplateMapDialog mapSelectorDialog = new TemplateMapDialog();
+
+        Optional<String> result = mapSelectorDialog.showDialog(stage);
+
+        result.ifPresent(selectedMapName -> {
+            logger.info("Selected map: " + selectedMapName);
+
+            try {
+                URL mapsDirUrl = getClass().getClassLoader().getResource("com/gnome/gnome/maps");
+
+                if (mapsDirUrl != null) {
+                    File mapsDirectory = new File(mapsDirUrl.toURI());
+
+                    if (mapsDirectory.exists() && mapsDirectory.isDirectory()) {
+                        File[] mapFiles = mapsDirectory.listFiles(file -> file.getName().endsWith(".map"));
+
+                        boolean mapFound = false;
+                        for (File mapFile : mapFiles) {
+                            if (mapFile.getName().equals(selectedMapName)) {
+                                logger.info("Map file found: " + mapFile.getPath());
+                                loadMapFromFile(mapFile);
+                                mapFound = true;
+                                break;
+                            }
+                        }
+
+                        if (!mapFound) {
+                            logger.log(Level.SEVERE, "Map file not found with the name: " + selectedMapName);
+                        }
+                    } else {
+                        logger.severe("Maps directory not found or it's not a directory.");
+                    }
+                } else {
+                    logger.log(Level.SEVERE, "Maps directory URL is null.");
+                }
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "Error loading map from resources", e);
+            }
+        });
+    }
+
 }

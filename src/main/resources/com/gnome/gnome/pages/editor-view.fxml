@@ -79,6 +79,9 @@
                 <Button onAction="#onClearButtonClick" text="Clear" />
             </children>
             <children>
+                <Button onAction="#onLoadMapFromResources" text="Templates" />
+            </children>
+            <children>
                 <Button onAction="#onLoadMapButtonClick" text="Load Map" />
             </children>
             <children>
