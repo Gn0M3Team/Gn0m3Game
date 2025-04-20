@@ -1,6 +1,7 @@
 package com.gnome.gnome.editor.controller;
 
 import com.gnome.gnome.dao.MapDAO;
+import com.gnome.gnome.editor.javafxobj.TemplateMapDialog;
 import com.gnome.gnome.editor.utils.BotType;
 import com.gnome.gnome.models.Map;
 import com.gnome.gnome.editor.javafxobj.SaveMapDialogBox;
@@ -19,18 +20,11 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TitledPane;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Scale;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -46,6 +40,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
 
 import static com.gnome.gnome.editor.utils.EditorConstants.*;
 import static javafx.scene.input.TransferMode.COPY;
@@ -630,4 +625,62 @@ public class EditorPageController {
     private void onClearButtonClick(ActionEvent event) {
         createAndSetEmptyGrid();
     }
+
+
+    /**
+     * Handles the event when the user selects a map from the list of available maps in the resources.
+     * <p>
+     * This method opens a dialog where the user can choose a map. Once the map is selected, the method
+     * checks if the map exists in the resources directory (`com/gnome/gnome/maps`). If the map file
+     * is found with the specified name and ends with `.map`, it is loaded into the game using the
+     * `loadMapFromFile()` method.
+     * </p>
+     *
+     * @param event the {@link ActionEvent} triggered when the user selects a map.
+     */
+    @FXML
+    protected void onLoadMapFromResources(ActionEvent event) {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+        TemplateMapDialog mapSelectorDialog = new TemplateMapDialog();
+
+        Optional<String> result = mapSelectorDialog.showDialog(stage);
+
+        result.ifPresent(selectedMapName -> {
+            logger.info("Selected map: " + selectedMapName);
+
+            try {
+                URL mapsDirUrl = getClass().getClassLoader().getResource("com/gnome/gnome/maps");
+
+                if (mapsDirUrl != null) {
+                    File mapsDirectory = new File(mapsDirUrl.toURI());
+
+                    if (mapsDirectory.exists() && mapsDirectory.isDirectory()) {
+                        File[] mapFiles = mapsDirectory.listFiles(file -> file.getName().endsWith(".map"));
+
+                        boolean mapFound = false;
+                        for (File mapFile : mapFiles) {
+                            if (mapFile.getName().equals(selectedMapName)) {
+                                logger.info("Map file found: " + mapFile.getPath());
+                                loadMapFromFile(mapFile);
+                                mapFound = true;
+                                break;
+                            }
+                        }
+
+                        if (!mapFound) {
+                            logger.log(Level.SEVERE, "Map file not found with the name: " + selectedMapName);
+                        }
+                    } else {
+                        logger.severe("Maps directory not found or it's not a directory.");
+                    }
+                } else {
+                    logger.log(Level.SEVERE, "Maps directory URL is null.");
+                }
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "Error loading map from resources", e);
+            }
+        });
+    }
+
 }
