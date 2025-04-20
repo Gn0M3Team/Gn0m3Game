@@ -1,6 +1,9 @@
 package com.gnome.gnome.editor.controller;
 
 import com.gnome.gnome.dao.MapDAO;
+import com.gnome.gnome.editor.javafxobj.TemplateMapDialog;
+import com.gnome.gnome.editor.utils.BotType;
+import com.gnome.gnome.dao.userDAO.UserSession;
 import com.gnome.gnome.models.Map;
 import com.gnome.gnome.editor.javafxobj.SaveMapDialogBox;
 import com.gnome.gnome.editor.javafxobj.SelectorMapDialogBox;
@@ -8,30 +11,22 @@ import com.gnome.gnome.editor.utils.CategoryGenerator;
 import com.gnome.gnome.editor.utils.GenerateGrid;
 import com.gnome.gnome.editor.utils.GridManager;
 import com.gnome.gnome.exceptions.DataAccessException;
+import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
+import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import com.gnome.gnome.utils.annotation.MyValueInjection;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TitledPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.ScrollEvent;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.layout.*;
 import javafx.scene.transform.Scale;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -47,6 +42,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
 
 import static com.gnome.gnome.editor.utils.EditorConstants.*;
 import static javafx.scene.input.TransferMode.COPY;
@@ -75,6 +71,10 @@ public class EditorPageController {
     @FXML private ScrollPane inlineScrollPane;
     @FXML private HBox inlineButtonsBox;
 
+    @FXML
+    private BorderPane editorPage;
+    private PageSwitcherInterface pageSwitch;
+
     private final MapDAO mapDAO = new MapDAO();
 
     /** Default zoom level */
@@ -91,7 +91,7 @@ public class EditorPageController {
     private final Scale scaleTransform;
 
     /** GridManager instance that now holds the grid pane internally. */
-    private final GridManager gridManager;
+    private GridManager gridManager;
 
     /** Instance of CategoryGenerator to dynamically create inline buttons. */
     private CategoryGenerator categoryGenerator = new CategoryGenerator();
@@ -112,6 +112,8 @@ public class EditorPageController {
      */
     @FXML
     public void initialize() {
+        pageSwitch=new SwitchPage();
+
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         scrollPane.setFitToWidth(false);
@@ -172,26 +174,15 @@ public class EditorPageController {
             Platform.runLater(() -> {
                 // Loop through the retrieved items.
                 for (Object item : items) {
-                    if (item instanceof String s) {
-                        createInlineButton(s);
-                    } else if (item instanceof ImageView iv) {
-                        iv.setFitWidth(64);
-                        iv.setPreserveRatio(true);
-                        inlineButtonsBox.getChildren().add(iv);
+                    if (item instanceof BotType botType) {
+                        createInlineButton(botType);
                     }
                 }
+
+
                 // Add a "Back" button to allow returning to the main category row.
                 Button backButton = new Button("Back");
-                backButton.setStyle(
-                        "-fx-background-color: linear-gradient(to bottom, #f9f9f9, #e6e6e6); " +
-                                "-fx-text-fill: #333; " +
-                                "-fx-font-size: 14px; " +
-                                "-fx-padding: 6 12; " +
-                                "-fx-background-radius: 4; " +
-                                "-fx-border-color: #ccc; " +
-                                "-fx-border-radius: 4; " +
-                                "-fx-border-width: 1;"
-                );
+
                 backButton.setOnAction(this::onBackToMainButtonClick);
                 inlineButtonsBox.getChildren().add(backButton);
 
@@ -205,6 +196,7 @@ public class EditorPageController {
             logger.log(Level.SEVERE, "Failed to retrieve category items", ex);
             return null;
         });
+
     }
 
     /**
@@ -242,28 +234,43 @@ public class EditorPageController {
     }
 
     /**
-     * Dynamically creates an inline button with the given text and applies styling.
+     * Creates an inline button for a given {@link BotType} and adds it to the {@link HBox} container.
      * <p>
-     * The created button is also configured to be draggable.
+     * This method dynamically generates a button with the name of the bot type as its text. It also sets the
+     * background image of the button based on the image path provided by the {@link BotType}. The button is
+     * styled with CSS properties, including background image, size, text color, and border radius.
+     * Additionally, the button is made draggable using the {@link #setupDragForButton(Button)} method.
      *
-     * @param text the text for the inline button
+     * @param botType the {@link BotType} object containing the name and image path for the button
+     * @throws NullPointerException if the {@link BotType} object is null or its image path cannot be found
+     * @see BotType
      */
-    private void createInlineButton(String text) {
-        Button subButton = new Button(text);
+    private void createInlineButton(BotType botType) {
+        Button subButton = new Button(botType.getName());
 
-        subButton.setStyle(
-                "-fx-background-color: linear-gradient(to bottom, #f9f9f9, #e6e6e6); " +
-                        "-fx-text-fill: #333; " +
-                        "-fx-font-size: 14px; " +
-                        "-fx-padding: 6 12; " +
-                        "-fx-background-radius: 4; " +
-                        "-fx-border-color: #ccc; " +
-                        "-fx-border-radius: 4; " +
-                        "-fx-border-width: 1;"
-        );
+        // Dynamically set background image for each button
+        String imagePath = botType.getImagePath();
+        URL resource = getClass().getResource(imagePath);
+
+        if (resource != null) {
+            String imageUrl = resource.toExternalForm();
+            subButton.setStyle("-fx-background-image: url(" + imageUrl + ");"
+                    + "-fx-background-repeat: no-repeat;"
+                    + "-fx-background-size: cover;"
+                    + "-fx-background-position: center;"
+                    + "-fx-text-fill: white;"
+                    + "-fx-font-size: 10px;"
+                    + "-fx-border-radius: 5px;"
+                    + "-fx-border-color: transparent;");
+
+            // Set button size
+            subButton.setPrefSize(100, 100); // Set button size
+        }
+
         setupDragForButton(subButton);
         inlineButtonsBox.getChildren().add(subButton);
     }
+
 
 
     /**
@@ -381,16 +388,10 @@ public class EditorPageController {
      * Handles returning to the main menu when the back button is clicked.
      *
      * @param event Button click event.
-     * @throws IOException If the FXML file cannot be loaded.
      */
     @FXML
-    protected void onBackButtonClick(ActionEvent event) throws IOException {
-        URL fxmlUrl = getClass().getResource("/com/gnome/gnome/pages/main-menu.fxml");
-        Objects.requireNonNull(fxmlUrl, "FXML file not found!");
-
-        Parent mainRoot = FXMLLoader.load(fxmlUrl);
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.getScene().setRoot(mainRoot);
+    protected void onBackButtonClick(ActionEvent event) {
+        pageSwitch.goMainMenu(editorPage);
     }
 
     @FXML
@@ -455,6 +456,8 @@ public class EditorPageController {
         gridPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         gridPane.getTransforms().clear();
         gridPane.getTransforms().add(scaleTransform);
+
+        gridManager = new GridManager(gridPane);
 
         Group zoomGroup = new Group(gridPane);
 
@@ -624,4 +627,62 @@ public class EditorPageController {
     private void onClearButtonClick(ActionEvent event) {
         createAndSetEmptyGrid();
     }
+
+
+    /**
+     * Handles the event when the user selects a map from the list of available maps in the resources.
+     * <p>
+     * This method opens a dialog where the user can choose a map. Once the map is selected, the method
+     * checks if the map exists in the resources directory (`com/gnome/gnome/maps`). If the map file
+     * is found with the specified name and ends with `.map`, it is loaded into the game using the
+     * `loadMapFromFile()` method.
+     * </p>
+     *
+     * @param event the {@link ActionEvent} triggered when the user selects a map.
+     */
+    @FXML
+    protected void onLoadMapFromResources(ActionEvent event) {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+        TemplateMapDialog mapSelectorDialog = new TemplateMapDialog();
+
+        Optional<String> result = mapSelectorDialog.showDialog(stage);
+
+        result.ifPresent(selectedMapName -> {
+            logger.info("Selected map: " + selectedMapName);
+
+            try {
+                URL mapsDirUrl = getClass().getClassLoader().getResource("com/gnome/gnome/maps");
+
+                if (mapsDirUrl != null) {
+                    File mapsDirectory = new File(mapsDirUrl.toURI());
+
+                    if (mapsDirectory.exists() && mapsDirectory.isDirectory()) {
+                        File[] mapFiles = mapsDirectory.listFiles(file -> file.getName().endsWith(".map"));
+
+                        boolean mapFound = false;
+                        for (File mapFile : mapFiles) {
+                            if (mapFile.getName().equals(selectedMapName)) {
+                                logger.info("Map file found: " + mapFile.getPath());
+                                loadMapFromFile(mapFile);
+                                mapFound = true;
+                                break;
+                            }
+                        }
+
+                        if (!mapFound) {
+                            logger.log(Level.SEVERE, "Map file not found with the name: " + selectedMapName);
+                        }
+                    } else {
+                        logger.severe("Maps directory not found or it's not a directory.");
+                    }
+                } else {
+                    logger.log(Level.SEVERE, "Maps directory URL is null.");
+                }
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "Error loading map from resources", e);
+            }
+        });
+    }
+
 }

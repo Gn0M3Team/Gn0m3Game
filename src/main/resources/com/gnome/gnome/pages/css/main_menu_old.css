@@ -10,11 +10,9 @@
 
 /* Root pane styling */
 .root-pane {
-    -fx-background-image: url('../../images/background-2.jpg');
+    -fx-background-color: #2a1a2a; /* Dark purple background */
+    /* If you have a textured image, you can use: -fx-background-image: url('path/to/texture.png'); */
     -fx-background-size: cover;
-    -fx-background-color: rgba(42, 26, 42, 0.5);
-    -fx-background-position: center;
-    -fx-background-repeat: no-repeat;
 }
 
 /* Top bar styling */
@@ -52,44 +50,25 @@
     -fx-font-weight: bold;
     -fx-padding: 20px 0;
 }
-.menu-error {
-    -fx-font-size: 12px;
-    -fx-text-fill: red;
-    -fx-font-family: "Press Start 2P", -apple-system;
-    -fx-alignment: center;
-    -fx-text-alignment: center;
-    -fx-max-width: 500;
-}
-.input-field {
-    -fx-text-fill: #000000;
-    -fx-font-size: 14px;
-    -fx-font-family: "Press Start 2P", -apple-system;
-    -fx-pref-height: 30px;
-    -fx-background-radius: 8px;
-    -fx-border-radius: 8px;
-    -fx-border-color: #000000;
-    -fx-padding: 8px;
-}
 
 /* Menu buttons */
 .menu-button {
-    -fx-background-color: transparent;
-    -fx-background-image: url('../../images/button-background.png');
-    -fx-background-size: cover;
-    -fx-text-fill: #ffffff; /* White text */
-    -fx-font-family: "Press Start 2P", -apple-system;
+    -fx-background-color: linear-gradient(to bottom, #6a4a6a, #4a3a4a); /* Purple gradient */
+    -fx-text-fill: white;
+    -fx-font-family: "Press Start 2P";
     -fx-font-size: 16px;
     -fx-padding: 15px;
     -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
     -fx-pref-width: 300px;
     -fx-pref-height: 50px;
     -fx-alignment: center;
-    -fx-cursor: hand;
-    -fx-border-color: black;
-    -fx-border-width: 2px;
 }
 
 .menu-button:hover {
-    -fx-background-image: url('../../images/button-background-05.jpg');
+    -fx-background-color: linear-gradient(to bottom, #8a6a8a, #6a5a6a);
 }
 
+.menu-button:pressed {
+    -fx-background-color: linear-gradient(to bottom, #4a3a4a, #2a1a2a);
+}
