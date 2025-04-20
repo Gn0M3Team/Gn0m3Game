@@ -3,23 +3,17 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
-<BorderPane fx:id="loginRegistretion" prefHeight="400.0" prefWidth="600.0"
-            xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.gnome.gnome.loginRegistration.LoginRegistrationController">
-
-    <top>
-        <Label text="Login and Registration" style="-fx-font-size: 20px; -fx-padding: 10; -fx-alignment: center;"/>
-    </top>
-
-    <center>
-        <VBox alignment="CENTER" spacing="20" style="-fx-padding: 20">
-            <Label text="Login to System" style="-fx-font-size: 20px"/>
-            <TextField fx:id="loginUsername" promptText="Username" maxWidth="350.0"/>
-            <PasswordField fx:id="loginPassword" promptText="Password" maxWidth="350.0"/>
-            <Button fx:id="loginButton" text="Login" onAction="#handleLogin" maxWidth="300.0"/>
-            <Label fx:id="loginMessage" text="" style="-fx-text-fill: red"/>
-        </VBox>
-    </center>
-
+<BorderPane fx:id="loginRegistretion" prefHeight="400.0" prefWidth="600.0" styleClass="login-registration-page" stylesheets="@./css/login-registration.css" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.gnome.gnome.loginRegistration.LoginRegistrationController">
+<top>
+    <Label text="Login and Registration" styleClass="top-label" />
+</top>
+<center>
+    <VBox alignment="CENTER" spacing="20" styleClass="center-vbox">
+        <Label text="Login to System" styleClass="section-label" />
+        <TextField fx:id="loginUsername" promptText="Username" maxWidth="350.0" styleClass="input-field" />
+        <PasswordField fx:id="loginPassword" promptText="Password" maxWidth="350.0" styleClass="input-field" />
+        <Button fx:id="loginButton" text="Login" onAction="#handleLogin" maxWidth="300.0" styleClass="action-button" />
+        <Label fx:id="loginMessage" text="" styleClass="message-label" />
+    </VBox>
+</center>
 </BorderPane>
