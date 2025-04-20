@@ -55,7 +55,7 @@
 
 /* Menu buttons */
 .menu-button {
-    -fx-background-color: transperent;
+    -fx-background-color: transparent;
     -fx-background-image: url('../../images/button-background.png');
     -fx-background-size: cover;
     -fx-text-fill: #ffffff; /* White text */
@@ -75,6 +75,3 @@
     -fx-background-image: url('../../images/button-background-05.jpg');
 }
 
-/*.menu-button:pressed {*/
-/*    -fx-background-color: linear-gradient(to bottom, #4a3a4a, #2a1a2a);*/
-/*}*/

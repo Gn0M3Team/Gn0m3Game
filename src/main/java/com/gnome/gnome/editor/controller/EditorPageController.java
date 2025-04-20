@@ -1,6 +1,7 @@
 package com.gnome.gnome.editor.controller;
 
 import com.gnome.gnome.dao.MapDAO;
+import com.gnome.gnome.editor.utils.BotType;
 import com.gnome.gnome.models.Map;
 import com.gnome.gnome.editor.javafxobj.SaveMapDialogBox;
 import com.gnome.gnome.editor.javafxobj.SelectorMapDialogBox;
@@ -21,15 +22,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TitledPane;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.ScrollEvent;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Scale;
@@ -172,14 +171,12 @@ public class EditorPageController {
             Platform.runLater(() -> {
                 // Loop through the retrieved items.
                 for (Object item : items) {
-                    if (item instanceof String s) {
-                        createInlineButton(s);
-                    } else if (item instanceof ImageView iv) {
-                        iv.setFitWidth(64);
-                        iv.setPreserveRatio(true);
-                        inlineButtonsBox.getChildren().add(iv);
+                    if (item instanceof BotType botType) {
+                        createInlineButton(botType);
                     }
                 }
+
+
                 // Add a "Back" button to allow returning to the main category row.
                 Button backButton = new Button("Back");
 
@@ -196,6 +193,7 @@ public class EditorPageController {
             logger.log(Level.SEVERE, "Failed to retrieve category items", ex);
             return null;
         });
+
     }
 
     /**
@@ -233,18 +231,43 @@ public class EditorPageController {
     }
 
     /**
-     * Dynamically creates an inline button with the given text and applies styling.
+     * Creates an inline button for a given {@link BotType} and adds it to the {@link HBox} container.
      * <p>
-     * The created button is also configured to be draggable.
+     * This method dynamically generates a button with the name of the bot type as its text. It also sets the
+     * background image of the button based on the image path provided by the {@link BotType}. The button is
+     * styled with CSS properties, including background image, size, text color, and border radius.
+     * Additionally, the button is made draggable using the {@link #setupDragForButton(Button)} method.
      *
-     * @param text the text for the inline button
+     * @param botType the {@link BotType} object containing the name and image path for the button
+     * @throws NullPointerException if the {@link BotType} object is null or its image path cannot be found
+     * @see BotType
      */
-    private void createInlineButton(String text) {
-        Button subButton = new Button(text);
+    private void createInlineButton(BotType botType) {
+        Button subButton = new Button(botType.getName());
+
+        // Dynamically set background image for each button
+        String imagePath = botType.getImagePath();
+        URL resource = getClass().getResource(imagePath);
+
+        if (resource != null) {
+            String imageUrl = resource.toExternalForm();
+            subButton.setStyle("-fx-background-image: url(" + imageUrl + ");"
+                    + "-fx-background-repeat: no-repeat;"
+                    + "-fx-background-size: cover;"
+                    + "-fx-background-position: center;"
+                    + "-fx-text-fill: white;"
+                    + "-fx-font-size: 10px;"
+                    + "-fx-border-radius: 5px;"
+                    + "-fx-border-color: transparent;");
+
+            // Set button size
+            subButton.setPrefSize(100, 100); // Set button size
+        }
 
         setupDragForButton(subButton);
         inlineButtonsBox.getChildren().add(subButton);
     }
+
 
 
     /**
