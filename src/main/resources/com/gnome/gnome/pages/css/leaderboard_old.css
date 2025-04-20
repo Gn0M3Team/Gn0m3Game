@@ -8,11 +8,11 @@
 
 .leaderboard-view {
     -fx-pref-width: 300;
-    -fx-background-color: #3b282c; /* Dark purple from main menu */
+    -fx-background-color: #2a1a2a; /* Dark purple from main menu */
 }
 
 .leaderboard-container {
-    -fx-background-color: #3B262F; /* Dark purple from main menu */
+    -fx-background-color: #2a1a2a; /* Dark purple from main menu */
     -fx-padding: 20;
     -fx-spacing: 10;
 }
@@ -28,9 +28,9 @@
 }
 
 .radio-button {
-    -fx-background-color: #3B262F; /* Matches top-button from main menu */
+    -fx-background-color: #4a3a4a; /* Matches top-button from main menu */
     -fx-background-radius: 15;
-    -fx-border-color: #3A2B30; /* Slightly lighter for border */
+    -fx-border-color: #6a5a6a; /* Slightly lighter for border */
     -fx-border-radius: 15;
     -fx-padding: 5 15;
     -fx-text-fill: #ffffff; /* White text from main menu */
@@ -47,12 +47,12 @@
 }
 
 .radio-button:selected {
-    -fx-background-color: linear-gradient(to bottom, #3B2E34, rgba(79, 57, 60, 0.49)); /* Gradient from main menu */
-    -fx-border-color: #2A181F; /* Lighter border for selected state */
+    -fx-background-color: linear-gradient(to bottom, #6a4a6a, #4a3a4a); /* Gradient from main menu */
+    -fx-border-color: #8a6a8a; /* Lighter border for selected state */
 }
 
 .radio-button:hover {
-    -fx-background-color: #3E2C31; /* Matches top-button hover from main menu */
+    -fx-background-color: #6a5a6a; /* Matches top-button hover from main menu */
 }
 
 .radio-row {
@@ -69,27 +69,27 @@
 }
 
 .search-field {
-    -fx-background-color: #472D3C; /* Matches top-button background */
-    -fx-border-color: #472D3C;
+    -fx-background-color: #4a3a4a; /* Matches top-button background */
+    -fx-border-color: #6a5a6a;
     -fx-border-radius: 5;
     -fx-padding: 5 10;
     -fx-font-family: "Press Start 2P", -apple-system;
     -fx-text-fill: #ffffff; /* White text */
-    -fx-prompt-text-fill: rgba(255, 255, 255, 0.3);
     -fx-font-size: 14px;
+    -fx-prompt-text-fill: #8a6a8a; /* Lighter purple for prompt text */
 }
 
 .search-field:hover {
-    -fx-border-color: #7A5A7A; /* Lighter border on hover */
+    -fx-border-color: #8a6a8a; /* Lighter border on hover */
 }
 
 .search-field:focused {
-    -fx-border-color: #5D3A5D; /* Slightly darker border when focused */
+    -fx-border-color: #6a4a6a; /* Slightly darker border when focused */
 }
 
 .list-view {
-    -fx-background-color: #472D3C; /* Matches top-button background */
-    -fx-border-color: #472D3C;
+    -fx-background-color: #4a3a4a; /* Matches top-button background */
+    -fx-border-color: #6a5a6a;
     -fx-border-radius: 5;
     -fx-background-insets: 0;
 }
@@ -103,11 +103,11 @@
 }
 
 .list-cell:filled:hover {
-    -fx-background-color: #472D3C; /* Matches top-button hover */
+    -fx-background-color: #6a5a6a; /* Matches top-button hover */
 }
 
 .list-cell:filled:selected, .list-cell:filled:selected:focused {
-    -fx-background-color: linear-gradient(to bottom, #472D3C, #472D3C); /* Gradient from main menu */
+    -fx-background-color: linear-gradient(to bottom, #6a4a6a, #4a3a4a); /* Gradient from main menu */
     -fx-text-fill: #ffffff; /* White text */
 }
 
@@ -116,24 +116,24 @@
 }
 
 .list-view .scroll-bar:vertical .track {
-    -fx-background-color: #2A181D; /* Matches root background */
+    -fx-background-color: #2a1a2a; /* Matches root background */
     -fx-background-radius: 8; /* Softer radius to match main menu buttons */
-    -fx-border-color: #472D3C; /* Subtle border to define the track */
+    -fx-border-color: #4a3a4a; /* Subtle border to define the track */
     -fx-border-radius: 8;
     -fx-border-width: 1;
 }
 
 .list-view .scroll-bar:vertical .thumb {
-    -fx-background-color: linear-gradient(to bottom, #472D3C, #472D3C); /* Gradient to match main menu buttons */
+    -fx-background-color: linear-gradient(to bottom, #6a4a6a, #4a3a4a); /* Gradient to match main menu buttons */
     -fx-background-radius: 8; /* Softer radius */
 }
 
 .list-view .scroll-bar:vertical .thumb:hover {
-    -fx-background-color: linear-gradient(to bottom, #7A5A7A, #472D3C); /* Gradient hover to match main menu buttons */
+    -fx-background-color: linear-gradient(to bottom, #8a6a8a, #6a5a6a); /* Gradient hover to match main menu buttons */
 }
 
 .list-view .scroll-bar:vertical .thumb:pressed {
-    -fx-background-color: linear-gradient(to bottom, #472D3C, #2A181D); /* Gradient pressed to match main menu */
+    -fx-background-color: linear-gradient(to bottom, #4a3a4a, #2a1a2a); /* Gradient pressed to match main menu */
 }
 
 .list-view .scroll-bar:vertical .increment-button,
@@ -149,24 +149,24 @@
 }
 
 .list-view .scroll-bar:horizontal .track {
-    -fx-background-color: #2A181D; /* Matches root background */
+    -fx-background-color: #2a1a2a; /* Matches root background */
     -fx-background-radius: 8; /* Softer radius to match main menu buttons */
-    -fx-border-color: #472D3C; /* Subtle border to define the track */
+    -fx-border-color: #4a3a4a; /* Subtle border to define the track */
     -fx-border-radius: 8;
     -fx-border-width: 1;
 }
 
 .list-view .scroll-bar:horizontal .thumb {
-    -fx-background-color: linear-gradient(to right, #472D3C, #472D3C); /* Gradient to match main menu buttons, adjusted for horizontal */
+    -fx-background-color: linear-gradient(to right, #6a4a6a, #4a3a4a); /* Gradient to match main menu buttons, adjusted for horizontal */
     -fx-background-radius: 8; /* Softer radius */
 }
 
 .list-view .scroll-bar:horizontal .thumb:hover {
-    -fx-background-color: linear-gradient(to right, #7A5A7A, #472D3C); /* Gradient hover to match main menu buttons */
+    -fx-background-color: linear-gradient(to right, #8a6a8a, #6a5a6a); /* Gradient hover to match main menu buttons */
 }
 
 .list-view .scroll-bar:horizontal .thumb:pressed {
-    -fx-background-color: linear-gradient(to right, #472D3C, #2A181D); /* Gradient pressed to match main menu */
+    -fx-background-color: linear-gradient(to right, #4a3a4a, #2a1a2a); /* Gradient pressed to match main menu */
 }
 
 .list-view .scroll-bar:horizontal .increment-button,
@@ -178,9 +178,9 @@
 }
 
 .close-button {
-    -fx-background-color: #472D3C; /* Matches top-button */
+    -fx-background-color: #4a3a4a; /* Matches top-button */
     -fx-background-radius: 8;
-    -fx-border-color: #472D3C;
+    -fx-border-color: #6a5a6a;
     -fx-border-radius: 8;
     -fx-text-fill: #ffffff; /* White text */
     -fx-font-weight: bold;
@@ -192,9 +192,9 @@
 }
 
 .close-button:hover {
-    -fx-background-color: #472D3C; /* Matches top-button hover */
+    -fx-background-color: #6a5a6a; /* Matches top-button hover */
 }
 
 .close-button:pressed {
-    -fx-background-color: linear-gradient(to bottom, #472D3C, #2A181D); /* Gradient from main menu */
+    -fx-background-color: linear-gradient(to bottom, #4a3a4a, #2a1a2a); /* Gradient from main menu */
 }

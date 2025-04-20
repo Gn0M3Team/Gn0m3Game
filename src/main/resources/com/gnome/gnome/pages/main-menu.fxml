@@ -13,7 +13,7 @@
         fx:id="helloPage"
         xmlns:fx="http://javafx.com/fxml/1"
         fx:controller="com.gnome.gnome.HelloController"
-        stylesheets="@./css/main_menu.css"
+        stylesheets="@./css/main_menu.css, @./css/leaderboard.css"
 >
 
     <top>
@@ -32,7 +32,7 @@
     <center>
         <StackPane>
             <VBox alignment="CENTER" maxWidth="400" spacing="20">
-                <Label styleClass="menu-title" text="MENU" />
+                <Label styleClass="menu-title" text="Dark Rifter" />
 
                 <Button maxWidth="Infinity" onAction="#onNewGameButtonClick" styleClass="menu-button" text="New game" />
 

@@ -1,0 +1,130 @@
+@font-face {
+    font-family: 'Press Start 2P';
+    src: url('../../fonts/PressStart2P-Regular.ttf') format('truetype');
+}
+
+/* Dialog pane styling */
+.dialog-pane {
+    -fx-background-color: #472D3C; /* Dark pink parchment background */
+    -fx-background-image: url("../../../images/button-background.png"); /* Parchment texture */
+    -fx-background-size: cover;
+    -fx-border-color: #6B4657; /* Darker pink border */
+    -fx-border-width: 2;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 10;
+    -fx-font-family: 'Press Start 2P', sans-serif;
+    -fx-font-size: 12px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 2);
+}
+
+/* Header panel styling */
+.dialog-pane .header-panel {
+    -fx-background-color: #2E1C26; /* Darker pink background */
+    -fx-padding: 10;
+    -fx-border-color: #4F2F3F;
+    -fx-border-width: 0 0 2 0;
+    -fx-background-radius: 8 8 0 0;
+}
+
+.dialog-pane .header-panel .label {
+    -fx-text-fill: #F4C8D4; /* Light pink text */
+    -fx-font-family: 'Press Start 2P', sans-serif;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+/* Content area styling */
+.dialog-pane .content {
+    -fx-padding: 10;
+    -fx-background-color: transparent;
+}
+
+/* Text field styling */
+.text-field {
+    -fx-background-color: #2E1C26; /* Darker pink background */
+    -fx-text-fill: #F4C8D4; /* Light pink text */
+    -fx-prompt-text-fill: #8F5B71; /* Lighter pink prompt text */
+    -fx-border-color: #6B4657; /* Dark pink border */
+    -fx-border-width: 2;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 8;
+    -fx-font-family: 'Press Start 2P', sans-serif;
+    -fx-font-size: 12px;
+    -fx-effect: innershadow(gaussian, rgba(0,0,0,0.2), 5, 0, 0, 1);
+}
+
+.text-field:focused {
+    -fx-border-color: #A35474; /* Brighter pink on focus */
+    -fx-border-width: 2;
+    -fx-background-color: #472D3C; /* Slightly lighter background */
+}
+
+/* Button bar styling */
+.dialog-pane .button-bar .button {
+    -fx-background-color:
+            linear-gradient(to bottom, #A35474, #6B4657),
+            linear-gradient(to bottom, #E8A7B9, #A35474);
+    -fx-background-insets: 0, 1;
+    -fx-text-fill: #2E1C26; /* Dark text */
+    -fx-font-family: 'Press Start 2P', sans-serif;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 16;
+    -fx-background-radius: 6;
+    -fx-border-color: #4F2F3F; /* Dark pink border */
+    -fx-border-width: 2;
+    -fx-border-radius: 6;
+    -fx-effect: innershadow(gaussian, rgba(0,0,0,0.2), 5, 0, 0, 1);
+}
+
+.dialog-pane .button-bar .button:hover {
+    -fx-background-color:
+            linear-gradient(to bottom, #C57694, #8F5B71),
+            linear-gradient(to bottom, #F4C8D4, #C57694);
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 12, 0, 0, 3);
+}
+
+.dialog-pane .button-bar .button:pressed {
+    -fx-background-color:
+            linear-gradient(to bottom, #8F5B71, #6B4657),
+            linear-gradient(to bottom, #A35474, #8F5B71);
+    -fx-effect: innershadow(gaussian, rgba(0,0,0,0.3), 8, 0, 0, 2);
+}
+
+.dialog-pane .button-bar .button:disabled {
+    -fx-background-color:
+            linear-gradient(to bottom, #6B4657, #4F2F3F),
+            linear-gradient(to bottom, #8F5B71, #6B4657);
+    -fx-text-fill: #8F5B71; /* Muted text for disabled state */
+    -fx-opacity: 0.6;
+}
+
+/* Cancel button specific styling */
+.dialog-pane .button-bar .button:cancel {
+    -fx-background-color:
+            linear-gradient(to bottom, #8F5B71, #6B4657),
+            linear-gradient(to bottom, #A35474, #8F5B71);
+    -fx-text-fill: #F4C8D4; /* Light pink text */
+}
+
+.dialog-pane .button-bar .button:cancel:hover {
+    -fx-background-color:
+            linear-gradient(to bottom, #C57694, #8F5B71),
+            linear-gradient(to bottom, #F4C8D4, #C57694);
+    -fx-text-fill: #2E1C26;
+}
+
+.dialog-pane .button-bar .button:cancel:pressed {
+    -fx-background-color:
+            linear-gradient(to bottom, #8F5B71, #6B4657),
+            linear-gradient(to bottom, #A35474, #8F5B71);
+}
+
+/* VBox styling for content spacing */
+.vbox {
+    -fx-spacing: 10;
+    -fx-background-color: transparent;
+}

@@ -1,0 +1,254 @@
+@font-face {
+    font-family: 'Press Start 2P';
+    src: url('../fonts/PressStart2P-Regular.ttf') format('truetype');
+}
+
+/* Root styles for BorderPane */
+BorderPane {
+    -fx-background-image: url('../../images/background-2.jpg');
+    -fx-background-size: cover;
+    -fx-background-color: rgba(71, 45, 60, 0.5); /* Dark pink overlay close to #472D3C */
+    -fx-background-position: center;
+    -fx-background-repeat: no-repeat;
+    -fx-font-family: 'Press Start 2P', sans-serif;
+}
+
+/* ScrollPane styling */
+ScrollPane {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+    -fx-border-color: #6B4657; /* Darker pink border */
+    -fx-border-width: 2;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+}
+
+/* ScrollBar styling for ScrollPane */
+ScrollPane .scroll-bar:vertical, ScrollPane .scroll-bar:horizontal {
+    -fx-background-color: #2E1C26; /* Darker pink track background */
+    -fx-background-radius: 5;
+    -fx-border-color: #4F2F3F;
+    -fx-border-width: 1;
+    -fx-border-radius: 5;
+}
+
+ScrollPane .scroll-bar .thumb {
+    -fx-background-color: #6B4657; /* Dark pink thumb */
+    -fx-background-radius: 5;
+    -fx-effect: innershadow(gaussian, rgba(0,0,0,0.3), 5, 0, 0, 1);
+}
+
+ScrollPane .scroll-bar .thumb:hover {
+    -fx-background-color: #8F5B71; /* Lighter pink on hover */
+}
+
+ScrollPane .scroll-bar .thumb:pressed {
+    -fx-background-color: #A35474; /* Slightly brighter pink when pressed */
+}
+
+ScrollPane .scroll-bar .track {
+    -fx-background-color: #2E1C26; /* Dark pink track */
+    -fx-background-radius: 5;
+}
+
+ScrollPane .scroll-bar .increment-button, ScrollPane .scroll-bar .decrement-button {
+    -fx-background-color: #472D3C; /* Dark pink buttons */
+    -fx-background-radius: 5;
+    -fx-border-color: #4F2F3F;
+    -fx-border-width: 1;
+    -fx-padding: 2;
+}
+
+ScrollPane .scroll-bar .increment-button:hover, ScrollPane .scroll-bar .decrement-button:hover {
+    -fx-background-color: #6B4657; /* Lighter pink on hover */
+}
+
+ScrollPane .scroll-bar .increment-button:pressed, ScrollPane .scroll-bar .decrement-button:pressed {
+    -fx-background-color: #8F5B71; /* Brighter pink when pressed */
+}
+
+ScrollPane .scroll-bar .increment-arrow, ScrollPane .scroll-bar .decrement-arrow {
+    -fx-shape: "M 0 0 L 6 6 L 12 0 Z"; /* Triangle shape */
+    -fx-background-color: #F4C8D4; /* Light pink arrow */
+    -fx-padding: 4;
+}
+
+/* StackPane container */
+StackPane {
+    -fx-background-color: #472D3C; /* Dark pink parchment */
+    -fx-background-size: cover;
+    -fx-border-color: #6B4657;
+    -fx-border-width: 2;
+    -fx-border-radius: 5;
+}
+
+/* Top VBox styling */
+VBox {
+    -fx-background-color: #472D3C; /* Dark pink wood panel */
+    -fx-border-color: #6B4657;
+    -fx-border-width: 0 0 2 0;
+    -fx-padding: 15 0 25 0;
+}
+
+/* Main category buttons HBox */
+HBox#mainButtonsBox {
+    -fx-background-color: #472D3C;
+    -fx-padding: 15;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 2);
+}
+
+/* Category buttons */
+Button {
+    -fx-background-color:
+            linear-gradient(to bottom, #A35474, #6B4657),
+            linear-gradient(to bottom, #E8A7B9, #A35474);
+    -fx-background-insets: 0, 1;
+    -fx-text-fill: #2E1C26;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-font-family: 'Digital Disco', sans-serif;
+    -fx-padding: 8 16;
+    -fx-background-radius: 6;
+    -fx-border-color: #4F2F3F;
+    -fx-border-width: 2;
+    -fx-border-radius: 6;
+    -fx-effect: innershadow(gaussian, rgba(0,0,0,0.2), 5, 0, 0, 1);
+}
+
+Button:hover {
+    -fx-background-color:
+            linear-gradient(to bottom, #C57694, #8F5B71),
+            linear-gradient(to bottom, #F4C8D4, #C57694);
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 12, 0, 0, 3);
+}
+
+Button:pressed, Button.selected {
+    -fx-background-color:
+            linear-gradient(to bottom, #8F5B71, #6B4657),
+            linear-gradient(to bottom, #A35474, #8F5B71);
+    -fx-effect: innershadow(gaussian, rgba(0,0,0,0.3), 8, 0, 0, 2);
+}
+
+/* Inline ScrollPane */
+ScrollPane#inlineScrollPane {
+    -fx-background-color: #472D3C;
+    -fx-background-image: url("https://www.transparenttextures.com/patterns/paper-fibers.png");
+    -fx-background-size: cover;
+    -fx-border-color: #6B4657;
+    -fx-border-width: 3;
+    -fx-border-radius: 15;
+    -fx-background-radius: 15;
+    -fx-padding: 8;
+}
+
+/* Inline buttons HBox */
+HBox#inlineButtonsBox {
+    -fx-background-color: #2E1C26;
+    -fx-padding: 12;
+}
+
+/* Bottom HBox for action buttons */
+HBox {
+    -fx-background-color: #2E1C26; /* Darker pink base */
+    -fx-padding: 10;
+    -fx-spacing: 10;
+    -fx-border-color: #6B4657;
+    -fx-border-width: 2 0 0 0;
+}
+
+/* Bottom action buttons */
+HBox Button {
+    -fx-background-color:
+            linear-gradient(to bottom, #8F5B71, #6B4657),
+            linear-gradient(to bottom, #A35474, #8F5B71);
+    -fx-text-fill: #F4C8D4;
+    -fx-font-size: 13px;
+    -fx-font-family: 'Digital Disco', sans-serif;
+    -fx-padding: 10 20;
+    -fx-background-radius: 8;
+    -fx-border-color: #4F2F3F;
+    -fx-border-width: 2;
+    -fx-border-radius: 8;
+}
+
+HBox Button:hover {
+    -fx-background-color:
+            linear-gradient(to bottom, #C57694, #8F5B71),
+            linear-gradient(to bottom, #F4C8D4, #C57694);
+    -fx-text-fill: #2E1C26;
+}
+
+HBox Button:pressed {
+    -fx-background-color:
+            linear-gradient(to bottom, #8F5B71, #6B4657),
+            linear-gradient(to bottom, #A35474, #8F5B71);
+}
+
+
+/* Main category buttons HBox */
+HBox#mainButtonsBox {
+    -fx-background-color: #472D3C; /* Dark pink background */
+    -fx-background-image: url("../../images/background-2.jpg"); /* Parchment texture */
+    -fx-background-size: cover;
+    -fx-padding: 15;
+    -fx-border-color: #6B4657; /* Darker pink border */
+    -fx-border-width: 2;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 2);
+}
+
+/* ScrollBar styling for HBox#mainButtonsBox when it overflows */
+HBox#mainButtonsBox .scroll-bar:horizontal {
+    -fx-background-color: #2E1C26; /* Darker pink track background */
+    -fx-background-radius: 5;
+    -fx-border-color: #4F2F3F;
+    -fx-border-width: 1;
+    -fx-border-radius: 5;
+}
+
+HBox#mainButtonsBox .scroll-bar .thumb {
+    -fx-background-color: #6B4657; /* Dark pink thumb */
+    -fx-background-radius: 5;
+    -fx-effect: innershadow(gaussian, rgba(0,0,0,0.3), 5, 0, 0, 1);
+}
+
+HBox#mainButtonsBox .scroll-bar .thumb:hover {
+    -fx-background-color: #8F5B71; /* Lighter pink on hover */
+}
+
+HBox#mainButtonsBox .scroll-bar .thumb:pressed {
+    -fx-background-color: #A35474; /* Slightly brighter pink when pressed */
+}
+
+HBox#mainButtonsBox .scroll-bar .track {
+    -fx-background-color: #2E1C26; /* Dark pink track */
+    -fx-background-radius: 5;
+}
+
+HBox#mainButtonsBox .scroll-bar .increment-button, HBox#mainButtonsBox .scroll-bar .decrement-button {
+    -fx-background-color: #472D3C; /* Dark pink buttons */
+    -fx-background-radius: 5;
+    -fx-border-color: #4F2F3F;
+    -fx-border-width: 1;
+    -fx-padding: 2;
+}
+
+HBox#mainButtonsBox .scroll-bar .increment-button:hover, HBox#mainButtonsBox .scroll-bar .decrement-button:hover {
+    -fx-background-color: #6B4657; /* Lighter pink on hover */
+}
+
+HBox#mainButtonsBox .scroll-bar .increment-button:pressed, HBox#mainButtonsBox .scroll-bar .decrement-button:pressed {
+    -fx-background-color: #8F5B71; /* Brighter pink when pressed */
+}
+
+HBox#mainButtonsBox .scroll-bar .increment-arrow, HBox#mainButtonsBox .scroll-bar .decrement-arrow {
+    -fx-shape: "M 0 0 L 6 6 L 12 0 Z"; /* Triangle shape */
+    -fx-background-color: #F4C8D4; /* Light pink arrow */
+    -fx-padding: 4;
+}
+
+

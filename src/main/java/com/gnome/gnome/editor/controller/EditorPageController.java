@@ -87,7 +87,7 @@ public class EditorPageController {
     private final Scale scaleTransform;
 
     /** GridManager instance that now holds the grid pane internally. */
-    private final GridManager gridManager;
+    private GridManager gridManager;
 
     /** Instance of CategoryGenerator to dynamically create inline buttons. */
     private CategoryGenerator categoryGenerator = new CategoryGenerator();
@@ -180,16 +180,7 @@ public class EditorPageController {
                 }
                 // Add a "Back" button to allow returning to the main category row.
                 Button backButton = new Button("Back");
-                backButton.setStyle(
-                        "-fx-background-color: linear-gradient(to bottom, #f9f9f9, #e6e6e6); " +
-                                "-fx-text-fill: #333; " +
-                                "-fx-font-size: 14px; " +
-                                "-fx-padding: 6 12; " +
-                                "-fx-background-radius: 4; " +
-                                "-fx-border-color: #ccc; " +
-                                "-fx-border-radius: 4; " +
-                                "-fx-border-width: 1;"
-                );
+
                 backButton.setOnAction(this::onBackToMainButtonClick);
                 inlineButtonsBox.getChildren().add(backButton);
 
@@ -249,16 +240,6 @@ public class EditorPageController {
     private void createInlineButton(String text) {
         Button subButton = new Button(text);
 
-        subButton.setStyle(
-                "-fx-background-color: linear-gradient(to bottom, #f9f9f9, #e6e6e6); " +
-                        "-fx-text-fill: #333; " +
-                        "-fx-font-size: 14px; " +
-                        "-fx-padding: 6 12; " +
-                        "-fx-background-radius: 4; " +
-                        "-fx-border-color: #ccc; " +
-                        "-fx-border-radius: 4; " +
-                        "-fx-border-width: 1;"
-        );
         setupDragForButton(subButton);
         inlineButtonsBox.getChildren().add(subButton);
     }
@@ -447,6 +428,8 @@ public class EditorPageController {
         gridPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         gridPane.getTransforms().clear();
         gridPane.getTransforms().add(scaleTransform);
+
+        gridManager = new GridManager(gridPane);
 
         Group zoomGroup = new Group(gridPane);
 

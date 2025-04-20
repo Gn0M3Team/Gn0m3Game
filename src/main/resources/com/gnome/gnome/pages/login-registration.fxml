@@ -6,7 +6,8 @@
 
 <BorderPane fx:id="loginRegistretion" prefHeight="400.0" prefWidth="600.0"
             xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-            stylesheets="@./css/main_menu.css"
+            styleClass="login-registration-page"
+            stylesheets="@./css/login-registration.css"
             fx:controller="com.gnome.gnome.loginRegistration.controller.LoginRegistrationController">
 
     <top>
@@ -15,15 +16,15 @@
 
     <center>
         <VBox alignment="CENTER" spacing="20" style="-fx-padding: 20">
-            <Label text="Login to System"  styleClass="menu-title"/>
+            <Label text="Login to System"  styleClass="section-label"/>
             <TextField fx:id="loginUsername" promptText="Username"  styleClass="input-field" maxWidth="350.0"/>
             <PasswordField fx:id="loginPassword" promptText="Password" styleClass="input-field" maxWidth="350.0"/>
             <HBox alignment="CENTER" maxWidth="400" spacing="10">
-                <Button fx:id="loginButton" styleClass="menu-button" text="Login" onAction="#handleLogin" prefWidth="180"/>
-                <Button fx:id="exitButton" styleClass="menu-button" text="Exit" onAction="#onExitButtonClick" prefWidth="180"/>
+                <Button fx:id="loginButton" styleClass="action-button" text="Login" onAction="#handleLogin" prefWidth="180"/>
+                <Button fx:id="exitButton" styleClass="action-button" text="Exit" onAction="#onExitButtonClick" prefWidth="180"/>
             </HBox>
 
-            <Label fx:id="loginMessage" styleClass="menu-error" text=""  wrapText="true" />
+            <Label fx:id="loginMessage" styleClass="message-label" text=""  wrapText="true" />
         </VBox>
     </center>
 

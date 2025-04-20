@@ -17,68 +17,29 @@
         </ScrollPane>
     </center>
     <top>
-        <VBox alignment="CENTER" spacing="10" BorderPane.alignment="CENTER"
-              style="-fx-padding: 10 0 20 0;">
+        <VBox alignment="CENTER" spacing="10" BorderPane.alignment="CENTER">
             <children>
                 <!-- Main category buttons row -->
-                <HBox fx:id="mainButtonsBox" alignment="CENTER" spacing="10"
-                      style="-fx-background-color: #f0f0f0; -fx-padding: 10;">
+                <HBox fx:id="mainButtonsBox" alignment="CENTER" spacing="10">
                     <children>
                         <Button text="Monsters"
                                 onAction="#onCategoryButtonClick"
-                                userData="Monsters"
-                                style="
-                    -fx-background-color: linear-gradient(to bottom, #f9f9f9, #e6e6e6);
-                    -fx-text-fill: #333;
-                    -fx-font-size: 14px;
-                    -fx-padding: 6 12;
-                    -fx-background-radius: 4;
-                    -fx-border-color: #ccc;
-                    -fx-border-radius: 4;
-                    -fx-border-width: 1;
-                "/>
+                                userData="Monsters"/>
 
                         <Button text="Props"
                                 onAction="#onCategoryButtonClick"
                                 userData="Props"
-                                style="
-                    -fx-background-color: linear-gradient(to bottom, #f9f9f9, #e6e6e6);
-                    -fx-text-fill: #333;
-                    -fx-font-size: 14px;
-                    -fx-padding: 6 12;
-                    -fx-background-radius: 4;
-                    -fx-border-color: #ccc;
-                    -fx-border-radius: 4;
-                    -fx-border-width: 1;
-                "/>
+                                />
 
                         <Button text="NPCs"
                                 onAction="#onCategoryButtonClick"
                                 userData="NPCs"
-                                style="
-                    -fx-background-color: linear-gradient(to bottom, #f9f9f9, #e6e6e6);
-                    -fx-text-fill: #333;
-                    -fx-font-size: 14px;
-                    -fx-padding: 6 12;
-                    -fx-background-radius: 4;
-                    -fx-border-color: #ccc;
-                    -fx-border-radius: 4;
-                    -fx-border-width: 1;
-                "/>
+                                />
 
                         <Button text="Environment"
                                 onAction="#onCategoryButtonClick"
                                 userData="Environment"
-                                style="
-                    -fx-background-color: linear-gradient(to bottom, #f9f9f9, #e6e6e6);
-                    -fx-text-fill: #333;
-                    -fx-font-size: 14px;
-                    -fx-padding: 6 12;
-                    -fx-background-radius: 4;
-                    -fx-border-color: #ccc;
-                    -fx-border-radius: 4;
-                    -fx-border-width: 1;
-                "/>
+                                />
                     </children>
                 </HBox>
 
@@ -101,10 +62,7 @@
                                 <HBox fx:id="inlineButtonsBox"
                                       alignment="CENTER"
                                       spacing="10"
-                                      style="
-                                      -fx-padding: 10;
-                                      -fx-background-color: #fafafa;"
-                                />
+                                      />
                             </content>
                         </ScrollPane>
                     </children>
