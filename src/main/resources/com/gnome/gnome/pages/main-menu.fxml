@@ -25,7 +25,12 @@
 
             <Pane HBox.hgrow="ALWAYS" />
 
-            <ImageView fx:id="musicIcon" fitWidth="24" fitHeight="24" preserveRatio="true" styleClass="top-button"/>
+            <Button fx:id="musicButton" onAction="#onMusicIconClick"  styleClass="top-button" >
+                <graphic>
+                    <ImageView fx:id="musicIcon" fitWidth="24" fitHeight="24" preserveRatio="true" styleClass="top-button"/>
+                </graphic>
+            </Button>
+
         </HBox>
     </top>
 
