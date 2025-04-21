@@ -113,4 +113,20 @@ public enum TypeOfObjects {
             default -> EMPTY;
         };
     }
+
+    /**
+     * Converts a string to its corresponding {@link TypeOfObjects} enum constant, ignoring case.
+     * Returns {@link TypeOfObjects#EMPTY} if the input does not match any constant.
+     *
+     * @param typeName the name of the type (case-insensitive)
+     * @return the matching TypeOfObjects, or EMPTY if not found
+     */
+    public static TypeOfObjects getTypeFromString(String typeName) {
+        try {
+            return TypeOfObjects.valueOf(typeName.toUpperCase()); // Преобразуем в верхний регистр для поиска
+        } catch (IllegalArgumentException e) {
+            return TypeOfObjects.EMPTY;
+        }
+    }
+
 }

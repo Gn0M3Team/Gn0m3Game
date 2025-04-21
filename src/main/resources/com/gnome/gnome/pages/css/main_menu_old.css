@@ -1,0 +1,74 @@
+/* main_menu.css */
+/*@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');*/
+
+@font-face {
+    font-family: 'Press Start 2P';
+    src: url('../fonts/PressStart2P-Regular.ttf') format('truetype');
+}
+
+/* main_menu.css */
+
+/* Root pane styling */
+.root-pane {
+    -fx-background-color: #2a1a2a; /* Dark purple background */
+    /* If you have a textured image, you can use: -fx-background-image: url('path/to/texture.png'); */
+    -fx-background-size: cover;
+}
+
+/* Top bar styling */
+.top-bar {
+    -fx-background-color: transparent;
+    -fx-padding: 10px;
+}
+
+/* Leaderboard button and music icon */
+.top-button {
+    -fx-background-color: #4a3a4a; /* Slightly lighter purple */
+    -fx-text-fill: white;
+    -fx-font-family: "Press Start 2P"; /* Pixelated font (replace if needed) */
+    -fx-font-size: 12px;
+    -fx-padding: 5px 10px;
+    -fx-background-radius: 5px;
+}
+
+.top-button:hover {
+    -fx-background-color: #6a5a6a;
+}
+
+/* Admin label */
+.top-label {
+    -fx-text-fill: white;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 12px;
+}
+
+/* Title styling */
+.menu-title {
+    -fx-text-fill: white;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 36px;
+    -fx-font-weight: bold;
+    -fx-padding: 20px 0;
+}
+
+/* Menu buttons */
+.menu-button {
+    -fx-background-color: linear-gradient(to bottom, #6a4a6a, #4a3a4a); /* Purple gradient */
+    -fx-text-fill: white;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 16px;
+    -fx-padding: 15px;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-pref-width: 300px;
+    -fx-pref-height: 50px;
+    -fx-alignment: center;
+}
+
+.menu-button:hover {
+    -fx-background-color: linear-gradient(to bottom, #8a6a8a, #6a5a6a);
+}
+
+.menu-button:pressed {
+    -fx-background-color: linear-gradient(to bottom, #4a3a4a, #2a1a2a);
+}

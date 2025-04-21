@@ -12,6 +12,8 @@ import com.gnome.gnome.monsters.types.missels.Arrow;
 import com.gnome.gnome.player.Player;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
+import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
+import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -69,9 +71,10 @@ public class ContinueGameController implements Initializable {
      * The active game map including monsters and dynamic elements.
      */
     private int[][] fieldMap;
-    /**
-     * Camera object for managing viewport rendering.
-     */
+    private PageSwitcherInterface pageSwitch;
+
+    /** The full 30x30 map grid representing the game world. */
+    private int[][] field30x30;
     private Camera camera;
     /**
      * Popup menu shown when the center menu button is clicked.
@@ -136,6 +139,8 @@ public class ContinueGameController implements Initializable {
         player      = new Player(15, 15, PLAYER_MAX_HEALTH);
         camera      = new Camera(fieldMap, player.getX(), player.getY(), player);
         updateMapWithMonsters();
+        pageSwitch=new SwitchPage();
+
 
         double vw = 15 * TILE_SIZE;
         double vh = 15 * TILE_SIZE;
@@ -183,6 +188,7 @@ public class ContinueGameController implements Initializable {
         startMonsterMovement();
         updateCameraViewport();
     }
+
 
      /* Initializes a map of given size filled with random values and surrounded by a border of mountains.
      *
@@ -495,6 +501,7 @@ public class ContinueGameController implements Initializable {
             centerMenuPopup.setAutoHide(true);
 
             VBox menuBox = new VBox(20);
+            menuBox.getStylesheets().add(getClass().getResource("/com/gnome/gnome/pages/css/continueGame.css").toExternalForm());
             menuBox.setAlignment(Pos.CENTER);
             menuBox.setStyle("-fx-background-color: #C0C0C0; -fx-padding: 20; -fx-background-radius: 20;");
             menuBox.getStyleClass().add("menu-popup");
@@ -504,20 +511,15 @@ public class ContinueGameController implements Initializable {
 
             Button option1 = new Button("Option 1");
             Button goBackButton = new Button("Go Back");
+            option1.getStyleClass().add("menu-button");
+            goBackButton.getStyleClass().add("menu-button");
 
             option1.setOnAction(e -> centerMenuPopup.hide());
 
             goBackButton.setOnAction(e -> {
-                try {
-                    URL fxmlUrl = getClass().getResource("/com/gnome/gnome/pages/main-menu.fxml");
-                    Parent mainRoot = FXMLLoader.load(Objects.requireNonNull(fxmlUrl));
-                    Stage stage = (Stage) centerMenuButton.getScene().getWindow();
-                    stage.getScene().setRoot(mainRoot);
-                } catch (IOException ex) {
-                    logger.severe("Failed to load main page: " + ex.getMessage());
-                    ex.printStackTrace();
-                }
+                logger.info("Go Back clicked. Redirecting to main page.");
                 centerMenuPopup.hide();
+                pageSwitch.goMainMenu(rootBorder);
             });
 
             menuBox.getChildren().addAll(title, option1, goBackButton);

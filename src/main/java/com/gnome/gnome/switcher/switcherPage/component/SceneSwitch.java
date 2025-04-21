@@ -1,18 +1,27 @@
 package com.gnome.gnome.switcher.switcherPage.component;
 
+import com.gnome.gnome.profile.ProfileController;
+import javafx.animation.FadeTransition;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import java.io.IOException;
 import java.util.Objects;
 
 import javafx.scene.layout.BorderPane;
-import java.util.Objects;
+import javafx.util.Duration;
 
 /**
  * The SceneSwitch class is responsible for switching the content of the current scene (AnchorPane)
  * by loading a new FXML-based layout and setting it as the new content.
  */
 public class SceneSwitch {
+
+    private static Object dataToPass;
+
+    public static void setGlobalData(Object data) {
+        dataToPass = data;
+    }
 
     public SceneSwitch(BorderPane curBorderPane, String fxml) {
         try {
@@ -27,15 +36,21 @@ public class SceneSwitch {
             Scene scene = curBorderPane.getScene();
             if (scene != null) {
 
-                if (fxml=="/com/gnome/gnome/pages/hello-view.fxml"){
-                    scene.getStylesheets().add(
-                        Objects.requireNonNull(getClass().getResource("/com/gnome/gnome/pages/css/style.css")).toExternalForm()
-                    );
+                if (fxml.endsWith("profile-page.fxml")){
+                    ProfileController controller = loader.getController();
+                    if (dataToPass instanceof String) {
+                        controller.setPlayer((String) dataToPass);
+                    }
+
                 }
+                if (dataToPass!=null){
+                    dataToPass=null;
+                }
+
                 scene.setRoot(nextBorderPane);
-//                System.out.println("Scene root updated to: " + fxml);
+                applyFadeIn(nextBorderPane);
             } else {
-//                System.err.println("No scene found for the current BorderPane");
+                System.err.println("No scene found for the current BorderPane");
             }
 
 
@@ -44,5 +59,14 @@ public class SceneSwitch {
             System.err.println("Detailed error: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+    /**
+     * Applies a fade-in transition to the new root node.
+     */
+    private void applyFadeIn(Parent root) {
+        FadeTransition fade = new FadeTransition(Duration.millis(300), root);
+        fade.setFromValue(0.0);
+        fade.setToValue(1.0);
+        fade.play();
     }
 }

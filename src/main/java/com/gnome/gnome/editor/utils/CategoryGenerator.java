@@ -11,10 +11,7 @@ import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
@@ -62,23 +59,46 @@ public class CategoryGenerator {
     private final Map<String, ImageView> imageCache = new ConcurrentHashMap<>();
 
     /**
-     * Returns the items for a given category.
+     * Retrieves a list of {@link BotType} objects for a given category from a local map.
      * <p>
-     * If {@code test} is true, returns a list of local strings for the category.
-     * Otherwise, it asynchronously retrieves images from S3 and returns a list of {@link ImageView} objects.
+     * This method fetches the items associated with the given category from the local category map,
+     * then attempts to convert each item (which is a string representing a type of object) into a {@link BotType}.
+     * For each valid item, a new {@link BotType} is created with the corresponding name and image path.
+     * If an item cannot be matched to a valid {@link TypeOfObjects}, it is skipped, and an error message is logged.
+     * The method returns a {@link CompletableFuture} that contains a list of {@link BotType} objects.
      *
-     * @param category The category name, e.g. "Monsters".
-     * @return a CompletableFuture that completes with a List of either Strings or ImageViews.
+     * @param category the category of items to retrieve (e.g., "monsters", "NPCs")
+     * @return a {@link CompletableFuture} containing a list of {@link BotType} objects
+     * @throws IllegalArgumentException if the item cannot be matched to a valid {@link TypeOfObjects} enum constant
+     * @see BotType
+     * @see TypeOfObjects
      */
     public CompletableFuture<List<Object>> getItemsForCategory(String category) {
-        if (test) {
-            // Return a copy of the local list so modifications won't affect the original map.
-            List<String> items  = localCategoryMap.getOrDefault(category, Collections.emptyList());
-            return CompletableFuture.completedFuture(new ArrayList<>(items));
-        } else {
-            // Retrieve images from S3.
-            return loadImagesFromS3(category);
+        // Return a copy of the local list so modifications won't affect the original map.
+        List<String> items  = localCategoryMap.getOrDefault(category, Collections.emptyList());
+        List<BotType> botTypes = new ArrayList<>();
+
+        // Проходим по каждому элементу в списке items
+        for (String item : items) {
+            try {
+                String typeName = item.toUpperCase();
+
+                TypeOfObjects objectType = TypeOfObjects.valueOf(typeName);
+
+                String imagePath = objectType.getImagePath();
+
+                TypeOfObjects monsterType = TypeOfObjects.getTypeFromString(typeName);
+
+                BotType botType = new BotType(item, imagePath, monsterType);
+
+                botTypes.add(botType);
+
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid monster type: " + item);
+            }
         }
+
+        return CompletableFuture.completedFuture(new ArrayList<>(botTypes));
     }
 
     /**

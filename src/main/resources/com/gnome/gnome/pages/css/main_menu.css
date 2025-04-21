@@ -1,47 +1,95 @@
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+/* main_menu.css */
+/*@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');*/
 
-.root-pane {
-    -fx-background-color: #FFFFFF;
+@font-face {
+    font-family: 'Press Start 2P';
+    src: url('../fonts/PressStart2P-Regular.ttf') format('truetype');
 }
 
+/* main_menu.css */
+
+/* Root pane styling */
+.root-pane {
+    -fx-background-image: url('../../images/background-2.jpg');
+    -fx-background-size: cover;
+    -fx-background-color: rgba(42, 26, 42, 0.5);
+    -fx-background-position: center;
+    -fx-background-repeat: no-repeat;
+}
+
+/* Top bar styling */
 .top-bar {
     -fx-background-color: transparent;
-    -fx-padding: 10;
+    -fx-padding: 10px;
 }
 
+/* Leaderboard button and music icon */
 .top-button {
-    -fx-background-color: transparent;
-    -fx-text-fill: #000000;
-    -fx-font-size: 14px;
-    -fx-cursor: hand;
-    -fx-border-color: transparent;
-    -fx-font-family: "Press Start 2P", -apple-system;
-    -fx-padding: 0 8;
+    -fx-background-color: #4a3a4a; /* Slightly lighter purple */
+    -fx-text-fill: white;
+    -fx-font-family: "Press Start 2P"; /* Pixelated font (replace if needed) */
+    -fx-font-size: 12px;
+    -fx-padding: 5px 10px;
+    -fx-background-radius: 5px;
 }
 
+.top-button:hover {
+    -fx-background-color: #6a5a6a;
+}
+
+/* Admin label */
 .top-label {
-    -fx-text-fill: #000000;
-    -fx-font-size: 14px;
-    -fx-font-family: "Press Start 2P", -apple-system;
+    -fx-text-fill: white;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 12px;
 }
 
+/* Title styling */
 .menu-title {
-    -fx-text-fill: #000000;
-    -fx-font-size: 28px;
+    -fx-text-fill: white;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 36px;
     -fx-font-weight: bold;
-    -fx-font-family: "Press Start 2P", -apple-system;
+    -fx-padding: 20px 0;
 }
-
-.menu-button {
-    -fx-background-color: #C0C0C0;
+.menu-error {
+    -fx-font-size: 12px;
+    -fx-text-fill: red;
+    -fx-font-family: "Press Start 2P", -apple-system;
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+    -fx-max-width: 500;
+}
+.input-field {
     -fx-text-fill: #000000;
     -fx-font-size: 14px;
-    -fx-background-radius: 20;
-    -fx-cursor: hand;
-    -fx-padding: 10 20;
     -fx-font-family: "Press Start 2P", -apple-system;
+    -fx-pref-height: 30px;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-color: #000000;
+    -fx-padding: 8px;
+}
+
+/* Menu buttons */
+.menu-button {
+    -fx-background-color: transparent;
+    -fx-background-image: url('../../images/button-background.png');
+    -fx-background-size: cover;
+    -fx-text-fill: #ffffff; /* White text */
+    -fx-font-family: "Press Start 2P", -apple-system;
+    -fx-font-size: 16px;
+    -fx-padding: 15px;
+    -fx-background-radius: 10px;
+    -fx-pref-width: 300px;
+    -fx-pref-height: 50px;
+    -fx-alignment: center;
+    -fx-cursor: hand;
+    -fx-border-color: black;
+    -fx-border-width: 2px;
 }
 
 .menu-button:hover {
-    -fx-background-color: #AAAAAA;
+    -fx-background-image: url('../../images/button-background-05.jpg');
 }
+

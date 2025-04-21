@@ -1,13 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+/*@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');*/
 
+/* Load the Press Start 2P font */
+@font-face {
+    font-family: 'Press Start 2P';
+    src: url('../fonts/PressStart2P-Regular.ttf') format('truetype');
+}
 
 .leaderboard-view {
     -fx-pref-width: 300;
-    -fx-background-color: #f0f0f0;
+    -fx-background-color: #3b282c; /* Dark purple from main menu */
 }
 
 .leaderboard-container {
-    -fx-background-color: #f0f0f0;
+    -fx-background-color: #3B262F; /* Dark purple from main menu */
     -fx-padding: 20;
     -fx-spacing: 10;
 }
@@ -17,19 +22,19 @@
     -fx-spacing: 10;
     -fx-padding: 0 0 5 0;
 }
+
 .search-row {
     -fx-padding: 0 0 10 0;
 }
 
 .radio-button {
-    -fx-background-color: #e0e0e0;
+    -fx-background-color: #3B262F; /* Matches top-button from main menu */
     -fx-background-radius: 15;
-    -fx-border-color: #bdc3c7;
+    -fx-border-color: #3A2B30; /* Slightly lighter for border */
     -fx-border-radius: 15;
     -fx-padding: 5 15;
-    -fx-text-fill: #2c3e50;
+    -fx-text-fill: #ffffff; /* White text from main menu */
     -fx-font-family: "Press Start 2P", -apple-system;
-
     -fx-cursor: hand;
 }
 
@@ -42,12 +47,12 @@
 }
 
 .radio-button:selected {
-    -fx-background-color: #cccccc;
-    -fx-border-color: #999999;
+    -fx-background-color: linear-gradient(to bottom, #3B2E34, rgba(79, 57, 60, 0.49)); /* Gradient from main menu */
+    -fx-border-color: #2A181F; /* Lighter border for selected state */
 }
 
 .radio-button:hover {
-    -fx-background-color: #d8d8d8;
+    -fx-background-color: #3E2C31; /* Matches top-button hover from main menu */
 }
 
 .radio-row {
@@ -59,37 +64,32 @@
 .title-label {
     -fx-font-weight: bold;
     -fx-font-size: 24px;
-    -fx-text-fill: #2c3e50;
+    -fx-text-fill: #ffffff; /* White text from main menu */
     -fx-font-family: "Press Start 2P", -apple-system;
 }
 
 .search-field {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #bdc3c7;
+    -fx-background-color: #472D3C; /* Matches top-button background */
+    -fx-border-color: #472D3C;
     -fx-border-radius: 5;
     -fx-padding: 5 10;
     -fx-font-family: "Press Start 2P", -apple-system;
-
-    -fx-text-fill: #2c3e50;
+    -fx-text-fill: #ffffff; /* White text */
+    -fx-prompt-text-fill: rgba(255, 255, 255, 0.3);
     -fx-font-size: 14px;
-    -fx-prompt-text-fill: #a0a0a0;
 }
 
 .search-field:hover {
-    -fx-border-color: #999999;
+    -fx-border-color: #7A5A7A; /* Lighter border on hover */
 }
 
 .search-field:focused {
-    -fx-border-color: #7f8c8d;
-}
-
-.radio-button {
-    -fx-text-fill: #2c3e50;
+    -fx-border-color: #5D3A5D; /* Slightly darker border when focused */
 }
 
 .list-view {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #bdc3c7;
+    -fx-background-color: #472D3C; /* Matches top-button background */
+    -fx-border-color: #472D3C;
     -fx-border-radius: 5;
     -fx-background-insets: 0;
 }
@@ -97,69 +97,104 @@
 .list-view .list-cell {
     -fx-font-family: "Press Start 2P", -apple-system;
     -fx-font-size: 14px;
-    -fx-text-fill: #2c3e50;
+    -fx-text-fill: #ffffff; /* White text */
     -fx-padding: 5 8;
     -fx-background-color: transparent;
 }
 
 .list-cell:filled:hover {
-    -fx-background-color: #f2f2f2;
+    -fx-background-color: #472D3C; /* Matches top-button hover */
 }
 
 .list-cell:filled:selected, .list-cell:filled:selected:focused {
-    -fx-background-color: #e0e0e0;
-    -fx-text-fill: #2c3e50;
+    -fx-background-color: linear-gradient(to bottom, #472D3C, #472D3C); /* Gradient from main menu */
+    -fx-text-fill: #ffffff; /* White text */
 }
 
 .list-view .scroll-bar:vertical {
-    -fx-pref-width: 12;
+    -fx-pref-width: 14; /* Slightly wider for better visibility */
 }
 
 .list-view .scroll-bar:vertical .track {
-    -fx-background-color: #eeeeee;
-    -fx-background-radius: 6;
+    -fx-background-color: #2A181D; /* Matches root background */
+    -fx-background-radius: 8; /* Softer radius to match main menu buttons */
+    -fx-border-color: #472D3C; /* Subtle border to define the track */
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
 }
 
 .list-view .scroll-bar:vertical .thumb {
-    -fx-background-color: #cccccc;
-    -fx-background-radius: 6;
+    -fx-background-color: linear-gradient(to bottom, #472D3C, #472D3C); /* Gradient to match main menu buttons */
+    -fx-background-radius: 8; /* Softer radius */
 }
 
 .list-view .scroll-bar:vertical .thumb:hover {
-    -fx-background-color: #b3b3b3;
+    -fx-background-color: linear-gradient(to bottom, #7A5A7A, #472D3C); /* Gradient hover to match main menu buttons */
 }
 
 .list-view .scroll-bar:vertical .thumb:pressed {
-    -fx-background-color: #999999;
+    -fx-background-color: linear-gradient(to bottom, #472D3C, #2A181D); /* Gradient pressed to match main menu */
 }
 
 .list-view .scroll-bar:vertical .increment-button,
 .list-view .scroll-bar:vertical .decrement-button {
     -fx-background-color: transparent;
     -fx-padding: 0;
-    -fx-background-radius: 6;
+    -fx-background-radius: 8; /* Match the radius */
+    -fx-opacity: 0;
+}
+
+.list-view .scroll-bar:horizontal {
+    -fx-pref-height: 14; /* Match the vertical scroll bar's width */
+}
+
+.list-view .scroll-bar:horizontal .track {
+    -fx-background-color: #2A181D; /* Matches root background */
+    -fx-background-radius: 8; /* Softer radius to match main menu buttons */
+    -fx-border-color: #472D3C; /* Subtle border to define the track */
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+}
+
+.list-view .scroll-bar:horizontal .thumb {
+    -fx-background-color: linear-gradient(to right, #472D3C, #472D3C); /* Gradient to match main menu buttons, adjusted for horizontal */
+    -fx-background-radius: 8; /* Softer radius */
+}
+
+.list-view .scroll-bar:horizontal .thumb:hover {
+    -fx-background-color: linear-gradient(to right, #7A5A7A, #472D3C); /* Gradient hover to match main menu buttons */
+}
+
+.list-view .scroll-bar:horizontal .thumb:pressed {
+    -fx-background-color: linear-gradient(to right, #472D3C, #2A181D); /* Gradient pressed to match main menu */
+}
+
+.list-view .scroll-bar:horizontal .increment-button,
+.list-view .scroll-bar:horizontal .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-background-radius: 8; /* Match the radius */
     -fx-opacity: 0;
 }
 
 .close-button {
-    -fx-background-color: #e0e0e0;
+    -fx-background-color: #472D3C; /* Matches top-button */
     -fx-background-radius: 8;
-    -fx-border-color: #bdc3c7;
+    -fx-border-color: #472D3C;
     -fx-border-radius: 8;
-    -fx-text-fill: #2c3e50;
+    -fx-text-fill: #ffffff; /* White text */
     -fx-font-weight: bold;
     -fx-font-family: "Press Start 2P", -apple-system;
     -fx-cursor: hand;
-
     -fx-padding: 5 10;
     -fx-min-width: 40;
     -fx-min-height: 30;
 }
 
 .close-button:hover {
-    -fx-background-color: #d8d8d8;
+    -fx-background-color: #472D3C; /* Matches top-button hover */
 }
 
 .close-button:pressed {
-    -fx-background-color: #cccccc;
+    -fx-background-color: linear-gradient(to bottom, #472D3C, #2A181D); /* Gradient from main menu */
 }

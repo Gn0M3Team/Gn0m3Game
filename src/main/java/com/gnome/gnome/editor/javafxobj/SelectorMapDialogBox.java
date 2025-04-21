@@ -49,6 +49,8 @@ public class SelectorMapDialogBox {
                 dialogButton == selectButtonType ? listView.getSelectionModel().getSelectedItem() : null
         );
 
+        dialog.getDialogPane().getStylesheets().add(getClass().getResource("/com/gnome/gnome/pages/css/dialogs/dialog_load_db.css").toExternalForm());
+
         return dialog.showAndWait();
     }
 }
