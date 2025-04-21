@@ -16,9 +16,9 @@ public class Goblin extends Monster {
                 startX,
                 startY,
                 TypeOfObjects.GOBLIN.getValue(),
-                new OmnidirectionalMovement());
+                new OmnidirectionalMovement(), "tile_123.png");
     }
-    
+
     @Override
     public Node attack(int cameraStartCol, int cameraStartRow, int playerGridX, int playerGridY) {
         System.out.println("The goblin attacks with mischievous ferocity!");

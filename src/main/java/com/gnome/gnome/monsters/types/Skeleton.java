@@ -50,9 +50,8 @@ public class Skeleton extends Monster {
      * @param startY the Y grid position of the skeleton
      */
     public Skeleton(int startX, int startY) {
-        super(30, 80, 50, 4, "Skeleton", "Skeleton", startX, startY, TypeOfObjects.SKELETON.getValue(), new RandomMovement());
+        super(30, 80, 50, 4,"Skeleton", "Skeleton", startX, startY, TypeOfObjects.SKELETON.getValue(), new RandomMovement(), "tile_125.png");
     }
-
     /**
      * Attempts to perform a ranged attack by launching an arrow toward the player.
      * The arrow will only be fired if the cooldown has expired, no active arrow exists,

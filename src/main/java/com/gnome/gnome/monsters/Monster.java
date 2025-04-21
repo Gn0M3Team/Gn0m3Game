@@ -2,9 +2,16 @@ package com.gnome.gnome.monsters;
 
 
 import com.gnome.gnome.monsters.movements.MovementStrategy;
+import javafx.animation.PauseTransition;
 import javafx.scene.Node;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
+import javafx.util.Duration;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+
+import java.util.Objects;
 
 /**
  * Abstract base class representing a monster in the game.
@@ -56,7 +63,25 @@ public abstract class Monster {
      * The movement strategy used by the monster.
      */
     protected MovementStrategy movementStrategy;
+    protected String imagePath;
+    protected String hitGifPath = "/com/gnome/gnome/effects/red_monster.gif";  // Path to GIF
 
+    protected boolean isHitEffectPlaying = false;
+
+    protected boolean debug_mode = false;
+    public Monster(int attack, int health, int cost, int attackRange, String nameEng, String nameSk, int startX, int startY, int value, MovementStrategy movementStrategy, String  imagePath) {
+        this.attack = attack;
+        this.health = health;
+        this.cost = cost;
+        this.attackRange = attackRange;
+        this.nameEng = nameEng;
+        this.nameSk = nameSk;
+        this.x = startX;
+        this.y = startY;
+        this.value = value;
+        this.movementStrategy = movementStrategy;
+        this.imagePath = imagePath;
+    }
 
     /**
      * Executes an attack action based on monster type.
@@ -107,11 +132,64 @@ public abstract class Monster {
      */
     public void takeDamage(int damage) {
         health -= damage;
+        System.out.println("Monster at (" + x + ", " + y + ") took " + damage + " damage, health now: " + health);
     }
 
     @Override
     public String toString() {
         return String.format("%s (%s) - Attack: %d, Health: %d, Cost: %d, Attack Range: %d, Position: (%d, %d)",
                 nameEng, nameSk, attack, health, cost, attackRange, x, y);
+    }
+
+    /**
+     * I'm lazy
+     * @param gameObjectsPane
+     * @param cameraStartCol
+     * @param cameraStartRow
+     * @param onFinish
+     */
+    public void showHitEffect(Pane gameObjectsPane, int cameraStartCol, int cameraStartRow, Runnable onFinish) {
+        if (gameObjectsPane == null) {
+            System.err.println("Error: gameObjectsPane is null in showHitEffect for Monster at (" + x + ", " + y + ")");
+            if (onFinish != null) {
+                onFinish.run();
+            }
+            return;
+        }
+
+        isHitEffectPlaying = true;
+
+        // Create an ImageView for a GIF
+        ImageView effectView = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(hitGifPath))));
+        effectView.setFitWidth(50);
+        effectView.setFitHeight(50);
+
+        // Position the GIF in absolute coordinates (not relative to the camera)
+        double absolutePixelX = x * 50;
+        double absolutePixelY = y * 50;
+
+        // Initially adjust the position to the current camera offset
+        double pixelX = absolutePixelX - (cameraStartCol * 50);
+        double pixelY = absolutePixelY - (cameraStartRow * 50);
+        effectView.setTranslateX(pixelX);
+        effectView.setTranslateY(pixelY);
+
+        // Add a property to store absolute coordinates
+        effectView.getProperties().put("absoluteX", absolutePixelX);
+        effectView.getProperties().put("absoluteY", absolutePixelY);
+
+        gameObjectsPane.getChildren().add(effectView);
+        System.out.println("Monster at (" + x + ", " + y + ") showing hit effect");
+
+        PauseTransition pause = new PauseTransition(Duration.seconds(1));
+        pause.setOnFinished(event -> {
+            gameObjectsPane.getChildren().remove(effectView);
+            System.out.println("Monster at (" + x + ", " + y + ") hit effect finished");
+            isHitEffectPlaying = false;
+            if (onFinish != null) {
+                onFinish.run();
+            }
+        });
+        pause.play();
     }
 }

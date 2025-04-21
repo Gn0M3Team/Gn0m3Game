@@ -16,7 +16,7 @@ public class Butterfly extends Monster {
                 startX,
                 startY,
                 TypeOfObjects.BUTTERFLY.getValue(),
-                new RandomMovement());
+                new RandomMovement(), "tile_125.png");
     }
 
     @Override

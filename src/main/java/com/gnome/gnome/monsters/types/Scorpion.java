@@ -16,9 +16,10 @@ public class Scorpion extends Monster {
                 startX,
                 startY,
                 TypeOfObjects.SCORPION.getValue(),
-                new StraightMovement());
+                new StraightMovement()
+                ,"tile_125.png");
     }
-    
+
     @Override
     public Node attack(int cameraStartCol, int cameraStartRow, int playerGridX, int playerGridY) {
         System.out.println("The scorpion strikes with its venomous sting!");

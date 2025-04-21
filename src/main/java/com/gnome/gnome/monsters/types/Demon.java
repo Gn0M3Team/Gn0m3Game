@@ -16,8 +16,8 @@ public class Demon extends Monster {
                 startX,
                 startY,
                 TypeOfObjects.DEMON.getValue(),
-                new OmnidirectionalMovement()
-                );
+                new OmnidirectionalMovement(), "tile_125.png"
+        );
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.gnome.gnome.player;
 import com.gnome.gnome.monsters.Monster;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import lombok.Getter;
@@ -11,6 +12,7 @@ import lombok.Setter;
 import static com.gnome.gnome.editor.utils.EditorConstants.TILE_SIZE;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Represents the player character in the game.
@@ -81,22 +83,39 @@ public class Player {
      * Returns a list of monsters that were eliminated.
      *
      * @param monsters List of all monsters in the game
-     * @param attackRange Range in which the player can hit
+     * @param range Range in which the player can hit
      * @param damage Damage dealt to each monster
      * @return List of monsters that died from the attack
      */
-    public List<Monster> attack(List<Monster> monsters, int attackRange, int damage) {
-        List<Monster> eliminated = new ArrayList<>();
+    public List<Monster> attack(List<Monster> monsters,
+                                int range,
+                                int damage,
+                                Pane gameObjectsPane,
+                                int cameraStartCol,
+                                int cameraStartRow,
+                                Consumer<Monster> onHitEffectFinished) {
+        List<Monster> hitMonsters = new ArrayList<>();
         for (Monster monster : monsters) {
-            int dx = Math.abs(monster.getX() - this.x);
-            int dy = Math.abs(monster.getY() - this.y);
-            if (dx <= attackRange && dy <= attackRange) {
-                monster.takeDamage(damage);
-                if (monster.getHealth() <= 0) {
-                    eliminated.add(monster);
-                }
+            int dx = Math.abs(monster.getX() - x);
+            int dy = Math.abs(monster.getY() - y);
+            if (dx <= range && dy <= range) {
+                hitMonsters.add(monster);
             }
         }
+
+        List<Monster> eliminated = new ArrayList<>();
+        for (Monster monster : hitMonsters) {
+            monster.takeDamage(damage);
+            if (monster.getHealth() <= 0) {
+                eliminated.add(monster);
+            }
+            monster.showHitEffect(gameObjectsPane, cameraStartCol, cameraStartRow, () -> {
+                if (eliminated.contains(monster)) {
+                    onHitEffectFinished.accept(monster);
+                }
+            });
+        }
+
         return eliminated;
     }
 

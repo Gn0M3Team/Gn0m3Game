@@ -11,9 +11,8 @@ import com.gnome.gnome.monsters.types.Skeleton;
 import com.gnome.gnome.monsters.types.missels.Arrow;
 import com.gnome.gnome.player.Player;
 import javafx.animation.AnimationTimer;
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
-import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
-import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -24,11 +23,16 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.*;
 import java.util.logging.Logger;
@@ -71,10 +75,9 @@ public class ContinueGameController implements Initializable {
      * The active game map including monsters and dynamic elements.
      */
     private int[][] fieldMap;
-    private PageSwitcherInterface pageSwitch;
-
-    /** The full 30x30 map grid representing the game world. */
-    private int[][] field30x30;
+    /**
+     * Camera object for managing viewport rendering.
+     */
     private Camera camera;
     /**
      * Popup menu shown when the center menu button is clicked.
@@ -125,6 +128,8 @@ public class ContinueGameController implements Initializable {
      */
     private VBox gameOverOverlay;
 
+    private boolean debug_mod_game;
+
     /**
      * Called to initialize the controller after its root element has been completely processed.
      * Initializes the game map, camera, viewport rendering, button handlers, and key listeners.
@@ -134,13 +139,14 @@ public class ContinueGameController implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
+        setupProperties();
+
         baseMap     = initMap(30, 30);
         fieldMap    = copyMap(baseMap);
         player      = new Player(15, 15, PLAYER_MAX_HEALTH);
         camera      = new Camera(fieldMap, player.getX(), player.getY(), player);
         updateMapWithMonsters();
-        pageSwitch=new SwitchPage();
-
 
         double vw = 15 * TILE_SIZE;
         double vh = 15 * TILE_SIZE;
@@ -158,13 +164,6 @@ public class ContinueGameController implements Initializable {
         centerStack.setAlignment(Pos.CENTER);
         centerStack.getChildren().setAll(viewportRoot);
         StackPane.setAlignment(viewportRoot, Pos.CENTER);
-
-        centerStack.widthProperty().addListener((obs, oldVal, newVal) -> {
-            System.out.println("centerStack width: " + newVal);
-        });
-        centerStack.heightProperty().addListener((obs, oldVal, newVal) -> {
-            System.out.println("centerStack height: " + newVal);
-        });
 
 //        viewportRoot.layoutXProperty().bind(
 //                centerStack.widthProperty().subtract(vw).divide(2)
@@ -189,8 +188,21 @@ public class ContinueGameController implements Initializable {
         updateCameraViewport();
     }
 
+    private void setupProperties() {
+        Properties properties = new Properties();
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("app.properties")) {
+            if (inputStream == null) {
+                throw new RuntimeException("Could not find app.properties in classpath");
+            }
+            properties.load(inputStream);
+        } catch (IOException e) {
+            throw new RuntimeException("Could not load properties file", e);
+        }
 
-     /* Initializes a map of given size filled with random values and surrounded by a border of mountains.
+        debug_mod_game = Boolean.parseBoolean(properties.getProperty("app.skip_login"));
+    }
+
+    /* Initializes a map of given size filled with random values and surrounded by a border of mountains.
      *
      * @param rows number of rows in the map
      * @param cols number of columns in the map
@@ -202,7 +214,7 @@ public class ContinueGameController implements Initializable {
 
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
-                int[] possibleValues = {0, 1, 2, 3, 4}; // EMPTY, MOUNTAIN, TREE, ROCK, RIVER
+                int[] possibleValues = {0}; // EMPTY, MOUNTAIN, TREE, ROCK, RIVER
                 map[row][col] = possibleValues[random.nextInt(possibleValues.length)];
             }
         }
@@ -274,10 +286,16 @@ public class ContinueGameController implements Initializable {
                     if (oldY < maxRow - 1) newY = oldY + 1;
                 }
                 case SPACE -> {
-                    List<Monster> eliminated = player.attack(monsterList, 1, 20);
-                    removeMonsters(eliminated);
+                    if (gameObjectsPane == null) {
+                        System.err.println("Error: gameObjectsPane is null when trying to attack");
+                        return;
+                    }
+                    showAttackRange(1, camera.getStartCol(), camera.getStartRow());
+                    player.attack(monsterList, 1, 20, gameObjectsPane, camera.getStartCol(), camera.getStartRow(), monster -> {
+                        removeMonsters(Collections.singletonList(monster));
+                    });
                 }
-                default -> { /* no movement */ }
+                default -> { /* no actions */ }
             }
 
             if (newX != oldX || newY != oldY) {
@@ -287,7 +305,7 @@ public class ContinueGameController implements Initializable {
                 }
                 TypeOfObjects tileType = TypeOfObjects.fromValue(tileValue);
 
-                if (tileType == TypeOfObjects.FLOOR || tileType == TypeOfObjects.HATCH || tileType == TypeOfObjects.RIVER) {
+                if (tileType == TypeOfObjects.FLOOR || tileType == TypeOfObjects.HATCH || tileType == TypeOfObjects.RIVER || tileType == TypeOfObjects.EMPTY) {
                     if (newX < oldX) player.moveLeft();
                     else if (newX > oldX) player.moveRight();
                     else if (newY < oldY) player.moveUp();
@@ -304,7 +322,8 @@ public class ContinueGameController implements Initializable {
                     camera.updateCameraCenter();
                     updateCameraViewport();
                 } else {
-                    System.out.println("Player cannot move to (" + newX + ", " + newY + ") - tile type: " + tileType);
+                    if (debug_mod_game)
+                        System.out.println("Player cannot move to (" + newX + ", " + newY + ") - tile type: " + tileType);
                 }
             }
         });
@@ -321,7 +340,8 @@ public class ContinueGameController implements Initializable {
      * Deals damage to the player.
      */
     private void onRiverStepped() {
-        System.out.println("Player stepped on RIVER at (" + player.getX() + ", " + player.getY() + ") - Taking 5 damage");
+        if (debug_mod_game)
+            System.out.println("Player stepped on RIVER at (" + player.getX() + ", " + player.getY() + ")");
         player.takeDamage(player.getCurrentHealth());
         updatePlayerHealthBar();
     }
@@ -367,9 +387,9 @@ public class ContinueGameController implements Initializable {
             fieldMap[y][x] = TypeOfObjects.FLOOR.getValue();
             Coin coin = new Coin(x, y, monster.getCost());
             coinsOnMap.add(coin);
+            monsterList.remove(monster);
         }
-
-        monsterList.removeAll(eliminated);
+        updateMapWithMonsters();
         updateCameraViewport();
     }
 
@@ -392,6 +412,20 @@ public class ContinueGameController implements Initializable {
 
         player.getRepresentation().setTranslateX(pixelX);
         player.getRepresentation().setTranslateY(pixelY);
+
+        for (var node : gameObjectsPane.getChildren()) {
+            if (node instanceof ImageView effectView) {
+                // Check if it is a GIF effect (it has absoluteX and absoluteY)
+                Object absoluteX = effectView.getProperties().get("absoluteX");
+                Object absoluteY = effectView.getProperties().get("absoluteY");
+                if (absoluteX instanceof Double && absoluteY instanceof Double) {
+                    double absX = (Double) absoluteX;
+                    double absY = (Double) absoluteY;
+                    effectView.setTranslateX(absX - (camera.getStartCol() * TILE_SIZE));
+                    effectView.setTranslateY(absY - (camera.getStartRow() * TILE_SIZE));
+                }
+            }
+        }
 
         for (Arrow arrow : activeArrows) {
             arrow.updateCameraOffset(camera.getStartCol(), camera.getStartRow());
@@ -441,6 +475,41 @@ public class ContinueGameController implements Initializable {
         monsterMovementTimer.start();
     }
 
+    private void showAttackRange(int range, int cameraStartCol, int cameraStartRow) {
+        List<Rectangle> rangeIndicators = new ArrayList<>();
+
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -1; dy <= 1; dy++) {
+                int attackX = player.getX() + dx;
+                int attackY = player.getY() + dy;
+
+                if (attackX >= 0 && attackX < baseMap[0].length && attackY >= 0 && attackY < baseMap.length) {
+                    int gridX = attackX - cameraStartCol;
+                    int gridY = attackY - cameraStartRow;
+                    double pixelX = gridX * TILE_SIZE;
+                    double pixelY = gridY * TILE_SIZE;
+
+                    Rectangle rangeIndicator = new Rectangle(pixelX, pixelY, TILE_SIZE, TILE_SIZE);
+                    rangeIndicator.setFill(Color.RED);
+                    rangeIndicator.setOpacity(0.3);
+
+                    rangeIndicators.add(rangeIndicator);
+                    gameObjectsPane.getChildren().add(rangeIndicator);
+
+                    if (debug_mod_game) {
+                        System.out.println("Highlighting attack range at (" + attackX + ", " + attackY + ")");
+                    }
+                }
+            }
+        }
+
+        PauseTransition pause = new PauseTransition(Duration.seconds(0.5));
+        pause.setOnFinished(event -> {
+            gameObjectsPane.getChildren().removeAll(rangeIndicators);
+        });
+        pause.play();
+    }
+
 
     /**
      * Moves all monsters on the map and refreshes the view.
@@ -453,6 +522,11 @@ public class ContinueGameController implements Initializable {
         List<Monster> toRemove = new ArrayList<>();
 
         for (Monster monster : monsterList) {
+            if (monster.isHitEffectPlaying()) {
+                if (debug_mod_game)
+                    System.out.println("Monster at (" + monster.getX() + ", " + monster.getY() + ") cannot move due to hit effect");
+                continue;
+            }
             int oldX = monster.getX();
             int oldY = monster.getY();
             int newX = oldX;
@@ -473,13 +547,15 @@ public class ContinueGameController implements Initializable {
             }
             TypeOfObjects tileType = TypeOfObjects.fromValue(tileValue);
 
-            if (tileType == TypeOfObjects.FLOOR || tileType == TypeOfObjects.HATCH || tileType == TypeOfObjects.RIVER) {
+            if (tileType == TypeOfObjects.FLOOR || tileType == TypeOfObjects.HATCH || tileType == TypeOfObjects.RIVER || tileType == TypeOfObjects.EMPTY) {
                 if (tileType == TypeOfObjects.RIVER) {
-                    System.out.println("Monster at (" + oldX + ", " + oldY + ") stepped on RIVER at (" + newX + ", " + newY + ") - Monster dies");
+                    if (debug_mod_game)
+                        System.out.println("Monster at (" + oldX + ", " + oldY + ") stepped on RIVER at (" + newX + ", " + newY + ") - Monster dies");
                     toRemove.add(monster);
                 }
             } else {
-                System.out.println("Monster cannot move to (" + newX + ", " + newY + ") - tile type: " + tileType);
+                if (debug_mod_game)
+                    System.out.println("Monster cannot move to (" + newX + ", " + newY + ") - tile type: " + tileType);
                 monster.setPosition(oldX, oldY);
             }
         }
@@ -501,7 +577,6 @@ public class ContinueGameController implements Initializable {
             centerMenuPopup.setAutoHide(true);
 
             VBox menuBox = new VBox(20);
-            menuBox.getStylesheets().add(getClass().getResource("/com/gnome/gnome/pages/css/continueGame.css").toExternalForm());
             menuBox.setAlignment(Pos.CENTER);
             menuBox.setStyle("-fx-background-color: #C0C0C0; -fx-padding: 20; -fx-background-radius: 20;");
             menuBox.getStyleClass().add("menu-popup");
@@ -511,15 +586,20 @@ public class ContinueGameController implements Initializable {
 
             Button option1 = new Button("Option 1");
             Button goBackButton = new Button("Go Back");
-            option1.getStyleClass().add("menu-button");
-            goBackButton.getStyleClass().add("menu-button");
 
             option1.setOnAction(e -> centerMenuPopup.hide());
 
             goBackButton.setOnAction(e -> {
-                logger.info("Go Back clicked. Redirecting to main page.");
+                try {
+                    URL fxmlUrl = getClass().getResource("/com/gnome/gnome/pages/main-menu.fxml");
+                    Parent mainRoot = FXMLLoader.load(Objects.requireNonNull(fxmlUrl));
+                    Stage stage = (Stage) centerMenuButton.getScene().getWindow();
+                    stage.getScene().setRoot(mainRoot);
+                } catch (IOException ex) {
+                    logger.severe("Failed to load main page: " + ex.getMessage());
+                    ex.printStackTrace();
+                }
                 centerMenuPopup.hide();
-                pageSwitch.goMainMenu(rootBorder);
             });
 
             menuBox.getChildren().addAll(title, option1, goBackButton);
