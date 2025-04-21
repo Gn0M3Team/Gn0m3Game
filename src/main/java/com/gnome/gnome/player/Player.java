@@ -1,6 +1,7 @@
 package com.gnome.gnome.player;
 
 import com.gnome.gnome.monsters.Monster;
+import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -11,30 +12,50 @@ import static com.gnome.gnome.editor.utils.EditorConstants.TILE_SIZE;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents the player character in the game.
+ * <p>
+ * Handles movement, health, coin collection, and combat interactions with monsters.
+ * The player is rendered as a yellow square in the UI.
+ * </p>
+ */
 @Getter
 public class Player {
-    private int x;
-    private int y;
+    /**
+     * Current X, Y position of the player on the grid.
+     */
+    private int x, y;
+    /**
+     * The maximum health of the player.
+     */
     private final int maxHealth;
+
+    /**
+     * The current health of the player.
+     */
     private int currentHealth;
+    /**
+     * Node representing the player visually on screen.
+     */
     private final Node representation;
+    /**
+     * Total number of coins the player has collected.
+     */
     private int playerCoins = 0;
 
+    /**
+     * Creates a new player at the specified position with the given maximum health.
+     *
+     * @param startX     the starting X position
+     * @param startY     the starting Y position
+     * @param maxHealth  the maximum health of the player
+     */
     public Player(int startX, int startY, int maxHealth) {
         this.x = startX;
         this.y = startY;
         this.maxHealth = maxHealth;
         this.currentHealth = maxHealth;
-        this.representation = createRepresentation();
-    }
-
-    /**
-     * Creates a visual representation of the player as a yellow square.
-     */
-    private Node createRepresentation() {
-        Rectangle rect = new Rectangle(TILE_SIZE, TILE_SIZE);
-        rect.setFill(Color.YELLOW);
-        return rect;
+        this.representation = new Rectangle(TILE_SIZE, TILE_SIZE, Color.YELLOW);
     }
 
     // Movement methods
@@ -89,7 +110,23 @@ public class Player {
         this.currentHealth = maxHealth;
     }
 
+
+    /**
+     * Adds a specified amount of coins to the player's total.
+     *
+     * @param coin the number of coins to add
+     */
     public void addCoin(int coin) {
         playerCoins += coin;
+    }
+
+    /**
+     * Returns the bounds of the player's visual representation on screen.
+     * Useful for collision detection.
+     *
+     * @return the bounds of the player's representation node
+     */
+    public Bounds getBounds() {
+        return representation.getBoundsInParent();
     }
 }

@@ -21,7 +21,7 @@ public class Demon extends Monster {
     }
 
     @Override
-    public Node attack() {
+    public Node attack(int cameraStartCol, int cameraStartRow, int playerGridX, int playerGridY) {
         System.out.println("The demon unleashes a fiery blast!");
         return null;
     }

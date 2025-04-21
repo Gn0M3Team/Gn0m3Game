@@ -16,15 +16,35 @@ import static com.gnome.gnome.editor.utils.EditorConstants.TILE_SIZE;
  */
 @Getter
 public class Coin {
+    /**
+     * The X position of the coin on the grid.
+     */
     private final int gridX;
+    /**
+     * The Y position of the coin on the grid.
+     */
     private final int gridY;
+    /**
+     * The value of the coin (amount added to player's coin count).
+     */
     private final int value;
+    /**
+     * The image used to visually represent the coin in the UI.
+     */
     private final ImageView imageView;
 
+    /**
+     * Constructs a new coin at the specified grid position with the given value.
+     *
+     * @param gridX the X coordinate on the map grid
+     * @param gridY the Y coordinate on the map grid
+     * @param value the numeric value of the coin
+     */
     public Coin(int gridX, int gridY, int value) {
         this.gridX = gridX;
         this.gridY = gridY;
         this.value = value;
+
         this.imageView = new ImageView(
                 new Image(
                         Objects.requireNonNull(
@@ -32,19 +52,7 @@ public class Coin {
                         )
                 )
         );
-        this.imageView.setFitWidth(20);
-        this.imageView.setFitHeight(20);
-    }
-
-    public void updateScreenPosition(int startCol, int startRow) {
-        double centerOfTileX = ((gridX - startCol) + 0.5) * TILE_SIZE;
-        double centerOfTileY = ((gridY - startRow) + 0.5) * TILE_SIZE;
-
-        // Place coin so its center matches the tile center
-        double coinCenterOffsetX = imageView.getFitWidth() / 2.0;
-        double coinCenterOffsetY = imageView.getFitHeight() / 2.0;
-
-        imageView.setTranslateX(centerOfTileX - coinCenterOffsetX);
-        imageView.setTranslateY(centerOfTileY - coinCenterOffsetY);
+        imageView.setFitWidth(TILE_SIZE * 0.5);
+        imageView.setFitHeight(TILE_SIZE * 0.5);
     }
 }

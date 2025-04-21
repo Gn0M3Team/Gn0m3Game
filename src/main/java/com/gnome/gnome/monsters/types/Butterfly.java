@@ -20,7 +20,7 @@ public class Butterfly extends Monster {
     }
 
     @Override
-    public Node attack() {
+    public Node attack(int cameraStartCol, int cameraStartRow, int playerGridX, int playerGridY) {
         System.out.println("The butterfly flutters around in a dazzling display!");
         return null;
     }
