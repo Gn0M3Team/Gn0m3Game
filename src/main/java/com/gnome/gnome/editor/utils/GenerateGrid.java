@@ -24,6 +24,8 @@ public class GenerateGrid {
     /** 2D grid representing the game state */
     private int[][] mapGrid;
 
+    private BotType selectedBotType = null;
+
     private GenerateGrid(int[][] mapGrid) {
         this.mapGrid = mapGrid.clone();
     }
@@ -87,12 +89,29 @@ public class GenerateGrid {
     }
 
     /**
-     * Creates a single tile for the grid based on the provided coordinates.
-     * Sets the tile's style, image, and click behavior.
+     * Creates a grid tile at the specified row and column, styles it, initializes its image,
+     * and attaches mouse click handlers for placing or clearing a monster.
+     * <p>
+     * The returned {@link StackPane} is configured with:
+     * <ul>
+     *   <li>A fixed preferred size of {@code TILE_SIZE x TILE_SIZE}.</li>
+     *   <li>A black border and transparent background.</li>
+     *   <li>User data storing its [row, col] coordinates.</li>
+     *   <li>An initial image based on the current value in {@code mapGrid[row][col]}.</li>
+     *   <li>A mouse click listener that:
+     *     <ul>
+     *       <li><b>Primary click</b> (left button): if {@code selectedBotType} is non-null,
+     *           retrieves its {@link TypeOfObjects}, updates the {@code mapGrid} at this cell,
+     *           and refreshes the tile image to the monster.</li>
+     *       <li><b>Secondary click</b> (right button): clears the cell to empty (value 0)
+     *           and updates the tile image to {@link TypeOfObjects#EMPTY}.</li>
+     *     </ul>
+     *   </li>
+     * </ul>
      *
-     * @param row the row index of the tile
-     * @param col the column index of the tile
-     * @return a StackPane representing the tile
+     * @param row the zero-based row index of this tile in the grid
+     * @param col the zero-based column index of this tile in the grid
+     * @return a {@link StackPane} representing the fully configured tile
      */
     private StackPane createTile(int row, int col) {
         StackPane tilePane = new StackPane();
@@ -111,7 +130,19 @@ public class GenerateGrid {
         updateTileImage(tilePane, tileType);
 
         tilePane.setOnMouseClicked(event -> {
-            if (event.getButton() == javafx.scene.input.MouseButton.PRIMARY) {
+            if (event.getButton() == javafx.scene.input.MouseButton.PRIMARY ) {  // Левая кнопка мыши
+                // Проверяем, выбран ли монстр
+                if (selectedBotType != null) {
+                    int[] indices = (int[]) tilePane.getUserData();
+                    int r = indices[0];
+                    int c = indices[1];
+
+                    TypeOfObjects monsterType = selectedBotType.getMonsterType();
+
+                    mapGrid[r][c] = monsterType.getValue();
+                    updateTileImage(tilePane, monsterType);
+                }
+            } else if (event.getButton() == javafx.scene.input.MouseButton.SECONDARY) {
                 int[] indices = (int[]) tilePane.getUserData();
                 int r = indices[0];
                 int c = indices[1];

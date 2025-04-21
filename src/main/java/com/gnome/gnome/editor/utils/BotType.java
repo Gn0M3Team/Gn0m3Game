@@ -9,9 +9,11 @@ import lombok.Setter;
 public class BotType {
     private String name;
     private String imagePath;
+    private TypeOfObjects monsterType;
 
-    public BotType(String name, String imagePath) {
+    public BotType(String name, String imagePath, TypeOfObjects monsterType) {
         this.name = name;
         this.imagePath = imagePath;
+        this.monsterType = monsterType;
     }
 }
