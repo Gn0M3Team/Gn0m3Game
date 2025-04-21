@@ -20,7 +20,7 @@ public class Scorpion extends Monster {
     }
     
     @Override
-    public Node attack() {
+    public Node attack(int cameraStartCol, int cameraStartRow, int playerGridX, int playerGridY) {
         System.out.println("The scorpion strikes with its venomous sting!");
         return null;
     }

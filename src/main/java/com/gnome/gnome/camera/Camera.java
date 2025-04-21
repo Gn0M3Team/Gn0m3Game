@@ -1,12 +1,16 @@
 package com.gnome.gnome.camera;
+import com.gnome.gnome.continueGame.component.Coin;
 import com.gnome.gnome.editor.utils.TypeOfObjects;
 import com.gnome.gnome.player.Player;
-import javafx.geometry.Insets;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import lombok.Data;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import static com.gnome.gnome.editor.utils.EditorConstants.TILE_SIZE;
 
@@ -17,22 +21,15 @@ import static com.gnome.gnome.editor.utils.EditorConstants.TILE_SIZE;
  */
 @Data
 public class Camera {
-    // The full map represented as a 2D array of integers (object types).
     private int[][] mapGrid;
     private int cameraCenterX;
-
-    /** Y coordinate of the camera's center */
     private int cameraCenterY;
-
-    // Size of the viewport (15x15 tiles).
     private final int viewportSize = 15;
-
-    // Calculated starting row and column of the visible viewport.
     private int startRow;
     private int startCol;
-
-    // Reference to the player (used to track his position).
     private Player player;
+
+    private static final Map<String, Image> imageCache = new HashMap<>();
 
     public Camera(int[][] fieldMap, int cameraCenterX, int cameraCenterY, Player player) {
         this.mapGrid = fieldMap;
@@ -42,63 +39,87 @@ public class Camera {
     }
 
     /**
-     * Returns a GridPane representing the current 15x15 viewport with image tiles.
-     * The player's current cell is highlighted with a yellow border.
+     * Draws the current viewport onto the provided canvas.
      *
-     * @return the GridPane containing the viewport tiles
+     * @param canvas the Canvas to draw on
      */
-    public GridPane getViewport() {
-        GridPane viewport = new GridPane();
-        viewport.setHgap(0);
-        viewport.setVgap(0);
-        viewport.setPadding(Insets.EMPTY);
+    public void drawViewport(Canvas canvas, List<Coin> coins) {
+        GraphicsContext gc = canvas.getGraphicsContext2D();
         int totalRows = mapGrid.length;
         int totalCols = mapGrid[0].length;
         int half = viewportSize / 2;
 
-        // Calculate top-left corner of the viewport while keeping it inside map bounds.
+        // Calculate the starting row and column for the viewport
         startRow = Math.max(0, Math.min(cameraCenterY - half, totalRows - viewportSize));
         startCol = Math.max(0, Math.min(cameraCenterX - half, totalCols - viewportSize));
 
+        // Clear the canvas
+        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
+        // Draw each visible tile
         for (int i = 0; i < viewportSize; i++) {
             for (int j = 0; j < viewportSize; j++) {
                 int row = startRow + i;
                 int col = startCol + j;
+                double x = j * TILE_SIZE;
+                double y = i * TILE_SIZE;
 
-                StackPane tilePane = new StackPane();
-                tilePane.setPrefSize(TILE_SIZE, TILE_SIZE);
-                tilePane.setMinSize(TILE_SIZE, TILE_SIZE);
-                tilePane.setMaxSize(TILE_SIZE, TILE_SIZE);
-
-                // Only add image if the tile is within map bounds.
                 if (row >= 0 && row < totalRows && col >= 0 && col < totalCols) {
+                    // Get tile type and its cached image
                     TypeOfObjects type = TypeOfObjects.fromValue(mapGrid[row][col]);
-                    ImageView icon = new ImageView(new Image(
-                            Objects.requireNonNull(TypeOfObjects.class.getResourceAsStream(type.getImagePath()))
-                    ));
-                    icon.setFitWidth(TILE_SIZE);
-                    icon.setFitHeight(TILE_SIZE);
-                    icon.setPreserveRatio(false); // Here maybe needed to change to true
-                    tilePane.getChildren().add(icon);
+                    Image tileImage = getCachedImage(type.getImagePath());
+                    if (tileImage != null) {
+                        gc.drawImage(tileImage, x, y, TILE_SIZE, TILE_SIZE);
+                    } else {
+                        gc.setFill(Color.GRAY);
+                        gc.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                    }
                 } else {
-                    tilePane.setStyle("-fx-background-color: darkgray;");
+                    // Draw a dark gray tile for areas outside the map bounds
+                    gc.setFill(Color.DARKGRAY);
+                    gc.fillRect(x, y, TILE_SIZE, TILE_SIZE);
                 }
 
-                // Border
-                tilePane.setStyle(tilePane.getStyle() + "-fx-border-color: black; -fx-border-width: 1;");
-
-                // Highlight player
+                // Draw borders, highlighting the player's tile with a yellow border
                 if (row == player.getY() && col == player.getX()) {
-                    tilePane.setStyle(tilePane.getStyle() + "-fx-border-color: yellow; -fx-border-width: 2;");
+                    gc.setStroke(Color.YELLOW);
+                    gc.setLineWidth(2);
+                } else {
+                    gc.setStroke(Color.BLACK);
+                    gc.setLineWidth(1);
                 }
-
-                viewport.add(tilePane, j, i);
+                gc.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
             }
         }
 
-        return viewport;
+        for (Coin coin : coins) {
+            int gx = coin.getGridX(), gy = coin.getGridY();
+            if (gx >= startCol && gx < startCol + viewportSize &&
+                    gy >= startRow && gy < startRow + viewportSize) {
+                Image img = coin.getImageView().getImage();
+                double w = coin.getImageView().getFitWidth();
+                double h = coin.getImageView().getFitHeight();
+                double ox = (TILE_SIZE - w) / 2;
+                double oy = (TILE_SIZE - h) / 2;
+                double px = (gx - startCol) * TILE_SIZE + ox;
+                double py = (gy - startRow) * TILE_SIZE + oy;
+                gc.drawImage(img, px, py, w, h);
+            }
+        }
     }
 
+    /**
+     * Returns a cached image; if it’s not already loaded, loads it from the resource.
+     *
+     * @param imagePath the path to the image
+     * @return the cached Image
+     */
+    private Image getCachedImage(String imagePath) {
+        return imageCache.computeIfAbsent(imagePath, path ->
+                new Image(Objects.requireNonNull(
+                        TypeOfObjects.class.getResourceAsStream(path)
+                )));
+    }
 
 
     /**

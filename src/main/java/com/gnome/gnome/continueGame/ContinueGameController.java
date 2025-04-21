@@ -17,12 +17,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
@@ -43,49 +42,86 @@ public class ContinueGameController implements Initializable {
 
     /** Root layout of the scene. */
     @FXML private BorderPane rootBorder;
-
     /** StackPane container for the camera viewport. */
     @FXML private StackPane centerStack;
-
     /** Button that opens the center menu popup. */
     @FXML private Button centerMenuButton;
+    /**
+     * Container for the player's health bar.
+     */
     @FXML private StackPane healthBarContainer;
 
+    /**
+     * The canvas used for rendering the visible portion of the map.
+     */
+    private Canvas viewportCanvas;
+
+    /**
+     * Label showing the number of coins collected by the player.
+     */
     @FXML private Label coinCountLabel;
 
-    // Game map
+    /**
+     * The initial game map (static terrain).
+     */
     private int[][] baseMap;
+    /**
+     * The active game map including monsters and dynamic elements.
+     */
     private int[][] fieldMap;
-
-    // Camera to view part of the map
+    /**
+     * Camera object for managing viewport rendering.
+     */
     private Camera camera;
-
-    // Popup for center menu
+    /**
+     * Popup menu shown when the center menu button is clicked.
+     */
     private Popup centerMenuPopup;
-
-    // List of monsters on the map
+    /**
+     * List of all active monsters in the game.
+     */
     private final List<Monster> monsterList = new ArrayList<>();
-    // List of coins on the map
+    /**
+     * List of coins currently present on the map.
+     */
     private final List<Coin> coinsOnMap = new ArrayList<>();
+    /**
+     * List of arrows currently active in the game.
+     */
+    private final List<Arrow> activeArrows = new ArrayList<>();
 
     private static final Logger logger = Logger.getLogger(ContinueGameController.class.getName());
 
-    // Game timer for monster movement
+    /**
+     * Timer for updating monster behavior periodically.
+     */
     private AnimationTimer monsterMovementTimer;
+    /**
+     * Time interval (in nanoseconds) for updating monsters.
+     */
     private final long MONSTER_UPDATE_INTERVAL_NANOS = 1_000_000_000L;
+    /**
+     * Last time monsters were updated.
+     */
     private long lastMonsterUpdateTime = 0;
-
-    // Skeleton attack interval
-    private final long SKELETON_ATTACK_INTERVAL_NANOS = 3_000_000_000L;
-    private long lastSkeletonAttackTime = 0;
 
     // Player instance
     private Player player;
     private static final int PLAYER_MAX_HEALTH = 100;
 
+    /**
+     * The player's health bar UI component.
+     */
     private PlayerHealthBar healthBar;
+    /**
+     * Pane containing game objects such as coins.
+     */
     private Pane gameObjectsPane;
+    /**
+     * Overlay shown when the game is over.
+     */
     private VBox gameOverOverlay;
+
     /**
      * Called to initialize the controller after its root element has been completely processed.
      * Initializes the game map, camera, viewport rendering, button handlers, and key listeners.
@@ -95,50 +131,57 @@ public class ContinueGameController implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Create and copy map
-        baseMap = initMap(30, 30);
-        fieldMap = copyMap(baseMap);
-
-        // Create player
-        player = new Player(15, 15, PLAYER_MAX_HEALTH);
-
-        // Initialize camera
-        camera = new Camera(fieldMap, 15, 15, player);
-
-        // Pane for dynamic objects (e.g. arrows)
-        gameObjectsPane = new Pane();
-        gameObjectsPane.setLayoutX(0);
-        gameObjectsPane.setLayoutY(0);
-        gameObjectsPane.setTranslateX(0);
-        gameObjectsPane.setTranslateY(0);
-        gameObjectsPane.setPrefSize(15 * TILE_SIZE, 15 * TILE_SIZE);
-        gameObjectsPane.setPickOnBounds(false);
-
+        baseMap     = initMap(30, 30);
+        fieldMap    = copyMap(baseMap);
+        player      = new Player(15, 15, PLAYER_MAX_HEALTH);
+        camera      = new Camera(fieldMap, player.getX(), player.getY(), player);
         updateMapWithMonsters();
 
-        // Health bar setup
+        double vw = 15 * TILE_SIZE;
+        double vh = 15 * TILE_SIZE;
+
+        viewportCanvas = new Canvas(vw, vh);
+
+        gameObjectsPane = new Pane();
+        gameObjectsPane.setPrefSize(vw, vh);
+        gameObjectsPane.setPickOnBounds(false);
+
+        Pane viewportRoot = new Pane(viewportCanvas, gameObjectsPane);
+        viewportRoot.setPrefSize(vw, vh);
+
+        centerStack.setPrefSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        centerStack.setAlignment(Pos.CENTER);
+        centerStack.getChildren().setAll(viewportRoot);
+        StackPane.setAlignment(viewportRoot, Pos.CENTER);
+
+        centerStack.widthProperty().addListener((obs, oldVal, newVal) -> {
+            System.out.println("centerStack width: " + newVal);
+        });
+        centerStack.heightProperty().addListener((obs, oldVal, newVal) -> {
+            System.out.println("centerStack height: " + newVal);
+        });
+
+//        viewportRoot.layoutXProperty().bind(
+//                centerStack.widthProperty().subtract(vw).divide(2)
+//        );
+//        viewportRoot.layoutYProperty().bind(
+//                centerStack.heightProperty().subtract(vh).divide(2)
+//        );
+
         healthBar = new PlayerHealthBar(200, 20);
         healthBarContainer.getChildren().add(healthBar);
         updatePlayerHealthBar();
 
-        centerStack.setAlignment(Pos.CENTER);
-        updateCameraViewport();
+        coinsOnMap.add(new Coin(9, 9, 100));
+        updateCoinLabel();
 
         centerMenuButton.setOnAction(e -> showCenterMenu());
-
-        // Register keyboard listeners
-        rootBorder.sceneProperty().addListener((obs, oldScene, newScene) -> {
-            if (newScene != null) {
-                registerKeyHandlers(newScene);
-            }
+        rootBorder.sceneProperty().addListener((obs, oldS, newS) -> {
+            if (newS != null) registerKeyHandlers(newS);
         });
 
         startMonsterMovement();
-
-        Coin coin = new Coin(9, 9, 100);
-        coin.updateScreenPosition(camera.getStartCol(), camera.getStartRow());
-        coinsOnMap.add(coin);
-        gameObjectsPane.getChildren().add(coin.getImageView());
+        updateCameraViewport();
     }
 
      /* Initializes a map of given size filled with random values and surrounded by a border of mountains.
@@ -153,15 +196,15 @@ public class ContinueGameController implements Initializable {
 
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
-                int[] possibleValues = {0, 1, 2, 3, 4, 5}; // EMPTY, MOUNTAIN, TREE, ROCK, RIVER, VILLAGER
+                int[] possibleValues = {0, 1, 2, 3, 4}; // EMPTY, MOUNTAIN, TREE, ROCK, RIVER
                 map[row][col] = possibleValues[random.nextInt(possibleValues.length)];
             }
         }
 
         // Add monsters to the list
-        monsterList.add(MonsterFactory.createMonster(MonsterType.GOBLIN, 10, 10));
-        monsterList.add(MonsterFactory.createMonster(MonsterType.DEMON, 5, 15));
-        monsterList.add(MonsterFactory.createMonster(MonsterType.SKELETON, 2, 15));
+        monsterList.add(MonsterFactory.createMonster(MonsterType.SKELETON, 10, 10));
+        monsterList.add(MonsterFactory.createMonster(MonsterType.SKELETON, 5, 15));
+        monsterList.add(MonsterFactory.createMonster(MonsterType.SKELETON, 8, 8));
 
         return map;
     }
@@ -170,7 +213,13 @@ public class ContinueGameController implements Initializable {
      * Makes a deep copy of the 2D map array.
      */
     private int[][] copyMap(int[][] src) {
-        return Arrays.stream(src).map(int[]::clone).toArray(int[][]::new);
+        int rows = src.length;
+        int[][] dest = new int[rows][];
+        for (int i = 0; i < rows; i++) {
+            dest[i] = new int[src[i].length];
+            System.arraycopy(src[i], 0, dest[i], 0, src[i].length);
+        }
+        return dest;
     }
 
 
@@ -197,29 +246,86 @@ public class ContinueGameController implements Initializable {
         scene.setOnKeyPressed(event -> {
             if (centerMenuPopup != null && centerMenuPopup.isShowing()) return;
 
-            KeyCode code = event.getCode();
-            switch (code) {
-                case LEFT, A -> player.moveLeft();
-                case RIGHT, D -> player.moveRight();
-                case UP, W -> player.moveUp();
-                case DOWN, S -> player.moveDown();
+            int maxRow = baseMap.length;
+            int maxCol = baseMap[0].length;
+
+            int oldX = player.getX();
+            int oldY = player.getY();
+            int newX = oldX;
+            int newY = oldY;
+
+            switch (event.getCode()) {
+                case LEFT, A -> {
+                    if (oldX > 0) newX = oldX - 1;
+                }
+                case RIGHT, D -> {
+                    if (oldX < maxCol - 1) newX = oldX + 1;
+                }
+                case UP, W -> {
+                    if (oldY > 0) newY = oldY - 1;
+                }
+                case DOWN, S -> {
+                    if (oldY < maxRow - 1) newY = oldY + 1;
+                }
                 case SPACE -> {
                     List<Monster> eliminated = player.attack(monsterList, 1, 20);
                     removeMonsters(eliminated);
                 }
-                default -> {}
+                default -> { /* no movement */ }
             }
-            checkCoinPickup();
-            camera.updateCameraCenter();
-            updateCameraViewport();
+
+            if (newX != oldX || newY != oldY) {
+                int tileValue = fieldMap[newY][newX];
+                if (tileValue < 0) {
+                    tileValue = baseMap[newY][newX];
+                }
+                TypeOfObjects tileType = TypeOfObjects.fromValue(tileValue);
+
+                if (tileType == TypeOfObjects.FLOOR || tileType == TypeOfObjects.HATCH || tileType == TypeOfObjects.RIVER) {
+                    if (newX < oldX) player.moveLeft();
+                    else if (newX > oldX) player.moveRight();
+                    else if (newY < oldY) player.moveUp();
+                    else if (newY > oldY) player.moveDown();
+
+                    if (tileType == TypeOfObjects.HATCH) {
+                        onHatchStepped();
+                    } else if (tileType == TypeOfObjects.RIVER) {
+                        onRiverStepped();
+                    }
+
+
+                    checkCoinPickup();
+                    camera.updateCameraCenter();
+                    updateCameraViewport();
+                } else {
+                    System.out.println("Player cannot move to (" + newX + ", " + newY + ") - tile type: " + tileType);
+                }
+            }
         });
         scene.getRoot().requestFocus();
     }
 
+    // TODO: Here we need to implement shop
+    private void onHatchStepped() {
+
+    }
+
+    /**
+     * Called when the player steps on a river tile.
+     * Deals damage to the player.
+     */
+    private void onRiverStepped() {
+        System.out.println("Player stepped on RIVER at (" + player.getX() + ", " + player.getY() + ") - Taking 5 damage");
+        player.takeDamage(player.getCurrentHealth());
+        updatePlayerHealthBar();
+    }
+
+    /**
+     * Checks whether the player is standing on a coin and collects it if found.
+     */
     private void checkCoinPickup() {
         int px = player.getX();
         int py = player.getY();
-
         List<Coin> collected = new ArrayList<>();
 
         for (Coin coin : coinsOnMap) {
@@ -234,26 +340,31 @@ public class ContinueGameController implements Initializable {
         updateCoinLabel();
     }
 
+    /**
+     * Updates the coin counter label to reflect collected coins.
+     */
     private void updateCoinLabel() {
         if (coinCountLabel != null) {
             coinCountLabel.setText("Coins: " + player.getPlayerCoins());
         }
     }
 
+    /**
+     * Removes the specified monsters and replaces them with coins.
+     *
+     * @param eliminated a list of monsters to remove
+     */
     private void removeMonsters(List<Monster> eliminated) {
         for (Monster monster : eliminated) {
             int x = monster.getX();
             int y = monster.getY();
-
-            baseMap[y][x] = TypeOfObjects.FLOOR.getValue();
-
+            fieldMap[y][x] = TypeOfObjects.FLOOR.getValue();
             Coin coin = new Coin(x, y, monster.getCost());
-            coin.updateScreenPosition(camera.getStartCol(), camera.getStartRow());
             coinsOnMap.add(coin);
-            gameObjectsPane.getChildren().add(coin.getImageView());
         }
 
         monsterList.removeAll(eliminated);
+        updateCameraViewport();
     }
 
 
@@ -261,60 +372,69 @@ public class ContinueGameController implements Initializable {
      * Updates the camera's viewport display.
      */
     private void updateCameraViewport() {
-        GridPane cameraViewport = camera.getViewport();
+        camera.updateCameraCenter();
+        camera.drawViewport(viewportCanvas, coinsOnMap);
 
-        int startCol = camera.getStartCol();
-        int startRow = camera.getStartRow();
-
-        gameObjectsPane.getChildren().clear();
-
-        for (Coin coin : coinsOnMap) {
-            if (coin.getGridX() >= startCol && coin.getGridX() < startCol + 15 &&
-                    coin.getGridY() >= startRow && coin.getGridY() < startRow + 15) {
-
-                coin.updateScreenPosition(startCol, startRow);
-                gameObjectsPane.getChildren().add(coin.getImageView());
-            }
+        if (!gameObjectsPane.getChildren().contains(player.getRepresentation())) {
+            gameObjectsPane.getChildren().add(player.getRepresentation());
         }
 
-        if (centerStack.getChildren().isEmpty()) {
-            centerStack.getChildren().addAll(cameraViewport, gameObjectsPane);
-        } else {
-            centerStack.getChildren().set(0, cameraViewport);
-            if (!centerStack.getChildren().contains(gameObjectsPane)) {
-                centerStack.getChildren().add(gameObjectsPane);
-            }
+        int playerGridX = player.getX() - camera.getStartCol(); //  X position relative to the start of the viewport
+        int playerGridY = player.getY() - camera.getStartRow(); // Y position relative to the start of the viewport
+        double pixelX = playerGridX * TILE_SIZE; // Convert to pixels
+        double pixelY = playerGridY * TILE_SIZE;
+
+        player.getRepresentation().setTranslateX(pixelX);
+        player.getRepresentation().setTranslateY(pixelY);
+
+        for (Arrow arrow : activeArrows) {
+            arrow.updateCameraOffset(camera.getStartCol(), camera.getStartRow());
         }
+
+        updateCoinLabel();
+        updatePlayerHealthBar();
     }
+
 
     /**
      * Game loop: moves monsters, triggers skeleton attacks, checks collisions.
      */
     private void startMonsterMovement() {
         monsterMovementTimer = new AnimationTimer() {
+            private long lastTime = 0;
             @Override
             public void handle(long now) {
-                if (lastMonsterUpdateTime == 0) {
-                    lastMonsterUpdateTime = now;
-                    lastSkeletonAttackTime = now;
+                if (lastTime == 0) {
+                    lastTime = now;
                     return;
                 }
+
+                updateCameraViewport();
 
                 if (now - lastMonsterUpdateTime >= MONSTER_UPDATE_INTERVAL_NANOS) {
                     handleMonsterMovement();
                     lastMonsterUpdateTime = now;
                 }
 
-                if (now - lastSkeletonAttackTime >= SKELETON_ATTACK_INTERVAL_NANOS) {
-                    handleSkeletonAttacks();
-                    lastSkeletonAttackTime = now;
+                for (Monster m : monsterList) {
+                    if (m instanceof Skeleton s) {
+                        Arrow arrow = s.attack(camera.getStartCol(), camera.getStartRow(), player.getX(), player.getY());
+                        if (arrow != null) {
+                            arrow.setSkeleton(s);
+                            activeArrows.add(arrow);
+                            arrow.shoot(gameObjectsPane, player);
+                        }
+                    }
                 }
 
-                checkArrowCollisionsWithPlayer();
+                activeArrows.removeIf(arrow -> !gameObjectsPane.getChildren().contains(arrow.getView()));
+
+                lastTime = now;
             }
         };
         monsterMovementTimer.start();
     }
+
 
     /**
      * Moves all monsters on the map and refreshes the view.
@@ -324,82 +444,47 @@ public class ContinueGameController implements Initializable {
         int cols = fieldMap[0].length;
 
         fieldMap = copyMap(baseMap);
+        List<Monster> toRemove = new ArrayList<>();
+
         for (Monster monster : monsterList) {
             int oldX = monster.getX();
             int oldY = monster.getY();
-            monster.move();
+            int newX = oldX;
+            int newY = oldY;
 
-            if (monster.getX() < 0 || monster.getX() >= cols ||
-                    monster.getY() < 0 || monster.getY() >= rows) {
+            monster.move();
+            newX = monster.getX();
+            newY = monster.getY();
+
+            if (newX < 0 || newX >= cols || newY < 0 || newY >= rows) {
+                monster.setPosition(oldX, oldY);
+                continue;
+            }
+
+            int tileValue = fieldMap[newY][newX];
+            if (tileValue < 0) {
+                tileValue = baseMap[newY][newX];
+            }
+            TypeOfObjects tileType = TypeOfObjects.fromValue(tileValue);
+
+            if (tileType == TypeOfObjects.FLOOR || tileType == TypeOfObjects.HATCH || tileType == TypeOfObjects.RIVER) {
+                if (tileType == TypeOfObjects.RIVER) {
+                    System.out.println("Monster at (" + oldX + ", " + oldY + ") stepped on RIVER at (" + newX + ", " + newY + ") - Monster dies");
+                    toRemove.add(monster);
+                }
+            } else {
+                System.out.println("Monster cannot move to (" + newX + ", " + newY + ") - tile type: " + tileType);
                 monster.setPosition(oldX, oldY);
             }
         }
+
+        removeMonsters(toRemove);
 
         updateMapWithMonsters();
         updateCameraViewport();
     }
 
     /**
-     * Skeleton attack logic (should be moved to Skeleton class).
-     */
-    private void handleSkeletonAttacks() {
-        // tile_92.png  arrow
-        for (Monster monster : monsterList) {
-            // TODO: My shit code is below, don't touch it, I'll fix it. I can't do without it now, so help me God
-            if (monster instanceof Skeleton skeleton) {
-                int sx = skeleton.getX();
-                int sy = skeleton.getY();
-
-                int startCol = camera.getStartCol();
-                int startRow = camera.getStartRow();
-
-                double screenSkeletonX = (sx - startCol) * TILE_SIZE;
-                double screenSkeletonY = (sy - startRow) * TILE_SIZE;
-                double arrowWidth = 10, arrowHeight = 3;
-                double offsetX = (TILE_SIZE - arrowWidth) / 2.0;
-                double offsetY = (TILE_SIZE - arrowHeight) / 2.0;
-
-                Arrow arrow = new Arrow(
-                        screenSkeletonX + offsetX,
-                        screenSkeletonY + offsetY,
-                        screenSkeletonX + offsetX + 5 * TILE_SIZE,
-                        screenSkeletonY + offsetY,
-                        5
-                );
-
-                arrow.launch();
-                gameObjectsPane.getChildren().add(arrow.getNode());
-            }
-        }
-    }
-
-    /**
-     * Checks collisions between arrows and the player.
-     */
-    private void checkArrowCollisionsWithPlayer() {
-        int globalPlayerX = player.getX();
-        int globalPlayerY = player.getY();
-        int startCol = camera.getStartCol();
-        int startRow = camera.getStartRow();
-
-        double playerScreenX = (globalPlayerX - startCol) * TILE_SIZE;
-        double playerScreenY = (globalPlayerY - startRow) * TILE_SIZE;
-
-        List<Node> arrowsToRemove = new ArrayList<>();
-        for (Node arrowNode : gameObjectsPane.getChildren()) {
-            if (arrowNode.getBoundsInParent().intersects(playerScreenX, playerScreenY, TILE_SIZE, TILE_SIZE)) {
-                player.takeDamage(10);
-                updatePlayerHealthBar();
-                arrowsToRemove.add(arrowNode);
-            }
-        }
-
-        gameObjectsPane.getChildren().removeAll(arrowsToRemove);
-    }
-
-
-    /**
-     * Shows the center menu with sample buttons.
      * Shows the center menu popup at the center of the scene.
      * The popup displays a title and two buttons: "Option 1" and "Go Back".
      * "Go Back" loads the main menu scene.
@@ -452,12 +537,14 @@ public class ContinueGameController implements Initializable {
      * Updates the health bar and shows Game Over if health reaches 0.
      */
     private void updatePlayerHealthBar() {
-        double fraction = (double) player.getCurrentHealth() / player.getMaxHealth();
-        healthBar.setHealthFraction(fraction);
+        Platform.runLater(() -> {
+            double fraction = (double) player.getCurrentHealth() / player.getMaxHealth();
+            healthBar.setHealthFraction(fraction);
 
-        if (player.getCurrentHealth() <= 0) {
-            showGameOverOverlay();
-        }
+            if (player.getCurrentHealth() <= 0) {
+                showGameOverOverlay();
+            }
+        });
     }
 
 
