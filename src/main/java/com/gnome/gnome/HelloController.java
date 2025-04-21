@@ -31,7 +31,6 @@ public class HelloController {
      */
     @FXML
     public void initialize() {
-        System.out.println("Currently logged in: " + UserSession.getInstance().getCurrentUser());
         pageSwitch=new SwitchPage();
 
         musicButton = new Button();

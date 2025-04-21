@@ -27,6 +27,7 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.transform.Scale;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -77,6 +78,9 @@ public class EditorPageController {
 
     private final MapDAO mapDAO = new MapDAO();
 
+    private GenerateGrid gridGen;
+
+    private Button prevButtonMonster;
     /** Default zoom level */
     private final double scale = 1.0;
     /** Minimum zoom scale dynamically calculated based on the viewport size  */
@@ -105,6 +109,8 @@ public class EditorPageController {
         scaleTransform = new Scale(scale, scale);
         gridManager = new GridManager();
         categoryGenerator = MyValueInjection.getInstance().createInstance(CategoryGenerator.class);
+        gridGen = GenerateGrid.getInstance();
+        prevButtonMonster = null;
     }
 
     /**
@@ -183,7 +189,13 @@ public class EditorPageController {
                 // Add a "Back" button to allow returning to the main category row.
                 Button backButton = new Button("Back");
 
-                backButton.setOnAction(this::onBackToMainButtonClick);
+                backButton.setOnAction(ev -> {
+                    onBackToMainButtonClick(ev);
+                    if (prevButtonMonster != null) {
+                        GenerateGrid.getInstance().setSelectedBotType(null);
+                    }
+                });
+
                 inlineButtonsBox.getChildren().add(backButton);
 
                 // Hide the main row and show the inline scroll pane.
@@ -261,14 +273,51 @@ public class EditorPageController {
                     + "-fx-text-fill: white;"
                     + "-fx-font-size: 10px;"
                     + "-fx-border-radius: 5px;"
-                    + "-fx-border-color: transparent;");
+                    );
 
             // Set button size
-            subButton.setPrefSize(100, 100); // Set button size
+            subButton.setPrefSize(100, 100);
         }
+
+        subButton.setOnAction(event -> {
+            handleButtonClick(botType, subButton);
+        });
 
         setupDragForButton(subButton);
         inlineButtonsBox.getChildren().add(subButton);
+    }
+
+
+    /**
+     * Handles the click on a monster‑type button: toggles its selection state and updates the button’s border.
+     * <p>
+     * If the given BotType is already selected in the GenerateGrid singleton, this method will:
+     * <ul>
+     *   <li>remove the yellow highlight (set border to transparent),</li>
+     *   <li>clear the selected BotType in GenerateGrid.</li>
+     * </ul>
+     * Otherwise, it will:
+     * <ul>
+     *   <li>apply a yellow border to the clicked button,</li>
+     *   <li>set the new BotType as selected in GenerateGrid.</li>
+     * </ul>
+     *
+     * @param botType    the BotType associated with this button
+     * @param subButton  the Button instance that was clicked
+     */
+    private void handleButtonClick(BotType botType, Button subButton) {
+        GenerateGrid grid = GenerateGrid.getInstance();
+        if (grid.getSelectedBotType() == botType) {
+            subButton.setStyle(subButton.getStyle() + ";-fx-border-color: transparent;");
+            grid.setSelectedBotType(null);
+            prevButtonMonster = null;
+        } else {
+            subButton.setStyle(subButton.getStyle() + ";-fx-border-color: yellow;");
+            grid.setSelectedBotType(botType);
+            if (prevButtonMonster != null)
+                prevButtonMonster.setStyle(prevButtonMonster.getStyle() + ";-fx-border-color: transparent;");
+            prevButtonMonster = subButton;
+        }
     }
 
 
@@ -392,6 +441,9 @@ public class EditorPageController {
     @FXML
     protected void onBackButtonClick(ActionEvent event) {
         pageSwitch.goMainMenu(editorPage);
+        if (prevButtonMonster != null) {
+            GenerateGrid.getInstance().setSelectedBotType(null);
+        }
     }
 
     @FXML
@@ -445,7 +497,7 @@ public class EditorPageController {
      * @param rows      the number of rows in the grid
      */
     private void setupGrid(int[][] levelGrid, int cols, int rows) {
-        GenerateGrid gridGen = GenerateGrid.getInstance(levelGrid);
+        gridGen = GenerateGrid.getInstance(levelGrid);
         GridPane gridPane = gridGen.generateGrid();
 
         double gridWidth = cols * TILE_SIZE;
@@ -577,7 +629,6 @@ public class EditorPageController {
                                     .mapToObj(String::valueOf)
                                     .collect(Collectors.joining(" ")))
                             .collect(Collectors.toList());
-//                    lines.forEach(System.out::println);
                     Files.write(fileToSave.toPath(), lines);
                     logger.info("Map successfully saved to local device.");
                 } catch (IOException e) {
@@ -684,5 +735,4 @@ public class EditorPageController {
             }
         });
     }
-
 }

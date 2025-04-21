@@ -87,7 +87,9 @@ public class CategoryGenerator {
 
                 String imagePath = objectType.getImagePath();
 
-                BotType botType = new BotType(item, imagePath);
+                TypeOfObjects monsterType = TypeOfObjects.getTypeFromString(typeName);
+
+                BotType botType = new BotType(item, imagePath, monsterType);
 
                 botTypes.add(botType);
 
