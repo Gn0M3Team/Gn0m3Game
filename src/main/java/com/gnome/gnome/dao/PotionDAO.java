@@ -26,7 +26,6 @@ public class PotionDAO extends BaseDAO<Potion> {
     protected Potion mapResultSet(ResultSet rs) throws SQLException {
         return new Potion(
                 rs.getInt("id"),
-                rs.getFloat("buff_val"),
                 rs.getInt("score_val"),
                 rs.getFloat("cost"),
                 rs.getString("name_eng"),
@@ -46,8 +45,8 @@ public class PotionDAO extends BaseDAO<Potion> {
     public Potion insertPotion(Potion potion) {
         try {
             db.beginTransaction();
-            String sql = "INSERT INTO \"Potion\" (buff_val, score_val, cost, name_eng, name_sk, details_eng, details_sk) VALUES (?, ?, ?, ?, ?, ?, ?)";
-            int rowsAffected = executeUpdate(sql, potion.getBuffVal(), potion.getScoreVal(), potion.getCost(),
+            String sql = "INSERT INTO \"Potion\" (score_val, cost, name_eng, name_sk, details_eng, details_sk) VALUES (?, ?, ?, ?, ?, ?)";
+            int rowsAffected = executeUpdate(sql, potion.getScoreVal(), potion.getCost(),
                     potion.getNameEng(), potion.getNameSk(), potion.getDetailsEng(), potion.getDetailsSk());
 
             if (rowsAffected == 1) {
