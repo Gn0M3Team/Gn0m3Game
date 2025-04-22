@@ -53,14 +53,19 @@ public class Player {
      * @param maxHealth  the maximum health of the player
      */
     public Player(int startX, int startY, int maxHealth) {
-        this.x = startX;
-        this.y = startY;
-        this.maxHealth = maxHealth;
-        this.currentHealth = maxHealth;
+        this.x = startX; // Set the player's initial X-coordinate on the grid
+        this.y = startY; // Set the player's initial Y-coordinate on the grid
+        this.maxHealth = maxHealth; // Set the player's maximum health.
+        this.currentHealth = maxHealth; // Set the player's current health to the maximum health at the start of the game.
+
+        // Create a yellow square to visually represent the player:
+        // - TILE_SIZE x TILE_SIZE defines the size of the square (50x50 pixels)
+        // - Color.YELLOW sets the fill color of the square to yellow
         this.representation = new Rectangle(TILE_SIZE, TILE_SIZE, Color.YELLOW);
     }
 
-    // Movement methods
+    // Movement methods: These methods allow the player to move on the grid by changing their x and y coordinates
+    // Each method adjusts the player's position by 1 tile in the specified direction
     public void moveLeft() { x--; }
     public void moveRight() { x++; }
     public void moveUp() { y--; }
@@ -71,21 +76,27 @@ public class Player {
      * Health cannot go below 0.
      */
     public void takeDamage(int damage) {
-        currentHealth -= damage;
+        currentHealth -= damage; // Subtract the damage from the player's current health
+        // Check if the health has gone below 0 (e.g., if currentHealth becomes -5 after taking damage)
         if (currentHealth < 0) {
-            currentHealth = 0;
+            currentHealth = 0; // Set health to 0 to prevent negative values
         }
     }
 
     /**
-     * Player attacks nearby monsters.
-     * Deals damage to monsters within the specified range.
-     * Returns a list of monsters that were eliminated.
+     * Allows the player to attack monsters within a specified range.
+     * This method deals damage to monsters that are close enough to the player and returns a list of monsters that were eliminated.
+     * It also triggers a visual hit effect for each monster that is attacked.
      *
-     * @param monsters List of all monsters in the game
-     * @param range Range in which the player can hit
-     * @param damage Damage dealt to each monster
-     * @return List of monsters that died from the attack
+     * @param monsters A list of all monsters currently in the game.
+     * @param range The attack range (in tiles). For example, if range=1, the player can attack monsters 1 tile away in any direction.
+     * @param damage The amount of damage to deal to each monster that is hit (e.g., 20).
+     * @param gameObjectsPane The JavaFX Pane where visual effects (like hit animations) are displayed.
+     * @param cameraStartCol The starting column of the camera's viewport (used for positioning visual effects).
+     * @param cameraStartRow The starting row of the camera's viewport (used for positioning visual effects).
+     * @param onHitEffectFinished A callback function (Consumer) that is called when a monster's hit effect finishes.
+     *                            This is used to handle actions after the hit effect (e.g., removing a dead monster).
+     * @return A list of monsters that were eliminated (killed) by the attack.
      */
     public List<Monster> attack(List<Monster> monsters,
                                 int range,
@@ -94,28 +105,52 @@ public class Player {
                                 int cameraStartCol,
                                 int cameraStartRow,
                                 Consumer<Monster> onHitEffectFinished) {
+        // Create a list to store monsters that are within the player's attack range
         List<Monster> hitMonsters = new ArrayList<>();
+
+        // Iterate through all monsters in the game to check which ones are within attack range
         for (Monster monster : monsters) {
+            // Calculate the distance between the player and the monster:
+            // - Math.abs(monster.getX() - x) gives the absolute difference in X-coordinates
+            // - Math.abs(monster.getY() - y) gives the absolute difference in Y-coordinates
             int dx = Math.abs(monster.getX() - x);
             int dy = Math.abs(monster.getY() - y);
+
+            // Check if the monster is within the attack range (e.g., if range=1, the monster must be 1 tile away or closer)
+            // This checks for monsters in a square area around the player, not just in a straight line
             if (dx <= range && dy <= range) {
                 hitMonsters.add(monster);
             }
         }
 
+        // Create a list to store monsters that are eliminated (killed) by the attack
         List<Monster> eliminated = new ArrayList<>();
+
+        // Iterate through all monsters that were hit to apply damage and visual effects
         for (Monster monster : hitMonsters) {
+            // Apply the specified damage to the monster (e.g., reduce its health by 20)
             monster.takeDamage(damage);
+
+            // Check if the monster's health has dropped to 0 or below (i.e., the monster is dead)
             if (monster.getHealth() <= 0) {
-                eliminated.add(monster);
+                eliminated.add(monster); // Add the monster to the list of eliminated monsters
             }
+
+            // Show a visual hit effect for the monster (animation)
+            // The hit effect is displayed on the gameObjectsPane at the monster's position, adjusted for the camera's viewport
+            // The lambda expression () -> {...} is a callback that runs when the hit effect finishes
             monster.showHitEffect(gameObjectsPane, cameraStartCol, cameraStartRow, () -> {
+                // Check if this monster was eliminated (killed) during the attack
                 if (eliminated.contains(monster)) {
+                    // If the monster was eliminated, call the callback function to handle post-elimination actions
+                    // For example, this remove the monster from the game and replace it with a coin
                     onHitEffectFinished.accept(monster);
                 }
             });
         }
 
+        // Return the list of monsters that were eliminated by the attack
+        // This list used by the game to remove those monsters and update the game state
         return eliminated;
     }
 
@@ -124,9 +159,9 @@ public class Player {
      * Useful when restarting the game.
      */
     public void reset(int startX, int startY) {
-        this.x = startX;
-        this.y = startY;
-        this.currentHealth = maxHealth;
+        this.x = startX; // Reset the player's X-coordinate to the specified starting position
+        this.y = startY; // Reset the player's Y-coordinate to the specified starting position
+        this.currentHealth = maxHealth; // Restore the player's health to the maximum value.
     }
 
 
@@ -136,7 +171,7 @@ public class Player {
      * @param coin the number of coins to add
      */
     public void addCoin(int coin) {
-        playerCoins += coin;
+        playerCoins += coin; // Increase the player's coin count by the specified amount
     }
 
     /**
@@ -146,6 +181,8 @@ public class Player {
      * @return the bounds of the player's representation node
      */
     public Bounds getBounds() {
+        // representation.getBoundsInParent() returns the bounding box of the player's yellow square
+        // This includes the square's position (adjusted for any transformations) and its size (TILE_SIZE x TILE_SIZE)
         return representation.getBoundsInParent();
     }
 }
