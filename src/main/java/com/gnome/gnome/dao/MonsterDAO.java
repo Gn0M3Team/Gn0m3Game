@@ -82,6 +82,19 @@ public class MonsterDAO extends BaseDAO<Monster> {
     }
 
     /**
+     * Retrieves a Monster from the database by its name_eng.
+     *
+     * @param nameEng the name of the Monster to retrieve
+     * @return the Monster object, or null if not found
+     * @throws DataAccessException if retrieval fails
+     */
+    public Monster getMonsterByNameEng(String nameEng) {
+        String sql = "SELECT * FROM \"Monsters\" WHERE name_eng = ?";
+        List<Monster> monsters = findAll(sql, nameEng);
+        return monsters.isEmpty() ? null : monsters.get(0);
+    }
+
+    /**
      * Retrieves all Monsters from the database.
      *
      * @return a list of all Monster objects

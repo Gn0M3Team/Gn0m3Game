@@ -93,6 +93,19 @@ public class ArmorDAO extends BaseDAO<Armor> {
     }
 
     /**
+     * Retrieves an Armor from the database by its name.
+     *
+     * @param nameEng the name of the Armor to retrieve
+     * @return the Armor object, or null if not found
+     * @throws DataAccessException if retrieval fails
+     */
+    public Armor getArmorByNameEng(String nameEng) {
+        String sql = "SELECT * FROM \"Armor\" WHERE name_eng = ?";
+        List<Armor> armors = findAll(sql, nameEng);
+        return armors.isEmpty() ? null : armors.get(0);
+    }
+
+    /**
      * Retrieves all Armors from the database.
      *
      * @return a list of all Armor objects

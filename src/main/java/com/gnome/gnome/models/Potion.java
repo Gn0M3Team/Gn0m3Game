@@ -11,7 +11,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class Potion {
     private int id;
-    private float buffVal;
     private int scoreVal;
     private float cost;
     private String nameEng;

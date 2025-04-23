@@ -92,6 +92,23 @@ public class WeaponDAO extends BaseDAO<Weapon> {
     }
 
     /**
+     * Retrieves a Weapon from the database by its English name.
+     * <p>
+     * This method queries the "Weapon" table for a row where the name_eng column matches the provided name.
+     * If multiple weapons have the same name_eng, only the first match is returned.
+     * The search is case-sensitive due to PostgreSQL's string comparison behavior.
+     *
+     * @param nameEng the English name of the weapon to retrieve (e.g., "Dragon Sword")
+     * @return the Weapon object with the matching name_eng, or null if not found
+     * @throws DataAccessException if retrieval fails due to a database error
+     */
+    public Weapon getWeaponByNameEng(String nameEng) {
+        String sql = "SELECT * FROM \"Weapon\" WHERE name_eng = ?";
+        List<Weapon> weapons = findAll(sql, nameEng);
+        return weapons.isEmpty() ? null : weapons.get(0);
+    }
+
+    /**
      * Retrieves all Weapons from the database.
      *
      * @return a list of all Weapon objects
