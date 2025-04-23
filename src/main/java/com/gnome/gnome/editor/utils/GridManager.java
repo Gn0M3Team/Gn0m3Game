@@ -112,13 +112,16 @@ public class GridManager {
             case "Tree"      -> TypeOfObjects.TREE.getValue();
             case "Rock"      -> TypeOfObjects.ROCK.getValue();
             case "River"     -> TypeOfObjects.RIVER.getValue();
-            case "Villager"  -> TypeOfObjects.VILLAGER.getValue();
-            case "Merchant"  -> TypeOfObjects.MERCHANT.getValue();
+            case "Bookshelf"     -> TypeOfObjects.BOOKSHELF.getValue();
             case "Mountain"  -> TypeOfObjects.MOUNTAIN.getValue();
             case "Hatch"     -> TypeOfObjects.HATCH.getValue();
             case "Floor"     -> TypeOfObjects.FLOOR.getValue();
-            case "WallOne"   -> TypeOfObjects.WALL_ONE.getValue();
-            case "WallTwo"   -> TypeOfObjects.WALL_TWO.getValue();
+            case "Wall_1"   -> TypeOfObjects.WALL_1.getValue();
+            case "Wall_2"   -> TypeOfObjects.WALL_2.getValue();
+            case "Wall_3"   -> TypeOfObjects.WALL_3.getValue();
+            case "Wall_4"   -> TypeOfObjects.WALL_4.getValue();
+            case "Wall_5"   -> TypeOfObjects.WALL_5.getValue();
+            case "Web"   -> TypeOfObjects.WEB.getValue();
             default          -> TypeOfObjects.EMPTY.getValue();
         };
     }
