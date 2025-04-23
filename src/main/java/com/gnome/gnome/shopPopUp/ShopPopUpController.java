@@ -43,8 +43,8 @@ public class ShopPopUpController {
         pageSwitch.goNewGame(shopPopUpPage);
     }
 
-
-
-
-
+    @FXML
+    public void exit(ActionEvent e) {
+        pageSwitch.goMainMenu(shopPopUpPage);
+    }
 }
