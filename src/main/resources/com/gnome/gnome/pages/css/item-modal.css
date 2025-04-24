@@ -1,0 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+.dialog-overlay {
+    -fx-background-color: rgba(0, 0, 0, 0.4);
+}
+
+.purchase-dialog {
+    -fx-background-color: transparent;
+    -fx-background-image: url('../../images/button-background.png');
+    -fx-background-size: cover;
+    -fx-padding: 20px;
+    -fx-pref-width: 600px;
+    -fx-pref-height: 400px;
+}
+
+.dialog-content {
+    -fx-padding: 0 20px;
+}
+
+.item-icon {
+    -fx-fit-width: 100px;
+    -fx-fit-height: 100px;
+}
+
+.item-price {
+    -fx-text-fill: #F0D23A;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 18px;
+    -fx-alignment: center;
+}
+
+.detail-box {
+    -fx-background-color: #7B586B;
+    -fx-background-radius: 8px;
+    -fx-padding: 15px;
+}
+
+.item-title {
+    -fx-text-fill: #D4DBE2;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 20px;
+    -fx-alignment: center;
+}
+
+.item-value {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 14px;
+}
+
+.item-details {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 12px;
+}
+
+.dialog-buttons {
+    -fx-padding: 10 0 0 0;
+}
+
+.button-cancel, .button-buy {
+    -fx-background-color: #7B586B;;
+    -fx-text-fill: #D4DBE2;
+    -fx-font-family: "Press Start 2P", -apple-system;
+    -fx-font-size: 16px;
+    -fx-background-radius: 8px;
+    -fx-padding: 10px 20px;
+    -fx-cursor: hand;
+}
+
+.button-cancel:hover, .button-buy:hover {
+    -fx-background-color:
+            linear-gradient(to bottom, #C57694, #8F5B71),
+            linear-gradient(to bottom, #F4C8D4, #C57694);
+    -fx-text-fill: #2E1C26;
+}
+
+
+.button-cancel:pressed, .button-buy:pressed {
+    -fx-background-color:
+            linear-gradient(to bottom, #8F5B71, #6B4657),
+            linear-gradient(to bottom, #A35474, #8F5B71);
+}

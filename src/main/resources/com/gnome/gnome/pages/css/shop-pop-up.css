@@ -42,21 +42,21 @@
 .shop-item-container {
     -fx-pref-width: 80px;
     -fx-pref-height: 80px;
-    -fx-min-width: 80px;
-    -fx-min-height: 80px;
     -fx-max-width: 80px;
     -fx-max-height: 80px;
     -fx-background-color: #35282F;
+    -fx-background-radius: 2px;
+
     -fx-border-color: #D4DBE2;
     -fx-border-width: 6px;
-    -fx-background-radius: 2px;
+    -fx-border-style: solid;
     -fx-border-radius: 2px;
 }
 
 .item-price {
     -fx-text-fill: #F0D23A;
     -fx-font-family: "Press Start 2P", -apple-system;
-    -fx-font-size: 14px;
+    -fx-font-size: 12px;
     -fx-alignment: center;
     -fx-text-alignment: center;
 }
@@ -75,4 +75,8 @@
     -fx-cursor: hand;
     -fx-border-color: black;
     -fx-border-width: 2px;
+}
+
+.shop-grid-item {
+    -fx-spacing: 10px;
 }
