@@ -30,6 +30,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import lombok.Getter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -70,6 +71,7 @@ public class ContinueGameController implements Initializable {
     /**
      * The initial game map (static terrain).
      */
+    @Getter
     private int[][] baseMap;
     /**
      * The active game map including monsters and dynamic elements.
@@ -112,6 +114,7 @@ public class ContinueGameController implements Initializable {
     private long lastMonsterUpdateTime = 0;
 
     // Player instance
+    @Getter
     private Player player;
     private static final int PLAYER_MAX_HEALTH = 100;
 
@@ -127,6 +130,15 @@ public class ContinueGameController implements Initializable {
      * Overlay shown when the game is over.
      */
     private VBox gameOverOverlay;
+
+    private static ContinueGameController instance; //Singleton Instance
+
+    public static ContinueGameController getContinueGameController(){
+        //Get ONLY initialized instance
+        if (ContinueGameController.instance == null)
+            return null;
+        return ContinueGameController.instance;
+    }
 
     private boolean debug_mod_game;
 
@@ -148,6 +160,7 @@ public class ContinueGameController implements Initializable {
         player      = new Player(15, 15, PLAYER_MAX_HEALTH); // Create a player at position (15, 15) with 100 health
         camera      = new Camera(fieldMap, player.getX(), player.getY(), player); // Initialize the camera to follow the player
         updateMapWithMonsters(); // Update the field map with monster positions
+        instance = this; //Fill singleton instance ONLY on initialization. BECAUSE OTHERWISE THERE IS NO DATA THAT IS REQUIRED IN OTHER CLASSES
 
         // Set up the viewport (the visible 15x15 tile area of the map)
         double vw = 15 * TILE_SIZE; // Viewport width: 15 tiles * TILE_SIZE (e.g., 15 * 50 = 750 pixels)
@@ -248,7 +261,7 @@ public class ContinueGameController implements Initializable {
 
         // Add monsters to the monsterList (commented-out code shows examples of adding skeletons)
         // Currently, only one goblin is added at position (8, 8)
-//        monsterList.add(MonsterFactory.createMonster(MonsterType.SKELETON, 10, 10));
+        monsterList.add(MonsterFactory.createMonster(MonsterType.SKELETON, 10, 10));
 //        monsterList.add(MonsterFactory.createMonster(MonsterType.SKELETON, 5, 15));
 //        monsterList.add(MonsterFactory.createMonster(MonsterType.SKELETON, 8, 8));
         monsterList.add(MonsterFactory.createMonster(MonsterType.GOBLIN, 8, 8));
@@ -694,7 +707,8 @@ public class ContinueGameController implements Initializable {
             int newY = oldY;
 
             // Move the monster according to its movement strategy (e.g., random movement for goblins)
-            monster.move();
+            monster.move( );
+
             newX = monster.getX(); // Get the new position after moving
             newY = monster.getY();
 

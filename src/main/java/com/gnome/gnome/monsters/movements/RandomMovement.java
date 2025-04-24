@@ -17,4 +17,5 @@ public class RandomMovement implements MovementStrategy {
             case 3 -> monster.setPosition(monster.getX() + 1, monster.getY());
         }
     }
+
 }

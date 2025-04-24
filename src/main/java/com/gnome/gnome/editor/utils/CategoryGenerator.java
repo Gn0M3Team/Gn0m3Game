@@ -44,9 +44,9 @@ public class CategoryGenerator {
     // Local categories for test = true
     private final Map<String, List<String>> localCategoryMap = Map.of(
             "Monsters",     List.of("Demon", "Butterfly", "Goblin", "Scorpion", "Skeleton"),
-            "Props",        List.of("Tree", "Rock", "Hatch"),
-            "NPCs",         List.of("Villager", "Merchant"),
-            "Environment",  List.of("Mountain", "River", "Floor", "WallOne", "WallTwo")
+            "Props",        List.of("Hatch", "Tree", "Cactus", "Rock", "Blocked", "Table", "Bookshelf"),
+            "Walls",        List.of("Wall_1", "Wall_2", "Wall_3", "Wall_4", "Wall_5"),
+            "Environment",  List.of("Mountain", "River", "Floor", "Web")
     );
 
     // Reference to your S3 utility class
@@ -78,7 +78,6 @@ public class CategoryGenerator {
         List<String> items  = localCategoryMap.getOrDefault(category, Collections.emptyList());
         List<BotType> botTypes = new ArrayList<>();
 
-        // Проходим по каждому элементу в списке items
         for (String item : items) {
             try {
                 String typeName = item.toUpperCase();

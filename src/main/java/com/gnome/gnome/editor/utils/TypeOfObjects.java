@@ -16,49 +16,68 @@ public enum TypeOfObjects {
     EMPTY("tile_0.png", 0),
 
     /** Mountain tile */
-    MOUNTAIN("tile_2.png", 1),
+    MOUNTAIN("tile_2.png", -1),
 
     /** Demon enemy tile (uses negative ID) */
-    DEMON("tile_125.png", -1),
+    DEMON("tile_125.png", 1),
 
     /** Butterfly enemy tile (uses negative ID) */
-    BUTTERFLY("tile_125.png", -2),
+    BUTTERFLY("tile_276.png", 4),
 
     /** Goblin enemy tile (uses negative ID) */
-    GOBLIN("tile_123.png", -3),
+    GOBLIN("tile_127.png", 3),
 
     /** Scorpion enemy tile (uses negative ID) */
-    SCORPION("tile_125.png", -4),
+    SCORPION("tile_269.png", 2),
 
     /** Skeleton enemy tile (uses negative ID) */
-    SKELETON("tile_125.png", -5),
+    SKELETON("tile_80.png", 5),
 
     /** Tree tile */
-    TREE("tile_54.png", 2),
+    TREE("tile_54.png", -2),
+
 
     /** Rock tile (uses same image as mountain) */
-    ROCK("tile_2.png", 3),
+    ROCK("tile_103.png", -3),
 
     /** River tile */
-    RIVER("tile_207.png", 4),
+    RIVER("tile_253.png", -4),
 
-    /** Villager character tile */
-    VILLAGER("tile_126.png", 5),
+    /** Bookshelf */
+    BOOKSHELF("tile_299.png", -5),
 
-    /** Merchant character tile */
-    MERCHANT("tile_129.png", 6),
+    /** Cactus tile */
+    CACTUS("tile_56.png", -6),
+
+    /** Cactus tile */
+    BLOCKED("tile_121.png", -7),
+
+    /** Table tile */
+    TABLE("tile_344.png", -8),
+
+    /** Web tile */
+    WEB("tile_737.png", -9),
 
     /** Dungeon floor tile */
     FLOOR("tile_60.png", 7),
 
-    /** First variant of dungeon wall */
-    WALL_ONE("tile_742.png", 8),
-
-    /** Second variant of dungeon wall */
-    WALL_TWO("tile_797.png", 9),
-
     /** Hatch or exit tile */
-    HATCH("tile_297.png", 10);
+    HATCH("tile_297.png", 8),
+
+    /** First variant of dungeon wall */
+    WALL_1("tile_893.png", 9),
+
+    /** First variant of dungeon wall */
+    WALL_2("tile_692.png", 10),
+
+    /** First variant of dungeon wall */
+    WALL_3("tile_699.png", 11),
+
+    /** First variant of dungeon wall */
+    WALL_4("tile_798.png", 12),
+
+    /** First variant of dungeon wall */
+    WALL_5("tile_893.png", 13);
 
     /** File name of the image representing the object */
     private final String imageName;
@@ -94,22 +113,24 @@ public enum TypeOfObjects {
      */
     public static TypeOfObjects fromValue(int value) {
         return switch (value) {
+            case -1 -> MOUNTAIN;
+            case -2 -> TREE;
+            case -3 -> ROCK;
+            case -4 -> RIVER;
+            case -5 -> BOOKSHELF;
             case 0 -> EMPTY;
-            case 1 -> MOUNTAIN;
-            case -1 -> DEMON;
-            case -2 -> BUTTERFLY;
-            case -3 -> GOBLIN;
-            case -4 -> SCORPION;
-            case -5 -> SKELETON;
-            case 2 -> TREE;
-            case 3 -> ROCK;
-            case 4 -> RIVER;
-            case 5 -> VILLAGER;
-            case 6 -> MERCHANT;
+            case 1 -> DEMON;
+            case 4 -> BUTTERFLY;
+            case 3 -> GOBLIN;
+            case 2 -> SCORPION;
+            case 5 -> SKELETON;
             case 7 -> FLOOR;
-            case 8 -> WALL_ONE;
-            case 9 -> WALL_TWO;
-            case 10 -> HATCH;
+            case 8 -> HATCH;
+            case 9 -> WALL_1;
+            case 10 -> WALL_2;
+            case 11 -> WALL_3;
+            case 12 -> WALL_4;
+            case 13 -> WALL_5;
             default -> EMPTY;
         };
     }
