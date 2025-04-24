@@ -392,7 +392,7 @@ public class ContinueGameController implements Initializable {
                 TypeOfObjects tileType = TypeOfObjects.fromValue(tileValue);
 
                 // Check if the tile is walkable (FLOOR, HATCH, RIVER, or EMPTY)
-                if (tileType == TypeOfObjects.FLOOR || tileType == TypeOfObjects.HATCH || tileType == TypeOfObjects.RIVER || tileType == TypeOfObjects.EMPTY) {
+                if (tileType == TypeOfObjects.FLOOR || tileType == TypeOfObjects.FINISH_POINT || tileType == TypeOfObjects.RIVER || tileType == TypeOfObjects.EMPTY) {
                     // Update the player's position based on the direction of movement
                     if (newX < oldX) player.moveLeft();
                     else if (newX > oldX) player.moveRight();
@@ -400,7 +400,7 @@ public class ContinueGameController implements Initializable {
                     else if (newY > oldY) player.moveDown();
 
                     // Handle special tile interactions
-                    if (tileType == TypeOfObjects.HATCH) {
+                    if (tileType == TypeOfObjects.FINISH_POINT) {
                         onHatchStepped(); // Handle stepping on a hatch (currently a placeholder)
                     } else if (tileType == TypeOfObjects.RIVER) {
                         onRiverStepped(); // Handle stepping on a river (deals damage to the player)
@@ -755,7 +755,7 @@ public class ContinueGameController implements Initializable {
             TypeOfObjects tileType = TypeOfObjects.fromValue(tileValue);
 
             // Check if the tile is walkable (FLOOR, HATCH, RIVER, or EMPTY)
-            if (tileType == TypeOfObjects.FLOOR || tileType == TypeOfObjects.HATCH || tileType == TypeOfObjects.RIVER || tileType == TypeOfObjects.EMPTY) {
+            if (tileType == TypeOfObjects.FLOOR || tileType == TypeOfObjects.FINISH_POINT || tileType == TypeOfObjects.RIVER || tileType == TypeOfObjects.EMPTY) {
                 // If the tile is a river, the monster dies
                 if (tileType == TypeOfObjects.RIVER) {
                     if (debug_mod_game)
