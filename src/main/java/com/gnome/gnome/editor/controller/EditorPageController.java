@@ -566,7 +566,7 @@ public class EditorPageController {
     protected void onLoadMapFromDatabase(ActionEvent event) {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         MapDAO mapDAO = new MapDAO();
-//        String currentUsername = getCurrentUsername(); // Implement this method to get the logged-in user
+//        String currentUsername = getCurrentUsername(); // TODO implement method to get current lodded user
         String currentUsername = "Admin"; // Admin for now
 
         try {
@@ -576,7 +576,7 @@ public class EditorPageController {
                 return;
             }
             List<String> mapNames = userMaps.stream()
-                    .map(Map::getMapNameEng)
+                    .map(map -> "ID: " + map.getId() + " - Name: " + map.getMapNameEng())
                     .collect(Collectors.toList());
 
             SelectorMapDialogBox mapDialog = new SelectorMapDialogBox(mapNames);
@@ -586,7 +586,7 @@ public class EditorPageController {
                 logger.info("Selected map: " + selectedItem);
 
                 Map selectedMap = userMaps.stream()
-                        .filter(map -> (map.getMapNameEng()).equals(selectedItem))
+                        .filter(map -> ("ID: " + map.getId() + " - Name: " + map.getMapNameEng()).equals(selectedItem))
                         .findFirst()
                         .orElse(null);
 
@@ -734,5 +734,59 @@ public class EditorPageController {
                 logger.log(Level.SEVERE, "Error loading map from resources", e);
             }
         });
+    }
+
+    /**
+     * Handles deleting a map from the database.
+     *
+     */
+    @FXML
+    protected void onDeleteMapFromDatabase(ActionEvent event) {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        MapDAO mapDAO = new MapDAO();
+        String currentUsername = "Admin"; // TODO
+
+        try {
+            List<Map> userMaps;
+            if(currentUsername.equals("Admin")){
+                userMaps = mapDAO.getAllMaps();
+            }
+            else{
+                userMaps = mapDAO.getMapsByUsername(currentUsername);
+            }
+            if (userMaps.isEmpty()) {
+                logger.info("No maps have been created by user: " + currentUsername);
+                return;
+            }
+
+            // Create a list of strings combining ID and name
+            List<String> mapDisplayList = userMaps.stream()
+                    .map(map -> "ID: " + map.getId() + " - Name: " + map.getMapNameEng())
+                    .collect(Collectors.toList());
+
+            SelectorMapDialogBox mapDialog = new SelectorMapDialogBox(mapDisplayList);
+            Optional<String> result = mapDialog.showDialog(stage);
+
+            result.ifPresent(selectedItem -> {
+                logger.info("Selected map for deletion: " + selectedItem);
+
+                // Find the selected map
+                Map selectedMap = userMaps.stream()
+                        .filter(map -> ("ID: " + map.getId() + " - Name: " + map.getMapNameEng()).equals(selectedItem))
+                        .findFirst()
+                        .orElse(null);
+
+                if (selectedMap != null) {
+                    // Delete the map from the database
+                    mapDAO.deleteMapById(selectedMap.getId());
+                    logger.info("Map deleted successfully: " + selectedItem);
+                } else {
+                    logger.log(Level.SEVERE, "Error", "Selected map not found in user maps.");
+                }
+            });
+
+        } catch (DataAccessException e) {
+            logger.log(Level.SEVERE, "Error deleting map from database", e);
+        }
     }
 }
