@@ -31,15 +31,15 @@
                                 userData="Props"
                                 />
 
-                        <Button text="NPCs"
+                        <Button text="Walls"
                                 onAction="#onCategoryButtonClick"
-                                userData="NPCs"
+                                userData="Walls"
                                 />
 
                         <Button text="Environment"
                                 onAction="#onCategoryButtonClick"
                                 userData="Environment"
-                                />
+                        />
                     </children>
                 </HBox>
 
