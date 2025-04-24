@@ -17,4 +17,5 @@ public class StraightMovement implements MovementStrategy{
             monster.setPosition(monster.getX(), monster.getY() + dy);
         }
     }
+
 }
