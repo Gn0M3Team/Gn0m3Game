@@ -59,12 +59,12 @@ public class ShopController {
      * @param e the action event triggered by the button click
      */
     @FXML
-    public void newGameButtonClick(ActionEvent e) {
+    public void onNewGame(ActionEvent e) {
         pageSwitch.goNewGame(shopPopUpPage);
     }
 
     @FXML
-    public void exit(ActionEvent e) {
+    public void onExit(ActionEvent e) {
         pageSwitch.goMainMenu(shopPopUpPage);
     }
 
@@ -93,26 +93,26 @@ public class ShopController {
                     item.getId()
             );
 
+            Image image = null;
             try (InputStream is = getClass().getResourceAsStream(resourcePath)) {
                 if (is != null) {
-                    Image image = new Image(is);
+                    image = new Image(is);
                     ImageView iv = new ImageView(image);
                     iv.setFitWidth(iconContainer.getPrefWidth());
                     iv.setFitHeight(iconContainer.getPrefHeight());
                     iv.setPreserveRatio(true);
                     iconContainer.getChildren().add(iv);
-                } else {
-                    System.err.println("Resource not found: " + resourcePath);
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch(IOException ex) {
+                ex.printStackTrace();
             }
 
-            cell.setOnMouseClicked(e -> showPurchasePopup(item));
+            Image itemImage = image;
+            cell.setOnMouseClicked(e -> showPurchasePopup(item, itemImage));
         }
     }
 
-    private void showPurchasePopup(ShopItem item) {
+    private void showPurchasePopup(ShopItem item, Image image) {
         try {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/gnome/gnome/pages/item-modal.fxml")
@@ -123,7 +123,7 @@ public class ShopController {
             Stage popup = new Stage();
             popup.initOwner(shopPopUpPage.getScene().getWindow());
             popup.initModality(Modality.APPLICATION_MODAL);
-            itemController.setItemData(item);
+            itemController.setItemData(item, new ImageView(image));
 
             popup.setScene(new Scene(root));
             popup.showAndWait();

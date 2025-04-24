@@ -80,10 +80,10 @@
 
     <bottom>
         <HBox alignment="CENTER" spacing="30" style="-fx-padding:10">
-            <Button fx:id="ExitButton" text="Exit" styleClass="action-button">
+            <Button fx:id="ExitButton" text="Exit" onAction="#onExit" styleClass="action-button">
                 <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
             </Button>
-            <Button fx:id="ReturnGameButton" onAction="#newGameButtonClick" text="Continue" styleClass="action-button">
+            <Button fx:id="ReturnGameButton" onAction="#onNewGame" text="Continue" styleClass="action-button">
                 <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
             </Button>
         </HBox>
