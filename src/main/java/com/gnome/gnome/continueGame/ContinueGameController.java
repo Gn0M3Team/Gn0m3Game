@@ -512,21 +512,13 @@ public class ContinueGameController implements Initializable {
         // Draw the viewport on the canvas, including the map tiles and coins
         camera.drawViewport(viewportCanvas, coinsOnMap);
 
-        // Ensure the player's visual representation (a yellow square) is added to the gameObjectsPane
+        // Add the player to the gameObjectsPane if not already added
         if (!gameObjectsPane.getChildren().contains(player.getRepresentation())) {
             gameObjectsPane.getChildren().add(player.getRepresentation());
         }
 
-        // Calculate the player's position relative to the camera's viewport
-        int playerGridX = player.getX() - camera.getStartCol(); //  X position relative to the viewport's start
-        int playerGridY = player.getY() - camera.getStartRow(); // Y position relative to the viewport's start
-        // Convert the grid position to pixel coordinates
-        double pixelX = playerGridX * TILE_SIZE; // X position in pixels
-        double pixelY = playerGridY * TILE_SIZE; // Y position in pixels
-
-        // Update the position of the player's visual representation on the screen
-        player.getRepresentation().setTranslateX(pixelX);
-        player.getRepresentation().setTranslateY(pixelY);
+        // Always update player position based on camera offset
+       player.updatePositionWithCamera(camera.getStartCol(), camera.getStartRow());
 
         // Update the positions of all effects (e.g., hit effects, attack animations) in the gameObjectsPane
         // Effects have absolute coordinates stored in their properties, which are adjusted based on the camera's position
@@ -554,7 +546,6 @@ public class ContinueGameController implements Initializable {
         updateCoinLabel();
         updatePlayerHealthBar();
     }
-
 
     /**
      * Starts the game loop using an AnimationTimer.

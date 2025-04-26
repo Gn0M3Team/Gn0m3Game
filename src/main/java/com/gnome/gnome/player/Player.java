@@ -61,7 +61,10 @@ public class Player {
         // Create a yellow square to visually represent the player:
         // - TILE_SIZE x TILE_SIZE defines the size of the square (50x50 pixels)
         // - Color.YELLOW sets the fill color of the square to yellow
-        this.representation = new Rectangle(TILE_SIZE, TILE_SIZE, Color.YELLOW);
+        Rectangle rect = new Rectangle(TILE_SIZE * 0.6, TILE_SIZE * 0.6, Color.YELLOW);
+        rect.setArcWidth(10); // Rounded corners
+        rect.setArcHeight(10);
+        this.representation = rect;
     }
 
     // Movement methods: These methods allow the player to move on the grid by changing their x and y coordinates
@@ -76,11 +79,8 @@ public class Player {
      * Health cannot go below 0.
      */
     public void takeDamage(int damage) {
-        currentHealth -= damage; // Subtract the damage from the player's current health
-        // Check if the health has gone below 0 (e.g., if currentHealth becomes -5 after taking damage)
-        if (currentHealth < 0) {
-            currentHealth = 0; // Set health to 0 to prevent negative values
-        }
+        currentHealth -= damage;
+        if (currentHealth < 0) currentHealth = 0;
     }
 
     /**
@@ -184,5 +184,23 @@ public class Player {
         // representation.getBoundsInParent() returns the bounding box of the player's yellow square
         // This includes the square's position (adjusted for any transformations) and its size (TILE_SIZE x TILE_SIZE)
         return representation.getBoundsInParent();
+    }
+
+    /**
+     * Updates the visual position of the player based on camera offset.
+     * This method must be called after moving or scrolling.
+     *
+     * @param cameraStartCol the first visible column (leftmost)
+     * @param cameraStartRow the first visible row (topmost)
+     */
+    public void updatePositionWithCamera(int cameraStartCol, int cameraStartRow) {
+        double size = TILE_SIZE * 0.6;
+        double offset = (TILE_SIZE - size) / 2.0;
+
+        double pixelX = (x - cameraStartCol) * TILE_SIZE + offset;
+        double pixelY = (y - cameraStartRow) * TILE_SIZE + offset;
+
+        representation.setTranslateX(pixelX);
+        representation.setTranslateY(pixelY);
     }
 }

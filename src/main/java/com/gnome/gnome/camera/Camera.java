@@ -122,18 +122,8 @@ public class Camera {
                     gc.fillRect(x, y, TILE_SIZE, TILE_SIZE);
                 }
 
-                // Draw a frame around the tiles so that the map grid is visible
-                // If it is a tile on which a player is standing, the frame will be yellow, otherwise it will be black
-                if (row == player.getY() && col == player.getX()) {
-                    gc.setStroke(Color.YELLOW);
-                    gc.setLineWidth(2);
-                } else {
-                    // For all other tiles, draw a thin black border
-                    gc.setStroke(Color.BLACK);
-                    gc.setLineWidth(1); // The frame thickness is 1 pixel
-                }
-
-                // Draw a frame around the tile (square).
+                gc.setStroke(Color.BLACK);
+                gc.setLineWidth(1);
                 gc.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
             }
         }
