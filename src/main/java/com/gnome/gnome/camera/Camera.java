@@ -38,6 +38,8 @@ public class Camera {
                                                                             // so that we don't have to load them from files every time we draw a map.
                                                                             // The key is the path to the image (String), the value is the Image object itself
 
+    private static Camera instance;
+
     /**
      * Constructor of the Camera class. Used to create a new Camera object.
      *
@@ -46,11 +48,28 @@ public class Camera {
      * @param cameraCenterY Initial Y coordinate of the camera centre (usually the player's position).
      * @param player A player object so we can keep track of the player's position.
      */
-    public Camera(int[][] fieldMap, int cameraCenterX, int cameraCenterY, Player player) {
+    private Camera(int[][] fieldMap, int cameraCenterX, int cameraCenterY, Player player) {
         this.mapGrid = fieldMap; // Initialise the map passed as a parameter
         this.cameraCenterX = cameraCenterX; // Set the initial X-coordinate of the camera centre
         this.cameraCenterY = cameraCenterY; // Set the initial Y-coordinate of the camera center
         this.player = player; // Save the reference to the player object
+    }
+
+    /**
+     * Singleton access method for the Camera.
+     */
+    public static Camera getInstance(int[][] fieldMap, int cameraCenterX, int cameraCenterY, Player player) {
+        if (instance == null) {
+            instance = new Camera(fieldMap, cameraCenterX, cameraCenterY, player);
+        }
+        return instance;
+    }
+
+    /**
+     * Reset instance
+     */
+    public static void resetInstance() {
+        instance = null;
     }
 
 

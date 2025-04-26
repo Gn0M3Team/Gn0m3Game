@@ -45,6 +45,8 @@ public class Player {
      */
     private int playerCoins = 0;
 
+    private static Player instance;
+
     /**
      * Creates a new player at the specified position with the given maximum health.
      *
@@ -52,7 +54,7 @@ public class Player {
      * @param startY     the starting Y position
      * @param maxHealth  the maximum health of the player
      */
-    public Player(int startX, int startY, int maxHealth) {
+    private Player(int startX, int startY, int maxHealth) {
         this.x = startX; // Set the player's initial X-coordinate on the grid
         this.y = startY; // Set the player's initial Y-coordinate on the grid
         this.maxHealth = maxHealth; // Set the player's maximum health.
@@ -66,6 +68,14 @@ public class Player {
         rect.setArcHeight(10);
         this.representation = rect;
     }
+
+    public static Player getInstance(int startX, int startY, int maxHealth) {
+        if (instance == null) {
+            instance = new Player(startX, startY, maxHealth);
+        }
+        return instance;
+    }
+
 
     // Movement methods: These methods allow the player to move on the grid by changing their x and y coordinates
     // Each method adjusts the player's position by 1 tile in the specified direction
@@ -158,10 +168,8 @@ public class Player {
      * Resets the player's position and health to the initial state.
      * Useful when restarting the game.
      */
-    public void reset(int startX, int startY) {
-        this.x = startX; // Reset the player's X-coordinate to the specified starting position
-        this.y = startY; // Reset the player's Y-coordinate to the specified starting position
-        this.currentHealth = maxHealth; // Restore the player's health to the maximum value.
+    public static void resetInstance() {
+        instance = null;
     }
 
 

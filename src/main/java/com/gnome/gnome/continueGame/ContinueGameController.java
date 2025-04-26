@@ -158,8 +158,8 @@ public class ContinueGameController implements Initializable {
         // Initialize the game map, player, camera, and monsters
         baseMap     = initMap(30, 30); // Create a 30x30 base map with static terrain
         fieldMap    = copyMap(baseMap); // Create a copy of the base map for dynamic updates
-        player      = new Player(15, 15, PLAYER_MAX_HEALTH); // Create a player at position (15, 15) with 100 health
-        camera      = new Camera(fieldMap, player.getX(), player.getY(), player); // Initialize the camera to follow the player
+        player      = Player.getInstance(15, 15, PLAYER_MAX_HEALTH); // Create a player at position (15, 15) with 100 health
+        camera      = Camera.getInstance(fieldMap, player.getX(), player.getY(), player); // Initialize the camera to follow the player
         updateMapWithMonsters(); // Update the field map with monster positions
         instance = this; //Fill singleton instance ONLY on initialization. BECAUSE OTHERWISE THERE IS NO DATA THAT IS REQUIRED IN OTHER CLASSES
 
