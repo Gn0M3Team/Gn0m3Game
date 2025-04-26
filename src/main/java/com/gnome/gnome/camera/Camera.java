@@ -178,6 +178,51 @@ public class Camera {
                 gc.drawImage(img, px, py, w, h);
             }
         }
+
+        double boxSize = 70;
+        double padding = 20;
+
+        double canvasWidth = canvas.getWidth();
+        double canvasHeight = canvas.getHeight();
+
+        gc.setFill(Color.color(0, 0, 0, 0.5));
+        gc.fillRect(
+                canvasWidth - boxSize - padding - 10,
+                canvasHeight - boxSize * 2 - padding - 30,
+                boxSize + 20,
+                boxSize * 2 + 40
+        );
+
+
+        gc.setFill(Color.LIGHTBLUE);
+        gc.fillRect(
+                canvasWidth - boxSize - padding,
+                canvasHeight - boxSize * 2 - padding - 20,
+                boxSize,
+                boxSize
+        );
+
+        gc.setFill(Color.LIGHTCORAL);
+        gc.fillRect(
+                canvasWidth - boxSize - padding,
+                canvasHeight - boxSize - padding,
+                boxSize,
+                boxSize
+        );
+
+        gc.setFill(Color.WHITE);
+        gc.setFont(javafx.scene.text.Font.font(16));
+
+        gc.fillText(
+                "Armor",
+                canvasWidth - boxSize - padding + 10,
+                canvasHeight - boxSize * 2 - padding + 10
+        );
+        gc.fillText(
+                "Sword",
+                canvasWidth - boxSize - padding + 10,
+                canvasHeight - boxSize - padding + 10
+        );
     }
 
     /**
