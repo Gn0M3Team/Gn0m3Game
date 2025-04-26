@@ -17,4 +17,5 @@ public class Weapon {
     private String nameSk;
     private String detailsEng;
     private String detailsSk;
+    private String img;
 }
