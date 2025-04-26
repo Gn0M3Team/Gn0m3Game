@@ -16,4 +16,6 @@ public class OmnidirectionalMovement implements MovementStrategy {
         }
         monster.setPosition(monster.getX() + dx, monster.getY() + dy);
     }
+
+
 }

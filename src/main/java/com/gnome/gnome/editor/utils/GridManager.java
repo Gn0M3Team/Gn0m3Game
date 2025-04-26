@@ -104,22 +104,72 @@ public class GridManager {
      */
     private int getValueForType(String type) {
         return switch (type) {
-            case "Demon"     -> TypeOfObjects.DEMON.getValue();
-            case "Butterfly" -> TypeOfObjects.BUTTERFLY.getValue();
-            case "Goblin"    -> TypeOfObjects.GOBLIN.getValue();
-            case "Scorpion"  -> TypeOfObjects.SCORPION.getValue();
-            case "Skeleton"  -> TypeOfObjects.SKELETON.getValue();
-            case "Tree"      -> TypeOfObjects.TREE.getValue();
-            case "Rock"      -> TypeOfObjects.ROCK.getValue();
-            case "River"     -> TypeOfObjects.RIVER.getValue();
-            case "Villager"  -> TypeOfObjects.VILLAGER.getValue();
-            case "Merchant"  -> TypeOfObjects.MERCHANT.getValue();
-            case "Mountain"  -> TypeOfObjects.MOUNTAIN.getValue();
-            case "Hatch"     -> TypeOfObjects.HATCH.getValue();
-            case "Floor"     -> TypeOfObjects.FLOOR.getValue();
-            case "WallOne"   -> TypeOfObjects.WALL_ONE.getValue();
-            case "WallTwo"   -> TypeOfObjects.WALL_TWO.getValue();
-            default          -> TypeOfObjects.EMPTY.getValue();
+            // Empty / Start / Finish
+            case "Empty"        -> TypeOfObjects.EMPTY.getValue();
+            case "Start_Point"   -> TypeOfObjects.START_POINT.getValue();
+            case "Finish_Point"  -> TypeOfObjects.FINISH_POINT.getValue();
+
+            // Monsters
+            case "Demon"        -> TypeOfObjects.DEMON.getValue();
+            case "Butterfly"    -> TypeOfObjects.BUTTERFLY.getValue();
+            case "Goblin"       -> TypeOfObjects.GOBLIN.getValue();
+            case "Scorpion"     -> TypeOfObjects.SCORPION.getValue();
+            case "Skeleton"     -> TypeOfObjects.SKELETON.getValue();
+
+            // Props
+            case "Floor"        -> TypeOfObjects.FLOOR.getValue();
+            case "Blocked"      -> TypeOfObjects.BLOCKED.getValue();
+            case "Bookshelf"    -> TypeOfObjects.BOOKSHELF.getValue();
+            case "Table"        -> TypeOfObjects.TABLE.getValue();
+
+            // Environment
+            case "Tree"         -> TypeOfObjects.TREE.getValue();
+            case "Rock"         -> TypeOfObjects.ROCK.getValue();
+            case "River"        -> TypeOfObjects.RIVER.getValue();
+            case "Cactus"       -> TypeOfObjects.CACTUS.getValue();
+            case "Web"          -> TypeOfObjects.WEB.getValue();
+            case "Stump"        -> TypeOfObjects.STUMP.getValue();
+            case "Mountain"     -> TypeOfObjects.MOUNTAIN.getValue();
+
+            // Walls
+            case "Wall_1"       -> TypeOfObjects.WALL_1.getValue();
+            case "Wall_2"       -> TypeOfObjects.WALL_2.getValue();
+            case "Wall_3"       -> TypeOfObjects.WALL_3.getValue();
+            case "Wall_4"       -> TypeOfObjects.WALL_4.getValue();
+            case "Wall_5"       -> TypeOfObjects.WALL_5.getValue();
+            case "Wall_6"       -> TypeOfObjects.WALL_6.getValue();
+            case "Wall_7"       -> TypeOfObjects.WALL_7.getValue();
+            case "Wall_8"       -> TypeOfObjects.WALL_8.getValue();
+            case "Wall_9"       -> TypeOfObjects.WALL_9.getValue();
+            case "Wall_10"      -> TypeOfObjects.WALL_10.getValue();
+            case "Wall_11"      -> TypeOfObjects.WALL_11.getValue();
+
+            // Chests
+            case "Chest_1"      -> TypeOfObjects.CHEST_1.getValue();
+            case "Chest_2"      -> TypeOfObjects.CHEST_2.getValue();
+            case "Chest_3"      -> TypeOfObjects.CHEST_3.getValue();
+            case "Chest_4"      -> TypeOfObjects.CHEST_4.getValue();
+            case "Chest_5"      -> TypeOfObjects.CHEST_5.getValue();
+            case "Chest_6"      -> TypeOfObjects.CHEST_6.getValue();
+            case "Chest_7"      -> TypeOfObjects.CHEST_7.getValue();
+
+            // Doors
+            case "Door_1"       -> TypeOfObjects.DOOR_1.getValue();
+            case "Door_2"       -> TypeOfObjects.DOOR_2.getValue();
+            case "Door_3"       -> TypeOfObjects.DOOR_3.getValue();
+            case "Door_4"       -> TypeOfObjects.DOOR_4.getValue();
+            case "Door_5"       -> TypeOfObjects.DOOR_5.getValue();
+            case "Door_6"       -> TypeOfObjects.DOOR_6.getValue();
+            case "Door_7"       -> TypeOfObjects.DOOR_7.getValue();
+            case "Door_8"       -> TypeOfObjects.DOOR_8.getValue();
+            case "Door_9"       -> TypeOfObjects.DOOR_9.getValue();
+            case "Door_10"      -> TypeOfObjects.DOOR_10.getValue();
+            case "Door_11"      -> TypeOfObjects.DOOR_11.getValue();
+            case "Door_12"      -> TypeOfObjects.DOOR_12.getValue();
+            case "Door_13"      -> TypeOfObjects.DOOR_13.getValue();
+
+            // Default fallback
+            default             -> TypeOfObjects.EMPTY.getValue();
         };
     }
 

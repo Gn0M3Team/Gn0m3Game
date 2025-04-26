@@ -38,6 +38,8 @@ public class Camera {
                                                                             // so that we don't have to load them from files every time we draw a map.
                                                                             // The key is the path to the image (String), the value is the Image object itself
 
+    private static Camera instance;
+
     /**
      * Constructor of the Camera class. Used to create a new Camera object.
      *
@@ -46,11 +48,28 @@ public class Camera {
      * @param cameraCenterY Initial Y coordinate of the camera centre (usually the player's position).
      * @param player A player object so we can keep track of the player's position.
      */
-    public Camera(int[][] fieldMap, int cameraCenterX, int cameraCenterY, Player player) {
+    private Camera(int[][] fieldMap, int cameraCenterX, int cameraCenterY, Player player) {
         this.mapGrid = fieldMap; // Initialise the map passed as a parameter
         this.cameraCenterX = cameraCenterX; // Set the initial X-coordinate of the camera centre
         this.cameraCenterY = cameraCenterY; // Set the initial Y-coordinate of the camera center
         this.player = player; // Save the reference to the player object
+    }
+
+    /**
+     * Singleton access method for the Camera.
+     */
+    public static Camera getInstance(int[][] fieldMap, int cameraCenterX, int cameraCenterY, Player player) {
+        if (instance == null) {
+            instance = new Camera(fieldMap, cameraCenterX, cameraCenterY, player);
+        }
+        return instance;
+    }
+
+    /**
+     * Reset instance
+     */
+    public static void resetInstance() {
+        instance = null;
     }
 
 
@@ -122,18 +141,8 @@ public class Camera {
                     gc.fillRect(x, y, TILE_SIZE, TILE_SIZE);
                 }
 
-                // Draw a frame around the tiles so that the map grid is visible
-                // If it is a tile on which a player is standing, the frame will be yellow, otherwise it will be black
-                if (row == player.getY() && col == player.getX()) {
-                    gc.setStroke(Color.YELLOW);
-                    gc.setLineWidth(2);
-                } else {
-                    // For all other tiles, draw a thin black border
-                    gc.setStroke(Color.BLACK);
-                    gc.setLineWidth(1); // The frame thickness is 1 pixel
-                }
-
-                // Draw a frame around the tile (square).
+                gc.setStroke(Color.BLACK);
+                gc.setLineWidth(1);
                 gc.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
             }
         }

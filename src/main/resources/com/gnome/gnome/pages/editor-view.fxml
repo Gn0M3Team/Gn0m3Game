@@ -22,24 +22,39 @@
                 <!-- Main category buttons row -->
                 <HBox fx:id="mainButtonsBox" alignment="CENTER" spacing="10">
                     <children>
+                        <Button text="Start/Finish"
+                                onAction="#onCategoryButtonClick"
+                                userData="Start/Finish"/>
+
                         <Button text="Monsters"
                                 onAction="#onCategoryButtonClick"
                                 userData="Monsters"/>
 
+                        <Button text="Walls"
+                                onAction="#onCategoryButtonClick"
+                                userData="Walls"
+                                />
+
+                        <Button text="Doors"
+                                onAction="#onCategoryButtonClick"
+                                userData="Doors"
+                        />
+
+                        <Button text="Chests"
+                                onAction="#onCategoryButtonClick"
+                                userData="Chests"
+                        />
+
                         <Button text="Props"
                                 onAction="#onCategoryButtonClick"
                                 userData="Props"
-                                />
+                        />
 
-                        <Button text="NPCs"
-                                onAction="#onCategoryButtonClick"
-                                userData="NPCs"
-                                />
 
                         <Button text="Environment"
                                 onAction="#onCategoryButtonClick"
                                 userData="Environment"
-                                />
+                        />
                     </children>
                 </HBox>
 
@@ -92,6 +107,9 @@
             </children>
             <children>
                 <Button onAction="#onSaveToDatabase" text="Save to database" />
+            </children>
+            <children>
+                <Button onAction="#onDeleteMapFromDatabase" text="Delete Map" />
             </children>
         </HBox>
     </bottom>

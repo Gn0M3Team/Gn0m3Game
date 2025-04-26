@@ -8,4 +8,5 @@ public interface MovementStrategy {
      * Moves the monster by updating its position.
      */
     void move(Monster monster);
+
 }
