@@ -18,7 +18,6 @@
 >
     <top>
         <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 10;">
-            <Label fx:id="coinCountLabel"/>
             <Button fx:id="centerMenuButton" text="Show Menu" styleClass="menu-button"/>
             <Pane HBox.hgrow="ALWAYS" />
             <StackPane fx:id="healthBarContainer" alignment="CENTER_RIGHT" />

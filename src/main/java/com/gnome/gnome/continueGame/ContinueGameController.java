@@ -3,6 +3,7 @@ package com.gnome.gnome.continueGame;
 import com.gnome.gnome.camera.Camera;
 import com.gnome.gnome.components.PlayerHealthBar;
 import com.gnome.gnome.continueGame.component.Coin;
+import com.gnome.gnome.continueGame.component.ObjectsConstants;
 import com.gnome.gnome.editor.utils.TypeOfObjects;
 import com.gnome.gnome.monsters.Monster;
 import com.gnome.gnome.monsters.MonsterFactory;
@@ -22,8 +23,10 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -63,11 +66,6 @@ public class ContinueGameController implements Initializable {
      * The canvas used for rendering the visible portion of the map.
      */
     private Canvas viewportCanvas;
-
-    /**
-     * Label showing the number of coins collected by the player.
-     */
-    @FXML private Label coinCountLabel;
 
     /**
      * The initial game map (static terrain).
@@ -132,6 +130,8 @@ public class ContinueGameController implements Initializable {
      */
     private VBox gameOverOverlay;
 
+    private Image coinImage;
+
     private static ContinueGameController instance; //Singleton Instance
 
     public static ContinueGameController getContinueGameController(){
@@ -183,7 +183,6 @@ public class ContinueGameController implements Initializable {
         updatePlayerHealthBar();
 
         coinsOnMap.add(new Coin(9, 9, 100));
-        updateCoinLabel();
 
         centerMenuButton.setOnAction(e -> showCenterMenu());
         rootBorder.sceneProperty().addListener((obs, oldS, newS) -> {
@@ -439,17 +438,37 @@ public class ContinueGameController implements Initializable {
         // Remove all collected coins from the map
         coinsOnMap.removeAll(collected);
         // Update the coin counter label to reflect the new total
-        updateCoinLabel();
     }
 
-    /**
-     * Updates the coin counter label to reflect collected coins.
-     */
-    private void updateCoinLabel() {
-        if (coinCountLabel != null) {
-            coinCountLabel.setText("Coins: " + player.getPlayerCoins());
+    private void drawCoinCounter() {
+        GraphicsContext gc = viewportCanvas.getGraphicsContext2D();
+        double canvasWidth = viewportCanvas.getWidth();
+        double canvasHeight = viewportCanvas.getHeight();
+        double padding = 20;
+
+        double panelWidth = 140;
+        double panelHeight = 50;
+
+        double panelX = padding;
+        double panelY = canvasHeight - panelHeight - padding;
+
+        gc.setFill(Color.color(0, 0, 0, 0.5));
+        gc.fillRoundRect(panelX, panelY, panelWidth, panelHeight, 15, 15);
+
+        if (coinImage == null) {
+            coinImage = new Image(Objects.requireNonNull(
+                    Coin.class.getResourceAsStream("/com/gnome/gnome/images/tiles/" + ObjectsConstants.COIN_IMAGE)
+            ));
         }
+
+        double coinSize = 30;
+        gc.drawImage(coinImage, panelX + 10, panelY + (panelHeight - coinSize) / 2, coinSize, coinSize);
+
+        gc.setFill(Color.WHITE);
+        gc.setFont(javafx.scene.text.Font.font(20));
+        gc.fillText("x " + player.getPlayerCoins(), panelX + 50, panelY + panelHeight / 2 + 7);
     }
+
 
     /**
      * Removes the specified monsters from the game and replaces them with coins.
@@ -533,7 +552,7 @@ public class ContinueGameController implements Initializable {
             arrow.updateCameraOffset(camera.getStartCol(), camera.getStartRow());
         }
 
-        updateCoinLabel();
+        drawCoinCounter();
         updatePlayerHealthBar();
     }
 
