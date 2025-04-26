@@ -33,7 +33,8 @@ public class ArmorDAO extends BaseDAO<Armor> {
                 rs.getString("name_eng"),
                 rs.getString("name_sk"),
                 rs.getString("details_eng"),
-                rs.getString("details_sk")
+                rs.getString("details_sk"),
+                rs.getString("img")
         );
     }
 
@@ -47,9 +48,9 @@ public class ArmorDAO extends BaseDAO<Armor> {
     public Armor insertArmor(Armor armor) {
         try {
             db.beginTransaction();
-            String sql = "INSERT INTO \"Armor\" (def_cof, health, cost, name_eng, name_sk, details_eng, details_sk) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO \"Armor\" (def_cof, health, cost, name_eng, name_sk, details_eng, details_sk, img) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             int rowsAffected = executeUpdate(sql, armor.getDefCof(), armor.getHealth(), armor.getCost(),
-                    armor.getNameEng(), armor.getNameSk(), armor.getDetailsEng(), armor.getDetailsSk());
+                    armor.getNameEng(), armor.getNameSk(), armor.getDetailsEng(), armor.getDetailsSk(), armor.getImg());
 
             if (rowsAffected == 1) {
                 ResultSet generatedKeys = db.executeQuery("SELECT LASTVAL()");

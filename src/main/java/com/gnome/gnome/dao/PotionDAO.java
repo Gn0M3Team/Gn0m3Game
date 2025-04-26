@@ -31,7 +31,9 @@ public class PotionDAO extends BaseDAO<Potion> {
                 rs.getString("name_eng"),
                 rs.getString("name_sk"),
                 rs.getString("details_eng"),
-                rs.getString("details_sk")
+                rs.getString("details_sk"),
+                rs.getString("img1"),
+                rs.getString("img2")
         );
     }
 
@@ -45,9 +47,9 @@ public class PotionDAO extends BaseDAO<Potion> {
     public Potion insertPotion(Potion potion) {
         try {
             db.beginTransaction();
-            String sql = "INSERT INTO \"Potion\" (score_val, cost, name_eng, name_sk, details_eng, details_sk) VALUES (?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO \"Potion\" (score_val, cost, name_eng, name_sk, details_eng, details_sk, img1, img2) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             int rowsAffected = executeUpdate(sql, potion.getScoreVal(), potion.getCost(),
-                    potion.getNameEng(), potion.getNameSk(), potion.getDetailsEng(), potion.getDetailsSk());
+                    potion.getNameEng(), potion.getNameSk(), potion.getDetailsEng(), potion.getDetailsSk(), potion.getImg1(), potion.getImg2());
 
             if (rowsAffected == 1) {
                 ResultSet generatedKeys = db.executeQuery("SELECT LASTVAL()");

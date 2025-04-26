@@ -17,4 +17,6 @@ public class Potion {
     private String nameSk;
     private String detailsEng;
     private String detailsSk;
+    private String img1;
+    private String img2;
 }

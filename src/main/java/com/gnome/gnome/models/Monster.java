@@ -16,4 +16,5 @@ public class Monster {
     private double radius;
     private int score_val;
     private double cost;
+    private String img;
 }
