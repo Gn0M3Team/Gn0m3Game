@@ -1,7 +1,8 @@
-package com.gnome.gnome.continueGame;
+package com.gnome.gnome.game;
 
 import com.gnome.gnome.camera.Camera;
 import com.gnome.gnome.components.PlayerHealthBar;
+import com.gnome.gnome.continueGame.ContinueGameController;
 import com.gnome.gnome.continueGame.component.Coin;
 import com.gnome.gnome.editor.utils.TypeOfObjects;
 import com.gnome.gnome.monsters.Monster;
@@ -15,7 +16,6 @@ import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -24,7 +24,10 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Popup;
@@ -37,18 +40,14 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.*;
 import java.util.logging.Logger;
-import java.util.Random;
 
 import static com.gnome.gnome.editor.utils.EditorConstants.TILE_SIZE;
 
-/**
- * Controller class for the "Continue Game" scene.
- * Manages player movement, the camera viewport, and an in-game popup menu.
- */
-public class ContinueGameController implements Initializable {
+public class GameController {
 
     /** Root layout of the scene. */
-    @FXML private BorderPane rootBorder;
+    @FXML
+    private BorderPane rootBorder;
     /** StackPane container for the camera viewport. */
     @FXML private StackPane centerStack;
     /** Button that opens the center menu popup. */
@@ -131,32 +130,25 @@ public class ContinueGameController implements Initializable {
      */
     private VBox gameOverOverlay;
 
-    private static ContinueGameController instance; //Singleton Instance
+    private static GameController instance; //Singleton Instance
 
-    public static ContinueGameController getContinueGameController(){
-        //Get ONLY initialized instance
-        if (ContinueGameController.instance == null)
-            return null;
-        return ContinueGameController.instance;
+    public static GameController getGameController(){
+        if (GameController.instance == null)
+            return new GameController();
+        return GameController.instance;
     }
+
+    private GameController() {}
 
     private boolean debug_mod_game;
 
-    /**
-     * Called to initialize the controller after its root element has been completely processed.
-     * Initializes the game map, camera, viewport rendering, button handlers, and key listeners.
-     *
-     * @param location  The location used to resolve relative paths for the root object.
-     * @param resources The resources used to localize the root object.
-     */
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        // Load properties (e.g., debug mode) from app.properties
+    public void initializeWithLoadedMap(int[][] mapData) {
         setupProperties();
+        this.baseMap = mapData;
+        this.fieldMap = copyMap(baseMap);
 
-        // Initialize the game map, player, camera, and monsters
-        baseMap     = initMap(30, 30); // Create a 30x30 base map with static terrain
-        fieldMap    = copyMap(baseMap); // Create a copy of the base map for dynamic updates
+        setupMap();
+
         player      = Player.getInstance(15, 15, PLAYER_MAX_HEALTH); // Create a player at position (15, 15) with 100 health
         camera      = Camera.getInstance(fieldMap, player.getX(), player.getY(), player); // Initialize the camera to follow the player
         updateMapWithMonsters(); // Update the field map with monster positions
@@ -216,6 +208,17 @@ public class ContinueGameController implements Initializable {
         updateCameraViewport();
     }
 
+    private void setupMap() {
+        for (int x = 0; x < fieldMap.length; x++) {
+            for (int y = 0; y < fieldMap[x].length; y++) {
+                if (fieldMap[x][y] < 0) {
+                    Monster monster = MonsterFactory.createMonster(TypeOfObjects.fromValue(y), x, y);
+                    monsterList.add(monster);
+                }
+            }
+        }
+    }
+
     /**
      * Loads properties from the app.properties file to configure the game.
      * Specifically, it loads the debug mode setting (app.skip_login).
@@ -237,36 +240,6 @@ public class ContinueGameController implements Initializable {
         debug_mod_game = Boolean.parseBoolean(properties.getProperty("app.skip_login"));
     }
 
-    /**
-     * Initializes a game map of the specified size with random terrain tiles.
-     * The map is filled with empty tiles (value 0) for simplicity.
-     * Monsters are added to the monsterList (but not directly to the map here).
-     *
-     * @param rows The number of rows in the map (e.g., 30).
-     * @param cols The number of columns in the map (e.g., 30).
-     * @return A 2D integer array representing the initialized map.
-     */
-    private int[][] initMap(int rows, int cols) {
-        Random random = new Random();
-        int[][] map = new int[rows][cols];
-
-        // Fill the map with random terrain tiles
-        // Currently, only EMPTY tiles (value 0) are used for simplicity
-        for (int row = 0; row < rows; row++) {
-            for (int col = 0; col < cols; col++) {
-                int[] possibleValues = {0}; // EMPTY, MOUNTAIN, TREE, ROCK, RIVER
-                map[row][col] = possibleValues[random.nextInt(possibleValues.length)]; // Assign a random tile value
-            }
-        }
-
-        // Add monsters to the monsterList (commented-out code shows examples of adding skeletons)
-        // Currently, only one goblin is added at position (8, 8)
-        monsterList.add(MonsterFactory.createMonster(TypeOfObjects.SKELETON, 10, 10));
-//        monsterList.add(MonsterFactory.createMonster(MonsterType.SKELETON, 5, 15));
-//        monsterList.add(MonsterFactory.createMonster(MonsterType.SKELETON, 8, 8));
-        monsterList.add(MonsterFactory.createMonster(TypeOfObjects.GOBLIN, 8, 8));
-        return map;
-    }
 
     /**
      * Creates a deep copy of a 2D map array.
@@ -517,7 +490,7 @@ public class ContinueGameController implements Initializable {
         }
 
         // Always update player position based on camera offset
-       player.updatePositionWithCamera(camera.getStartCol(), camera.getStartRow());
+        player.updatePositionWithCamera(camera.getStartCol(), camera.getStartRow());
 
         // Update the positions of all effects (e.g., hit effects, attack animations) in the gameObjectsPane
         // Effects have absolute coordinates stored in their properties, which are adjusted based on the camera's position
@@ -898,4 +871,6 @@ public class ContinueGameController implements Initializable {
             ex.printStackTrace();
         }
     }
+
+
 }
