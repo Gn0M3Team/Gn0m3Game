@@ -7,6 +7,7 @@ import com.gnome.gnome.editor.utils.TypeOfObjects;
 import com.gnome.gnome.monsters.Monster;
 import com.gnome.gnome.monsters.MonsterFactory;
 import com.gnome.gnome.monsters.MonsterFactory.MonsterType;
+import com.gnome.gnome.monsters.movements.FollowingMovement;
 import com.gnome.gnome.monsters.types.Skeleton;
 import com.gnome.gnome.monsters.types.missels.Arrow;
 import com.gnome.gnome.player.Player;
@@ -176,10 +177,10 @@ public class ContinueGameController implements Initializable {
 
         // Create a root Pane to hold both the Canvas (map) and the gameObjectsPane (dynamic objects)
         Pane viewportRoot = new Pane(viewportCanvas, gameObjectsPane);
-        viewportRoot.setPrefSize(vw, vh); // Set the size of the root Pane to match the viewport
+        viewportRoot.setPrefSize(vw, vh); // Set the size of the root Pane to match the viewport;
 
         // Configure the centerStack to center the viewport in the window
-        centerStack.setPrefSize(Double.MAX_VALUE, Double.MAX_VALUE); // Allow the StackPane to grow to fill available space
+//        centerStack.setPrefSize(Double.MAX_VALUE, Double.MAX_VALUE); // Allow the StackPane to grow to fill available space
         centerStack.setAlignment(Pos.CENTER); // Center its children (the viewportRoot)
         centerStack.getChildren().setAll(viewportRoot); // Add the viewportRoot to the StackPane
         StackPane.setAlignment(viewportRoot, Pos.CENTER); // Ensure the viewportRoot is centered within the StackPane
@@ -676,6 +677,18 @@ public class ContinueGameController implements Initializable {
 
         // Iterate through all monsters to update their positions and behavior
         for (Monster monster : monsterList) {
+            int dx = Math.abs(player.getX() - monster.getX());
+            int dy = Math.abs(player.getY() - monster.getY());
+
+            if (dx <= monster.getAttackRange() && dy <= monster.getAttackRange()) {
+                if (!(monster.getMovementStrategy() instanceof FollowingMovement)) {
+                    monster.setMovementStrategy(new FollowingMovement());
+                    if (debug_mod_game) {
+                        System.out.println(monster.getNameEng() + " switches to FollowingMovement!");
+                    }
+                }
+            }
+
             // If the monster is not a skeleton, attempt a melee attack on the player
             if (!(monster instanceof Skeleton)) {
                 monster.meleeAttack(player, gameObjectsPane, camera.getStartCol(), camera.getStartRow(), currentTime);
@@ -689,10 +702,6 @@ public class ContinueGameController implements Initializable {
                 continue;
             }
 
-            // Check if the player is within the monster's attack range
-            // If so, the monster does not move (it will attack instead)
-            int dx = Math.abs(player.getX() - monster.getX());
-            int dy = Math.abs(player.getY() - monster.getY());
             if (dx <= monster.getAttackRange() && dy <= monster.getAttackRange()) {
                 if (debug_mod_game) {
                     System.out.println("Monster at (" + monster.getX() + ", " + monster.getY() + ") will not move - player is within attack range (" + dx + ", " + dy + ")");
@@ -707,7 +716,7 @@ public class ContinueGameController implements Initializable {
             int newY = oldY;
 
             // Move the monster according to its movement strategy (e.g., random movement for goblins)
-            monster.move( );
+            monster.move();
 
             newX = monster.getX(); // Get the new position after moving
             newY = monster.getY();
