@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.geometry.Insets?>
 
 <BorderPane
         fx:id="rootBorder"
@@ -15,13 +18,16 @@
 >
     <top>
         <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 10;">
-            <StackPane fx:id="healthBarContainer" alignment="CENTER_LEFT" />
-            <Pane HBox.hgrow="ALWAYS" />
             <Label fx:id="coinCountLabel"/>
             <Button fx:id="centerMenuButton" text="Show Menu" styleClass="menu-button"/>
+            <Pane HBox.hgrow="ALWAYS" />
+            <StackPane fx:id="healthBarContainer" alignment="CENTER_RIGHT" />
         </HBox>
     </top>
+
     <center>
-        <StackPane fx:id="centerStack" maxHeight="-1" maxWidth="-1" BorderPane.alignment="CENTER" />
+        <StackPane fx:id="centerStack" maxHeight="-1" maxWidth="-1" BorderPane.alignment="CENTER">
+
+        </StackPane>
     </center>
 </BorderPane>

@@ -39,6 +39,8 @@ public class Camera {
                                                                             // The key is the path to the image (String), the value is the Image object itself
 
     private static Camera instance;
+    private double dynamicTileSize;
+
 
     /**
      * Constructor of the Camera class. Used to create a new Camera object.
@@ -53,6 +55,7 @@ public class Camera {
         this.cameraCenterX = cameraCenterX; // Set the initial X-coordinate of the camera centre
         this.cameraCenterY = cameraCenterY; // Set the initial Y-coordinate of the camera center
         this.player = player; // Save the reference to the player object
+
     }
 
     /**
@@ -81,6 +84,9 @@ public class Camera {
      * @param coins A list of coins to display if they are in the visible area.
      */
     public void drawViewport(Canvas canvas, List<Coin> coins) {
+        // 🧠 New TILE_SIZE based on canvas width
+        this.dynamicTileSize = canvas.getWidth() / viewportSize;
+
         // We get a GraphicsContext, which is a tool for drawing on Canvas
         // We use it to draw tiles, frames, coins, etc
         GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -113,8 +119,8 @@ public class Camera {
 
                 // Calculate the coordinates in pixels for drawing tiles on Canvas:
                 // Each tile has a size of TILE_SIZE x TILE_SIZE (50x50 pixels)
-                double x = j * TILE_SIZE; // X position in pixels (for example, 0, 50, 100, ...)
-                double y = i * TILE_SIZE; // Y-axis in pixels
+                double x = j * dynamicTileSize;
+                double y = i * dynamicTileSize;
 
                 // Check if the tile coordinates are within the map
                 if (row >= 0 && row < totalRows && col >= 0 && col < totalCols) {
@@ -128,22 +134,25 @@ public class Camera {
                     // If the image is successfully uploaded, draw it on Canvas
                     if (tileImage != null) {
                         // Draw the tile image at the coordinates (x, y) with the size TILE_SIZE x TILE_SIZE
-                        gc.drawImage(tileImage, x, y, TILE_SIZE, TILE_SIZE);
+                        gc.drawImage(tileImage, x, y, dynamicTileSize, dynamicTileSize);
                     } else {
                         // If the image fails to load, draw a grey square as a backup
                         gc.setFill(Color.GRAY); // Set the fill colour to grey
-                        gc.fillRect(x, y, TILE_SIZE, TILE_SIZE); // Draw a square
+                        gc.fillRect(x, y, dynamicTileSize, dynamicTileSize);
                     }
                 } else {
-                    // If the tile coordinates are outside the map (for example, if the map is smaller than 15x15),
-                    // draw a dark grey square to indicate the ‘empty’ area
-                    gc.setFill(Color.DARKGRAY);
-                    gc.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                    Image outOfMapImage = getCachedImage(TypeOfObjects.MOUNTAIN.getImagePath());
+                    if (outOfMapImage != null) {
+                        gc.drawImage(outOfMapImage, x, y, dynamicTileSize, dynamicTileSize);
+                    } else {
+                        gc.setFill(Color.DARKGRAY);
+                        gc.fillRect(x, y, dynamicTileSize, dynamicTileSize);
+                    }
                 }
 
                 gc.setStroke(Color.BLACK);
                 gc.setLineWidth(1);
-                gc.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
+                gc.strokeRect(x, y, dynamicTileSize, dynamicTileSize);
             }
         }
 
@@ -160,15 +169,10 @@ public class Camera {
                 double w = coin.getImageView().getFitWidth(); // The width of the coin image
                 double h = coin.getImageView().getFitHeight(); // The height of the coin image
 
-                // Calculate the offset to centre the coin image inside the tile
-                // For example, if the tile is 50x50 and the coin is 30x30, we shift it by (50-30)/2 = 10 pixels
-                double ox = (TILE_SIZE - w) / 2; // X offset
-                double oy = (TILE_SIZE - h) / 2; // Y offset
-
-                // Calculate the coordinates of the coin in pixels on Canvas:
-                // (gx - startCol) * TILE_SIZE is the position of the coin relative to the beginning of the viewport
-                double px = (gx - startCol) * TILE_SIZE + ox; // The final position is X
-                double py = (gy - startRow) * TILE_SIZE + oy; // The final position is Y
+                double ox = (dynamicTileSize - w) / 2;
+                double oy = (dynamicTileSize - h) / 2;
+                double px = (gx - startCol) * dynamicTileSize + ox;
+                double py = (gy - startRow) * dynamicTileSize + oy;
 
                 // Draw an image of the coin on Canvas
                 gc.drawImage(img, px, py, w, h);

@@ -251,6 +251,7 @@ public abstract class Monster {
      * @param cameraStartRow The starting row of the camera's viewport (used for positioning the effect).
      * @param currentTime The current time (in nanoseconds), used to enforce the attack cooldown.
      */
+    // TODO: HERE ALSO CHANGE TILE_SIZE.
     public void meleeAttack(Player player, Pane gameObjectsPane, int cameraStartCol, int cameraStartRow, long currentTime) {
         // Check if the monster is already dead (health <= 0). If so, do not attack
         if (health <= 0) return;

@@ -47,6 +47,9 @@ public class Player {
 
     private static Player instance;
 
+    @Setter
+    private double dynamicTileSize;
+
     /**
      * Creates a new player at the specified position with the given maximum health.
      *
@@ -202,13 +205,20 @@ public class Player {
      * @param cameraStartRow the first visible row (topmost)
      */
     public void updatePositionWithCamera(int cameraStartCol, int cameraStartRow) {
-        double size = TILE_SIZE * 0.6;
-        double offset = (TILE_SIZE - size) / 2.0;
+        if (dynamicTileSize == 0) return; // Safety check
 
-        double pixelX = (x - cameraStartCol) * TILE_SIZE + offset;
-        double pixelY = (y - cameraStartRow) * TILE_SIZE + offset;
+        double size = dynamicTileSize * 0.6;
+        double offset = (dynamicTileSize - size) / 2.0;
+
+        double pixelX = (x - cameraStartCol) * dynamicTileSize + offset;
+        double pixelY = (y - cameraStartRow) * dynamicTileSize + offset;
 
         representation.setTranslateX(pixelX);
         representation.setTranslateY(pixelY);
+
+        if (representation instanceof Rectangle rect) {
+            rect.setWidth(size);
+            rect.setHeight(size);
+        }
     }
 }
