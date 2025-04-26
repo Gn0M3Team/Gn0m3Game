@@ -31,7 +31,8 @@ public class WeaponDAO extends BaseDAO<Weapon> {
                 rs.getString("name_eng"),
                 rs.getString("name_sk"),
                 rs.getString("details_eng"),
-                rs.getString("details_sk")
+                rs.getString("details_sk"),
+                rs.getString("img")
         );
     }
 
@@ -45,9 +46,9 @@ public class WeaponDAO extends BaseDAO<Weapon> {
     public Weapon insertWeapon(Weapon weapon) {
         try {
             db.beginTransaction();
-            String sql = "INSERT INTO \"Weapon\" (atk_value, cost, name_eng, name_sk, details_eng, details_sk) VALUES (?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO \"Weapon\" (atk_value, cost, name_eng, name_sk, details_eng, details_sk, img) VALUES (?, ?, ?, ?, ?, ?, ?)";
             int rowsAffected = executeUpdate(sql, weapon.getAtkValue(), weapon.getCost(), weapon.getNameEng(),
-                    weapon.getNameSk(), weapon.getDetailsEng(), weapon.getDetailsSk());
+                    weapon.getNameSk(), weapon.getDetailsEng(), weapon.getDetailsSk(), weapon.getImg());
 
             if (rowsAffected == 1) {
                 // Retrieve the generated ID (assuming PostgreSQL or similar with LASTVAL)

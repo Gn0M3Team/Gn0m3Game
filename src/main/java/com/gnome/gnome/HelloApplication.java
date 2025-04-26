@@ -1,9 +1,7 @@
 package com.gnome.gnome;
 
 import com.gnome.gnome.config.EditorLogger;
-import com.gnome.gnome.dao.MonsterDAO;
 import com.gnome.gnome.db.DatabaseWrapper;
-import com.gnome.gnome.models.Monster;
 import com.gnome.gnome.utils.ImageParser;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -31,7 +29,7 @@ public class HelloApplication extends Application {
         Scene scene = new Scene(fxmlLoader.load());
 
         stage.setFullScreen(true);
-        stage.setTitle("Hello!");
+        stage.setTitle("Dark Rifter");
         stage.setScene(scene);
         stage.show();
     }
@@ -84,11 +82,6 @@ public class HelloApplication extends Application {
             } else {
                 System.out.println("❌ Failed to connect to database.");
             }
-
-            MonsterDAO monsterDAO = new MonsterDAO();
-
-            Monster monster = monsterDAO.getMonsterById(1);
-            System.out.println(monster);
         }
     }
 
