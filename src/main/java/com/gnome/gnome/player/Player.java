@@ -45,6 +45,8 @@ public class Player {
      */
     private int playerCoins = 0;
 
+    private static Player instance;
+
     /**
      * Creates a new player at the specified position with the given maximum health.
      *
@@ -52,7 +54,7 @@ public class Player {
      * @param startY     the starting Y position
      * @param maxHealth  the maximum health of the player
      */
-    public Player(int startX, int startY, int maxHealth) {
+    private Player(int startX, int startY, int maxHealth) {
         this.x = startX; // Set the player's initial X-coordinate on the grid
         this.y = startY; // Set the player's initial Y-coordinate on the grid
         this.maxHealth = maxHealth; // Set the player's maximum health.
@@ -61,8 +63,19 @@ public class Player {
         // Create a yellow square to visually represent the player:
         // - TILE_SIZE x TILE_SIZE defines the size of the square (50x50 pixels)
         // - Color.YELLOW sets the fill color of the square to yellow
-        this.representation = new Rectangle(TILE_SIZE, TILE_SIZE, Color.YELLOW);
+        Rectangle rect = new Rectangle(TILE_SIZE * 0.6, TILE_SIZE * 0.6, Color.YELLOW);
+        rect.setArcWidth(10); // Rounded corners
+        rect.setArcHeight(10);
+        this.representation = rect;
     }
+
+    public static Player getInstance(int startX, int startY, int maxHealth) {
+        if (instance == null) {
+            instance = new Player(startX, startY, maxHealth);
+        }
+        return instance;
+    }
+
 
     // Movement methods: These methods allow the player to move on the grid by changing their x and y coordinates
     // Each method adjusts the player's position by 1 tile in the specified direction
@@ -76,11 +89,8 @@ public class Player {
      * Health cannot go below 0.
      */
     public void takeDamage(int damage) {
-        currentHealth -= damage; // Subtract the damage from the player's current health
-        // Check if the health has gone below 0 (e.g., if currentHealth becomes -5 after taking damage)
-        if (currentHealth < 0) {
-            currentHealth = 0; // Set health to 0 to prevent negative values
-        }
+        currentHealth -= damage;
+        if (currentHealth < 0) currentHealth = 0;
     }
 
     /**
@@ -158,10 +168,8 @@ public class Player {
      * Resets the player's position and health to the initial state.
      * Useful when restarting the game.
      */
-    public void reset(int startX, int startY) {
-        this.x = startX; // Reset the player's X-coordinate to the specified starting position
-        this.y = startY; // Reset the player's Y-coordinate to the specified starting position
-        this.currentHealth = maxHealth; // Restore the player's health to the maximum value.
+    public static void resetInstance() {
+        instance = null;
     }
 
 
@@ -184,5 +192,23 @@ public class Player {
         // representation.getBoundsInParent() returns the bounding box of the player's yellow square
         // This includes the square's position (adjusted for any transformations) and its size (TILE_SIZE x TILE_SIZE)
         return representation.getBoundsInParent();
+    }
+
+    /**
+     * Updates the visual position of the player based on camera offset.
+     * This method must be called after moving or scrolling.
+     *
+     * @param cameraStartCol the first visible column (leftmost)
+     * @param cameraStartRow the first visible row (topmost)
+     */
+    public void updatePositionWithCamera(int cameraStartCol, int cameraStartRow) {
+        double size = TILE_SIZE * 0.6;
+        double offset = (TILE_SIZE - size) / 2.0;
+
+        double pixelX = (x - cameraStartCol) * TILE_SIZE + offset;
+        double pixelY = (y - cameraStartRow) * TILE_SIZE + offset;
+
+        representation.setTranslateX(pixelX);
+        representation.setTranslateY(pixelY);
     }
 }

@@ -7,6 +7,7 @@ import com.gnome.gnome.editor.utils.TypeOfObjects;
 import com.gnome.gnome.monsters.Monster;
 import com.gnome.gnome.monsters.MonsterFactory;
 import com.gnome.gnome.monsters.MonsterFactory.MonsterType;
+import com.gnome.gnome.monsters.movements.FollowingMovement;
 import com.gnome.gnome.monsters.types.Skeleton;
 import com.gnome.gnome.monsters.types.missels.Arrow;
 import com.gnome.gnome.player.Player;
@@ -157,8 +158,8 @@ public class ContinueGameController implements Initializable {
         // Initialize the game map, player, camera, and monsters
         baseMap     = initMap(30, 30); // Create a 30x30 base map with static terrain
         fieldMap    = copyMap(baseMap); // Create a copy of the base map for dynamic updates
-        player      = new Player(15, 15, PLAYER_MAX_HEALTH); // Create a player at position (15, 15) with 100 health
-        camera      = new Camera(fieldMap, player.getX(), player.getY(), player); // Initialize the camera to follow the player
+        player      = Player.getInstance(15, 15, PLAYER_MAX_HEALTH); // Create a player at position (15, 15) with 100 health
+        camera      = Camera.getInstance(fieldMap, player.getX(), player.getY(), player); // Initialize the camera to follow the player
         updateMapWithMonsters(); // Update the field map with monster positions
         instance = this; //Fill singleton instance ONLY on initialization. BECAUSE OTHERWISE THERE IS NO DATA THAT IS REQUIRED IN OTHER CLASSES
 
@@ -176,10 +177,10 @@ public class ContinueGameController implements Initializable {
 
         // Create a root Pane to hold both the Canvas (map) and the gameObjectsPane (dynamic objects)
         Pane viewportRoot = new Pane(viewportCanvas, gameObjectsPane);
-        viewportRoot.setPrefSize(vw, vh); // Set the size of the root Pane to match the viewport
+        viewportRoot.setPrefSize(vw, vh); // Set the size of the root Pane to match the viewport;
 
         // Configure the centerStack to center the viewport in the window
-        centerStack.setPrefSize(Double.MAX_VALUE, Double.MAX_VALUE); // Allow the StackPane to grow to fill available space
+//        centerStack.setPrefSize(Double.MAX_VALUE, Double.MAX_VALUE); // Allow the StackPane to grow to fill available space
         centerStack.setAlignment(Pos.CENTER); // Center its children (the viewportRoot)
         centerStack.getChildren().setAll(viewportRoot); // Add the viewportRoot to the StackPane
         StackPane.setAlignment(viewportRoot, Pos.CENTER); // Ensure the viewportRoot is centered within the StackPane
@@ -511,21 +512,13 @@ public class ContinueGameController implements Initializable {
         // Draw the viewport on the canvas, including the map tiles and coins
         camera.drawViewport(viewportCanvas, coinsOnMap);
 
-        // Ensure the player's visual representation (a yellow square) is added to the gameObjectsPane
+        // Add the player to the gameObjectsPane if not already added
         if (!gameObjectsPane.getChildren().contains(player.getRepresentation())) {
             gameObjectsPane.getChildren().add(player.getRepresentation());
         }
 
-        // Calculate the player's position relative to the camera's viewport
-        int playerGridX = player.getX() - camera.getStartCol(); //  X position relative to the viewport's start
-        int playerGridY = player.getY() - camera.getStartRow(); // Y position relative to the viewport's start
-        // Convert the grid position to pixel coordinates
-        double pixelX = playerGridX * TILE_SIZE; // X position in pixels
-        double pixelY = playerGridY * TILE_SIZE; // Y position in pixels
-
-        // Update the position of the player's visual representation on the screen
-        player.getRepresentation().setTranslateX(pixelX);
-        player.getRepresentation().setTranslateY(pixelY);
+        // Always update player position based on camera offset
+       player.updatePositionWithCamera(camera.getStartCol(), camera.getStartRow());
 
         // Update the positions of all effects (e.g., hit effects, attack animations) in the gameObjectsPane
         // Effects have absolute coordinates stored in their properties, which are adjusted based on the camera's position
@@ -553,7 +546,6 @@ public class ContinueGameController implements Initializable {
         updateCoinLabel();
         updatePlayerHealthBar();
     }
-
 
     /**
      * Starts the game loop using an AnimationTimer.
@@ -676,6 +668,18 @@ public class ContinueGameController implements Initializable {
 
         // Iterate through all monsters to update their positions and behavior
         for (Monster monster : monsterList) {
+            int dx = Math.abs(player.getX() - monster.getX());
+            int dy = Math.abs(player.getY() - monster.getY());
+
+            if (dx <= monster.getAttackRange() && dy <= monster.getAttackRange()) {
+                if (!(monster.getMovementStrategy() instanceof FollowingMovement)) {
+                    monster.setMovementStrategy(new FollowingMovement());
+                    if (debug_mod_game) {
+                        System.out.println(monster.getNameEng() + " switches to FollowingMovement!");
+                    }
+                }
+            }
+
             // If the monster is not a skeleton, attempt a melee attack on the player
             if (!(monster instanceof Skeleton)) {
                 monster.meleeAttack(player, gameObjectsPane, camera.getStartCol(), camera.getStartRow(), currentTime);
@@ -689,10 +693,6 @@ public class ContinueGameController implements Initializable {
                 continue;
             }
 
-            // Check if the player is within the monster's attack range
-            // If so, the monster does not move (it will attack instead)
-            int dx = Math.abs(player.getX() - monster.getX());
-            int dy = Math.abs(player.getY() - monster.getY());
             if (dx <= monster.getAttackRange() && dy <= monster.getAttackRange()) {
                 if (debug_mod_game) {
                     System.out.println("Monster at (" + monster.getX() + ", " + monster.getY() + ") will not move - player is within attack range (" + dx + ", " + dy + ")");
@@ -707,7 +707,7 @@ public class ContinueGameController implements Initializable {
             int newY = oldY;
 
             // Move the monster according to its movement strategy (e.g., random movement for goblins)
-            monster.move( );
+            monster.move();
 
             newX = monster.getX(); // Get the new position after moving
             newY = monster.getY();

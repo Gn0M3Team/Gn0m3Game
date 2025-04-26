@@ -27,6 +27,9 @@ module com.gnome.gnome {
     exports com.gnome.gnome.models;
     opens com.gnome.gnome.models to javafx.fxml;
 
+    opens com.gnome.gnome.newNewGame to javafx.fxml;
+    exports com.gnome.gnome.newNewGame;
+
     opens com.gnome.gnome.editor.controller to javafx.fxml;
     exports com.gnome.gnome.editor.controller;
     opens com.gnome.gnome.editor.javafxobj to javafx.fxml;

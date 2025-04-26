@@ -1,0 +1,64 @@
+@font-face {
+    font-family: 'Press Start 2P';
+    src: url('../fonts/PressStart2P-Regular.ttf') format('truetype');
+}
+
+/* Background matches main page */
+.root-pane {
+    -fx-background-image: url('../../images/background-2.jpg');
+    -fx-background-size: cover;
+    -fx-background-color: rgba(42, 26, 42, 0.5);
+    -fx-background-position: center;
+    -fx-background-repeat: no-repeat;
+}
+
+/* Top bar */
+.top-bar {
+    -fx-background-color: transparent;
+    -fx-padding: 10px;
+}
+
+/* Back button */
+.top-button {
+    -fx-background-color: #4a3a4a;
+    -fx-text-fill: white;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 12px;
+    -fx-padding: 5px 10px;
+    -fx-background-radius: 5px;
+}
+
+.top-button:hover {
+    -fx-background-color: #6a5a6a;
+}
+
+/* Title */
+.menu-title {
+    -fx-text-fill: white;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 36px;
+    -fx-font-weight: bold;
+    -fx-padding: 20px 0;
+}
+
+/* Buttons */
+.menu-button {
+    -fx-background-color: transparent;
+    -fx-background-image: url('../../images/button-background.png');
+    -fx-background-size: cover;
+    -fx-text-fill: #ffffff;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 16px;
+    -fx-padding: 15px;
+    -fx-background-radius: 10px;
+    -fx-pref-width: 300px;
+    -fx-pref-height: 50px;
+    -fx-alignment: center;
+    -fx-cursor: hand;
+    -fx-border-color: black;
+    -fx-border-width: 2px;
+}
+
+.menu-button:hover {
+    -fx-background-image: url('../../images/button-background-05.jpg');
+}
