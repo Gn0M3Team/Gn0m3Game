@@ -1,65 +1,50 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
 .profile-root {
-    -fx-background-color: #f8f8f8;
+    -fx-background-image: url('../../images/background-2.jpg');
+    -fx-background-size: cover;
+    -fx-background-color: rgba(42, 26, 42, 0.5);
+    -fx-background-position: center;
+    -fx-background-repeat: no-repeat;
 }
 
 .profile-name {
     -fx-font-family: "Press Start 2P", sans-serif;
     -fx-font-size: 20px;
-    -fx-text-fill: #2c3e50;
+    -fx-text-fill: #ffffff;
 }
 
 .profile-record {
     -fx-font-family: "Press Start 2P", sans-serif;
     -fx-font-size: 16px;
-    -fx-text-fill: #2c3e50;
+    -fx-text-fill: #ffffff;
 }
 
 .profile-role {
     -fx-font-family: "Press Start 2P", sans-serif;
     -fx-font-size: 16px;
-    -fx-text-fill: #2c3e50;
+    -fx-text-fill: #ffffff;
 }
 
 .profile-stats {
     -fx-font-family: "Press Start 2P", sans-serif;
     -fx-font-size: 14px;
-    -fx-text-fill: #2c3e50;
+    -fx-text-fill: #ffffff;
 }
 
 
-.cards-title {
-    -fx-font-family: "Press Start 2P", sans-serif;
-    -fx-font-size: 18px;
-    -fx-text-fill: #2c3e50;
-    -fx-underline: true;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 2, 0, 0, 1);
-}
 
 .maps-title {
     -fx-font-family: "Press Start 2P", sans-serif;
     -fx-font-size: 18px;
-    -fx-text-fill: #2c3e50;
+    -fx-text-fill: #ffffff;
     -fx-underline: true;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 2, 0, 0, 1);
 }
 
-.card-list {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #bdc3c7;
-    -fx-border-radius: 5;
-    -fx-background-insets: 0;
-
-    -fx-control-inner-background: #ffffff;
-    -fx-control-inner-background-alt: #f2f2f2;
-
-    -fx-focus-color: transparent;
-    -fx-faint-focus-color: transparent;
-}
-
 .map-list {
     -fx-background-color: linear-gradient(to bottom, #ffffff, #f0f0f0);
+    -fx-max-width: 900px;
     -fx-border-color: #a0a0a0;
     -fx-border-width: 2;
     -fx-border-radius: 10;
@@ -70,30 +55,12 @@
     -fx-faint-focus-color: transparent;
 }
 
-.card-list .list-cell {
-    -fx-font-family: "Press Start 2P", sans-serif;
-    -fx-font-size: 14px;
-    -fx-text-fill: #2c3e50;
-    -fx-padding: 5 10;
-    -fx-background-color: transparent;
-}
-
 .map-list .list-cell {
     -fx-font-family: "Press Start 2P", sans-serif;
     -fx-font-size: 14px;
     -fx-text-fill: #2c3e50;
     -fx-padding: 8 12;
     -fx-background-color: transparent;
-}
-
-.card-list .list-cell:filled:hover {
-    -fx-background-color: #e8e8e8;
-}
-
-.card-list .list-cell:filled:selected,
-.card-list .list-cell:filled:selected:focused {
-    -fx-background-color: #d0d0d0;
-    -fx-text-fill: #2c3e50;
 }
 
 .map-list .list-cell:filled:hover {
@@ -106,14 +73,27 @@
     -fx-text-fill: #1a1a2e;
 }
 
-.profile-back-button {
-    -fx-font-family: "Press Start 2P", sans-serif;
-    -fx-font-size: 14px;
-    -fx-background-color: #e0e0e0;
-    -fx-border-color: #bdc3c7;
-    -fx-border-radius: 5;
-    -fx-background-radius: 5;
-    -fx-padding: 5 10;
+.action-button {
+    -fx-background-color: transparent;
+    -fx-background-image: url('../../images/button-background.png');
+    -fx-background-size: cover;
+    -fx-text-fill: #ffffff; /* White text */
+    -fx-font-family: "Press Start 2P", -apple-system;
+    -fx-font-size: 16px;
+    -fx-padding: 15px;
+    -fx-max-width: 300.0; /* Match FXML */
+    -fx-pref-height: 50px; /* Consistent with main menu buttons */
+    -fx-alignment: center;
+    -fx-cursor: hand;
+    -fx-border-color: black;
+    -fx-border-width: 2px;
+}
+.action-button:hover {
+    -fx-background-image: url('../../images/button-background-05.jpg');
+}
+
+.action-button:pressed {
+    -fx-background-color: linear-gradient(to bottom, #4a3a4a, #2a1a2a); /* Pressed gradient from main menu */
 }
 
 .profile-ban-button {
@@ -128,14 +108,3 @@
     -fx-cursor: hand;
 }
 
-.profile-edit-role-button {
-    -fx-font-family: "Press Start 2P", sans-serif;
-    -fx-font-size: 14px;
-    -fx-background-color: #00b300;
-    -fx-text-fill: #ffffff;
-    -fx-border-color: #009900;
-    -fx-border-radius: 5;
-    -fx-background-radius: 5;
-    -fx-padding: 5 10;
-    -fx-cursor: hand;
-}

@@ -21,7 +21,7 @@
             <Button onAction="#onLeaderBoardButtonClick" styleClass="top-button" text="Leader board">
             </Button>
 
-            <Label styleClass="top-label" text="Admin" />
+            <Label fx:id="nicknameLabel" styleClass="top-label" text="User: Admin" />
 
             <Pane HBox.hgrow="ALWAYS" />
 
@@ -43,7 +43,7 @@
 
                 <Button maxWidth="Infinity" onAction="#onContinueGameButtonClick" styleClass="menu-button" text="Continue the game" />
 
-                <Button maxWidth="Infinity" onAction="#onEditorButtonClick" styleClass="menu-button" text="Create a map" />
+                <Button fx:id="editorButton" maxWidth="Infinity" onAction="#onEditorButtonClick" styleClass="menu-button" text="Create a map" />
 
                 <HBox alignment="CENTER" maxWidth="400" spacing="10">
                     <Button maxWidth="Infinity" onAction="#onSettingsButtonClick" prefHeight="18.0" prefWidth="236.0" styleClass="menu-button" text="Settings" />

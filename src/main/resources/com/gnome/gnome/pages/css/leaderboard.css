@@ -7,7 +7,7 @@
 }
 
 .leaderboard-view {
-    -fx-pref-width: 300;
+    -fx-pref-width: 400;
     -fx-background-color: #3b282c; /* Dark purple from main menu */
 }
 

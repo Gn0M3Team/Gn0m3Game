@@ -1,5 +1,7 @@
 package com.gnome.gnome;
 
+import com.gnome.gnome.dao.userDAO.AuthUserDAO;
+import com.gnome.gnome.models.user.AuthUser;
 import com.gnome.gnome.music.MusicWizard;
 import com.gnome.gnome.dao.userDAO.UserSession;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
@@ -9,6 +11,7 @@ import javafx.animation.FadeTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -23,11 +26,17 @@ public class HelloController {
     private Button musicButton;
     @FXML
     private BorderPane helloPage;
+    @FXML
+    private Button editorButton;
+    @FXML
+    private Label nicknameLabel;
     private PageSwitcherInterface pageSwitch;
     private LeaderBoardView leaderboard;
+    private final AuthUserDAO userDAO = new AuthUserDAO();
 
     /**
      * Initializes the controller and sets the music icon for the button.
+     * It also runs user tests and sets up the music button with an icon.
      */
     @FXML
     public void initialize() {
@@ -43,9 +52,34 @@ public class HelloController {
                 )
         );
 
+        User_test_for_creation();
+        user_test();
+
         musicButton.setGraphic(musicIcon);
 
     }
+    /**
+     * Checks if there is a current user. If not, sets a default user (Admin).
+     */
+    private void User_test_for_creation(){
+        System.out.println("Current User:" + UserSession.getInstance().getCurrentUser());
+        if (UserSession.getInstance().getCurrentUser()==null){
+            AuthUser admin=userDAO.getAuthUserByUsername("Admin");
+            UserSession.getInstance().setCurrentUser(admin);
+            System.out.println("Current User:" + UserSession.getInstance().getCurrentUser());
+        }
+    }
+    /**
+     * Displays the current user's username and sets visibility of the editor button based on user role.
+     */
+    private void user_test(){
+        AuthUser authUser=UserSession.getInstance().getCurrentUser();
+        nicknameLabel.setText("User: "+authUser.getUsername());
+        if (authUser.getRole().equals("user")){
+            editorButton.setVisible(false);
+        }
+    }
+
 
     /**
      * Navigates to the editor page when "Create a map" is clicked.
