@@ -1,52 +1,56 @@
 package com.gnome.gnome.newNewGame;
 
+import com.gnome.gnome.continueGame.ContinueGameController;
+import com.gnome.gnome.dao.MapDAO;
+import com.gnome.gnome.game.GameController;
+import com.gnome.gnome.models.Map;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
-import javafx.scene.Scene;
-import javafx.scene.layout.HBox;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 
 public class NewNewGameController {
 
-    @FXML
-    private Button storyModeButton;
-
-    @FXML
-    private Button otherModeButton;
+    @FXML private Button storyModeButton;
+    @FXML private Button otherModeButton;
+    @FXML private Button backButton;
 
     private Popup storyPopup;
-
-    @FXML
-    private Button backButton;
+    private Popup loadingPopup;
+    private final ExecutorService executor = Executors.newSingleThreadExecutor(); // background thread for loading
 
     @FXML
     public void initialize() {
         storyModeButton.setOnAction(e -> showStoryPopup());
-
-        otherModeButton.setOnAction(e -> {
-            Alert alert = new Alert(AlertType.INFORMATION);
-            alert.setHeaderText(null);
-            alert.setContentText("Other mode is under development.");
-            alert.showAndWait();
-        });
-
+        otherModeButton.setOnAction(e -> showUnderDevelopmentAlert());
         backButton.setOnAction(e -> goBackToMainMenu());
     }
 
     private void goBackToMainMenu() {
         try {
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/com/gnome/gnome/pages/main-menu.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/gnome/gnome/pages/main-menu.fxml"));
             Stage stage = (Stage) backButton.getScene().getWindow();
             stage.getScene().setRoot(loader.load());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    private void showUnderDevelopmentAlert() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setHeaderText(null);
+        alert.setContentText("Other mode is under development.");
+        alert.showAndWait();
     }
 
     private void showStoryPopup() {
@@ -56,7 +60,6 @@ public class NewNewGameController {
             storyBox.setStyle("-fx-background-color: #333; -fx-padding: 20; -fx-background-radius: 10;");
             storyBox.setAlignment(Pos.CENTER);
 
-            // Simulating 4 maps (first unlocked, others locked)
             for (int i = 1; i <= 4; i++) {
                 Button mapButton = new Button("Map " + i);
                 mapButton.setPrefWidth(150);
@@ -67,7 +70,7 @@ public class NewNewGameController {
                         showStartMap(1);
                     });
                 } else {
-                    mapButton.setDisable(true); // Locked maps
+                    mapButton.setDisable(true);
                 }
 
                 storyBox.getChildren().add(mapButton);
@@ -86,11 +89,88 @@ public class NewNewGameController {
         }
     }
 
+    // This one I should put in solo independent class.
     private void showStartMap(int mapNumber) {
-        Alert alert = new Alert(AlertType.INFORMATION);
-        alert.setHeaderText(null);
-        alert.setContentText("Starting Map " + mapNumber + "...");
+        showLoadingPopup();
+
+        executor.submit(() -> {
+            try {
+                // Load maps from database
+                MapDAO mapDAO = new MapDAO();
+                List<Map> allMaps = mapDAO.getAllMaps();
+
+                // Simulate map selection (e.g., based on map number, for now take first map)
+                Map selectedMap = allMaps.isEmpty() ? null : allMaps.getFirst();
+
+                if (selectedMap != null) {
+                    Platform.runLater(() -> {
+                        loadContinueGamePage(selectedMap);
+                    });
+                } else {
+                    Platform.runLater(() -> {
+                        hideLoadingPopup();
+                        showError("No maps found in database!");
+                    });
+                }
+
+            } catch (Exception ex) {
+                Platform.runLater(() -> {
+                    hideLoadingPopup();
+                    showError("Failed to load map: " + ex.getMessage());
+                });
+            }
+        });
+    }
+
+    private void showLoadingPopup() {
+        if (loadingPopup == null) {
+            loadingPopup = new Popup();
+            Label loadingLabel = new Label("Loading... Please wait");
+            loadingLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: white; -fx-background-color: #222; -fx-padding: 20px; -fx-background-radius: 10;");
+            VBox box = new VBox(loadingLabel);
+            box.setAlignment(Pos.CENTER);
+            box.setStyle("-fx-background-color: transparent;");
+            loadingPopup.getContent().add(box);
+            loadingPopup.setAutoHide(false);
+        }
+
+        Scene scene = storyModeButton.getScene();
+        if (scene != null) {
+            Stage stage = (Stage) scene.getWindow();
+            loadingPopup.show(stage);
+            loadingPopup.setX(stage.getX() + stage.getWidth() / 2 - 100);
+            loadingPopup.setY(stage.getY() + stage.getHeight() / 2 - 50);
+        }
+    }
+
+    private void hideLoadingPopup() {
+        if (loadingPopup != null) {
+            loadingPopup.hide();
+        }
+    }
+
+    private void loadContinueGamePage(Map selectedMap) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/gnome/gnome/pages/continue-game.fxml"));
+            Parent root = loader.load();
+            GameController controller = loader.getController();
+            controller.initializeWithLoadedMap(selectedMap.getMapData());
+
+            Stage stage = (Stage) storyModeButton.getScene().getWindow();
+            stage.getScene().setRoot(root);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            showError("Failed to load Continue Game page.");
+        } finally {
+            hideLoadingPopup();
+        }
+    }
+
+    private void showError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setHeaderText("Error");
+        alert.setContentText(message);
         alert.showAndWait();
-        // TODO: Here you can load the map scene (once you implement maps)
     }
 }

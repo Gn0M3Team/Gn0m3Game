@@ -1,9 +1,9 @@
-package com.gnome.gnome.continueGame;
+package com.gnome.gnome.game;
 
 import com.gnome.gnome.camera.Camera;
 import com.gnome.gnome.components.PlayerHealthBar;
+import com.gnome.gnome.continueGame.ContinueGameController;
 import com.gnome.gnome.continueGame.component.Coin;
-import com.gnome.gnome.continueGame.component.ObjectsConstants;
 import com.gnome.gnome.editor.utils.TypeOfObjects;
 import com.gnome.gnome.monsters.Monster;
 import com.gnome.gnome.monsters.MonsterFactory;
@@ -16,19 +16,18 @@ import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.geometry.Bounds;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Popup;
@@ -41,18 +40,14 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.*;
 import java.util.logging.Logger;
-import java.util.Random;
 
 import static com.gnome.gnome.editor.utils.EditorConstants.TILE_SIZE;
 
-/**
- * Controller class for the "Continue Game" scene.
- * Manages player movement, the camera viewport, and an in-game popup menu.
- */
-public class ContinueGameController implements Initializable {
+public class GameController {
 
     /** Root layout of the scene. */
-    @FXML private BorderPane rootBorder;
+    @FXML
+    private BorderPane rootBorder;
     /** StackPane container for the camera viewport. */
     @FXML private StackPane centerStack;
     /** Button that opens the center menu popup. */
@@ -66,6 +61,11 @@ public class ContinueGameController implements Initializable {
      * The canvas used for rendering the visible portion of the map.
      */
     private Canvas viewportCanvas;
+
+    /**
+     * Label showing the number of coins collected by the player.
+     */
+    @FXML private Label coinCountLabel;
 
     /**
      * The initial game map (static terrain).
@@ -130,67 +130,93 @@ public class ContinueGameController implements Initializable {
      */
     private VBox gameOverOverlay;
 
-    private Image coinImage;
+    private static GameController instance; //Singleton Instance
 
-    private static ContinueGameController instance; //Singleton Instance
-
-    public static ContinueGameController getContinueGameController(){
-        //Get ONLY initialized instance
-        if (ContinueGameController.instance == null)
-            return null;
-        return ContinueGameController.instance;
+    public static GameController getGameController(){
+        if (GameController.instance == null)
+            return new GameController();
+        return GameController.instance;
     }
+
+    private GameController() {}
 
     private boolean debug_mod_game;
 
-    private double dynamicTileSize;
-
-    /**
-     * Called to initialize the controller after its root element has been completely processed.
-     * Initializes the game map, camera, viewport rendering, button handlers, and key listeners.
-     *
-     * @param location  The location used to resolve relative paths for the root object.
-     * @param resources The resources used to localize the root object.
-     */
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
+    public void initializeWithLoadedMap(int[][] mapData) {
         setupProperties();
+        this.baseMap = mapData;
+        this.fieldMap = copyMap(baseMap);
 
-        baseMap = initMap(30, 30);
-        fieldMap = copyMap(baseMap);
-        player = Player.getInstance(15, 15, PLAYER_MAX_HEALTH);
-        camera = Camera.getInstance(fieldMap, player.getX(), player.getY(), player);
-        updateMapWithMonsters();
-        instance = this;
+        setupMap();
 
-        viewportCanvas = new Canvas();
-        viewportCanvas.widthProperty().bind(centerStack.widthProperty());
-        viewportCanvas.heightProperty().bind(centerStack.heightProperty());
+        player      = Player.getInstance(15, 15, PLAYER_MAX_HEALTH); // Create a player at position (15, 15) with 100 health
+        camera      = Camera.getInstance(fieldMap, player.getX(), player.getY(), player); // Initialize the camera to follow the player
+        updateMapWithMonsters(); // Update the field map with monster positions
+        instance = this; //Fill singleton instance ONLY on initialization. BECAUSE OTHERWISE THERE IS NO DATA THAT IS REQUIRED IN OTHER CLASSES
 
+        // Set up the viewport (the visible 15x15 tile area of the map)
+        double vw = 15 * TILE_SIZE; // Viewport width: 15 tiles * TILE_SIZE (e.g., 15 * 50 = 750 pixels)
+        double vh = 15 * TILE_SIZE; // Viewport height: 15 tiles * TILE_SIZE (e.g., 15 * 50 = 750 pixels)
+
+        // Create a Canvas to render the map (tiles, monsters, etc.)
+        viewportCanvas = new Canvas(vw, vh);
+
+        // Create a Pane to hold dynamic game objects (e.g., player, coins, effects)
         gameObjectsPane = new Pane();
-        gameObjectsPane.prefWidthProperty().bind(centerStack.widthProperty());
-        gameObjectsPane.prefHeightProperty().bind(centerStack.heightProperty());
-        gameObjectsPane.setPickOnBounds(false);
+        gameObjectsPane.setPrefSize(vw, vh); // Set the size of the Pane to match the viewport
+        gameObjectsPane.setPickOnBounds(false); // Allow mouse events to pass through the Pane to the elements below it
 
+        // Create a root Pane to hold both the Canvas (map) and the gameObjectsPane (dynamic objects)
         Pane viewportRoot = new Pane(viewportCanvas, gameObjectsPane);
-        centerStack.setAlignment(Pos.CENTER);
-        centerStack.getChildren().setAll(viewportRoot);
+        viewportRoot.setPrefSize(vw, vh); // Set the size of the root Pane to match the viewport;
 
-        healthBar = new PlayerHealthBar(200, 20);
-        healthBarContainer.getChildren().add(healthBar);
-        StackPane.setMargin(healthBar, new Insets(20, 20, 0, 0));
+        // Configure the centerStack to center the viewport in the window
+//        centerStack.setPrefSize(Double.MAX_VALUE, Double.MAX_VALUE); // Allow the StackPane to grow to fill available space
+        centerStack.setAlignment(Pos.CENTER); // Center its children (the viewportRoot)
+        centerStack.getChildren().setAll(viewportRoot); // Add the viewportRoot to the StackPane
+        StackPane.setAlignment(viewportRoot, Pos.CENTER); // Ensure the viewportRoot is centered within the StackPane
 
-        updatePlayerHealthBar();
+//        viewportRoot.layoutXProperty().bind(
+//                centerStack.widthProperty().subtract(vw).divide(2)
+//        );
+//        viewportRoot.layoutYProperty().bind(
+//                centerStack.heightProperty().subtract(vh).divide(2)
+//        );
 
+        // Initialize the player's health bar and add it to the UI
+        healthBar = new PlayerHealthBar(200, 20); // Create a health bar (200 pixels wide, 20 pixels tall)
+        healthBarContainer.getChildren().add(healthBar); // Add the health bar to its container
+        updatePlayerHealthBar(); // Update the health bar to reflect the player's initial health
+
+        // Add a coin to the map at position (9, 9) with a value of 100
         coinsOnMap.add(new Coin(9, 9, 100));
+        updateCoinLabel(); // Update the coin counter label to show the player's initial coin count (0)
 
+        // Set up the center menu button to show the popup menu when clicked
         centerMenuButton.setOnAction(e -> showCenterMenu());
+
+        // Listen for changes to the scene property of the rootBorder
+        // When the scene is set (i.e., the UI is fully loaded), register key handlers for player input
         rootBorder.sceneProperty().addListener((obs, oldS, newS) -> {
             if (newS != null) registerKeyHandlers(newS);
         });
 
+        // Start the game loop to handle monster movement and attacks
         startMonsterMovement();
+
+        // Initial update of the camera viewport to render the map and player
         updateCameraViewport();
+    }
+
+    private void setupMap() {
+        for (int x = 0; x < fieldMap.length; x++) {
+            for (int y = 0; y < fieldMap[x].length; y++) {
+                if (fieldMap[x][y] < 0) {
+                    Monster monster = MonsterFactory.createMonster(TypeOfObjects.fromValue(y), x, y);
+                    monsterList.add(monster);
+                }
+            }
+        }
     }
 
     /**
@@ -214,35 +240,6 @@ public class ContinueGameController implements Initializable {
         debug_mod_game = Boolean.parseBoolean(properties.getProperty("app.skip_login"));
     }
 
-    /**
-     * Initializes a game map of the specified size with random terrain tiles.
-     * The map is filled with empty tiles (value 0) for simplicity.
-     * Monsters are added to the monsterList (but not directly to the map here).
-     *
-     * @param rows The number of rows in the map (e.g., 30).
-     * @param cols The number of columns in the map (e.g., 30).
-     * @return A 2D integer array representing the initialized map.
-     */
-    private int[][] initMap(int rows, int cols) {
-        Random random = new Random();
-        int[][] map = new int[rows][cols];
-
-        // Fill the map with random terrain tiles
-        // Currently, only EMPTY tiles (value 0) are used for simplicity
-        for (int row = 0; row < rows; row++) {
-            for (int col = 0; col < cols; col++) {
-                map[row][col] = 0;
-            }
-        }
-
-        // Add monsters to the monsterList (commented-out code shows examples of adding skeletons)
-        // Currently, only one goblin is added at position (8, 8)
-        monsterList.add(MonsterFactory.createMonster(TypeOfObjects.SKELETON, 10, 10));
-//        monsterList.add(MonsterFactory.createMonster(MonsterType.SKELETON, 5, 15));
-//        monsterList.add(MonsterFactory.createMonster(MonsterType.SKELETON, 8, 8));
-        monsterList.add(MonsterFactory.createMonster(TypeOfObjects.GOBLIN, 8, 8));
-        return map;
-    }
 
     /**
      * Creates a deep copy of a 2D map array.
@@ -438,37 +435,17 @@ public class ContinueGameController implements Initializable {
         // Remove all collected coins from the map
         coinsOnMap.removeAll(collected);
         // Update the coin counter label to reflect the new total
+        updateCoinLabel();
     }
 
-    private void drawCoinCounter() {
-        GraphicsContext gc = viewportCanvas.getGraphicsContext2D();
-        double canvasWidth = viewportCanvas.getWidth();
-        double canvasHeight = viewportCanvas.getHeight();
-        double padding = 20;
-
-        double panelWidth = 140;
-        double panelHeight = 50;
-
-        double panelX = padding;
-        double panelY = canvasHeight - panelHeight - padding;
-
-        gc.setFill(Color.color(0, 0, 0, 0.5));
-        gc.fillRoundRect(panelX, panelY, panelWidth, panelHeight, 15, 15);
-
-        if (coinImage == null) {
-            coinImage = new Image(Objects.requireNonNull(
-                    Coin.class.getResourceAsStream("/com/gnome/gnome/images/tiles/" + ObjectsConstants.COIN_IMAGE)
-            ));
+    /**
+     * Updates the coin counter label to reflect collected coins.
+     */
+    private void updateCoinLabel() {
+        if (coinCountLabel != null) {
+            coinCountLabel.setText("Coins: " + player.getPlayerCoins());
         }
-
-        double coinSize = 30;
-        gc.drawImage(coinImage, panelX + 10, panelY + (panelHeight - coinSize) / 2, coinSize, coinSize);
-
-        gc.setFill(Color.WHITE);
-        gc.setFont(javafx.scene.text.Font.font(20));
-        gc.fillText("x " + player.getPlayerCoins(), panelX + 50, panelY + panelHeight / 2 + 7);
     }
-
 
     /**
      * Removes the specified monsters from the game and replaces them with coins.
@@ -501,62 +478,46 @@ public class ContinueGameController implements Initializable {
      * This includes drawing the map, updating the player's position, repositioning effects, and updating UI elements.
      */
     private void updateCameraViewport() {
-        // Update camera center
+        // Update the camera's center to follow the player
         camera.updateCameraCenter();
 
-        // Draw map and coins
+        // Draw the viewport on the canvas, including the map tiles and coins
         camera.drawViewport(viewportCanvas, coinsOnMap);
 
-        // Update player's dynamic tile size
-        player.setDynamicTileSize(camera.getDynamicTileSize());
-
-        double dynamicTileSize = camera.getDynamicTileSize();
-        double playerSize = dynamicTileSize * 0.6;
-        double playerOffset = (dynamicTileSize - playerSize) / 2.0;
-
-        // Calculate player centered on canvas
-        double centerOffsetX = viewportCanvas.getWidth() / 2 - playerSize / 2;
-        double centerOffsetY = viewportCanvas.getHeight() / 2 - playerSize / 2;
-
-        // Set player position
-        player.getRepresentation().setTranslateX(centerOffsetX);
-        player.getRepresentation().setTranslateY(centerOffsetY);
-
-        // Update player rectangle size
-        if (player.getRepresentation() instanceof Rectangle rect) {
-            rect.setWidth(playerSize);
-            rect.setHeight(playerSize);
-        }
-
-        // Add player to the scene if not yet added
+        // Add the player to the gameObjectsPane if not already added
         if (!gameObjectsPane.getChildren().contains(player.getRepresentation())) {
             gameObjectsPane.getChildren().add(player.getRepresentation());
         }
 
-        // Update active visual effects (e.g., attacks, hit animations)
+        // Always update player position based on camera offset
+        player.updatePositionWithCamera(camera.getStartCol(), camera.getStartRow());
+
+        // Update the positions of all effects (e.g., hit effects, attack animations) in the gameObjectsPane
+        // Effects have absolute coordinates stored in their properties, which are adjusted based on the camera's position
         for (var node : gameObjectsPane.getChildren()) {
             if (node instanceof ImageView effectView) {
+                // Check if the node is an effect (e.g., a GIF) with absolute coordinates
                 Object absoluteX = effectView.getProperties().get("absoluteX");
                 Object absoluteY = effectView.getProperties().get("absoluteY");
-                if (absoluteX instanceof Double absX && absoluteY instanceof Double absY) {
-                    double offsetX = (absX - camera.getStartCol()) * dynamicTileSize + playerOffset;
-                    double offsetY = (absY - camera.getStartRow()) * dynamicTileSize + playerOffset;
-                    effectView.setTranslateX(offsetX);
-                    effectView.setTranslateY(offsetY);
+                if (absoluteX instanceof Double && absoluteY instanceof Double) {
+                    double absX = (Double) absoluteX; // Absolute X position in pixels
+                    double absY = (Double) absoluteY; // Absolute Y position in pixels
+                    // Adjust the effect's position relative to the camera's viewport
+                    effectView.setTranslateX(absX - (camera.getStartCol() * TILE_SIZE));
+                    effectView.setTranslateY(absY - (camera.getStartRow() * TILE_SIZE));
                 }
             }
         }
 
-        // Update all active arrows
+        // Update the camera offset for all active arrows (shot by skeletons) to ensure they are positioned correctly
         for (Arrow arrow : activeArrows) {
             arrow.updateCameraOffset(camera.getStartCol(), camera.getStartRow());
         }
 
-        drawCoinCounter();
+        // Update the coin counter label and health bar to reflect the current game state
+        updateCoinLabel();
         updatePlayerHealthBar();
     }
-
-
 
     /**
      * Starts the game loop using an AnimationTimer.
@@ -591,8 +552,8 @@ public class ContinueGameController implements Initializable {
                         if (arrow != null) {
                             // If an arrow was shot, set the skeleton as its owner and add it to the active arrows list
                             arrow.setSkeleton(s);
-                            arrow.setDynamicTileSize(camera.getDynamicTileSize());
                             activeArrows.add(arrow);
+                            // Start the arrow's animation (movement towards the player)
                             arrow.shoot(gameObjectsPane, player);
                         }
                     }
@@ -618,43 +579,47 @@ public class ContinueGameController implements Initializable {
      * @param cameraStartRow The starting row of the camera's viewport.
      */
     private void showAttackRange(int range, int cameraStartCol, int cameraStartRow) {
-        List<Rectangle> rangeIndicators = new ArrayList<>();
+        List<Rectangle> rangeIndicators = new ArrayList<>(); // List to store the visual indicators
 
-        double dynamicTileSize = camera.getDynamicTileSize();
-        double offset = dynamicTileSize * 0.2;
+        // Iterate over a 3x3 grid around the player (range=1 means 1 tile in all directions)
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -1; dy <= 1; dy++) {
+                int attackX = player.getX() + dx; // X position of the tile in the attack range
+                int attackY = player.getY() + dy; // Y position of the tile in the attack range
 
-        double centerOffsetX = viewportCanvas.getWidth() / 2 - dynamicTileSize / 2;
-        double centerOffsetY = viewportCanvas.getHeight() / 2 - dynamicTileSize / 2;
-
-        for (int dx = -range; dx <= range; dx++) {
-            for (int dy = -range; dy <= range; dy++) {
-                int attackX = player.getX() + dx;
-                int attackY = player.getY() + dy;
-
+                // Check if the tile is within the map bounds
                 if (attackX >= 0 && attackX < baseMap[0].length && attackY >= 0 && attackY < baseMap.length) {
-                    double pixelX = centerOffsetX + dx * dynamicTileSize + offset;
-                    double pixelY = centerOffsetY + dy * dynamicTileSize + offset;
+                    // Calculate the tile's position relative to the camera's viewport
+                    int gridX = attackX - cameraStartCol;
+                    int gridY = attackY - cameraStartRow;
+                    // Convert the grid position to pixel coordinates
+                    double pixelX = gridX * TILE_SIZE;
+                    double pixelY = gridY * TILE_SIZE;
 
-                    Rectangle rangeIndicator = new Rectangle(dynamicTileSize * 0.6, dynamicTileSize * 0.6);
-                    rangeIndicator.setTranslateX(pixelX);
-                    rangeIndicator.setTranslateY(pixelY);
+                    //  Create a semi-transparent red square to indicate the attack range
+                    Rectangle rangeIndicator = new Rectangle(pixelX, pixelY, TILE_SIZE, TILE_SIZE);
                     rangeIndicator.setFill(Color.RED);
-                    rangeIndicator.setOpacity(0.3);
+                    rangeIndicator.setOpacity(0.3); // Make the square semi-transparent
 
+                    // Add the indicator to the list and the gameObjectsPane to display it
                     rangeIndicators.add(rangeIndicator);
                     gameObjectsPane.getChildren().add(rangeIndicator);
+
+                    if (debug_mod_game) {
+                        System.out.println("Highlighting attack range at (" + attackX + ", " + attackY + ")");
+                    }
                 }
             }
         }
 
+        // Create a PauseTransition to remove the indicators after 0.5 seconds
         PauseTransition pause = new PauseTransition(Duration.seconds(0.5));
         pause.setOnFinished(event -> {
+            // Remove all range indicators from the scene
             gameObjectsPane.getChildren().removeAll(rangeIndicators);
         });
-        pause.play();
+        pause.play(); // Start the timer to show the indicators temporarily
     }
-
-
 
 
 
@@ -906,4 +871,6 @@ public class ContinueGameController implements Initializable {
             ex.printStackTrace();
         }
     }
+
+
 }

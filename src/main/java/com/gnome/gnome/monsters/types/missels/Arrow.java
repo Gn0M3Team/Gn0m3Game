@@ -60,6 +60,10 @@ public class Arrow {
     private Skeleton skeleton;
     private int cameraStartCol, cameraStartRow;
 
+    @Setter
+    private double dynamicTileSize;
+
+
     /**
      * Constructs a new Arrow with the specified starting position, velocity, and target.
      *
@@ -83,7 +87,7 @@ public class Arrow {
         System.out.println("Creating arrow " + arrowId + " at (" + startX + ", " + startY + ") with velocity (" + vx + ", " + vy + ") towards (" + targetX + ", " + targetY + ")");
 
         // Create a Rectangle to visually represent the arrow
-        // The rectangle is 30x30 pixels for simplicity (smaller than a tile, which is typically 50x50 pixels)
+        // The rectangle is 30x30 pixels for simplicity
         view = new Rectangle(30, 30);
 
         // Generate a random color for the rectangle (for debugging purposes)
@@ -91,6 +95,12 @@ public class Arrow {
         Random rand = new Random();
         // Set the fill color of the rectangle to a random RGB color
         view.setFill(Color.rgb(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256)));
+    }
+
+    public void setDynamicTileSize(double dynamicTileSize) {
+        this.dynamicTileSize = dynamicTileSize;
+        view.setWidth(dynamicTileSize * 0.6);
+        view.setHeight(dynamicTileSize * 0.6);
     }
 
     /**
@@ -101,19 +111,23 @@ public class Arrow {
      * @param cameraStartRow The starting row of the camera's viewport (the topmost row currently visible).
      */
     public void updateCameraOffset(int cameraStartCol, int cameraStartRow) {
-        this.cameraStartCol = cameraStartCol; // Store the camera's starting column
-        this.cameraStartRow = cameraStartRow; // Store the camera's starting row
+        this.cameraStartCol = cameraStartCol;
+        this.cameraStartRow = cameraStartRow;
 
-        // Convert the arrow's absolute position (in tiles) to pixel coordinates relative to the camera's viewport:
-        // - Subtract the camera's starting column/row to get the position relative to the viewport
-        // - Multiply by TILE_SIZE (e.g., 50 pixels) to convert from tiles to pixels
-        double pixelX = (x - cameraStartCol) * TILE_SIZE; // X position in pixels
-        double pixelY = (y - cameraStartRow) * TILE_SIZE; // Y position in pixels
+        if (dynamicTileSize == 0) return;
 
-        // Set the position of the arrow's visual representation (Rectangle) on the screen
-        view.setTranslateX(pixelX); // Set the X position in pixels
-        view.setTranslateY(pixelY); // Set the Y position in pixels
+        double viewSize = dynamicTileSize * 0.6;
+        double offset = (dynamicTileSize - viewSize) / 2.0;
+
+        double pixelX = (x - cameraStartCol) * dynamicTileSize + offset;
+        double pixelY = (y - cameraStartRow) * dynamicTileSize + offset;
+
+        view.setTranslateX(pixelX);
+        view.setTranslateY(pixelY);
+        view.setWidth(viewSize);
+        view.setHeight(viewSize);
     }
+
 
     /**
      * Adds the arrow to the scene and animates its movement until it goes out of bounds,
@@ -123,100 +137,71 @@ public class Arrow {
      * @param player the player object to check for collisions
      */
     public void shoot(Pane layer, Player player) {
-        // Check if the arrow is already animating (moving)
-        // If it is, skip the shoot operation to prevent multiple animations from running simultaneously
         if (isAnimating) {
             System.out.println("Arrow " + arrowId + " is already animating, skipping shoot");
             return;
         }
-
-        // Set the flag to indicate the arrow is now animating
         isAnimating = true;
 
         System.out.println("Adding arrow " + arrowId + " to gameObjectsPane at (" + x + ", " + y + ")");
 
-        // Add the arrow's visual representation (Rectangle) to the provided Pane so it appears on the screen
+        // Very important: set initial dynamic size BEFORE adding to layer
+        double viewSize = dynamicTileSize * 0.6;
+        view.setWidth(viewSize);
+        view.setHeight(viewSize);
+
+        // Correct starting pixel position:
+        double offset = (dynamicTileSize - viewSize) / 2.0;
+        double pixelX = (x - cameraStartCol) * dynamicTileSize + offset;
+        double pixelY = (y - cameraStartRow) * dynamicTileSize + offset;
+        view.setTranslateX(pixelX);
+        view.setTranslateY(pixelY);
+
+        // Now add the view to scene
         layer.getChildren().add(view);
 
-        // Create a new AnimationTimer to handle the arrow's movement and interactions frame by frame
-        // AnimationTimer runs at approximately 60 FPS, updating the arrow's position each frame
         new AnimationTimer() {
             @Override
             public void handle(long now) {
-                // Update the arrow's absolute position (in tiles) by adding the velocity (tiles/frame)
-                x += vx; // Update the X position
-                y += vy; // Update the Y position
+                x += vx;
+                y += vy;
 
-                // Convert the updated absolute position (in tiles) to pixel coordinates relative to the camera's viewport
-                double pixelX = (x - cameraStartCol) * TILE_SIZE; // X position in pixels
-                double pixelY = (y - cameraStartRow) * TILE_SIZE; // Y position in pixels
+                double pixelX = (x - cameraStartCol) * dynamicTileSize + offset;
+                double pixelY = (y - cameraStartRow) * dynamicTileSize + offset;
+                view.setTranslateX(pixelX);
+                view.setTranslateY(pixelY);
 
-                // Update the position of the arrow's visual representation (Rectangle) on the screen
-                view.setTranslateX(pixelX); // Set the new X position in pixels
-                view.setTranslateY(pixelY); /// Set the new Y position in pixels
-                System.out.println("Arrow " + arrowId + " moving to (" + x + ", " + y + ") in tiles, (" + pixelX + ", " + pixelY + ") in pixels");
+                double paneWidth = layer.getWidth();
+                double paneHeight = layer.getHeight();
 
-                // Get the dimensions of the Pane (viewport) to check if the arrow has gone out of bounds
-                double paneWidth = layer.getWidth(); // Width of the Pane in pixels
-                double paneHeight = layer.getHeight(); // Height of the Pane in pixels
-
-                // Check if the Pane has valid dimensions (non-zero width and height)
-                // If the dimensions are 0, the Pane might not be properly initialized, which could cause issues
-                if (paneWidth == 0 || paneHeight == 0) {
-                    System.out.println("Warning: gameObjectsPane has invalid size: " + paneWidth + "x" + paneHeight);
-                }
-
-                // Check if the arrow should stop moving. The arrow stops if:
-                // 1. It goes out of bounds (outside the viewport: pixelX < 0, pixelX > paneWidth, pixelY < 0, or pixelY > paneHeight)
-                // 2. It reaches or passes its target position:
-                //    - If moving right (vx > 0), stop if x >= targetX
-                //    - If moving left (vx < 0), stop if x <= targetX
-                //    - If moving down (vy > 0), stop if y >= targetY
-                //    - If moving up (vy < 0), stop if y <= targetY
                 if (pixelX < 0 || pixelX > paneWidth || pixelY < 0 || pixelY > paneHeight ||
                         (vx > 0 && x >= targetX) || (vx < 0 && x <= targetX) ||
                         (vy > 0 && y >= targetY) || (vy < 0 && y <= targetY)) {
+
                     System.out.println("Arrow " + arrowId + " removed: reached bounds or target at (" + x + ", " + y + ")");
-
-                    // Remove the arrow's visual representation from the Pane to stop displaying it
                     layer.getChildren().remove(view);
-
-                    // Stop the AnimationTimer to end the animation
                     stop();
-                    // Reset the flag to indicate the arrow is no longer animating
                     isAnimating = false;
 
-                    // If the arrow was shot by a skeleton, notify the skeleton that the arrow has been removed
                     if (skeleton != null) {
-                        skeleton.clearActiveArrow(); // This allows the skeleton to shoot another arrow
+                        skeleton.clearActiveArrow();
                     }
                     return;
                 }
 
-                // Debug: drawing the boundaries of the arrow and the player
-                System.out.println("Arrow bounds: " + view.getBoundsInParent());
-                System.out.println("Player bounds: " + player.getBounds());
-
-                // Check if the arrow collides with the player by checking if their bounding boxes intersect
-                // - view.getBoundsInParent() returns the arrow's bounding box in the parent's coordinate system (the Pane)
-                // - player.getBounds() returns the player's bounding box (a 50x50 square in this game)
                 if (view.getBoundsInParent().intersects(player.getBounds())) {
                     System.out.println("Arrow " + arrowId + " hit player at (" + x + ", " + y + ")");
-
-                    // Apply damage to the player (DAMAGE=10)
                     player.takeDamage(DAMAGE);
-                    // Remove the arrow's visual representation from the Pane to stop displaying it
                     layer.getChildren().remove(view);
-                    // Stop the AnimationTimer to end the animation
                     stop();
-                    // Reset the flag to indicate the arrow is no longer animating
                     isAnimating = false;
-                    // If the arrow was shot by a skeleton, notify the skeleton that the arrow has been removed
+
                     if (skeleton != null) {
-                        skeleton.clearActiveArrow(); // This allows the skeleton to shoot another arrow
+                        skeleton.clearActiveArrow();
                     }
                 }
             }
-        }.start(); // Start the AnimationTimer to begin the arrow's animation
+        }.start();
     }
+
 }
