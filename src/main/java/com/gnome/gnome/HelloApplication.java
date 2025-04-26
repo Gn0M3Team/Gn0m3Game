@@ -31,7 +31,7 @@ public class HelloApplication extends Application {
         Scene scene = new Scene(fxmlLoader.load());
 
         stage.setFullScreen(true);
-        stage.setTitle("Hello!");
+        stage.setTitle("Dark Rifter");
         stage.setScene(scene);
         stage.show();
     }

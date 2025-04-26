@@ -22,7 +22,7 @@ public class SettingController {
     @FXML
     private Button backGameButton;
     @FXML
-    private Button meinMenuButton;
+    private Button mainMenuButton;
     @FXML
     private BorderPane settingPage;
 
@@ -54,7 +54,7 @@ public class SettingController {
      * @param e the action event triggered by the button click
      */
     @FXML
-    public void meinMenuButtonClick(ActionEvent e) {
+    public void mainMenuButtonClick(ActionEvent e) {
         pageSwitch.goMainMenu(settingPage);
     }
 }

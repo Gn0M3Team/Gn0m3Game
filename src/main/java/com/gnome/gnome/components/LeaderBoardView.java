@@ -1,6 +1,9 @@
 package com.gnome.gnome.components;
 
 import com.gnome.gnome.HelloController;
+import com.gnome.gnome.dao.userDAO.AuthUserDAO;
+import com.gnome.gnome.dao.userDAO.UserSession;
+import com.gnome.gnome.models.user.AuthUser;
 import com.gnome.gnome.profile.ProfileController;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
@@ -9,22 +12,15 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.stage.Popup;
-import javafx.stage.Stage;
-import javafx.util.Duration;
 
-import java.io.IOException;
-import java.util.Objects;
-import java.util.logging.Level;
+import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 
 public class LeaderBoardView extends VBox {
@@ -37,6 +33,10 @@ public class LeaderBoardView extends VBox {
     private RadioButton onlyMyRadioButton;
     private ToggleGroup toggleGroup;
     private ListView<String> listView;
+    private List<AuthUser> allUsers;
+    private List<AuthUser> filteredUsers;
+
+    private AuthUser currentUser;
 
     // Pagination state for the list items
     private int currentPage = 1;
@@ -44,10 +44,12 @@ public class LeaderBoardView extends VBox {
     private boolean loading = false;
     private final HelloController parentController;
     private PageSwitcherInterface pageSwitch;
+    private final AuthUserDAO userDAO = new AuthUserDAO();
     /**
-     * Constructs a LeaderBoardView.
+     * Constructs a LeaderBoardView with a parent controller and a close action.
      *
-     * @param onCloseAction a Runnable to be executed when the close button is pressed.
+     * @param parentController the controller of the parent page.
+     * @param onCloseAction a Runnable to execute when the close button is pressed.
      */
     public LeaderBoardView(HelloController parentController,Runnable onCloseAction) {
 
@@ -59,6 +61,7 @@ public class LeaderBoardView extends VBox {
         this.getStylesheets().add(
                 getClass().getResource("/com/gnome/gnome/pages/css/leaderboard.css").toExternalForm()
         );
+        this.currentUser = UserSession.getInstance().getCurrentUser();
 
         logger.info("Initializing LeaderBoardView...");
 
@@ -93,6 +96,7 @@ public class LeaderBoardView extends VBox {
 
         // Load the initial set of items into the ListView.
         loadMoreItems();
+        searchField.setOnKeyReleased(event -> filterList(searchField.getText()));
     }
 
     /**
@@ -154,16 +158,18 @@ public class LeaderBoardView extends VBox {
     }
 
     /**
-     * Sets up a listener on the toggle group to filter the list items.
+     * Sets up listeners for the radio buttons to filter between all users and only the current user's data.
      */
     private void setupToggleListener() {
         toggleGroup.selectedToggleProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal == onlyMyRadioButton) {
                 logger.info("Filter: only my");
-                listView.getItems().setAll("bot1 - 12354 (mine?)");
+                listView.getItems().clear();
+                filterOnlyMyUser();
             } else {
                 logger.info("Filter: all");
                 listView.getItems().clear();
+                allUsers = null;
                 currentPage = 1;
                 loadMoreItems();
             }
@@ -171,18 +177,66 @@ public class LeaderBoardView extends VBox {
     }
 
     /**
-     * Loads additional items (simulating pagination) and appends them to the ListView.
+     * Loads additional users from the database and appends them to the ListView.
+     * This method supports paginated loading.
      */
     private void loadMoreItems() {
         loading = true;
         logger.fine("Loading more leaderboard items...");
 
-        for (int i = 1; i <= pageSize; i++) {
-            int botNumber = (currentPage - 1) * pageSize + i;
-            listView.getItems().add("bot" + botNumber + " - " + (12354 + botNumber));
+        int offset = (currentPage - 1) * pageSize;
+        List<AuthUser> users = userDAO.getUsersByPage(offset, pageSize);
+
+        if (allUsers == null) {
+            allUsers = users;
+            filteredUsers = users;
+        } else {
+            allUsers.addAll(users);
+            filteredUsers = allUsers;
         }
-        currentPage++;
+
+        updateListView(filteredUsers);
+
+        if (!users.isEmpty()) {
+            currentPage++;
+        }
+
         loading = false;
+    }
+
+    /**
+     * Filters the list based on the text input from the search field.
+     *
+     * @param query the text to filter usernames by.
+     */
+    private void filterList(String query) {
+        filteredUsers = allUsers.stream()
+                .filter(user -> user.getUsername().toLowerCase().contains(query.toLowerCase()))
+                .collect(Collectors.toList());
+
+        updateListView(filteredUsers);
+    }
+    /**
+     * Filters the list to show only the current user's record.
+     */
+    private void filterOnlyMyUser() {
+        filteredUsers = allUsers.stream()
+                .filter(user -> user.getUsername().equals(currentUser.getUsername()))
+                .collect(Collectors.toList());
+
+        updateListView(filteredUsers);
+    }
+    /**
+     * Updates the ListView with a new set of AuthUser objects.
+     *
+     * @param users the list of users to display.
+     */
+    private void updateListView(List<AuthUser> users) {
+        listView.getItems().clear();
+        for (AuthUser user : users) {
+            String display = user.getUsername() + " - [role: " + user.getRole() + "]";
+            listView.getItems().add(display);
+        }
     }
 
     /**
@@ -197,7 +251,9 @@ public class LeaderBoardView extends VBox {
             if (selected != null) {
                 logger.info("Opening profile for: " + selected);
                 BorderPane helloPage = parentController.getHelloPage();
-                pageSwitch.goProfile(helloPage,selected);
+                String username = selected.split(" - ")[0];
+                logger.info(username);
+                pageSwitch.goProfile(helloPage, username);
             }
         }
     }
