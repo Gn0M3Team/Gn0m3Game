@@ -164,17 +164,36 @@ public class ContinueGameController implements Initializable {
         instance = this;
 
         viewportCanvas = new Canvas();
+
+        BorderPane.setAlignment(centerStack, Pos.CENTER);
+        BorderPane.setMargin(centerStack, new Insets(0));
+
+// Центр займає всю доступну ширину і висоту
+        centerStack.prefWidthProperty().bind(rootBorder.widthProperty());
+        centerStack.prefHeightProperty().bind(rootBorder.heightProperty());
+        centerStack.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE); // <-- Додаємо обов'язково
+
+// Явно вставляємо в центр BorderPane
+        rootBorder.setCenter(centerStack);
+
+// Створюємо Canvas без фіксованого розміру
+        viewportCanvas = new Canvas();
         viewportCanvas.widthProperty().bind(centerStack.widthProperty());
         viewportCanvas.heightProperty().bind(centerStack.heightProperty());
 
+// Pane для об'єктів
         gameObjectsPane = new Pane();
         gameObjectsPane.prefWidthProperty().bind(centerStack.widthProperty());
         gameObjectsPane.prefHeightProperty().bind(centerStack.heightProperty());
         gameObjectsPane.setPickOnBounds(false);
 
+// Комбінуємо канвас і об'єкти
         Pane viewportRoot = new Pane(viewportCanvas, gameObjectsPane);
-        centerStack.setAlignment(Pos.CENTER);
+
+// Додаємо в centerStack
         centerStack.getChildren().setAll(viewportRoot);
+        centerStack.setAlignment(viewportRoot, Pos.CENTER);
+
 
         healthBar = new PlayerHealthBar(200, 20);
         healthBarContainer.getChildren().add(healthBar);
@@ -192,6 +211,19 @@ public class ContinueGameController implements Initializable {
         startMonsterMovement();
         updateCameraViewport();
     }
+
+    private void updateCanvasSize() {
+        double width = centerStack.getWidth();
+        double height = centerStack.getHeight();
+        double size = Math.min(width, height);
+
+        double tileSize = size / camera.getViewportSize();
+        double canvasSize = tileSize * camera.getViewportSize();
+
+        viewportCanvas.setWidth(canvasSize);
+        viewportCanvas.setHeight(canvasSize);
+    }
+
 
     /**
      * Loads properties from the app.properties file to configure the game.
@@ -446,8 +478,8 @@ public class ContinueGameController implements Initializable {
         double canvasHeight = viewportCanvas.getHeight();
         double padding = 20;
 
-        double panelWidth = 140;
-        double panelHeight = 50;
+        double panelWidth = viewportCanvas.getWidth() * 0.15;
+        double panelHeight = viewportCanvas.getHeight() * 0.07;
 
         double panelX = padding;
         double panelY = canvasHeight - panelHeight - padding;
@@ -461,7 +493,7 @@ public class ContinueGameController implements Initializable {
             ));
         }
 
-        double coinSize = 30;
+        double coinSize = viewportCanvas.getWidth() * 0.05;
         gc.drawImage(coinImage, panelX + 10, panelY + (panelHeight - coinSize) / 2, coinSize, coinSize);
 
         gc.setFill(Color.WHITE);
@@ -501,53 +533,29 @@ public class ContinueGameController implements Initializable {
      * This includes drawing the map, updating the player's position, repositioning effects, and updating UI elements.
      */
     private void updateCameraViewport() {
-        // Update camera center
         camera.updateCameraCenter();
-
-        // Draw map and coins
         camera.drawViewport(viewportCanvas, coinsOnMap);
 
-        // Update player's dynamic tile size
         player.setDynamicTileSize(camera.getDynamicTileSize());
+        player.updatePositionWithCamera(camera.getStartCol(), camera.getStartRow());
 
-        double dynamicTileSize = camera.getDynamicTileSize();
-        double playerSize = dynamicTileSize * 0.6;
-        double playerOffset = (dynamicTileSize - playerSize) / 2.0;
-
-        // Calculate player centered on canvas
-        double centerOffsetX = viewportCanvas.getWidth() / 2 - playerSize / 2;
-        double centerOffsetY = viewportCanvas.getHeight() / 2 - playerSize / 2;
-
-        // Set player position
-        player.getRepresentation().setTranslateX(centerOffsetX);
-        player.getRepresentation().setTranslateY(centerOffsetY);
-
-        // Update player rectangle size
-        if (player.getRepresentation() instanceof Rectangle rect) {
-            rect.setWidth(playerSize);
-            rect.setHeight(playerSize);
-        }
-
-        // Add player to the scene if not yet added
         if (!gameObjectsPane.getChildren().contains(player.getRepresentation())) {
             gameObjectsPane.getChildren().add(player.getRepresentation());
         }
 
-        // Update active visual effects (e.g., attacks, hit animations)
         for (var node : gameObjectsPane.getChildren()) {
             if (node instanceof ImageView effectView) {
                 Object absoluteX = effectView.getProperties().get("absoluteX");
                 Object absoluteY = effectView.getProperties().get("absoluteY");
                 if (absoluteX instanceof Double absX && absoluteY instanceof Double absY) {
-                    double offsetX = (absX - camera.getStartCol()) * dynamicTileSize + playerOffset;
-                    double offsetY = (absY - camera.getStartRow()) * dynamicTileSize + playerOffset;
+                    double offsetX = (absX - camera.getStartCol()) * camera.getDynamicTileSize();
+                    double offsetY = (absY - camera.getStartRow()) * camera.getDynamicTileSize();
                     effectView.setTranslateX(offsetX);
                     effectView.setTranslateY(offsetY);
                 }
             }
         }
 
-        // Update all active arrows
         for (Arrow arrow : activeArrows) {
             arrow.updateCameraOffset(camera.getStartCol(), camera.getStartRow());
         }

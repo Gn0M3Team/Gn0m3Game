@@ -24,6 +24,7 @@ public class HelloApplication extends Application {
         // If parameter skip_log is true then start with menu page, otherwise start with logging
         Map<String, Boolean> properties = getProperties();
         skip_db = properties.get("skip_db");
+        System.out.println(skip_db);
 
         FXMLLoader fxmlLoader = getFxmlLoader(properties.get("skip_logging"));
         Scene scene = new Scene(fxmlLoader.load());
