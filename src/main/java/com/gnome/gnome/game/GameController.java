@@ -152,7 +152,16 @@ public class GameController {
 
         setupMap();
 
-        camera      = Camera.getInstance(fieldMap, player.getX(), player.getY(), player); // Initialize the camera to follow the player
+        System.out.println("Player info: " + player);
+        System.out.println("Player X info: " + player.getX());
+        System.out.println("Player Y info: " + player.getY());
+
+        if (player == null)
+            throw new RuntimeException("player is null");
+
+        camera = Camera.getInstance(fieldMap, player.getX(), player.getY(), player); // Initialize the camera to follow the player
+        camera.updateCameraCenter();
+
         updateMapWithMonsters(); // Update the field map with monster positions
         instance = this; //Fill singleton instance ONLY on initialization. BECAUSE OTHERWISE THERE IS NO DATA THAT IS REQUIRED IN OTHER CLASSES
 
@@ -184,6 +193,10 @@ public class GameController {
 
         // Комбінуємо канвас і об'єкти
         Pane viewportRoot = new Pane(viewportCanvas, gameObjectsPane);
+        centerStack.getChildren().setAll(viewportRoot);
+        StackPane.setAlignment(viewportRoot, Pos.CENTER);
+
+        addMonstersToGameObjectsPane();
 
         // Додаємо в centerStack
         centerStack.getChildren().setAll(viewportRoot);
@@ -215,26 +228,59 @@ public class GameController {
         updateCameraViewport();
     }
 
+    private void addMonstersToGameObjectsPane() {
+        camera.updateCameraCenter(); // Оновити камеру перед додаванням монстрів!
+
+        double tileSize = camera.getDynamicTileSize();
+
+        for (Monster monster : monsterList) {
+            ImageView monsterView = monster.getRepresentation();
+            monsterView.getProperties().put("gridX", monster.getX());
+            monsterView.getProperties().put("gridY", monster.getY());
+
+            // Обов'язково оновлюємо розміри і координати тут:
+            monsterView.setFitWidth(tileSize);
+            monsterView.setFitHeight(tileSize);
+
+            monsterView.setTranslateX((monster.getX() - camera.getStartCol()) * tileSize);
+            monsterView.setTranslateY((monster.getY() - camera.getStartRow()) * tileSize);
+
+            if (!gameObjectsPane.getChildren().contains(monsterView)) {
+                gameObjectsPane.getChildren().add(monsterView);
+            }
+        }
+    }
+
+
+
     private void onSceneExit() {
+        // 1) stop the game‐loop timer if it’s running
+        if (monsterMovementTimer != null) {
+            monsterMovementTimer.stop();
+        }
         monsterMovementTimer = null;
+
         Camera.resetInstance();
         Player.resetInstance();
+        GameController.instance = null;
+
+        // 3) drop any scene‐specific nodes
         viewportCanvas = null;
         monsterList.clear();
         coinsOnMap.clear();
         activeArrows.clear();
-
-        // ← clear out the old GameController singleton too:
-        GameController.instance = null;
     }
 
 
     private void setupMap() {
+        boolean flag = false;
         for (int row = 0; row < baseMap.length; row++) {
             for (int col = 0; col < baseMap[row].length; col++) {
                 int tile = baseMap[row][col];
 
                 if (tile == TypeOfObjects.START_POINT.getValue()) {
+                    flag = true;
+                    System.out.println("Player is created");
                     player = Player.getInstance(col, row, PLAYER_MAX_HEALTH);
                     baseMap[row][col] = TypeOfObjects.FLOOR.getValue();
                 }
@@ -242,9 +288,14 @@ public class GameController {
                 if (tile < 0) {
                     Monster m = MonsterFactory
                             .createMonster(TypeOfObjects.fromValue(tile), col, row);
+                    baseMap[row][col] = TypeOfObjects.FLOOR.getValue();
                     monsterList.add(m);
                 }
             }
+        }
+
+        if (!flag) {
+            throw new RuntimeException("User cann't be createds");
         }
     }
 
@@ -295,23 +346,11 @@ public class GameController {
      * Each monster's position is marked on the fieldMap with its monster value (e.g., -1 for a goblin).
      */
     private void updateMapWithMonsters() {
-        // Create a fresh copy of the baseMap
+        // 🧹 Just refresh baseMap - don't insert monsters manually anymore
         fieldMap = copyMap(baseMap);
-
-        // Iterate through all monsters and place them on the fieldMap
-        for (Monster monster : monsterList) {
-            int x = monster.getX(); // Monster's X position
-            int y = monster.getY(); // Monster's Y position
-            // Check if the monster's position is within the map bounds
-            if (y >= 0 && y < fieldMap.length && x >= 0 && x < fieldMap[0].length) {
-                // Set the map cell to the monster's value
-                fieldMap[y][x] = monster.getMonsterValue();
-            }
-        }
-
-        // Update the camera with the new fieldMap so it can render the updated map
         camera.setMapGrid(fieldMap);
     }
+
 
     /**
      * Registers key event handlers on the Scene to handle player input (e.g., movement, attacking).
@@ -525,6 +564,11 @@ public class GameController {
         double tw = camera.getTileWidth();
         double th = camera.getTileHeight();
 
+        for (Monster monster : monsterList) {
+            monster.updatePositionWithCamera(camera.getStartCol(), camera.getStartRow(),
+                    camera.getTileWidth(), camera.getTileHeight());
+        }
+
         player.setDynamicTileSize(Math.min(tw, th));
         player.updatePositionWithCamera(
                 camera.getStartCol(),
@@ -536,19 +580,6 @@ public class GameController {
 
         if (!gameObjectsPane.getChildren().contains(player.getRepresentation())) {
             gameObjectsPane.getChildren().add(player.getRepresentation());
-        }
-
-        for (var node : gameObjectsPane.getChildren()) {
-            if (node instanceof ImageView effectView) {
-                Object absoluteX = effectView.getProperties().get("absoluteX");
-                Object absoluteY = effectView.getProperties().get("absoluteY");
-                if (absoluteX instanceof Double absX && absoluteY instanceof Double absY) {
-                    double offsetX = (absX - camera.getStartCol()) * camera.getDynamicTileSize();
-                    double offsetY = (absY - camera.getStartRow()) * camera.getDynamicTileSize();
-                    effectView.setTranslateX(offsetX);
-                    effectView.setTranslateY(offsetY);
-                }
-            }
         }
 
         for (Arrow arrow : activeArrows) {
@@ -647,14 +678,12 @@ public class GameController {
      * @param currentTime The current timestamp (in nanoseconds), used for melee attack cooldowns.
      */
     private void handleMonsterMovement(long currentTime) {
-        int rows = fieldMap.length; // Number of rows in the map
-        int cols = fieldMap[0].length; // Number of columns in the map
+        int rows = fieldMap.length;
+        int cols = fieldMap[0].length;
 
-        // Create a fresh copy of the baseMap to reset dynamic elements
-        fieldMap = copyMap(baseMap);
-        List<Monster> toRemove = new ArrayList<>(); // List of monsters to remove (e.g., if they die)
+        // Do NOT recreate fieldMap, only update monsters visually now
+        List<Monster> toRemove = new ArrayList<>();
 
-        // Iterate through all monsters to update their positions and behavior
         for (Monster monster : monsterList) {
             int dx = Math.abs(player.getX() - monster.getX());
             int dy = Math.abs(player.getY() - monster.getY());
@@ -668,105 +697,68 @@ public class GameController {
                 }
             }
 
-            // If the monster is not a skeleton, attempt a melee attack on the player
             if (!(monster instanceof Skeleton)) {
-                monster.meleeAttack(player, gameObjectsPane, camera.getStartCol(), camera.getStartRow(), currentTime);
+//                monster.meleeAttack(player, gameObjectsPane, camera.getStartCol(), camera.getStartRow(), currentTime);
             }
 
-            // Check if the monster is currently playing a hit effect or melee attack animation
-            // If so, it cannot move
             if (monster.isHitEffectPlaying() || monster.isMeleeAttacking()) {
-                if (debug_mod_game)
-                    System.out.println("Monster at (" + monster.getX() + ", " + monster.getY() + ") cannot move due to " + (monster.isHitEffectPlaying() ? "hit effect" : "melee attack"));
                 continue;
             }
 
             if (dx <= monster.getAttackRange() && dy <= monster.getAttackRange()) {
-                if (debug_mod_game) {
-                    System.out.println("Monster at (" + monster.getX() + ", " + monster.getY() + ") will not move - player is within attack range (" + dx + ", " + dy + ")");
-                }
-                continue; // Гравець у зоні досяжності, монстр не рухається
+                continue; // Player is nearby, monster stays
             }
 
-            // Store the monster's current position
             int oldX = monster.getX();
             int oldY = monster.getY();
-            int newX = oldX;
-            int newY = oldY;
+            int newX, newY;
 
-            // Move the monster according to its movement strategy (e.g., random movement for goblins)
             monster.move();
-
-            newX = monster.getX(); // Get the new position after moving
+            newX = monster.getX();
             newY = monster.getY();
 
-            // Check if the new position is outside the map bounds
-            // If so, revert the monster to its old position
             if (newX < 0 || newX >= cols || newY < 0 || newY >= rows) {
                 monster.setPosition(oldX, oldY);
                 continue;
             }
 
-            // Check if the new position is occupied by the player
-            // If so, revert the monster to its old position (monsters cannot move onto the player's tile)
             if (newX == player.getX() && newY == player.getY()) {
-                if (debug_mod_game) {
-                    System.out.println("Monster at (" + oldX + ", " + oldY + ") cannot move to (" + newX + ", " + newY + ") - position occupied by player");
-                }
                 monster.setPosition(oldX, oldY);
                 continue;
             }
 
-            // Check if the new position is occupied by another monster
-            boolean isOccupiedByAnotherMonster = false;
-            for (Monster otherMonster : monsterList) {
-                if (otherMonster != monster && otherMonster.getX() == newX && otherMonster.getY() == newY) {
-                    isOccupiedByAnotherMonster = true;
+            boolean occupied = false;
+            for (Monster other : monsterList) {
+                if (other != monster && other.getX() == newX && other.getY() == newY) {
+                    occupied = true;
                     break;
                 }
             }
 
-            // If the new position has another monster, revert the monster to its old position
-            if (isOccupiedByAnotherMonster) {
-                if (debug_mod_game) {
-                    System.out.println("Monster at (" + oldX + ", " + oldY + ") cannot move to (" + newX + ", " + newY + ") - position occupied by another monster");
-                }
+            if (occupied) {
                 monster.setPosition(oldX, oldY);
                 continue;
             }
 
-            // Get the tile type at the new position
             int tileValue = fieldMap[newY][newX];
             if (tileValue < 0) {
-                tileValue = baseMap[newY][newX]; // If a monster is present, get the underlying base map value
+                tileValue = baseMap[newY][newX];
             }
             TypeOfObjects tileType = TypeOfObjects.fromValue(tileValue);
 
-            // Check if the tile is walkable (FLOOR, HATCH, RIVER, or EMPTY)
-            if (tileType == TypeOfObjects.FLOOR || tileType == TypeOfObjects.FINISH_POINT || tileType == TypeOfObjects.RIVER || tileType == TypeOfObjects.EMPTY) {
-                // If the tile is a river, the monster dies
+            if (tileType.isWalkable()) {
                 if (tileType == TypeOfObjects.RIVER) {
-                    if (debug_mod_game)
-                        System.out.println("Monster at (" + oldX + ", " + oldY + ") stepped on RIVER at (" + newX + ", " + newY + ") - Monster dies");
-                    toRemove.add(monster); // Mark the monster for removal
+                    toRemove.add(monster);
                 }
+                // Good move — no action needed
             } else {
-                // If the tile is not walkable (e.g., MOUNTAIN, TREE), revert the monster to its old position
-                if (debug_mod_game)
-                    System.out.println("Monster cannot move to (" + newX + ", " + newY + ") - tile type: " + tileType);
                 monster.setPosition(oldX, oldY);
             }
         }
 
-        // Remove any monsters marked for removal (e.g., those that stepped on a river)
         removeMonsters(toRemove);
-
-        // Update the fieldMap with the remaining monsters
-        updateMapWithMonsters();
-
-        // Redraw the viewport to reflect the updated game state
-        updateCameraViewport();
     }
+
 
     /**
      * Shows the center menu popup at the center of the scene.

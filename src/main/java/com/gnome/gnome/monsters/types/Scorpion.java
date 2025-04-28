@@ -17,7 +17,7 @@ public class Scorpion extends Monster {
                 startY,
                 TypeOfObjects.SCORPION.getValue(),
                 new StraightMovement()
-                ,"tile_125.png");
+                ,TypeOfObjects.SCORPION.getImagePath(), "/com/gnome/gnome/effects/scorpion_damaged.gif");
     }
 
     @Override

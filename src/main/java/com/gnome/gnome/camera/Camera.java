@@ -65,6 +65,11 @@ public class Camera {
     public static Camera getInstance(int[][] fieldMap, int cameraCenterX, int cameraCenterY, Player player) {
         if (instance == null) {
             instance = new Camera(fieldMap, cameraCenterX, cameraCenterY, player);
+        } else {
+            instance.setMapGrid(fieldMap);
+            instance.setCameraCenterX(cameraCenterX);
+            instance.setCameraCenterY(cameraCenterY);
+            instance.setPlayer(player);
         }
         return instance;
     }
