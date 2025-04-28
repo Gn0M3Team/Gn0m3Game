@@ -4,7 +4,9 @@ import com.gnome.gnome.camera.Camera;
 import com.gnome.gnome.components.PlayerHealthBar;
 import com.gnome.gnome.continueGame.component.Coin;
 import com.gnome.gnome.continueGame.component.ObjectsConstants;
+import com.gnome.gnome.dao.MapDAO;
 import com.gnome.gnome.editor.utils.TypeOfObjects;
+import com.gnome.gnome.models.Map;
 import com.gnome.gnome.monsters.Monster;
 import com.gnome.gnome.monsters.MonsterFactory;
 import com.gnome.gnome.monsters.movements.FollowingMovement;
@@ -256,24 +258,29 @@ public class ContinueGameController implements Initializable {
      * @return A 2D integer array representing the initialized map.
      */
     private int[][] initMap(int rows, int cols) {
-        Random random = new Random();
-        int[][] map = new int[rows][cols];
+//        Random random = new Random();
+//        int[][] map = new int[rows][cols];
+//
+//        // Fill the map with random terrain tiles
+//        // Currently, only EMPTY tiles (value 0) are used for simplicity
+//        for (int row = 0; row < rows; row++) {
+//            for (int col = 0; col < cols; col++) {
+//                map[row][col] = 0;
+//            }
+//        }
+//
+//        // Add monsters to the monsterList (commented-out code shows examples of adding skeletons)
+//        // Currently, only one goblin is added at position (8, 8)
+//        monsterList.add(MonsterFactory.createMonster(TypeOfObjects.SKELETON, 10, 10));
+////        monsterList.add(MonsterFactory.createMonster(MonsterType.SKELETON, 5, 15));
+////        monsterList.add(MonsterFactory.createMonster(MonsterType.SKELETON, 8, 8));
+//        monsterList.add(MonsterFactory.createMonster(TypeOfObjects.GOBLIN, 8, 8));
 
-        // Fill the map with random terrain tiles
-        // Currently, only EMPTY tiles (value 0) are used for simplicity
-        for (int row = 0; row < rows; row++) {
-            for (int col = 0; col < cols; col++) {
-                map[row][col] = 0;
-            }
-        }
+        MapDAO mapDAO = new MapDAO();
+        List<Map> allLevelMaps = mapDAO.getAllLevelMaps();
+        Map selectedMap = allLevelMaps.get(1);
 
-        // Add monsters to the monsterList (commented-out code shows examples of adding skeletons)
-        // Currently, only one goblin is added at position (8, 8)
-        monsterList.add(MonsterFactory.createMonster(TypeOfObjects.SKELETON, 10, 10));
-//        monsterList.add(MonsterFactory.createMonster(MonsterType.SKELETON, 5, 15));
-//        monsterList.add(MonsterFactory.createMonster(MonsterType.SKELETON, 8, 8));
-        monsterList.add(MonsterFactory.createMonster(TypeOfObjects.GOBLIN, 8, 8));
-        return map;
+        return selectedMap.getMapData();
     }
 
     /**

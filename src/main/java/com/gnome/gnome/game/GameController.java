@@ -138,11 +138,13 @@ public class GameController {
         return GameController.instance;
     }
 
-    private GameController() {}
+    public GameController() {}
 
     private boolean debug_mod_game;
 
     public void initializeWithLoadedMap(int[][] mapData) {
+        System.out.println("----------------------------------------------");
+        System.out.println("MAP DATA: "+ Arrays.deepToString(mapData));
         setupProperties();
         this.baseMap = mapData;
         this.fieldMap = copyMap(baseMap);
@@ -212,7 +214,7 @@ public class GameController {
         for (int x = 0; x < fieldMap.length; x++) {
             for (int y = 0; y < fieldMap[x].length; y++) {
                 if (fieldMap[x][y] < 0) {
-                    Monster monster = MonsterFactory.createMonster(TypeOfObjects.fromValue(y), x, y);
+                    Monster monster = MonsterFactory.createMonster(TypeOfObjects.fromValue(fieldMap[x][y]), x, y);
                     monsterList.add(monster);
                 }
             }

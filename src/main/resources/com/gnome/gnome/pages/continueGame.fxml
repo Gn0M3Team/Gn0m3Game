@@ -6,6 +6,10 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.geometry.Insets?>
 
+<!--        fx:controller="com.gnome.gnome.continueGame.ContinueGameController"-->
+<!--        fx:controller="com.gnome.gnome.game.GameController"-->
+
+
 <BorderPane
         fx:id="rootBorder"
         prefHeight="600.0"
@@ -14,8 +18,8 @@
         stylesheets="@./css/continueGame.css"
         xmlns="http://javafx.com/javafx/17.0.2-ea"
         xmlns:fx="http://javafx.com/fxml/1"
-        fx:controller="com.gnome.gnome.continueGame.ContinueGameController"
->
+        fx:controller="com.gnome.gnome.game.GameController"
+        >
     <top>
         <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 10;">
             <Button fx:id="centerMenuButton" text="Show Menu" styleClass="menu-button"/>

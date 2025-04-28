@@ -77,6 +77,19 @@ public class MapDAO extends BaseDAO<Map> {
     }
 
     /**
+     * Retrieves a Map from the database by its Level.
+     *
+     * @param level the level of the Map to retrieve
+     * @return the Map object, or null if not found
+     * @throws DataAccessException if retrieval fails
+     */
+    public Map getMapByLevel(int level) {
+        String sql = "SELECT * FROM \"Maps\" WHERE level = ?";
+        List<Map> maps = findAll(sql, level);
+        return maps.isEmpty() ? null : maps.getFirst();
+    }
+
+    /**
      * Retrieves all Maps from the database created by the specified username.
      *
      * @param username the username of the map creator
@@ -99,6 +112,17 @@ public class MapDAO extends BaseDAO<Map> {
         String sql = "SELECT * FROM \"Maps\" WHERE map_name_eng = ? OR map_name_sk = ?";
         List<Map> maps = findAll(sql, mapName, mapName);
         return maps.isEmpty() ? null : maps.get(0);
+    }
+
+    /**
+     * Retrieves all level Maps from the database.
+     *
+     * @return a list of all Map objects, which has the level > 0, where each map's data is parsed into a 2D int array
+     * @throws DataAccessException if retrieval fails
+     */
+    public List<Map> getAllLevelMaps() {
+        String sql = "SELECT * FROM \"Maps\" WHERE level > 0 ORDER BY level";
+        return findAll(sql);
     }
 
     /**

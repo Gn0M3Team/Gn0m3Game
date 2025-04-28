@@ -17,6 +17,7 @@ module com.gnome.gnome {
     requires software.amazon.awssdk.awscore;
     requires jbcrypt;
 
+    opens com.gnome.gnome.game to javafx.fxml;
 
     opens com.gnome.gnome to javafx.fxml;
     exports com.gnome.gnome;
