@@ -53,30 +53,7 @@ public class HelloController {
      */
     @FXML
     public void initialize() {
-//        pageSwitch=new SwitchPage();
-//
-//        musicButton = new Button();
-//
-//        musicIcon.setImage(
-//                new Image(
-//                        Objects.requireNonNull(
-//                                getClass().getResourceAsStream("/com/gnome/gnome/images/musicicon.png")
-//                        )
-//                )
-//        );
-//
-//        User_test_for_creation();
-//        user_test();
-//
-//
-//        Platform.runLater(() -> {
-//            primaryStage = (Stage) .getScene().getWindow();
-//            mapLoader = new MapLoader(primaryStage);
-//        });
         pageSwitch = new SwitchPage();
-
-        // НЕ СОЗДАЕМ НОВУЮ КНОПКУ!!! Используем ту, что пришла из FXML
-        // musicButton = new Button(); ❌ Убрать эту строку!
 
         musicIcon.setImage(
                 new Image(
@@ -142,17 +119,6 @@ public class HelloController {
     @FXML
     protected void onNewGameButtonClick(ActionEvent event){
         pageSwitch.goNewGame(helloPage);
-    }
-
-    /**
-     * Placeholder for handling continue game logic (to be implemented).
-     */
-    @FXML
-    public void onContinueGameButtonClick(ActionEvent event) {
-        MapDAO levelMapDAO = new MapDAO();
-        Map selectedMap = levelMapDAO.getMapByLevel(1);
-//        pageSwitch.goContinueGame(helloPage);
-        mapLoader.showStartMap(selectedMap.getId());
     }
 
     /**

@@ -28,8 +28,6 @@ public class SceneSwitch {
             if (getClass().getResource(fxml) == null) {
                 throw new IOException("FXML file not found: " + fxml);
             }
-//            System.out.println(fxml);
-
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
             BorderPane nextBorderPane = loader.load();
 

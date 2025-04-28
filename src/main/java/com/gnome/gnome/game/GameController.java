@@ -2,7 +2,6 @@ package com.gnome.gnome.game;
 
 import com.gnome.gnome.camera.Camera;
 import com.gnome.gnome.components.PlayerHealthBar;
-import com.gnome.gnome.continueGame.ContinueGameController;
 import com.gnome.gnome.continueGame.component.Coin;
 import com.gnome.gnome.continueGame.component.ObjectsConstants;
 import com.gnome.gnome.editor.utils.TypeOfObjects;
@@ -96,8 +95,6 @@ public class GameController {
      */
     private final List<Arrow> activeArrows = new ArrayList<>();
 
-    private static final Logger logger = Logger.getLogger(ContinueGameController.class.getName());
-
     /**
      * Timer for updating monster behavior periodically.
      */
@@ -144,8 +141,6 @@ public class GameController {
     private boolean debug_mod_game;
 
     public void initializeWithLoadedMap(int[][] mapData) {
-        System.out.println("----------------------------------------------");
-        System.out.println("MAP DATA: "+ Arrays.deepToString(mapData));
         setupProperties();
         this.baseMap = mapData;
         this.fieldMap = copyMap(baseMap);
@@ -339,7 +334,6 @@ public class GameController {
                 case SPACE -> {
                     // Check if the gameObjectsPane is initialized (needed for attack effects)
                     if (gameObjectsPane == null) {
-                        System.err.println("Error: gameObjectsPane is null when trying to attack");
                         return;
                     }
                     // Show a visual indicator of the player's attack range (1 tile in all directions)
@@ -816,7 +810,6 @@ public class GameController {
                     Stage stage = (Stage) centerMenuButton.getScene().getWindow();
                     stage.getScene().setRoot(mainRoot);
                 } catch (IOException ex) {
-                    logger.severe("Failed to load main page: " + ex.getMessage());
                     ex.printStackTrace();
                 }
                 centerMenuPopup.hide();

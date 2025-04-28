@@ -41,9 +41,6 @@ module com.gnome.gnome {
     opens com.gnome.gnome.profile to javafx.fxml;
     exports com.gnome.gnome.profile;
 
-    opens com.gnome.gnome.continueGame to javafx.fxml;
-    exports com.gnome.gnome.continueGame;
-
     exports com.gnome.gnome.dao.userDAO;
     opens com.gnome.gnome.dao.userDAO to javafx.fxml;
 
