@@ -223,7 +223,11 @@ public class GameController {
         monsterList.clear();
         coinsOnMap.clear();
         activeArrows.clear();
+
+        // ← clear out the old GameController singleton too:
+        GameController.instance = null;
     }
+
 
     private void setupMap() {
         for (int row = 0; row < baseMap.length; row++) {
@@ -795,6 +799,7 @@ public class GameController {
             // Define the action for "Go Back" (loads the main menu scene)
             goBackButton.setOnAction(e -> {
                 try {
+                    onSceneExit();
                     URL fxmlUrl = getClass().getResource("/com/gnome/gnome/pages/main-menu.fxml");
                     Parent mainRoot = FXMLLoader.load(Objects.requireNonNull(fxmlUrl));
                     Stage stage = (Stage) centerMenuButton.getScene().getWindow();
@@ -876,14 +881,25 @@ public class GameController {
     private void restartGame() {
         try {
             onSceneExit();
-            URL fxmlUrl = getClass().getResource("/com/gnome/gnome/pages/game.fxml");
-            Parent newRoot = FXMLLoader.load(Objects.requireNonNull(fxmlUrl));
+
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/gnome/gnome/pages/game.fxml")
+            );
+
+            Parent newRoot = loader.load();
+
+            GameController ctrl = loader.getController();
+
+            ctrl.initializeWithLoadedMap(this.baseMap);
+
             Stage stage = (Stage) rootBorder.getScene().getWindow();
             stage.getScene().setRoot(newRoot);
+
         } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
+
 
 
 }
