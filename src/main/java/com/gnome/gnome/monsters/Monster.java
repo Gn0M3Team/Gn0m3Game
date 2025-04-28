@@ -242,19 +242,16 @@ public abstract class Monster {
      * @param cameraStartRow The starting row of the camera's viewport (used for positioning the effect).
      * @param onFinish A callback function (Runnable) that is executed when the hit effect animation finishes.
      */
-    // In Monster.java, replace showHitEffect(...) with:
     public void showHitEffect(Pane gameObjectsPane,
                               int cameraStartCol,
                               int cameraStartRow,
                               Runnable onFinish) {
-        if (gameObjectsPane == null) {
+        if (representation == null) {
             if (onFinish != null) onFinish.run();
             return;
         }
-        isHitEffectPlaying = true;
 
-        // get current tile size
-        double ts = Camera.getInstance(null,0,0,null).getDynamicTileSize();
+        isHitEffectPlaying = true;
 
         InputStream gifStream = getClass().getResourceAsStream(hitGifPath);
         if (gifStream == null) {
@@ -264,31 +261,20 @@ public abstract class Monster {
             return;
         }
 
-        ImageView effectView = new ImageView(new Image(gifStream));
-        effectView.setFitWidth(ts);
-        effectView.setFitHeight(ts);
+        Image gifImage = new Image(gifStream);
+        Image originalImage = ((ImageView) representation).getImage();
 
-        // store grid coords instead of pixel absoluteX/Y
-        effectView.getProperties().put("gridX", x);
-        effectView.getProperties().put("gridY", y);
-
-        // position initially via layoutX/Y
-        effectView.setTranslateX((x - cameraStartCol) * ts);
-        effectView.setTranslateY((y - cameraStartRow) * ts);
-
-        effectView.toFront();
-        effectView.setMouseTransparent(true);
-
-        gameObjectsPane.getChildren().add(effectView);
+        ((ImageView) representation).setImage(gifImage);
 
         PauseTransition delay = new PauseTransition(Duration.seconds(1));
         delay.setOnFinished(evt -> {
-            gameObjectsPane.getChildren().remove(effectView);
+            ((ImageView) representation).setImage(originalImage);
             isHitEffectPlaying = false;
             if (onFinish != null) onFinish.run();
         });
         delay.play();
     }
+
 
 
 

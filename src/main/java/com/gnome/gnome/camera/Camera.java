@@ -74,6 +74,14 @@ public class Camera {
         return instance;
     }
 
+    public static Camera getInstance() {
+        if (instance == null) {
+               throw new IllegalStateException("Camera not initialized");
+        }
+
+        return instance;
+    }
+
     /**
      * Reset instance
      */
