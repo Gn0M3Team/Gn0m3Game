@@ -25,7 +25,7 @@ public class Camera {
                              // corresponding to a particular type of tile (for example, 0 for floor, -1 for goblin, etc.)
     private int cameraCenterX; //    X-coordinate of the camera centre (in tiles, not pixels). This is usually the player's X position
     private int cameraCenterY; // Y coordinate of the camera centre (in tiles). This is usually the player's Y position
-    private final int viewportSize = 15; // The size of the viewport in tiles. The camera always displays a 15x15 tile square
+    private final int viewportSize = 20; // The size of the viewport in tiles. The camera always displays a 15x15 tile square
                                          // This means that we see 15 tiles in width and 15 in height
     private int startRow; // The starting line (Y) of the map, from which we start drawing tiles in the preview window
     private int startCol; // The initial column (X) of the map from which we start drawing tiles in the preview window
@@ -84,104 +84,81 @@ public class Camera {
      * @param coins A list of coins to display if they are in the visible area.
      */
     public void drawViewport(Canvas canvas, List<Coin> coins) {
-        // 🧠 New TILE_SIZE based on canvas width
-        this.dynamicTileSize = canvas.getWidth() / viewportSize;
+        // Підрахунок ширини і висоти одного тайла
+        double tileWidth = canvas.getWidth() / viewportSize;
+        double tileHeight = canvas.getHeight() / viewportSize;
+        this.dynamicTileSize = Math.min(tileWidth, tileHeight); // Для гравця
 
-        // We get a GraphicsContext, which is a tool for drawing on Canvas
-        // We use it to draw tiles, frames, coins, etc
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
-        // Get the size of the map (number of rows and columns)
-        int totalRows = mapGrid.length; // Number of lines in the map
-        int totalCols = mapGrid[0].length; // Number of columns in the map
+        int totalRows = mapGrid.length;
+        int totalCols = mapGrid[0].length;
 
-        // Calculate half the size of the viewport (viewportSize / 2)
-        // This is necessary to determine which map tiles we will draw (depending on the camera centre)
         int half = viewportSize / 2;
 
-        // Calculate the starting row (startRow) and column (startCol) for drawing
-        // We want the centre of the camera (cameraCenterX, cameraCenterY) to be in the centre of the viewport
-        // - Math.max(0, ...) ensures that we do not go beyond the map on the left or top (do not draw negative coordinates)
-        // - Math.min(..., totalRows - viewportSize) ensures that we don't go beyond the map on the right or bottom
         startRow = Math.max(0, Math.min(cameraCenterY - half, totalRows - viewportSize));
         startCol = Math.max(0, Math.min(cameraCenterX - half, totalCols - viewportSize));
 
-        // Clear the entire Canvas before drawing to remove previous content
-        // This prevents old images from overlapping with new ones
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-        // Go through all the tiles in the visible area (15x15) and draw them
-        for (int i = 0; i < viewportSize; i++) { // Loop through the lines of the viewport
-            for (int j = 0; j < viewportSize; j++) { // Loop through the columns of the viewport
-                // Calculate the real coordinates of the tile on the map:
-                int row = startRow + i; // Real line on the map
-                int col = startCol + j; // Real column on the map
+        for (int i = 0; i < viewportSize; i++) {
+            for (int j = 0; j < viewportSize; j++) {
+                int row = startRow + i;
+                int col = startCol + j;
 
-                // Calculate the coordinates in pixels for drawing tiles on Canvas:
-                // Each tile has a size of TILE_SIZE x TILE_SIZE (50x50 pixels)
-                double x = j * dynamicTileSize;
-                double y = i * dynamicTileSize;
+                double x = j * tileWidth;
+                double y = i * tileHeight;
 
-                // Check if the tile coordinates are within the map
                 if (row >= 0 && row < totalRows && col >= 0 && col < totalCols) {
-                    // If the tile is within the map, determine its type
-                    // The mapGrid[row][col] contains a number representing the type of tile
                     TypeOfObjects type = TypeOfObjects.fromValue(mapGrid[row][col]);
-
-                    // Fetch the image for this tile type from the cache (or load it if it is not already in the cache)
                     Image tileImage = getCachedImage(type.getImagePath());
 
-                    // If the image is successfully uploaded, draw it on Canvas
                     if (tileImage != null) {
-                        // Draw the tile image at the coordinates (x, y) with the size TILE_SIZE x TILE_SIZE
-                        gc.drawImage(tileImage, x, y, dynamicTileSize, dynamicTileSize);
+                        gc.drawImage(tileImage, x, y, tileWidth, tileHeight); // ⚡ правильні пропорції
                     } else {
-                        // If the image fails to load, draw a grey square as a backup
-                        gc.setFill(Color.GRAY); // Set the fill colour to grey
-                        gc.fillRect(x, y, dynamicTileSize, dynamicTileSize);
+                        gc.setFill(Color.GRAY);
+                        gc.fillRect(x, y, tileWidth, tileHeight);
                     }
                 } else {
                     Image outOfMapImage = getCachedImage(TypeOfObjects.MOUNTAIN.getImagePath());
                     if (outOfMapImage != null) {
-                        gc.drawImage(outOfMapImage, x, y, dynamicTileSize, dynamicTileSize);
+                        gc.drawImage(outOfMapImage, x, y, tileWidth, tileHeight);
                     } else {
                         gc.setFill(Color.DARKGRAY);
-                        gc.fillRect(x, y, dynamicTileSize, dynamicTileSize);
+                        gc.fillRect(x, y, tileWidth, tileHeight);
                     }
                 }
 
                 gc.setStroke(Color.BLACK);
                 gc.setLineWidth(1);
-                gc.strokeRect(x, y, dynamicTileSize, dynamicTileSize);
+                gc.strokeRect(x, y, tileWidth, tileHeight);
             }
         }
 
-        // Draw coins (Coin) that are in the visible area
+        // Малюємо монети
         for (Coin coin : coins) {
-            // Get the coordinates of the coin on the map (in tiles)
-            int gx = coin.getGridX(), gy = coin.getGridY();
+            int gx = coin.getGridX();
+            int gy = coin.getGridY();
 
-            // Check that the coin is in the visible area (15x15 tiles)
             if (gx >= startCol && gx < startCol + viewportSize &&
                     gy >= startRow && gy < startRow + viewportSize) {
-                // If the coin is visible, we get its image and dimensions
-                Image img = coin.getImageView().getImage(); //  Image of the coin
-                double w = coin.getImageView().getFitWidth(); // The width of the coin image
-                double h = coin.getImageView().getFitHeight(); // The height of the coin image
 
-                double ox = (dynamicTileSize - w) / 2;
-                double oy = (dynamicTileSize - h) / 2;
-                double px = (gx - startCol) * dynamicTileSize + ox;
-                double py = (gy - startRow) * dynamicTileSize + oy;
+                Image img = coin.getImageView().getImage();
+                double w = coin.getImageView().getFitWidth();
+                double h = coin.getImageView().getFitHeight();
 
-                // Draw an image of the coin on Canvas
+                double ox = (tileWidth - w) / 2;
+                double oy = (tileHeight - h) / 2;
+                double px = (gx - startCol) * tileWidth + ox;
+                double py = (gy - startRow) * tileHeight + oy;
+
                 gc.drawImage(img, px, py, w, h);
             }
         }
 
-        double boxSize = 70;
-        double padding = 20;
-
+        // Малюємо кнопки Armor / Sword
+        double boxSize = canvas.getWidth() * 0.08;
+        double padding = canvas.getWidth() * 0.02;
         double canvasWidth = canvas.getWidth();
         double canvasHeight = canvas.getHeight();
 
@@ -192,7 +169,6 @@ public class Camera {
                 boxSize + 20,
                 boxSize * 2 + 40
         );
-
 
         gc.setFill(Color.LIGHTBLUE);
         gc.fillRect(
@@ -224,6 +200,7 @@ public class Camera {
                 canvasHeight - boxSize - padding + 10
         );
     }
+
 
     /**
      * Returns a cached image; if it’s not already loaded, loads it from the resource.
@@ -261,7 +238,7 @@ public class Camera {
      * so that the viewport doesn't go out of bounds.
      */
     private void clampCameraCenter() {
-        int half = viewportSize / 2; // Calculate half the size of the viewport (viewportSize / 2)
+        int halfViewport = viewportSize / 2; // Calculate half the size of the viewport (viewportSize / 2)
 
         int totalCols = mapGrid[0].length; // Number of columns
         int totalRows = mapGrid.length; // Number of lines
@@ -269,10 +246,8 @@ public class Camera {
         // Bound cameraCenterX so that the viewport does not extend beyond the map:
         // - Math.max(half, ...) ensures that the centre is not too close to the left edge (so as not to show negative coordinates)
         // - Math.min(..., totalCols - viewportSize + half) ensures that the centre is not too close to the right edge
-        cameraCenterX = Math.max(half, Math.min(cameraCenterX, totalCols - viewportSize + half));
-
-        // Similarly, we constrain cameraCenterY for the top and bottom edges of the map
-        cameraCenterY = Math.max(half, Math.min(cameraCenterY, totalRows - viewportSize + half));
+        cameraCenterX = Math.max(halfViewport, Math.min(cameraCenterX, totalCols - halfViewport));
+        cameraCenterY = Math.max(halfViewport, Math.min(cameraCenterY, totalRows - halfViewport));
     }
 
 }

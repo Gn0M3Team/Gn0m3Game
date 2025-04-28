@@ -1,6 +1,9 @@
 package com.gnome.gnome;
 
+import com.gnome.gnome.dao.MapDAO;
 import com.gnome.gnome.dao.userDAO.AuthUserDAO;
+import com.gnome.gnome.game.MapLoader;
+import com.gnome.gnome.models.Map;
 import com.gnome.gnome.models.user.AuthUser;
 import com.gnome.gnome.music.MusicWizard;
 import com.gnome.gnome.dao.userDAO.UserSession;
@@ -8,6 +11,7 @@ import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import com.gnome.gnome.components.LeaderBoardView;
 import javafx.animation.FadeTransition;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -15,6 +19,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.util.Objects;
@@ -29,10 +34,18 @@ public class HelloController {
     @FXML
     private Button editorButton;
     @FXML
+    private Button continueGameButton;
+    @FXML
     private Label nicknameLabel;
+
     private PageSwitcherInterface pageSwitch;
     private LeaderBoardView leaderboard;
     private final AuthUserDAO userDAO = new AuthUserDAO();
+
+    Stage primaryStage;
+
+    MapLoader mapLoader;
+
 
     /**
      * Initializes the controller and sets the music icon for the button.
@@ -40,9 +53,30 @@ public class HelloController {
      */
     @FXML
     public void initialize() {
-        pageSwitch=new SwitchPage();
+//        pageSwitch=new SwitchPage();
+//
+//        musicButton = new Button();
+//
+//        musicIcon.setImage(
+//                new Image(
+//                        Objects.requireNonNull(
+//                                getClass().getResourceAsStream("/com/gnome/gnome/images/musicicon.png")
+//                        )
+//                )
+//        );
+//
+//        User_test_for_creation();
+//        user_test();
+//
+//
+//        Platform.runLater(() -> {
+//            primaryStage = (Stage) .getScene().getWindow();
+//            mapLoader = new MapLoader(primaryStage);
+//        });
+        pageSwitch = new SwitchPage();
 
-        musicButton = new Button();
+        // НЕ СОЗДАЕМ НОВУЮ КНОПКУ!!! Используем ту, что пришла из FXML
+        // musicButton = new Button(); ❌ Убрать эту строку!
 
         musicIcon.setImage(
                 new Image(
@@ -56,8 +90,21 @@ public class HelloController {
         user_test();
 
         musicButton.setGraphic(musicIcon);
-
     }
+
+    public void setPrimaryStage(Stage primaryStage) {
+        this.primaryStage = primaryStage;
+        this.mapLoader = new MapLoader(primaryStage);
+
+        continueGameButton.setOnAction(e -> {
+            if (mapLoader != null) {
+                MapDAO levelMapDAO = new MapDAO();
+                Map selectedMap = levelMapDAO.getMapByLevel(1);
+                mapLoader.showStartMap(selectedMap.getId());
+            }
+        });
+    }
+
     /**
      * Checks if there is a current user. If not, sets a default user (Admin).
      */
@@ -102,7 +149,10 @@ public class HelloController {
      */
     @FXML
     public void onContinueGameButtonClick(ActionEvent event) {
-        pageSwitch.goContinueGame(helloPage);
+        MapDAO levelMapDAO = new MapDAO();
+        Map selectedMap = levelMapDAO.getMapByLevel(1);
+//        pageSwitch.goContinueGame(helloPage);
+        mapLoader.showStartMap(selectedMap.getId());
     }
 
     /**

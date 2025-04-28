@@ -4,6 +4,7 @@ import com.gnome.gnome.camera.Camera;
 import com.gnome.gnome.components.PlayerHealthBar;
 import com.gnome.gnome.continueGame.ContinueGameController;
 import com.gnome.gnome.continueGame.component.Coin;
+import com.gnome.gnome.continueGame.component.ObjectsConstants;
 import com.gnome.gnome.editor.utils.TypeOfObjects;
 import com.gnome.gnome.monsters.Monster;
 import com.gnome.gnome.monsters.MonsterFactory;
@@ -17,12 +18,15 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
@@ -61,11 +65,6 @@ public class GameController {
      * The canvas used for rendering the visible portion of the map.
      */
     private Canvas viewportCanvas;
-
-    /**
-     * Label showing the number of coins collected by the player.
-     */
-    @FXML private Label coinCountLabel;
 
     /**
      * The initial game map (static terrain).
@@ -130,6 +129,8 @@ public class GameController {
      */
     private VBox gameOverOverlay;
 
+    private Image coinImage;
+
     private static GameController instance; //Singleton Instance
 
     public static GameController getGameController(){
@@ -138,11 +139,13 @@ public class GameController {
         return GameController.instance;
     }
 
-    private GameController() {}
+    public GameController() {}
 
     private boolean debug_mod_game;
 
     public void initializeWithLoadedMap(int[][] mapData) {
+        System.out.println("----------------------------------------------");
+        System.out.println("MAP DATA: "+ Arrays.deepToString(mapData));
         setupProperties();
         this.baseMap = mapData;
         this.fieldMap = copyMap(baseMap);
@@ -154,34 +157,37 @@ public class GameController {
         updateMapWithMonsters(); // Update the field map with monster positions
         instance = this; //Fill singleton instance ONLY on initialization. BECAUSE OTHERWISE THERE IS NO DATA THAT IS REQUIRED IN OTHER CLASSES
 
-        // Set up the viewport (the visible 15x15 tile area of the map)
-        double vw = 15 * TILE_SIZE; // Viewport width: 15 tiles * TILE_SIZE (e.g., 15 * 50 = 750 pixels)
-        double vh = 15 * TILE_SIZE; // Viewport height: 15 tiles * TILE_SIZE (e.g., 15 * 50 = 750 pixels)
+        viewportCanvas = new Canvas();
 
-        // Create a Canvas to render the map (tiles, monsters, etc.)
-        viewportCanvas = new Canvas(vw, vh);
+        BorderPane.setAlignment(centerStack, Pos.CENTER);
+        BorderPane.setMargin(centerStack, new Insets(0));
 
-        // Create a Pane to hold dynamic game objects (e.g., player, coins, effects)
+        // Центр займає всю доступну ширину і висоту
+        centerStack.prefWidthProperty().bind(rootBorder.widthProperty());
+        centerStack.prefHeightProperty().bind(rootBorder.heightProperty());
+        centerStack.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE); // <-- Додаємо обов'язково
+
+        // Явно вставляємо в центр BorderPane
+        rootBorder.setCenter(centerStack);
+
+        // Створюємо Canvas без фіксованого розміру
+        viewportCanvas = new Canvas();
+        viewportCanvas.widthProperty().bind(centerStack.widthProperty());
+        viewportCanvas.heightProperty().bind(centerStack.heightProperty());
+
+    // Pane для об'єктів
         gameObjectsPane = new Pane();
-        gameObjectsPane.setPrefSize(vw, vh); // Set the size of the Pane to match the viewport
-        gameObjectsPane.setPickOnBounds(false); // Allow mouse events to pass through the Pane to the elements below it
+        gameObjectsPane.prefWidthProperty().bind(centerStack.widthProperty());
+        gameObjectsPane.prefHeightProperty().bind(centerStack.heightProperty());
+        gameObjectsPane.setPickOnBounds(false);
 
-        // Create a root Pane to hold both the Canvas (map) and the gameObjectsPane (dynamic objects)
+        // Комбінуємо канвас і об'єкти
         Pane viewportRoot = new Pane(viewportCanvas, gameObjectsPane);
-        viewportRoot.setPrefSize(vw, vh); // Set the size of the root Pane to match the viewport;
 
-        // Configure the centerStack to center the viewport in the window
-//        centerStack.setPrefSize(Double.MAX_VALUE, Double.MAX_VALUE); // Allow the StackPane to grow to fill available space
-        centerStack.setAlignment(Pos.CENTER); // Center its children (the viewportRoot)
-        centerStack.getChildren().setAll(viewportRoot); // Add the viewportRoot to the StackPane
-        StackPane.setAlignment(viewportRoot, Pos.CENTER); // Ensure the viewportRoot is centered within the StackPane
+        // Додаємо в centerStack
+        centerStack.getChildren().setAll(viewportRoot);
+        centerStack.setAlignment(viewportRoot, Pos.CENTER);
 
-//        viewportRoot.layoutXProperty().bind(
-//                centerStack.widthProperty().subtract(vw).divide(2)
-//        );
-//        viewportRoot.layoutYProperty().bind(
-//                centerStack.heightProperty().subtract(vh).divide(2)
-//        );
 
         // Initialize the player's health bar and add it to the UI
         healthBar = new PlayerHealthBar(200, 20); // Create a health bar (200 pixels wide, 20 pixels tall)
@@ -190,7 +196,7 @@ public class GameController {
 
         // Add a coin to the map at position (9, 9) with a value of 100
         coinsOnMap.add(new Coin(9, 9, 100));
-        updateCoinLabel(); // Update the coin counter label to show the player's initial coin count (0)
+        drawCoinCounter(); // Update the coin counter label to show the player's initial coin count (0)
 
         // Set up the center menu button to show the popup menu when clicked
         centerMenuButton.setOnAction(e -> showCenterMenu());
@@ -208,11 +214,21 @@ public class GameController {
         updateCameraViewport();
     }
 
+    private void onSceneExit() {
+        Camera.resetInstance();
+        Player.resetInstance();
+        viewportCanvas = null;
+        monsterList.clear();
+        coinsOnMap.clear();
+        activeArrows.clear();
+        monsterMovementTimer = null;
+    }
+
     private void setupMap() {
         for (int x = 0; x < fieldMap.length; x++) {
             for (int y = 0; y < fieldMap[x].length; y++) {
                 if (fieldMap[x][y] < 0) {
-                    Monster monster = MonsterFactory.createMonster(TypeOfObjects.fromValue(y), x, y);
+                    Monster monster = MonsterFactory.createMonster(TypeOfObjects.fromValue(fieldMap[x][y]), x, y);
                     monsterList.add(monster);
                 }
             }
@@ -435,17 +451,10 @@ public class GameController {
         // Remove all collected coins from the map
         coinsOnMap.removeAll(collected);
         // Update the coin counter label to reflect the new total
-        updateCoinLabel();
+        drawCoinCounter();
     }
 
-    /**
-     * Updates the coin counter label to reflect collected coins.
-     */
-    private void updateCoinLabel() {
-        if (coinCountLabel != null) {
-            coinCountLabel.setText("Coins: " + player.getPlayerCoins());
-        }
-    }
+
 
     /**
      * Removes the specified monsters from the game and replaces them with coins.
@@ -478,45 +487,64 @@ public class GameController {
      * This includes drawing the map, updating the player's position, repositioning effects, and updating UI elements.
      */
     private void updateCameraViewport() {
-        // Update the camera's center to follow the player
         camera.updateCameraCenter();
-
-        // Draw the viewport on the canvas, including the map tiles and coins
         camera.drawViewport(viewportCanvas, coinsOnMap);
 
-        // Add the player to the gameObjectsPane if not already added
+        player.setDynamicTileSize(camera.getDynamicTileSize());
+        player.updatePositionWithCamera(camera.getStartCol(), camera.getStartRow());
+
         if (!gameObjectsPane.getChildren().contains(player.getRepresentation())) {
             gameObjectsPane.getChildren().add(player.getRepresentation());
         }
 
-        // Always update player position based on camera offset
-        player.updatePositionWithCamera(camera.getStartCol(), camera.getStartRow());
-
-        // Update the positions of all effects (e.g., hit effects, attack animations) in the gameObjectsPane
-        // Effects have absolute coordinates stored in their properties, which are adjusted based on the camera's position
         for (var node : gameObjectsPane.getChildren()) {
             if (node instanceof ImageView effectView) {
-                // Check if the node is an effect (e.g., a GIF) with absolute coordinates
                 Object absoluteX = effectView.getProperties().get("absoluteX");
                 Object absoluteY = effectView.getProperties().get("absoluteY");
-                if (absoluteX instanceof Double && absoluteY instanceof Double) {
-                    double absX = (Double) absoluteX; // Absolute X position in pixels
-                    double absY = (Double) absoluteY; // Absolute Y position in pixels
-                    // Adjust the effect's position relative to the camera's viewport
-                    effectView.setTranslateX(absX - (camera.getStartCol() * TILE_SIZE));
-                    effectView.setTranslateY(absY - (camera.getStartRow() * TILE_SIZE));
+                if (absoluteX instanceof Double absX && absoluteY instanceof Double absY) {
+                    double offsetX = (absX - camera.getStartCol()) * camera.getDynamicTileSize();
+                    double offsetY = (absY - camera.getStartRow()) * camera.getDynamicTileSize();
+                    effectView.setTranslateX(offsetX);
+                    effectView.setTranslateY(offsetY);
                 }
             }
         }
 
-        // Update the camera offset for all active arrows (shot by skeletons) to ensure they are positioned correctly
         for (Arrow arrow : activeArrows) {
             arrow.updateCameraOffset(camera.getStartCol(), camera.getStartRow());
         }
 
-        // Update the coin counter label and health bar to reflect the current game state
-        updateCoinLabel();
+        drawCoinCounter();
         updatePlayerHealthBar();
+    }
+
+    private void drawCoinCounter() {
+        GraphicsContext gc = viewportCanvas.getGraphicsContext2D();
+        double canvasWidth = viewportCanvas.getWidth();
+        double canvasHeight = viewportCanvas.getHeight();
+        double padding = 20;
+
+        double panelWidth = viewportCanvas.getWidth() * 0.15;
+        double panelHeight = viewportCanvas.getHeight() * 0.07;
+
+        double panelX = padding;
+        double panelY = canvasHeight - panelHeight - padding;
+
+        gc.setFill(Color.color(0, 0, 0, 0.5));
+        gc.fillRoundRect(panelX, panelY, panelWidth, panelHeight, 15, 15);
+
+        if (coinImage == null) {
+            coinImage = new Image(Objects.requireNonNull(
+                    Coin.class.getResourceAsStream("/com/gnome/gnome/images/tiles/" + ObjectsConstants.COIN_IMAGE)
+            ));
+        }
+
+        double coinSize = viewportCanvas.getWidth() * 0.05;
+        gc.drawImage(coinImage, panelX + 10, panelY + (panelHeight - coinSize) / 2, coinSize, coinSize);
+
+        gc.setFill(Color.WHITE);
+        gc.setFont(javafx.scene.text.Font.font(20));
+        gc.fillText("x " + player.getPlayerCoins(), panelX + 50, panelY + panelHeight / 2 + 7);
     }
 
     /**
@@ -863,7 +891,8 @@ public class GameController {
      */
     private void restartGame() {
         try {
-            URL fxmlUrl = getClass().getResource("/com/gnome/gnome/pages/continue-game.fxml");
+            onSceneExit();
+            URL fxmlUrl = getClass().getResource("/com/gnome/gnome/pages/game.fxml");
             Parent newRoot = FXMLLoader.load(Objects.requireNonNull(fxmlUrl));
             Stage stage = (Stage) rootBorder.getScene().getWindow();
             stage.getScene().setRoot(newRoot);

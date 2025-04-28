@@ -282,7 +282,7 @@ public abstract class Monster {
 
             // Load the attack effect GIF (among-us.gif) to display during the attack
             // Objects.requireNonNull ensures the image resource exists, or it throws an exception
-            Image attackEffectImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/gnome/gnome/effects/among-us.gif")));
+            Image attackEffectImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/gnome/gnome/effects/red_monster.gif")));
             // Create an ImageView to display the attack effect GIF
             ImageView attackEffectView = new ImageView(attackEffectImage);
             attackEffectView.setFitWidth(TILE_SIZE); // Set the width of the GIF to match the tile size (50 pixels)
