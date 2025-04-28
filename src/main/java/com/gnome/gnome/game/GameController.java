@@ -150,8 +150,10 @@ public class GameController {
 
         setupMap();
 
+
         player      = Player.getInstance(15, 15, PLAYER_MAX_HEALTH); // Create a player at position (15, 15) with 100 health
         camera      = Camera.getInstance(fieldMap, player.getX(), player.getY(), player, armor, weapon, potion); // Initialize the camera to follow the player
+
         updateMapWithMonsters(); // Update the field map with monster positions
         instance = this; //Fill singleton instance ONLY on initialization. BECAUSE OTHERWISE THERE IS NO DATA THAT IS REQUIRED IN OTHER CLASSES
 
@@ -172,6 +174,8 @@ public class GameController {
         viewportCanvas = new Canvas();
         viewportCanvas.widthProperty().bind(centerStack.widthProperty());
         viewportCanvas.heightProperty().bind(centerStack.heightProperty());
+        viewportCanvas.setFocusTraversable(true);
+        viewportCanvas.requestFocus();
 
     // Pane для об'єктів
         gameObjectsPane = new Pane();
@@ -184,7 +188,7 @@ public class GameController {
 
         // Додаємо в centerStack
         centerStack.getChildren().setAll(viewportRoot);
-        centerStack.setAlignment(viewportRoot, Pos.CENTER);
+        StackPane.setAlignment(viewportRoot, Pos.CENTER);
 
 
         // Initialize the player's health bar and add it to the UI
@@ -213,25 +217,38 @@ public class GameController {
     }
 
     private void onSceneExit() {
+        monsterMovementTimer = null;
         Camera.resetInstance();
         Player.resetInstance();
         viewportCanvas = null;
         monsterList.clear();
         coinsOnMap.clear();
         activeArrows.clear();
-        monsterMovementTimer = null;
+
+        // ← clear out the old GameController singleton too:
+        GameController.instance = null;
     }
 
+
     private void setupMap() {
-        for (int x = 0; x < fieldMap.length; x++) {
-            for (int y = 0; y < fieldMap[x].length; y++) {
-                if (fieldMap[x][y] < 0) {
-                    Monster monster = MonsterFactory.createMonster(TypeOfObjects.fromValue(fieldMap[x][y]), x, y);
-                    monsterList.add(monster);
+        for (int row = 0; row < baseMap.length; row++) {
+            for (int col = 0; col < baseMap[row].length; col++) {
+                int tile = baseMap[row][col];
+
+                if (tile == TypeOfObjects.START_POINT.getValue()) {
+                    player = Player.getInstance(col, row, PLAYER_MAX_HEALTH);
+                    baseMap[row][col] = TypeOfObjects.FLOOR.getValue();
+                }
+
+                if (tile < 0) {
+                    Monster m = MonsterFactory
+                            .createMonster(TypeOfObjects.fromValue(tile), col, row);
+                    monsterList.add(m);
                 }
             }
         }
     }
+
 
     /**
      * Loads properties from the app.properties file to configure the game.
@@ -339,8 +356,6 @@ public class GameController {
                     if (gameObjectsPane == null) {
                         return;
                     }
-                    // Show a visual indicator of the player's attack range (1 tile in all directions)
-                    showAttackRange(1, camera.getStartCol(), camera.getStartRow());
                     // Perform the attack, dealing 20 damage to monsters within 1 tile
                     // The callback removes any monsters that are killed by the attack
                     player.attack(monsterList, 1, 20, gameObjectsPane, camera.getStartCol(), camera.getStartRow(), monster -> {
@@ -378,7 +393,7 @@ public class GameController {
                 TypeOfObjects tileType = TypeOfObjects.fromValue(tileValue);
 
                 // Check if the tile is walkable (FLOOR, HATCH, RIVER, or EMPTY)
-                if (tileType == TypeOfObjects.FLOOR || tileType == TypeOfObjects.FINISH_POINT || tileType == TypeOfObjects.RIVER || tileType == TypeOfObjects.EMPTY) {
+                if (tileType.isWalkable()) {
                     // Update the player's position based on the direction of movement
                     if (newX < oldX) player.moveLeft();
                     else if (newX > oldX) player.moveRight();
@@ -451,6 +466,25 @@ public class GameController {
         drawCoinCounter();
     }
 
+    private void drawAttackRange(GraphicsContext gc, int range) {
+        double tw = camera.getTileWidth();
+        double th = camera.getTileHeight();
+        int c0 = camera.getStartCol();
+        int r0 = camera.getStartRow();
+        int baseX = player.getX() - c0;
+        int baseY = player.getY() - r0;
+
+        gc.setFill(Color.color(1, 0, 0, 0.3));
+        for (int dx = -range; dx <= range; dx++) {
+            for (int dy = -range; dy <= range; dy++) {
+                double x = (baseX + dx) * tw;
+                double y = (baseY + dy) * th;
+                gc.fillRect(x, y, tw, th);
+            }
+        }
+    }
+
+
 
 
     /**
@@ -484,11 +518,21 @@ public class GameController {
      * This includes drawing the map, updating the player's position, repositioning effects, and updating UI elements.
      */
     private void updateCameraViewport() {
+        GraphicsContext gc = viewportCanvas.getGraphicsContext2D();
         camera.updateCameraCenter();
         camera.drawViewport(viewportCanvas, coinsOnMap);
+        drawAttackRange(gc, 1);
+        double tw = camera.getTileWidth();
+        double th = camera.getTileHeight();
 
-        player.setDynamicTileSize(camera.getDynamicTileSize());
-        player.updatePositionWithCamera(camera.getStartCol(), camera.getStartRow());
+        player.setDynamicTileSize(Math.min(tw, th));
+        player.updatePositionWithCamera(
+                camera.getStartCol(),
+                camera.getStartRow(),
+                tw,
+                th
+        );
+
 
         if (!gameObjectsPane.getChildren().contains(player.getRepresentation())) {
             gameObjectsPane.getChildren().add(player.getRepresentation());
@@ -521,8 +565,8 @@ public class GameController {
         double canvasHeight = viewportCanvas.getHeight();
         double padding = 20;
 
-        double panelWidth = viewportCanvas.getWidth() * 0.15;
-        double panelHeight = viewportCanvas.getHeight() * 0.07;
+        double panelWidth = canvasWidth * 0.15;
+        double panelHeight = canvasHeight * 0.07;
 
         double panelX = padding;
         double panelY = canvasHeight - panelHeight - padding;
@@ -594,59 +638,6 @@ public class GameController {
         // Start the game loop
         monsterMovementTimer.start();
     }
-
-    /**
-     * Displays a visual indicator of the player's attack range (1 tile in all directions).
-     * The range is shown as semi-transparent red squares for 0.5 seconds.
-     *
-     * @param range The attack range (in tiles, currently hardcoded to 1).
-     * @param cameraStartCol The starting column of the camera's viewport.
-     * @param cameraStartRow The starting row of the camera's viewport.
-     */
-    private void showAttackRange(int range, int cameraStartCol, int cameraStartRow) {
-        List<Rectangle> rangeIndicators = new ArrayList<>(); // List to store the visual indicators
-
-        // Iterate over a 3x3 grid around the player (range=1 means 1 tile in all directions)
-        for (int dx = -1; dx <= 1; dx++) {
-            for (int dy = -1; dy <= 1; dy++) {
-                int attackX = player.getX() + dx; // X position of the tile in the attack range
-                int attackY = player.getY() + dy; // Y position of the tile in the attack range
-
-                // Check if the tile is within the map bounds
-                if (attackX >= 0 && attackX < baseMap[0].length && attackY >= 0 && attackY < baseMap.length) {
-                    // Calculate the tile's position relative to the camera's viewport
-                    int gridX = attackX - cameraStartCol;
-                    int gridY = attackY - cameraStartRow;
-                    // Convert the grid position to pixel coordinates
-                    double pixelX = gridX * TILE_SIZE;
-                    double pixelY = gridY * TILE_SIZE;
-
-                    //  Create a semi-transparent red square to indicate the attack range
-                    Rectangle rangeIndicator = new Rectangle(pixelX, pixelY, TILE_SIZE, TILE_SIZE);
-                    rangeIndicator.setFill(Color.RED);
-                    rangeIndicator.setOpacity(0.3); // Make the square semi-transparent
-
-                    // Add the indicator to the list and the gameObjectsPane to display it
-                    rangeIndicators.add(rangeIndicator);
-                    gameObjectsPane.getChildren().add(rangeIndicator);
-
-                    if (debug_mod_game) {
-                        System.out.println("Highlighting attack range at (" + attackX + ", " + attackY + ")");
-                    }
-                }
-            }
-        }
-
-        // Create a PauseTransition to remove the indicators after 0.5 seconds
-        PauseTransition pause = new PauseTransition(Duration.seconds(0.5));
-        pause.setOnFinished(event -> {
-            // Remove all range indicators from the scene
-            gameObjectsPane.getChildren().removeAll(rangeIndicators);
-        });
-        pause.play(); // Start the timer to show the indicators temporarily
-    }
-
-
 
     /**
      * Handles monster movement and attacks as part of the game loop.
@@ -808,6 +799,7 @@ public class GameController {
             // Define the action for "Go Back" (loads the main menu scene)
             goBackButton.setOnAction(e -> {
                 try {
+                    onSceneExit();
                     URL fxmlUrl = getClass().getResource("/com/gnome/gnome/pages/main-menu.fxml");
                     Parent mainRoot = FXMLLoader.load(Objects.requireNonNull(fxmlUrl));
                     Stage stage = (Stage) centerMenuButton.getScene().getWindow();
@@ -888,14 +880,25 @@ public class GameController {
     private void restartGame() {
         try {
             onSceneExit();
-            URL fxmlUrl = getClass().getResource("/com/gnome/gnome/pages/game.fxml");
-            Parent newRoot = FXMLLoader.load(Objects.requireNonNull(fxmlUrl));
+
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/gnome/gnome/pages/game.fxml")
+            );
+
+            Parent newRoot = loader.load();
+
+            GameController ctrl = loader.getController();
+
+            ctrl.initializeWithLoadedMap(this.baseMap);
+
             Stage stage = (Stage) rootBorder.getScene().getWindow();
             stage.getScene().setRoot(newRoot);
+
         } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
+
 
 
 }

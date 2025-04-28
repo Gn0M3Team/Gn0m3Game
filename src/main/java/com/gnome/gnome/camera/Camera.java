@@ -49,6 +49,7 @@ public class Camera {
     private static Camera instance;
     private double dynamicTileSize;
 
+
     private Weapon weapon;
     private Armor armor;
     private Potion potion;
@@ -56,6 +57,9 @@ public class Camera {
     private Image weaponImage;
     private Image armorImage;
     private Image potionImage;
+
+
+    private double tileWidth, tileHeight;
 
 
     /**
@@ -105,6 +109,8 @@ public class Camera {
         // Підрахунок ширини і висоти одного тайла
         double tileWidth = canvas.getWidth() / viewportSize;
         double tileHeight = canvas.getHeight() / viewportSize;
+        this.tileWidth = tileWidth;
+        this.tileHeight = tileHeight;
         this.dynamicTileSize = Math.min(tileWidth, tileHeight); // Для гравця
 
         GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -242,6 +248,7 @@ public class Camera {
                 canvasHeight - boxSize - padding + 10
         );
     }
+
 
 
     /**
