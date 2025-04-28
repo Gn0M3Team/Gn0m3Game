@@ -5,6 +5,9 @@ import com.gnome.gnome.components.PlayerHealthBar;
 import com.gnome.gnome.continueGame.component.Coin;
 import com.gnome.gnome.continueGame.component.ObjectsConstants;
 import com.gnome.gnome.editor.utils.TypeOfObjects;
+import com.gnome.gnome.models.Armor;
+import com.gnome.gnome.models.Potion;
+import com.gnome.gnome.models.Weapon;
 import com.gnome.gnome.monsters.Monster;
 import com.gnome.gnome.monsters.MonsterFactory;
 import com.gnome.gnome.monsters.movements.FollowingMovement;
@@ -140,7 +143,7 @@ public class GameController {
 
     private boolean debug_mod_game;
 
-    public void initializeWithLoadedMap(int[][] mapData) {
+    public void initializeWithLoadedMap(int[][] mapData, Armor armor, Weapon weapon, Potion potion) {
         setupProperties();
         this.baseMap = mapData;
         this.fieldMap = copyMap(baseMap);
@@ -148,7 +151,7 @@ public class GameController {
         setupMap();
 
         player      = Player.getInstance(15, 15, PLAYER_MAX_HEALTH); // Create a player at position (15, 15) with 100 health
-        camera      = Camera.getInstance(fieldMap, player.getX(), player.getY(), player); // Initialize the camera to follow the player
+        camera      = Camera.getInstance(fieldMap, player.getX(), player.getY(), player, armor, weapon, potion); // Initialize the camera to follow the player
         updateMapWithMonsters(); // Update the field map with monster positions
         instance = this; //Fill singleton instance ONLY on initialization. BECAUSE OTHERWISE THERE IS NO DATA THAT IS REQUIRED IN OTHER CLASSES
 

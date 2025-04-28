@@ -3,7 +3,7 @@ package com.gnome.gnome.loginRegistration.controller;
 import com.gnome.gnome.dao.userDAO.AuthUserDAO;
 import com.gnome.gnome.dao.userDAO.UserGameStateDAO;
 import com.gnome.gnome.dao.userDAO.UserSession;
-import com.gnome.gnome.dto.UserState;
+import com.gnome.gnome.userState.UserState;
 import com.gnome.gnome.loginRegistration.service.LoginRegistrationService;
 import com.gnome.gnome.loginRegistration.service.LoginResult;
 import com.gnome.gnome.models.user.AuthUser;

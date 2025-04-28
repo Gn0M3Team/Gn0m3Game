@@ -34,8 +34,6 @@ public class MainApplication extends Application {
             controller.setPrimaryStage(stage);
         }
 
-//        LoginRegistrationController controller = fxmlLoader.getController();
-
 
         Scene scene = new Scene(root);
         stage.setFullScreen(true);

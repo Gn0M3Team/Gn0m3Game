@@ -1,15 +1,23 @@
 package com.gnome.gnome.game;
 
+import com.gnome.gnome.dao.ArmorDAO;
 import com.gnome.gnome.dao.MapDAO;
 
+import com.gnome.gnome.dao.PotionDAO;
+import com.gnome.gnome.dao.WeaponDAO;
+import com.gnome.gnome.models.Armor;
 import com.gnome.gnome.models.Map;
 
+import com.gnome.gnome.models.Potion;
+import com.gnome.gnome.models.Weapon;
+import com.gnome.gnome.userState.UserState;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
@@ -23,6 +31,14 @@ public class MapLoader {
 
     private Popup loadingPopup;
     private Stage primaryStage;
+
+    private Weapon weapon;
+    private Armor armor;
+    private Potion potion;
+
+    private final WeaponDAO weaponDAO = new WeaponDAO();
+    private final ArmorDAO armorDAO = new ArmorDAO();
+    private final PotionDAO potionDAO = new PotionDAO();
 
     public MapLoader() {
     }
@@ -38,10 +54,18 @@ public class MapLoader {
     public void showStartMap(Map selectedMap) {
         showLoadingPopup();
 
+        int armorId = UserState.getInstance().getArmorId();
+        int weaponId = UserState.getInstance().getWeaponId();
+        int potionId = UserState.getInstance().getPotionId();
+
+        armor = armorDAO.getArmorById(armorId);
+        weapon = weaponDAO.getWeaponById(weaponId);
+        potion = potionDAO.getPotionById(potionId);
+
         executor.submit(() -> {
             try {
                 if (selectedMap != null) {
-                    Platform.runLater(() -> loadGamePage(selectedMap));
+                    Platform.runLater(() -> loadGamePage(selectedMap, armor, weapon, potion));
                 } else {
                     Platform.runLater(() -> {
                         hideLoadingPopup();
@@ -83,12 +107,12 @@ public class MapLoader {
         }
     }
 
-    private void loadGamePage(Map selectedMap) {
+    private void loadGamePage(Map selectedMap, Armor armor, Weapon weapon, Potion potion) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/gnome/gnome/pages/game.fxml"));
             Parent root = loader.load();
             GameController controller = loader.getController();
-            controller.initializeWithLoadedMap(selectedMap.getMapData());
+            controller.initializeWithLoadedMap(selectedMap.getMapData(), armor, weapon, potion);
 
             primaryStage.getScene().setRoot(root);
 

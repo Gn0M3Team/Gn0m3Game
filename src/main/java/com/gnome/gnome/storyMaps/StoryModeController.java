@@ -1,7 +1,7 @@
 package com.gnome.gnome.storyMaps;
 
 import com.gnome.gnome.dao.MapDAO;
-import com.gnome.gnome.dto.UserState;
+import com.gnome.gnome.userState.UserState;
 import com.gnome.gnome.models.Map;
 import com.gnome.gnome.game.MapLoader;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
@@ -114,18 +114,6 @@ public class StoryModeController {
     @FXML
     private void onBackButtonClick(ActionEvent event) {
         pageSwitch.goNewGame(storyMapsBorderPane);
-        // Implement navigation back to main menu
-        // Load main menu FXML (adjust path as needed)
-        // Example: FXMLLoader.load(getClass().getResource("/path/to/main_menu.fxml"));
-
-
-//        try {
-//            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/gnome/gnome/pages/main-menu.fxml"));
-//            Stage stage = (Stage) storyMapsBorderPane.getScene().getWindow();
-//            stage.getScene().setRoot(loader.load());
-//        } catch (Exception ex) {
-//            ex.printStackTrace();
-//        }
     }
 
     @FXML

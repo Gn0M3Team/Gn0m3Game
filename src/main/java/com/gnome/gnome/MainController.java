@@ -2,7 +2,7 @@ package com.gnome.gnome;
 
 import com.gnome.gnome.dao.MapDAO;
 import com.gnome.gnome.dao.userDAO.AuthUserDAO;
-import com.gnome.gnome.dto.UserState;
+import com.gnome.gnome.userState.UserState;
 import com.gnome.gnome.game.MapLoader;
 import com.gnome.gnome.models.Map;
 import com.gnome.gnome.models.user.AuthUser;

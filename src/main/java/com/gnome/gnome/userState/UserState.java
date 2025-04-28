@@ -1,4 +1,4 @@
-package com.gnome.gnome.dto;
+package com.gnome.gnome.userState;
 
 import com.gnome.gnome.dao.userDAO.AuthUserDAO;
 import com.gnome.gnome.dao.userDAO.UserGameStateDAO;

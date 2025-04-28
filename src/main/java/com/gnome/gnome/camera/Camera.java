@@ -1,7 +1,15 @@
 package com.gnome.gnome.camera;
 import com.gnome.gnome.continueGame.component.Coin;
+import com.gnome.gnome.dao.ArmorDAO;
+import com.gnome.gnome.dao.MapDAO;
+import com.gnome.gnome.dao.PotionDAO;
+import com.gnome.gnome.dao.WeaponDAO;
 import com.gnome.gnome.editor.utils.TypeOfObjects;
+import com.gnome.gnome.models.Armor;
+import com.gnome.gnome.models.Potion;
+import com.gnome.gnome.models.Weapon;
 import com.gnome.gnome.player.Player;
+import com.gnome.gnome.userState.UserState;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
@@ -41,6 +49,14 @@ public class Camera {
     private static Camera instance;
     private double dynamicTileSize;
 
+    private Weapon weapon;
+    private Armor armor;
+    private Potion potion;
+
+    private Image weaponImage;
+    private Image armorImage;
+    private Image potionImage;
+
 
     /**
      * Constructor of the Camera class. Used to create a new Camera object.
@@ -50,20 +66,22 @@ public class Camera {
      * @param cameraCenterY Initial Y coordinate of the camera centre (usually the player's position).
      * @param player A player object so we can keep track of the player's position.
      */
-    private Camera(int[][] fieldMap, int cameraCenterX, int cameraCenterY, Player player) {
+    private Camera(int[][] fieldMap, int cameraCenterX, int cameraCenterY, Player player, Armor armor, Weapon weapon, Potion potion) {
         this.mapGrid = fieldMap; // Initialise the map passed as a parameter
         this.cameraCenterX = cameraCenterX; // Set the initial X-coordinate of the camera centre
         this.cameraCenterY = cameraCenterY; // Set the initial Y-coordinate of the camera center
         this.player = player; // Save the reference to the player object
-
+        this.armor = armor;
+        this.weapon = weapon;
+        this.potion = potion;
     }
 
     /**
      * Singleton access method for the Camera.
      */
-    public static Camera getInstance(int[][] fieldMap, int cameraCenterX, int cameraCenterY, Player player) {
+    public static Camera getInstance(int[][] fieldMap, int cameraCenterX, int cameraCenterY, Player player, Armor armor, Weapon weapon, Potion potion) {
         if (instance == null) {
-            instance = new Camera(fieldMap, cameraCenterX, cameraCenterY, player);
+            instance = new Camera(fieldMap, cameraCenterX, cameraCenterY, player, armor, weapon, potion);
         }
         return instance;
     }
@@ -156,6 +174,30 @@ public class Camera {
             }
         }
 
+//        System.out.println("/com/gnome/gnome/images/tiles/" + armor.getImg() );
+//        System.out.println("/com/gnome/gnome/images/tiles/" + weapon.getImg());
+//        System.exit(1);
+
+        armorImage = new Image(
+                Objects.requireNonNull(
+                        getClass().getResourceAsStream("/com/gnome/gnome/images/tiles/" + armor.getImg() + ".png")
+                )
+        );
+
+        weaponImage = new Image(
+                Objects.requireNonNull(
+                        getClass().getResourceAsStream("/com/gnome/gnome/images/tiles/" + weapon.getImg() + ".png")
+                )
+        );
+
+        potionImage = new Image(
+                Objects.requireNonNull(
+                        getClass().getResourceAsStream("/com/gnome/gnome/images/tiles/" + weapon.getImg() + ".png")
+                )
+        );
+
+
+
         // Малюємо кнопки Armor / Sword
         double boxSize = canvas.getWidth() * 0.08;
         double padding = canvas.getWidth() * 0.02;
@@ -170,16 +212,16 @@ public class Camera {
                 boxSize * 2 + 40
         );
 
-        gc.setFill(Color.LIGHTBLUE);
-        gc.fillRect(
+        gc.drawImage(
+                armorImage,
                 canvasWidth - boxSize - padding,
                 canvasHeight - boxSize * 2 - padding - 20,
                 boxSize,
                 boxSize
         );
 
-        gc.setFill(Color.LIGHTCORAL);
-        gc.fillRect(
+        gc.drawImage(
+                weaponImage,
                 canvasWidth - boxSize - padding,
                 canvasHeight - boxSize - padding,
                 boxSize,
@@ -190,12 +232,12 @@ public class Camera {
         gc.setFont(javafx.scene.text.Font.font(16));
 
         gc.fillText(
-                "Armor",
+                armor.getNameEng(),
                 canvasWidth - boxSize - padding + 10,
                 canvasHeight - boxSize * 2 - padding + 10
         );
         gc.fillText(
-                "Sword",
+                weapon.getNameEng(),
                 canvasWidth - boxSize - padding + 10,
                 canvasHeight - boxSize - padding + 10
         );
