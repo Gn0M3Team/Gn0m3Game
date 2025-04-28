@@ -74,7 +74,7 @@ public class ProfileController {
 
         UserGameStateDAO GameState = new UserGameStateDAO();
 
-        UserGameState gameState=GameState.getUserGameStateByUsername(selectedPlayer);
+        UserGameState gameState = GameState.getUserGameStateByUsername(selectedPlayer);
 
         nameLabel.setText("Profile of " + user.getUsername());
         recordLabel.setText("Score: " +gameState.getScore());

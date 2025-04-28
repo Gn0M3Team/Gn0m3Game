@@ -57,6 +57,11 @@ public class SwitchPage implements PageSwitcherInterface {
         new SceneSwitch(anchorPane, "/com/gnome/gnome/pages/shop-pop-up.fxml");
     }
 
+    @Override
+    public void goStoryMaps(BorderPane anchorPane)  {
+        new SceneSwitch(anchorPane, "/com/gnome/gnome/pages/story-mode-page.fxml");
+    }
+
 
 
 }

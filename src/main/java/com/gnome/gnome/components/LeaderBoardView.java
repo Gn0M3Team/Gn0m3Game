@@ -1,15 +1,11 @@
 package com.gnome.gnome.components;
 
-import com.gnome.gnome.HelloController;
+import com.gnome.gnome.MainController;
 import com.gnome.gnome.dao.userDAO.AuthUserDAO;
 import com.gnome.gnome.dao.userDAO.UserSession;
 import com.gnome.gnome.models.user.AuthUser;
-import com.gnome.gnome.profile.ProfileController;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
-import javafx.animation.FadeTransition;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -42,7 +38,7 @@ public class LeaderBoardView extends VBox {
     private int currentPage = 1;
     private final int pageSize = 17;
     private boolean loading = false;
-    private final HelloController parentController;
+    private final MainController parentController;
     private PageSwitcherInterface pageSwitch;
     private final AuthUserDAO userDAO = new AuthUserDAO();
     /**
@@ -51,7 +47,7 @@ public class LeaderBoardView extends VBox {
      * @param parentController the controller of the parent page.
      * @param onCloseAction a Runnable to execute when the close button is pressed.
      */
-    public LeaderBoardView(HelloController parentController,Runnable onCloseAction) {
+    public LeaderBoardView(MainController parentController, Runnable onCloseAction) {
 
         this.parentController=parentController;
         pageSwitch=new SwitchPage();
@@ -250,7 +246,7 @@ public class LeaderBoardView extends VBox {
             String selected = listView.getSelectionModel().getSelectedItem();
             if (selected != null) {
                 logger.info("Opening profile for: " + selected);
-                BorderPane helloPage = parentController.getHelloPage();
+                BorderPane helloPage = parentController.getMainBorderPane();
                 String username = selected.split(" - ")[0];
                 logger.info(username);
                 pageSwitch.goProfile(helloPage, username);

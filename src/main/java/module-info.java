@@ -28,8 +28,8 @@ module com.gnome.gnome {
     exports com.gnome.gnome.models;
     opens com.gnome.gnome.models to javafx.fxml;
 
-    opens com.gnome.gnome.newNewGame to javafx.fxml;
-    exports com.gnome.gnome.newNewGame;
+    opens com.gnome.gnome.newGame to javafx.fxml;
+    exports com.gnome.gnome.newGame;
 
     opens com.gnome.gnome.editor.controller to javafx.fxml;
     exports com.gnome.gnome.editor.controller;
@@ -47,12 +47,13 @@ module com.gnome.gnome {
     opens com.gnome.gnome.loginRegistration.controller to javafx.fxml;
     exports com.gnome.gnome.loginRegistration.controller;
 
-    opens com.gnome.gnome.newGame to javafx.fxml;
-    exports com.gnome.gnome.newGame;
-
     opens com.gnome.gnome.setting to javafx.fxml;
     exports com.gnome.gnome.setting;
 
     opens com.gnome.gnome.shopPopUp to javafx.fxml;
     exports com.gnome.gnome.shopPopUp;
+
+    opens com.gnome.gnome.storyMaps to javafx.fxml;
+    exports com.gnome.gnome.storyMaps;
+
 }

@@ -35,14 +35,11 @@ public class MapLoader {
 
 
 
-    public void showStartMap(int mapId) {
+    public void showStartMap(Map selectedMap) {
         showLoadingPopup();
 
         executor.submit(() -> {
             try {
-                MapDAO levelMapDAO = new MapDAO();
-                Map selectedMap = levelMapDAO.getMapById(mapId);
-
                 if (selectedMap != null) {
                     Platform.runLater(() -> loadGamePage(selectedMap));
                 } else {

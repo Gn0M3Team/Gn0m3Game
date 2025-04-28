@@ -125,7 +125,7 @@
                         <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>com.gnome.gnome/com.gnome.gnome.HelloApplication</mainClass>
+                            <mainClass>com.gnome.gnome/com.gnome.gnome.MainApplication</mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
                             <jlinkImageName>app</jlinkImageName>

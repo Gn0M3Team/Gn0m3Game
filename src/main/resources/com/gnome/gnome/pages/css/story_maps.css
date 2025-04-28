@@ -1,0 +1,126 @@
+/* story_maps.css */
+
+@font-face {
+    font-family: 'Press Start 2P';
+    src: url('../fonts/PressStart2P-Regular.ttf') format('truetype');
+}
+
+/* ScrollPane styling */
+.map-scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-padding: 10px;
+}
+
+/* VBox containing map entries */
+.maps-vbox {
+    -fx-background-color: transparent;
+    -fx-padding: 20px;
+}
+
+/* Individual map entry */
+.map-entry {
+    -fx-background-color: rgba(74, 58, 74, 0.8); /* Matches top-button color with transparency */
+    -fx-background-radius: 10px;
+    -fx-padding: 10px;
+    -fx-border-color: black;
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
+}
+
+/* Map entry when completed */
+.map-entry-completed {
+    -fx-border-color: green;
+}
+
+/* Map entry when current */
+.map-entry-current {
+    -fx-border-color: orange;
+}
+
+/* Map entry when locked */
+.map-entry-locked {
+    -fx-opacity: 0.6;
+}
+
+/* Map name label */
+.map-name {
+    -fx-text-fill: white;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 14px;
+    -fx-padding: 5px 0;
+}
+
+/* Map status label */
+.map-status {
+    -fx-text-fill: #cccccc;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 10px;
+}
+
+/* Map preview image */
+.map-preview {
+    -fx-border-color: black;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+}
+
+/* ScrollPane styling */
+ScrollPane {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+    -fx-border-color: #6B4657; /* Darker pink border */
+    -fx-border-width: 2;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+}
+
+/* ScrollBar styling for ScrollPane */
+ScrollPane .scroll-bar:vertical, ScrollPane .scroll-bar:horizontal {
+    -fx-background-color: #2E1C26; /* Darker pink track background */
+    -fx-background-radius: 5;
+    -fx-border-color: #4F2F3F;
+    -fx-border-width: 1;
+    -fx-border-radius: 5;
+}
+
+ScrollPane .scroll-bar .thumb {
+    -fx-background-color: #6B4657; /* Dark pink thumb */
+    -fx-background-radius: 5;
+    -fx-effect: innershadow(gaussian, rgba(0,0,0,0.3), 5, 0, 0, 1);
+}
+
+ScrollPane .scroll-bar .thumb:hover {
+    -fx-background-color: #8F5B71; /* Lighter pink on hover */
+}
+
+ScrollPane .scroll-bar .thumb:pressed {
+    -fx-background-color: #A35474; /* Slightly brighter pink when pressed */
+}
+
+ScrollPane .scroll-bar .track {
+    -fx-background-color: #2E1C26; /* Dark pink track */
+    -fx-background-radius: 5;
+}
+
+ScrollPane .scroll-bar .increment-button, ScrollPane .scroll-bar .decrement-button {
+    -fx-background-color: #472D3C; /* Dark pink buttons */
+    -fx-background-radius: 5;
+    -fx-border-color: #4F2F3F;
+    -fx-border-width: 1;
+    -fx-padding: 2;
+}
+
+ScrollPane .scroll-bar .increment-button:hover, ScrollPane .scroll-bar .decrement-button:hover {
+    -fx-background-color: #6B4657; /* Lighter pink on hover */
+}
+
+ScrollPane .scroll-bar .increment-button:pressed, ScrollPane .scroll-bar .decrement-button:pressed {
+    -fx-background-color: #8F5B71; /* Brighter pink when pressed */
+}
+
+ScrollPane .scroll-bar .increment-arrow, ScrollPane .scroll-bar .decrement-arrow {
+    -fx-shape: "M 0 0 L 6 6 L 12 0 Z"; /* Triangle shape */
+    -fx-background-color: #F4C8D4; /* Light pink arrow */
+    -fx-padding: 4;
+}
