@@ -2,6 +2,7 @@ package com.gnome.gnome;
 
 import com.gnome.gnome.dao.MapDAO;
 import com.gnome.gnome.dao.userDAO.AuthUserDAO;
+import com.gnome.gnome.userState.UserState;
 import com.gnome.gnome.game.MapLoader;
 import com.gnome.gnome.models.Map;
 import com.gnome.gnome.models.user.AuthUser;
@@ -24,13 +25,13 @@ import javafx.util.Duration;
 
 import java.util.Objects;
 
-public class HelloController {
+public class MainController {
 
     @FXML private ImageView musicIcon;
     @FXML
     private Button musicButton;
     @FXML
-    private BorderPane helloPage;
+    private BorderPane mainBorderPane;
     @FXML
     private Button editorButton;
     @FXML
@@ -53,30 +54,7 @@ public class HelloController {
      */
     @FXML
     public void initialize() {
-//        pageSwitch=new SwitchPage();
-//
-//        musicButton = new Button();
-//
-//        musicIcon.setImage(
-//                new Image(
-//                        Objects.requireNonNull(
-//                                getClass().getResourceAsStream("/com/gnome/gnome/images/musicicon.png")
-//                        )
-//                )
-//        );
-//
-//        User_test_for_creation();
-//        user_test();
-//
-//
-//        Platform.runLater(() -> {
-//            primaryStage = (Stage) .getScene().getWindow();
-//            mapLoader = new MapLoader(primaryStage);
-//        });
         pageSwitch = new SwitchPage();
-
-        // НЕ СОЗДАЕМ НОВУЮ КНОПКУ!!! Используем ту, что пришла из FXML
-        // musicButton = new Button(); ❌ Убрать эту строку!
 
         musicIcon.setImage(
                 new Image(
@@ -90,6 +68,11 @@ public class HelloController {
         user_test();
 
         musicButton.setGraphic(musicIcon);
+
+        Platform.runLater(() -> {
+            primaryStage = (Stage) continueGameButton.getScene().getWindow();
+            this.setPrimaryStage(primaryStage);
+        });
     }
 
     public void setPrimaryStage(Stage primaryStage) {
@@ -98,9 +81,10 @@ public class HelloController {
 
         continueGameButton.setOnAction(e -> {
             if (mapLoader != null) {
+                int currentLevel = UserState.getInstance().getMapLevel();
                 MapDAO levelMapDAO = new MapDAO();
-                Map selectedMap = levelMapDAO.getMapByLevel(1);
-                mapLoader.showStartMap(selectedMap.getId());
+                Map selectedMap = levelMapDAO.getMapByLevel(currentLevel);
+                mapLoader.showStartMap(selectedMap);
             }
         });
     }
@@ -133,7 +117,7 @@ public class HelloController {
      */
     @FXML
     protected void onEditorButtonClick(ActionEvent event){
-        pageSwitch.goEditor(helloPage);
+        pageSwitch.goEditor(mainBorderPane);
     }
 
     /**
@@ -141,18 +125,7 @@ public class HelloController {
      */
     @FXML
     protected void onNewGameButtonClick(ActionEvent event){
-        pageSwitch.goNewGame(helloPage);
-    }
-
-    /**
-     * Placeholder for handling continue game logic (to be implemented).
-     */
-    @FXML
-    public void onContinueGameButtonClick(ActionEvent event) {
-        MapDAO levelMapDAO = new MapDAO();
-        Map selectedMap = levelMapDAO.getMapByLevel(1);
-//        pageSwitch.goContinueGame(helloPage);
-        mapLoader.showStartMap(selectedMap.getId());
+        pageSwitch.goNewGame(mainBorderPane);
     }
 
     /**
@@ -160,7 +133,7 @@ public class HelloController {
      */
     @FXML
     public void onSettingsButtonClick(ActionEvent event) {
-        pageSwitch.goSetting(helloPage);
+        pageSwitch.goSetting(mainBorderPane);
     }
 
     /**
@@ -169,8 +142,8 @@ public class HelloController {
      * @return the BorderPane representing the Hello page UI.
      */
     @FXML
-    public BorderPane getHelloPage() {
-        return helloPage;
+    public BorderPane getMainBorderPane() {
+        return mainBorderPane;
     }
 
     /**
@@ -183,13 +156,13 @@ public class HelloController {
             FadeTransition fadeOut = new FadeTransition(Duration.millis(500), this.leaderboard);
             fadeOut.setFromValue(1.0);
             fadeOut.setToValue(0.0);
-            fadeOut.setOnFinished(e -> helloPage.setLeft(null));
+            fadeOut.setOnFinished(e -> mainBorderPane.setLeft(null));
             fadeOut.play();
         });
 
         this.leaderboard.setOpacity(0.0);
 
-        helloPage.setLeft(this.leaderboard);
+        mainBorderPane.setLeft(this.leaderboard);
 
         FadeTransition fadeIn = new FadeTransition(Duration.millis(300), this.leaderboard);
         fadeIn.setFromValue(0.0);
@@ -221,6 +194,6 @@ public class HelloController {
     public void onExitButtonClick(ActionEvent event) {
         MusicWizard.stop = true;
 //        Platform.exit();
-        pageSwitch.goLogin(helloPage);
+        pageSwitch.goLogin(mainBorderPane);
     }
 }

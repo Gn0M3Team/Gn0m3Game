@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane
+        prefHeight="600"
+        prefWidth="800"
+        styleClass="root-pane"
+        fx:id="storyMapsBorderPane"
+        xmlns="http://javafx.com/javafx/17.0.2-ea"
+        xmlns:fx="http://javafx.com/fxml/1"
+        fx:controller="com.gnome.gnome.storyMaps.StoryModeController"
+        stylesheets="@./css/main_menu.css, @./css/story_maps.css"
+>
+
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="10" styleClass="top-bar">
+            <Button fx:id="backButton" onAction="#onBackButtonClick" styleClass="top-button" text="Back to Menu">
+            </Button>
+
+            <Label styleClass="top-label" text="Story Maps" />
+
+            <Pane HBox.hgrow="ALWAYS" />
+
+            <Button fx:id="musicButton" onAction="#onMusicIconClick" styleClass="top-button">
+                <graphic>
+                    <ImageView fx:id="musicIcon" fitWidth="24" fitHeight="24" preserveRatio="true" styleClass="top-button"/>
+                </graphic>
+            </Button>
+        </HBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="map-scroll-pane">
+            <content>
+                <VBox fx:id="mapsContainer" alignment="CENTER" spacing="15" styleClass="maps-vbox">
+                    <!-- Map entries will be dynamically added here -->
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+
+    <padding>
+        <Insets bottom="20" left="20" right="20" top="20" />
+    </padding>
+</BorderPane>

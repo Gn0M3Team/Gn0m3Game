@@ -1,8 +1,13 @@
 package com.gnome.gnome.loginRegistration.controller;
 
+import com.gnome.gnome.dao.userDAO.AuthUserDAO;
+import com.gnome.gnome.dao.userDAO.UserGameStateDAO;
 import com.gnome.gnome.dao.userDAO.UserSession;
+import com.gnome.gnome.userState.UserState;
 import com.gnome.gnome.loginRegistration.service.LoginRegistrationService;
 import com.gnome.gnome.loginRegistration.service.LoginResult;
+import com.gnome.gnome.models.user.AuthUser;
+import com.gnome.gnome.models.user.UserGameState;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import javafx.application.Platform;
@@ -57,8 +62,19 @@ public class LoginRegistrationController {
 
         LoginResult result = LoginRegistrationService.loginOrRegisterUser(username, password);
 
-        if (result.getUser()!=(null)) {
+        if (result.getUser() != null) {
             UserSession.getInstance().setCurrentUser(result.getUser());
+
+            AuthUserDAO authUserDAO = new AuthUserDAO();
+            UserGameStateDAO userGameStateDAO = new UserGameStateDAO();
+
+            UserGameState userGameState = userGameStateDAO.getUserGameStateByUsername(username);
+            AuthUser authUser = authUserDAO.getAuthUserByUsername(username);
+
+            if (authUser != null && userGameState != null) {
+                UserState.init(authUser, userGameState);
+            }
+
             pageSwitch.goMainMenu(loginRegistretion);
         } else {
             loginMessage.setText(result.getMessage());

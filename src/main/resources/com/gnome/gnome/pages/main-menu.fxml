@@ -10,9 +10,9 @@
         prefWidth="800"
         styleClass="root-pane"
         xmlns="http://javafx.com/javafx/17.0.2-ea"
-        fx:id="helloPage"
+        fx:id="mainBorderPane"
         xmlns:fx="http://javafx.com/fxml/1"
-        fx:controller="com.gnome.gnome.HelloController"
+        fx:controller="com.gnome.gnome.MainController"
         stylesheets="@./css/main_menu.css, @./css/leaderboard.css"
 >
 
@@ -41,7 +41,7 @@
 
                 <Button maxWidth="Infinity" onAction="#onNewGameButtonClick" styleClass="menu-button" text="New game" />
 
-                <Button fx:id="continueGameButton" maxWidth="Infinity" onAction="#onContinueGameButtonClick" styleClass="menu-button" text="Continue the game" />
+                <Button fx:id="continueGameButton" maxWidth="Infinity" styleClass="menu-button" text="Continue the game" />
 
                 <Button fx:id="editorButton" maxWidth="Infinity" onAction="#onEditorButtonClick" styleClass="menu-button" text="Create a map" />
 

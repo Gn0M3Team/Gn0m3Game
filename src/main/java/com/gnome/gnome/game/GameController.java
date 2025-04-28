@@ -2,10 +2,12 @@ package com.gnome.gnome.game;
 
 import com.gnome.gnome.camera.Camera;
 import com.gnome.gnome.components.PlayerHealthBar;
-import com.gnome.gnome.continueGame.ContinueGameController;
 import com.gnome.gnome.continueGame.component.Coin;
 import com.gnome.gnome.continueGame.component.ObjectsConstants;
 import com.gnome.gnome.editor.utils.TypeOfObjects;
+import com.gnome.gnome.models.Armor;
+import com.gnome.gnome.models.Potion;
+import com.gnome.gnome.models.Weapon;
 import com.gnome.gnome.monsters.Monster;
 import com.gnome.gnome.monsters.MonsterFactory;
 import com.gnome.gnome.monsters.movements.FollowingMovement;
@@ -96,8 +98,6 @@ public class GameController {
      */
     private final List<Arrow> activeArrows = new ArrayList<>();
 
-    private static final Logger logger = Logger.getLogger(ContinueGameController.class.getName());
-
     /**
      * Timer for updating monster behavior periodically.
      */
@@ -143,16 +143,17 @@ public class GameController {
 
     private boolean debug_mod_game;
 
-    public void initializeWithLoadedMap(int[][] mapData) {
-        System.out.println("----------------------------------------------");
-        System.out.println("MAP DATA: "+ Arrays.deepToString(mapData));
+    public void initializeWithLoadedMap(int[][] mapData, Armor armor, Weapon weapon, Potion potion) {
         setupProperties();
         this.baseMap = mapData;
         this.fieldMap = copyMap(baseMap);
 
         setupMap();
 
-        camera      = Camera.getInstance(fieldMap, player.getX(), player.getY(), player); // Initialize the camera to follow the player
+
+        player      = Player.getInstance(15, 15, PLAYER_MAX_HEALTH); // Create a player at position (15, 15) with 100 health
+        camera      = Camera.getInstance(fieldMap, player.getX(), player.getY(), player, armor, weapon, potion); // Initialize the camera to follow the player
+
         updateMapWithMonsters(); // Update the field map with monster positions
         instance = this; //Fill singleton instance ONLY on initialization. BECAUSE OTHERWISE THERE IS NO DATA THAT IS REQUIRED IN OTHER CLASSES
 
@@ -353,7 +354,6 @@ public class GameController {
                 case SPACE -> {
                     // Check if the gameObjectsPane is initialized (needed for attack effects)
                     if (gameObjectsPane == null) {
-                        System.err.println("Error: gameObjectsPane is null when trying to attack");
                         return;
                     }
                     // Perform the attack, dealing 20 damage to monsters within 1 tile
@@ -805,7 +805,6 @@ public class GameController {
                     Stage stage = (Stage) centerMenuButton.getScene().getWindow();
                     stage.getScene().setRoot(mainRoot);
                 } catch (IOException ex) {
-                    logger.severe("Failed to load main page: " + ex.getMessage());
                     ex.printStackTrace();
                 }
                 centerMenuPopup.hide();
