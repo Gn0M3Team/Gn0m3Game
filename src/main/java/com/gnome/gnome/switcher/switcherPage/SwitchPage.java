@@ -21,11 +21,6 @@ public class SwitchPage implements PageSwitcherInterface {
 
     @Override
     public void goContinueGame(BorderPane anchorPane) {
-//        mapButton.setOnAction(e -> {
-//            storyPopup.hide();
-//            mapLoader.showStartMap(mapId);
-//                    showStartMap(mapId);
-//        });
         new SceneSwitch(anchorPane, "/com/gnome/gnome/pages/game.fxml");
     }
 

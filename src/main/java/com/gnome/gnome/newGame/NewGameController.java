@@ -1,24 +1,14 @@
 package com.gnome.gnome.newGame;
 
-import com.gnome.gnome.dao.MapDAO;
-import com.gnome.gnome.dto.UserState;
 import com.gnome.gnome.game.MapLoader;
-import com.gnome.gnome.models.Map;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
-import javafx.stage.Popup;
 import javafx.stage.Stage;
-import javafx.geometry.Pos;
-
-import java.util.List;
 
 public class NewGameController {
 
@@ -28,9 +18,6 @@ public class NewGameController {
     @FXML private BorderPane newGameBorderPane;
 
     private PageSwitcherInterface pageSwitch;
-
-    private Popup storyPopup;
-    private Popup loadingPopup;
 
     Stage primaryStage;
 
@@ -51,13 +38,7 @@ public class NewGameController {
     }
 
     private void goBackToMainMenu() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/gnome/gnome/pages/main-menu.fxml"));
-            Stage stage = (Stage) backButton.getScene().getWindow();
-            stage.getScene().setRoot(loader.load());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        pageSwitch.goMainMenu(newGameBorderPane);
     }
 
     private void showUnderDevelopmentAlert() {

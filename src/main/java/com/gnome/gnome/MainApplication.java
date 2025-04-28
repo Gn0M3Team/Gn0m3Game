@@ -24,12 +24,17 @@ public class MainApplication extends Application {
         skip_db = properties.get("skip_db");
         System.out.println(skip_db);
 
-        FXMLLoader fxmlLoader = getFxmlLoader(properties.get("skip_logging"));
+        boolean skipLogging = properties.get("skip_logging");
+
+        FXMLLoader fxmlLoader = getFxmlLoader(skipLogging);
         Parent root = fxmlLoader.load();
 
-//        MainController controller = fxmlLoader.getController();
-//        controller.setPrimaryStage(stage);
-        LoginRegistrationController controller = fxmlLoader.getController();
+        if (skipLogging) {
+            MainController controller = fxmlLoader.getController();
+            controller.setPrimaryStage(stage);
+        }
+
+//        LoginRegistrationController controller = fxmlLoader.getController();
 
 
         Scene scene = new Scene(root);
