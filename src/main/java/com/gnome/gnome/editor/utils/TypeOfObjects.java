@@ -201,4 +201,15 @@ public enum TypeOfObjects {
         }
     }
 
+    public boolean isWalkable() {
+        return switch (this) {
+            case FLOOR, FINISH_POINT, RIVER, EMPTY, WEB,
+                 CHEST_1, CHEST_2, CHEST_3, CHEST_4, CHEST_5, CHEST_6, CHEST_7,
+                 DOOR_1, DOOR_2, DOOR_3, DOOR_4, DOOR_5, DOOR_6, DOOR_7, DOOR_8, DOOR_9, DOOR_10, DOOR_11, DOOR_12, DOOR_13
+                    -> true;
+            default -> false;
+        };
+    }
+
+
 }

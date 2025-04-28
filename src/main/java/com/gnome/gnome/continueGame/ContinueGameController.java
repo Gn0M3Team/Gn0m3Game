@@ -543,8 +543,17 @@ public class ContinueGameController implements Initializable {
         camera.updateCameraCenter();
         camera.drawViewport(viewportCanvas, coinsOnMap);
 
-        player.setDynamicTileSize(camera.getDynamicTileSize());
-        player.updatePositionWithCamera(camera.getStartCol(), camera.getStartRow());
+        double tw = camera.getTileWidth();
+        double th = camera.getTileHeight();
+
+        player.setDynamicTileSize(Math.min(tw, th));   // you can keep this if other code needs it
+        player.updatePositionWithCamera(
+                camera.getStartCol(),
+                camera.getStartRow(),
+                tw,
+                th
+        );
+
 
         if (!gameObjectsPane.getChildren().contains(player.getRepresentation())) {
             gameObjectsPane.getChildren().add(player.getRepresentation());
