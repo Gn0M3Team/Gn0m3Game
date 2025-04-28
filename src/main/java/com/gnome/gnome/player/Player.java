@@ -204,21 +204,27 @@ public class Player {
      * @param cameraStartCol the first visible column (leftmost)
      * @param cameraStartRow the first visible row (topmost)
      */
-    public void updatePositionWithCamera(int cameraStartCol, int cameraStartRow) {
-        if (dynamicTileSize == 0) return; // Safety check
+    /**
+     * Center the player rectangle in its cell using the actual cell width/height.
+     */
+    public void updatePositionWithCamera(int cameraStartCol, int cameraStartRow,
+                                         double tileWidth, double tileHeight) {
+        double sizeX = tileWidth  * 0.6;
+        double sizeY = tileHeight * 0.6;
 
-        double size = dynamicTileSize * 0.6;
-        double offset = (dynamicTileSize - size) / 2.0;
+        double offsetX = (tileWidth  - sizeX) / 2;
+        double offsetY = (tileHeight - sizeY) / 2;
 
-        double pixelX = (x - cameraStartCol) * dynamicTileSize + offset;
-        double pixelY = (y - cameraStartRow) * dynamicTileSize + offset;
+        double px = (x - cameraStartCol) * tileWidth  + offsetX;
+        double py = (y - cameraStartRow) * tileHeight + offsetY;
 
-        representation.setTranslateX(pixelX);
-        representation.setTranslateY(pixelY);
+        representation.setTranslateX(px);
+        representation.setTranslateY(py);
 
-        if (representation instanceof Rectangle rect) {
-            rect.setWidth(size);
-            rect.setHeight(size);
+        if (representation instanceof Rectangle r) {
+            r.setWidth(sizeX);
+            r.setHeight(sizeY);
         }
     }
+
 }
