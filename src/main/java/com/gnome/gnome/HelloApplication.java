@@ -8,6 +8,7 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -19,16 +20,20 @@ import java.util.Properties;
 
 public class HelloApplication extends Application {
     private boolean skip_db;
-    @Override
     public void start(Stage stage) throws IOException {
-        // If parameter skip_log is true then start with menu page, otherwise start with logging
+        // Если параметр skip_log true — пропускаем логин
         Map<String, Boolean> properties = getProperties();
         skip_db = properties.get("skip_db");
         System.out.println(skip_db);
 
         FXMLLoader fxmlLoader = getFxmlLoader(properties.get("skip_logging"));
-        Scene scene = new Scene(fxmlLoader.load());
+        Parent root = fxmlLoader.load();
 
+        // Вот здесь получаем контроллер
+        HelloController controller = fxmlLoader.getController();
+        controller.setPrimaryStage(stage); // Передаём Stage в контроллер
+
+        Scene scene = new Scene(root);
         stage.setFullScreen(true);
         stage.setTitle("Dark Rifter");
         stage.setScene(scene);

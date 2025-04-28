@@ -3,32 +3,37 @@ package com.gnome.gnome.game;
 import com.gnome.gnome.dao.MapDAO;
 
 import com.gnome.gnome.models.Map;
-import com.gnome.gnome.game.GameController;
 
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 
-import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MapLoader {
 
-    private final ExecutorService executor;
-    private Popup loadingPopup;
-    private final Stage primaryStage;
+    private ExecutorService executor;
 
-    public MapLoader(ExecutorService executor, Stage primaryStage) {
-        this.executor = executor;
+    private Popup loadingPopup;
+    private Stage primaryStage;
+
+    public MapLoader() {
+    }
+
+
+    public MapLoader(Stage primaryStage) {
+        this.executor = Executors.newSingleThreadExecutor();
         this.primaryStage = primaryStage;
     }
+
+
 
     public void showStartMap(int mapId) {
         showLoadingPopup();
@@ -39,7 +44,7 @@ public class MapLoader {
                 Map selectedMap = levelMapDAO.getMapById(mapId);
 
                 if (selectedMap != null) {
-                    Platform.runLater(() -> loadContinueGamePage(selectedMap));
+                    Platform.runLater(() -> loadGamePage(selectedMap));
                 } else {
                     Platform.runLater(() -> {
                         hideLoadingPopup();
@@ -81,9 +86,9 @@ public class MapLoader {
         }
     }
 
-    private void loadContinueGamePage(Map selectedMap) {
+    private void loadGamePage(Map selectedMap) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/gnome/gnome/pages/continueGame.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/gnome/gnome/pages/game.fxml"));
             Parent root = loader.load();
             GameController controller = loader.getController();
             controller.initializeWithLoadedMap(selectedMap.getMapData());
@@ -97,6 +102,7 @@ public class MapLoader {
             hideLoadingPopup();
         }
     }
+
 
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);

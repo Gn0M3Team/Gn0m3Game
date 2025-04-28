@@ -30,11 +30,10 @@ public class NewNewGameController {
 
     private Popup storyPopup;
     private Popup loadingPopup;
-    private final ExecutorService executor = Executors.newSingleThreadExecutor(); // background thread for loading\
 
-    Stage primaryStage = (Stage) storyModeButton.getScene().getWindow();
+    Stage primaryStage;
 
-    MapLoader mapLoader = new MapLoader(executor, primaryStage);
+    MapLoader mapLoader;
 
 
     @FXML
@@ -42,6 +41,10 @@ public class NewNewGameController {
         storyModeButton.setOnAction(e -> showStoryPopup());
         otherModeButton.setOnAction(e -> showUnderDevelopmentAlert());
         backButton.setOnAction(e -> goBackToMainMenu());
+        Platform.runLater(() -> {
+            primaryStage = (Stage) storyModeButton.getScene().getWindow();
+            mapLoader = new MapLoader(primaryStage);
+        });
     }
 
     private void goBackToMainMenu() {
