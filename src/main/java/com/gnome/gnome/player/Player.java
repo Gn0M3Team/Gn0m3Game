@@ -43,7 +43,8 @@ public class Player {
     /**
      * Total number of coins the player has collected.
      */
-    private int playerCoins = 0;
+    @Setter @Getter
+    private int playerCoins = 10000;
 
     private static Player instance;
 

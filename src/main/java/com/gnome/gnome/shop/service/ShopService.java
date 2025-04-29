@@ -1,6 +1,4 @@
 package com.gnome.gnome.shop.service;
-
-import com.gnome.gnome.continueGame.ContinueGameController;
 import com.gnome.gnome.dao.ArmorDAO;
 import com.gnome.gnome.dao.PotionDAO;
 import com.gnome.gnome.dao.WeaponDAO;
@@ -9,8 +7,6 @@ import com.gnome.gnome.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.gnome.gnome.continueGame.ContinueGameController.getContinueGameController;
 
 public class ShopService {
     private final WeaponDAO weaponDAO = new WeaponDAO();
@@ -21,11 +17,7 @@ public class ShopService {
     private List<ShopItem> items = new ArrayList<>();
 
     public ShopService() {
-        ContinueGameController controller = getContinueGameController();
-        if (controller == null) {
-            throw new RuntimeException("Controller does not exist");
-        }
-        this.player = controller.getPlayer();
+        this.player = Player.getInstance(0, 0, 0);
     }
 
     public List<ShopItem> get_shop_items() {
@@ -41,12 +33,13 @@ public class ShopService {
     }
 
     public void buy(ShopItem item) {
-//        float playerCoinsRemainder = player.getPlayerCoins() - item.getCost();
-//        if (playerCoinsRemainder < 0) {
-//            throw new BalanceException("Not enough money");
-//        }
+        float playerCoinsRemainder = player.getPlayerCoins() - item.getCost();
+        if (playerCoinsRemainder < 0) {
+            throw new BalanceException("Not enough money");
+        }
 
-        player.setPlayerCoins((int) 900);
+        System.out.println("playerCoinsRemainder" + playerCoinsRemainder);
+        player.setPlayerCoins((int) playerCoinsRemainder);
         item.buy(player);
 
         System.out.println();

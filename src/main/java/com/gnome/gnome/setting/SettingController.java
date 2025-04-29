@@ -38,6 +38,9 @@ public class SettingController {
         pageSwitch = new SwitchPage();
     }
 
+    @FXML
+    public void switchToShop() { pageSwitch.goShop(settingPage); }
+
     /**
      * Handles the action of the "Back to Game" button.
      *

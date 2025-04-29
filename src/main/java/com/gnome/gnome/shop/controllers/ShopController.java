@@ -1,6 +1,5 @@
 package com.gnome.gnome.shop.controllers;
 
-import com.gnome.gnome.continueGame.ContinueGameController;
 import com.gnome.gnome.shop.service.ShopItem;
 import com.gnome.gnome.shop.service.ShopService;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
@@ -107,7 +106,7 @@ public class ShopController {
                 }
             } catch(IOException ex) {
                 logger.severe("Failed to load item's image: " + ex.getMessage());
-                ex.printStackTrace();
+                throw new RuntimeException("Unable to load item's image" + ex.getMessage());
             }
 
             Image itemImage = image;
@@ -132,7 +131,7 @@ public class ShopController {
             popup.showAndWait();
         } catch (IOException e) {
             logger.severe("Failed to load item's data popup: " + e.getMessage());
-            e.printStackTrace();
+            throw new RuntimeException("Failed to load item's data popup: " + e.getMessage());
         }
     }
 }

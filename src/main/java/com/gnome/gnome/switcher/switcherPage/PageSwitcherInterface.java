@@ -67,7 +67,7 @@ public interface PageSwitcherInterface {
      *
      * @param anchorPane the current root pane from which the scene will switch or where the pop-up will appear
      */
-    void goShopPopUp(BorderPane anchorPane);
+    void goShop(BorderPane anchorPane);
 
     void goStoryMaps(BorderPane anchorPane);
 }
