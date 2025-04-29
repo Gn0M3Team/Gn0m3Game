@@ -2,8 +2,10 @@ package com.gnome.gnome.components;
 
 import com.gnome.gnome.MainController;
 import com.gnome.gnome.dao.userDAO.AuthUserDAO;
+import com.gnome.gnome.dao.userDAO.UserGameStateDAO;
 import com.gnome.gnome.dao.userDAO.UserSession;
 import com.gnome.gnome.models.user.AuthUser;
+import com.gnome.gnome.models.user.UserGameState;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import javafx.geometry.Insets;
@@ -14,7 +16,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -41,6 +45,11 @@ public class LeaderBoardView extends VBox {
     private final MainController parentController;
     private PageSwitcherInterface pageSwitch;
     private final AuthUserDAO userDAO = new AuthUserDAO();
+
+    private final UserGameStateDAO userGameStateDAO = new UserGameStateDAO();
+    private Map<String, UserGameState> userGameStatesByUsername = new HashMap<>();
+
+
     /**
      * Constructs a LeaderBoardView with a parent controller and a close action.
      *
@@ -186,6 +195,10 @@ public class LeaderBoardView extends VBox {
         if (allUsers == null) {
             allUsers = users;
             filteredUsers = users;
+
+            List<UserGameState> allGameStates = userGameStateDAO.getAllUserGameStates();
+            userGameStatesByUsername = allGameStates.stream()
+                    .collect(Collectors.toMap(UserGameState::getUsername, u -> u));
         } else {
             allUsers.addAll(users);
             filteredUsers = allUsers;
@@ -230,7 +243,9 @@ public class LeaderBoardView extends VBox {
     private void updateListView(List<AuthUser> users) {
         listView.getItems().clear();
         for (AuthUser user : users) {
-            String display = user.getUsername() + " - [role: " + user.getRole() + "]";
+            UserGameState gameState = userGameStatesByUsername.get(user.getUsername());
+            int score = (gameState != null) ? gameState.getScore() : 0;
+            String display = score + ": " + user.getUsername();
             listView.getItems().add(display);
         }
     }

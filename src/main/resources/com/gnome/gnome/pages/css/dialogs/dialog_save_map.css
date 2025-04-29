@@ -128,3 +128,44 @@
     -fx-spacing: 10;
     -fx-background-color: transparent;
 }
+
+/* CheckBox styling */
+.check-box {
+    -fx-font-family: 'Press Start 2P', sans-serif;
+    -fx-font-size: 12px;
+    -fx-text-fill: #F4C8D4; /* Light pink text */
+    -fx-padding: 5 0;
+}
+
+.check-box:hover {
+    -fx-text-fill: #FFFFFF; /* White text on hover */
+    -fx-cursor: hand;
+}
+
+/* CheckBox box styling */
+.check-box .box {
+    -fx-background-color: #2E1C26; /* Darker pink background */
+    -fx-border-color: #6B4657; /* Dark pink border */
+    -fx-border-width: 2;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-effect: innershadow(gaussian, rgba(0,0,0,0.2), 5, 0, 0, 1);
+    -fx-padding: 6; /* Size of the box */
+}
+
+.check-box .box:hover {
+    -fx-border-color: #8F5B71; /* Lighter pink on hover */
+}
+
+/* CheckBox selected state */
+.check-box:selected .box {
+    -fx-background-color: #A35474; /* Brighter pink when selected */
+}
+
+/* CheckBox mark (checkmark) */
+.check-box .mark {
+    -fx-background-color: #F4C8D4; /* Light pink checkmark */
+    -fx-shape: "M 2 6 L 6 10 L 12 2"; /* Custom checkmark shape */
+    -fx-scale-shape: true;
+    -fx-padding: 4;
+}

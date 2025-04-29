@@ -3,6 +3,7 @@ package com.gnome.gnome.loginRegistration.service;
 import com.gnome.gnome.dao.userDAO.AuthUserDAO;
 import com.gnome.gnome.dao.userDAO.PasswordUtils;
 import com.gnome.gnome.models.user.AuthUser;
+import com.gnome.gnome.models.user.PlayerRole;
 
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -78,7 +79,7 @@ public class LoginRegistrationService {
                     return new LoginResult(null, "Incorrect password.");
                 }
             } else {
-                AuthUser newUser = new AuthUser(username, PasswordUtils.hashPassword(password), "user");
+                AuthUser newUser = new AuthUser(username, PasswordUtils.hashPassword(password), PlayerRole.USER);
                 System.out.println(newUser);
                 authUserDAO.insertAuthUser(newUser);
                 System.out.println("User not found.User creation: "+username);

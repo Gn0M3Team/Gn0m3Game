@@ -13,5 +13,5 @@ import lombok.Data;
 public class AuthUser {
     private String username;
     private String password;
-    private String role;
+    private PlayerRole role;;
 }

@@ -2,6 +2,7 @@ package com.gnome.gnome;
 
 import com.gnome.gnome.dao.MapDAO;
 import com.gnome.gnome.dao.userDAO.AuthUserDAO;
+import com.gnome.gnome.models.user.PlayerRole;
 import com.gnome.gnome.userState.UserState;
 import com.gnome.gnome.game.MapLoader;
 import com.gnome.gnome.models.Map;
@@ -42,6 +43,7 @@ public class MainController {
     private PageSwitcherInterface pageSwitch;
     private LeaderBoardView leaderboard;
     private final AuthUserDAO userDAO = new AuthUserDAO();
+    private final UserState userState = UserState.getInstance();
 
     Stage primaryStage;
 
@@ -65,7 +67,7 @@ public class MainController {
         );
 
         User_test_for_creation();
-        user_test();
+//        checkUserRole();
 
         musicButton.setGraphic(musicIcon);
 
@@ -73,6 +75,8 @@ public class MainController {
             primaryStage = (Stage) continueGameButton.getScene().getWindow();
             this.setPrimaryStage(primaryStage);
         });
+
+        nicknameLabel.setText(userState.getUsername() + ": " + userState.getRole());
     }
 
     public void setPrimaryStage(Stage primaryStage) {
@@ -89,13 +93,14 @@ public class MainController {
         });
     }
 
+//    TODO: delete in final
     /**
      * Checks if there is a current user. If not, sets a default user (Admin).
      */
     private void User_test_for_creation(){
         System.out.println("Current User:" + UserSession.getInstance().getCurrentUser());
-        if (UserSession.getInstance().getCurrentUser()==null){
-            AuthUser admin=userDAO.getAuthUserByUsername("Admin");
+        if (UserSession.getInstance().getCurrentUser() == null){
+            AuthUser admin = userDAO.getAuthUserByUsername("Admin");
             UserSession.getInstance().setCurrentUser(admin);
             System.out.println("Current User:" + UserSession.getInstance().getCurrentUser());
         }
@@ -103,11 +108,12 @@ public class MainController {
     /**
      * Displays the current user's username and sets visibility of the editor button based on user role.
      */
-    private void user_test(){
-        AuthUser authUser=UserSession.getInstance().getCurrentUser();
-        nicknameLabel.setText("User: "+authUser.getUsername());
-        if (authUser.getRole().equals("user")){
-            editorButton.setVisible(false);
+    private void checkUserRole() {
+        if (userState.getRole() != null) {
+            if (userState.getRole() == PlayerRole.USER) {
+                editorButton.setVisible(false);
+                editorButton.setManaged(false);
+            }
         }
     }
 
@@ -193,7 +199,6 @@ public class MainController {
     @FXML
     public void onExitButtonClick(ActionEvent event) {
         MusicWizard.stop = true;
-//        Platform.exit();
         pageSwitch.goLogin(mainBorderPane);
     }
 }
