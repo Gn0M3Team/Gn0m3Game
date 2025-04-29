@@ -68,6 +68,10 @@ public class GameController {
      */
     private Canvas viewportCanvas;
 
+    private Weapon weapon;
+    private Armor armor;
+    private Potion potion;
+
     /**
      * The initial game map (static terrain).
      */
@@ -144,6 +148,11 @@ public class GameController {
     private boolean debug_mod_game;
 
     public void initializeWithLoadedMap(int[][] mapData, Armor armor, Weapon weapon, Potion potion) {
+
+        this.armor = armor;
+        this.weapon = weapon;
+        this.potion = potion;
+
         setupProperties();
         this.baseMap = mapData;
         this.fieldMap = copyMap(baseMap);
@@ -198,7 +207,7 @@ public class GameController {
 
         // Add a coin to the map at position (9, 9) with a value of 100
         coinsOnMap.add(new Coin(9, 9, 100));
-        drawCoinCounter(); // Update the coin counter label to show the player's initial coin count (0)
+//        drawCoinCounter(); // Update the coin counter label to show the player's initial coin count (0)
 
         // Set up the center menu button to show the popup menu when clicked
         centerMenuButton.setOnAction(e -> showCenterMenu());
@@ -463,7 +472,7 @@ public class GameController {
         // Remove all collected coins from the map
         coinsOnMap.removeAll(collected);
         // Update the coin counter label to reflect the new total
-        drawCoinCounter();
+//        drawCoinCounter();
     }
 
     private void drawAttackRange(GraphicsContext gc, int range) {
@@ -555,38 +564,38 @@ public class GameController {
             arrow.updateCameraOffset(camera.getStartCol(), camera.getStartRow());
         }
 
-        drawCoinCounter();
+//        drawCoinCounter();
         updatePlayerHealthBar();
     }
 
-    private void drawCoinCounter() {
-        GraphicsContext gc = viewportCanvas.getGraphicsContext2D();
-        double canvasWidth = viewportCanvas.getWidth();
-        double canvasHeight = viewportCanvas.getHeight();
-        double padding = 20;
-
-        double panelWidth = canvasWidth * 0.15;
-        double panelHeight = canvasHeight * 0.07;
-
-        double panelX = padding;
-        double panelY = canvasHeight - panelHeight - padding;
-
-        gc.setFill(Color.color(0, 0, 0, 0.5));
-        gc.fillRoundRect(panelX, panelY, panelWidth, panelHeight, 15, 15);
-
-        if (coinImage == null) {
-            coinImage = new Image(Objects.requireNonNull(
-                    Coin.class.getResourceAsStream("/com/gnome/gnome/images/tiles/" + ObjectsConstants.COIN_IMAGE)
-            ));
-        }
-
-        double coinSize = viewportCanvas.getWidth() * 0.05;
-        gc.drawImage(coinImage, panelX + 10, panelY + (panelHeight - coinSize) / 2, coinSize, coinSize);
-
-        gc.setFill(Color.WHITE);
-        gc.setFont(javafx.scene.text.Font.font(20));
-        gc.fillText("x " + player.getPlayerCoins(), panelX + 50, panelY + panelHeight / 2 + 7);
-    }
+//    private void drawCoinCounter() {
+//        GraphicsContext gc = viewportCanvas.getGraphicsContext2D();
+//        double canvasWidth = viewportCanvas.getWidth();
+//        double canvasHeight = viewportCanvas.getHeight();
+//        double padding = 20;
+//
+//        double panelWidth = canvasWidth * 0.15;
+//        double panelHeight = canvasHeight * 0.07;
+//
+//        double panelX = padding;
+//        double panelY = canvasHeight - panelHeight - padding;
+//
+//        gc.setFill(Color.color(0, 0, 0, 0.5));
+//        gc.fillRoundRect(panelX, panelY, panelWidth, panelHeight, 15, 15);
+//
+//        if (coinImage == null) {
+//            coinImage = new Image(Objects.requireNonNull(
+//                    Coin.class.getResourceAsStream("/com/gnome/gnome/images/tiles/" + ObjectsConstants.COIN_IMAGE)
+//            ));
+//        }
+//
+//        double coinSize = viewportCanvas.getWidth() * 0.05;
+//        gc.drawImage(coinImage, panelX + 10, panelY + (panelHeight - coinSize) / 2, coinSize, coinSize);
+//
+//        gc.setFill(Color.WHITE);
+//        gc.setFont(javafx.scene.text.Font.font(20));
+//        gc.fillText("x " + player.getPlayerCoins(), panelX + 50, panelY + panelHeight / 2 + 7);
+//    }
 
     /**
      * Starts the game loop using an AnimationTimer.
@@ -889,7 +898,7 @@ public class GameController {
 
             GameController ctrl = loader.getController();
 
-            ctrl.initializeWithLoadedMap(this.baseMap);
+            ctrl.initializeWithLoadedMap(this.baseMap, armor, weapon, potion);
 
             Stage stage = (Stage) rootBorder.getScene().getWindow();
             stage.getScene().setRoot(newRoot);

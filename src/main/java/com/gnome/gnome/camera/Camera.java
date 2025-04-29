@@ -14,6 +14,11 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import lombok.Data;
 
 import java.util.HashMap;
@@ -105,19 +110,19 @@ public class Camera {
      * @param canvas The Canvas object on which to draw the map (this is the area in JavaFX where you can draw graphics).
      * @param coins A list of coins to display if they are in the visible area.
      */
+
     public void drawViewport(Canvas canvas, List<Coin> coins) {
-        // Підрахунок ширини і висоти одного тайла
+        // Calculate tile dimensions
         double tileWidth = canvas.getWidth() / viewportSize;
         double tileHeight = canvas.getHeight() / viewportSize;
         this.tileWidth = tileWidth;
         this.tileHeight = tileHeight;
-        this.dynamicTileSize = Math.min(tileWidth, tileHeight); // Для гравця
+        this.dynamicTileSize = Math.min(tileWidth, tileHeight);
 
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
         int totalRows = mapGrid.length;
         int totalCols = mapGrid[0].length;
-
         int half = viewportSize / 2;
 
         startRow = Math.max(0, Math.min(cameraCenterY - half, totalRows - viewportSize));
@@ -125,6 +130,7 @@ public class Camera {
 
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
+        // Draw map tiles
         for (int i = 0; i < viewportSize; i++) {
             for (int j = 0; j < viewportSize; j++) {
                 int row = startRow + i;
@@ -138,7 +144,7 @@ public class Camera {
                     Image tileImage = getCachedImage(type.getImagePath());
 
                     if (tileImage != null) {
-                        gc.drawImage(tileImage, x, y, tileWidth, tileHeight); // ⚡ правильні пропорції
+                        gc.drawImage(tileImage, x, y, tileWidth, tileHeight);
                     } else {
                         gc.setFill(Color.GRAY);
                         gc.fillRect(x, y, tileWidth, tileHeight);
@@ -159,14 +165,13 @@ public class Camera {
             }
         }
 
-        // Малюємо монети
+        // Draw coins on the map
         for (Coin coin : coins) {
             int gx = coin.getGridX();
             int gy = coin.getGridY();
 
             if (gx >= startCol && gx < startCol + viewportSize &&
                     gy >= startRow && gy < startRow + viewportSize) {
-
                 Image img = coin.getImageView().getImage();
                 double w = coin.getImageView().getFitWidth();
                 double h = coin.getImageView().getFitHeight();
@@ -180,72 +185,190 @@ public class Camera {
             }
         }
 
-//        System.out.println("/com/gnome/gnome/images/tiles/" + armor.getImg() );
-//        System.out.println("/com/gnome/gnome/images/tiles/" + weapon.getImg());
-//        System.exit(1);
+        // Load item images
+        armorImage = loadItemImage(armor != null ? armor.getImg() : null);
+        weaponImage = loadItemImage(weapon != null ? weapon.getImg() : null);
+        potionImage = loadItemImage(potion != null ? potion.getImg1() : null);
 
-        armorImage = new Image(
-                Objects.requireNonNull(
-                        getClass().getResourceAsStream("/com/gnome/gnome/images/tiles/" + armor.getImg() + ".png")
-                )
-        );
-
-        weaponImage = new Image(
-                Objects.requireNonNull(
-                        getClass().getResourceAsStream("/com/gnome/gnome/images/tiles/" + weapon.getImg() + ".png")
-                )
-        );
-
-        potionImage = new Image(
-                Objects.requireNonNull(
-                        getClass().getResourceAsStream("/com/gnome/gnome/images/tiles/" + weapon.getImg() + ".png")
-                )
-        );
-
-
-
-        // Малюємо кнопки Armor / Sword
-        double boxSize = canvas.getWidth() * 0.08;
-        double padding = canvas.getWidth() * 0.02;
+        // Item display parameters
+        double boxSize = canvas.getWidth() * 0.06;
+        double padding = canvas.getWidth() * 0.015;
         double canvasWidth = canvas.getWidth();
         double canvasHeight = canvas.getHeight();
+        double cornerRadius = 10.0;
+        double shadowOffset = 3.0;
 
-        gc.setFill(Color.color(0, 0, 0, 0.5));
-        gc.fillRect(
-                canvasWidth - boxSize - padding - 10,
-                canvasHeight - boxSize * 2 - padding - 30,
-                boxSize + 20,
-                boxSize * 2 + 40
-        );
+        // Position items in the bottom-middle
+        double bottomMargin = 10;
+        double totalItemsWidth = 3 * boxSize + 2 * padding; // 3 items + padding between them
+        double startX = (canvasWidth - totalItemsWidth) / 2; // Center horizontally
+        double itemY = canvasHeight - boxSize - padding - bottomMargin - 40; // Position at bottom with space for text
 
-        gc.drawImage(
-                armorImage,
-                canvasWidth - boxSize - padding,
-                canvasHeight - boxSize * 2 - padding - 20,
-                boxSize,
-                boxSize
-        );
+        // Item positions (side by side)
+        double weaponX = startX;
+        double potionX = startX + boxSize + padding;
+        double armorX = startX + 2 * (boxSize + padding);
 
-        gc.drawImage(
-                weaponImage,
-                canvasWidth - boxSize - padding,
-                canvasHeight - boxSize - padding,
-                boxSize,
-                boxSize
+        // Draw items with enhanced styling
+        drawItemBox(gc, weaponImage, weapon, weaponX, itemY, boxSize, cornerRadius, shadowOffset, canvas);
+        drawItemBox(gc, potionImage, potion, potionX, itemY, boxSize, cornerRadius, shadowOffset, canvas);
+        drawItemBox(gc, armorImage, armor, armorX, itemY, boxSize, cornerRadius, shadowOffset, canvas);
+
+        // Position coin amount in the bottom-left with small margins
+        double sideMargin = 10;
+        double coinX = sideMargin;
+        double coinY = canvasHeight - boxSize - padding - bottomMargin; // Reduced height due to horizontal layout
+
+        // Draw coin amount
+        int coinCount = coins.size(); // Assuming this represents the player's coin count
+        Image coinImage = coins.isEmpty() ? null : coins.get(0).getImageView().getImage(); // Use the coin image
+        drawCoinAmount(gc, coinImage, coinCount, coinX, coinY, boxSize, cornerRadius, shadowOffset, canvas);
+    }
+
+    // Helper method to draw coin amount (horizontal layout)
+    private void drawCoinAmount(GraphicsContext gc, Image coinImage, int coinCount, double x, double y,
+                                double boxSize, double cornerRadius, double shadowOffset, Canvas canvas) {
+        gc.save();
+
+        // Calculate box dimensions for horizontal layout
+        double boxWidth = boxSize * 2.5; // Wider to accommodate horizontal layout
+        double boxHeight = boxSize; // Shorter since no stacking
+
+        // Draw shadow
+        gc.setFill(Color.color(0, 0, 0, 0.3));
+        gc.fillRoundRect(x + shadowOffset, y + shadowOffset, boxWidth, boxHeight,
+                cornerRadius, cornerRadius);
+
+        // Draw gradient background with #6B4657 base color
+        LinearGradient gradient = new LinearGradient(
+                0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
+                new Stop(0, Color.web("#8B6677", 0.9)),
+                new Stop(1, Color.web("#6B4657", 0.9))
         );
+        gc.setFill(gradient);
+        gc.fillRoundRect(x, y, boxWidth, boxHeight, cornerRadius, cornerRadius);
+
+        // Draw border
+        gc.setStroke(Color.rgb(100, 100, 120, 0.7));
+        gc.setLineWidth(1.5);
+        gc.strokeRoundRect(x, y, boxWidth, boxHeight, cornerRadius, cornerRadius);
+
+        // Draw coin image on the left
+        if (coinImage != null) {
+            double imageSize = boxSize * 0.75;
+            double imageX = x + (boxSize - imageSize) / 2;
+            double imageY = y + (boxSize - imageSize) / 2;
+            gc.drawImage(coinImage, imageX, imageY, imageSize, imageSize);
+        }
+
+        // Draw coin count text to the right of the image
+//        String coinText = "x" + coinCount;
+        String coinText = "x" + player.getPlayerCoins();
+        gc.setFill(Color.WHITE);
+        gc.setFont(Font.font("Arial", FontWeight.BOLD, 12));
+        double textX = x + boxSize + 5; // Position after the image with a small gap
+        double textY = y + boxSize / 2 + 5; // Center vertically
+        gc.fillText(coinText, textX, textY);
+
+        // Draw label "Coins" to the right of the count
+        gc.setFont(Font.font("Arial", FontWeight.NORMAL, 10));
+        gc.setFill(Color.rgb(200, 200, 200));
+        gc.fillText("Coins", textX + 30, textY); // Adjust position based on text width
+
+        gc.restore();
+    }
+
+    // Helper method to draw item box
+    private void drawItemBox(GraphicsContext gc, Image image, Object item, double x, double y,
+                             double boxSize, double cornerRadius, double shadowOffset, Canvas canvas) {
+        gc.save();
+
+        // Draw shadow
+        gc.setFill(Color.color(0, 0, 0, 0.3));
+        gc.fillRoundRect(x + shadowOffset, y + shadowOffset, boxSize, boxSize + 40,
+                cornerRadius, cornerRadius);
+
+        // Draw gradient background with #6B4657 base color
+        LinearGradient gradient = new LinearGradient(
+                0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
+                new Stop(0, Color.web("#8B6677", 0.9)),
+                new Stop(1, Color.web("#6B4657", 0.9))
+        );
+        gc.setFill(gradient);
+        gc.fillRoundRect(x, y, boxSize, boxSize + 40, cornerRadius, cornerRadius);
+
+        // Draw border
+        gc.setStroke(Color.rgb(100, 100, 120, 0.7));
+        gc.setLineWidth(1.5);
+        gc.strokeRoundRect(x, y, boxSize, boxSize + 40, cornerRadius, cornerRadius);
+
+        // Draw item image
+        if (image != null) {
+            double imageSize = boxSize * 0.75;
+            double imageX = x + (boxSize - imageSize) / 2;
+            double imageY = y + (boxSize - imageSize) / 2;
+            gc.drawImage(image, imageX, imageY, imageSize, imageSize);
+        }
+
+        // Draw item text
+        String name = item != null ? getItemName(item) : "None";
+        String stats = item != null ? getItemStats(item) : "";
 
         gc.setFill(Color.WHITE);
-        gc.setFont(javafx.scene.text.Font.font(16));
+        gc.setFont(Font.font("Arial", FontWeight.BOLD, 12));
+        gc.fillText(name, x + 5, y + boxSize + 15);
 
-        gc.fillText(
-                armor.getNameEng(),
-                canvasWidth - boxSize - padding + 10,
-                canvasHeight - boxSize * 2 - padding + 10
-        );
-        gc.fillText(
-                weapon.getNameEng(),
-                canvasWidth - boxSize - padding + 10,
-                canvasHeight - boxSize - padding + 10
+        gc.setFont(Font.font("Arial", FontWeight.NORMAL, 10));
+        gc.setFill(Color.rgb(200, 200, 200));
+        gc.fillText(stats, x + 5, y + boxSize + 28);
+
+        gc.restore();
+    }
+
+    // Helper methods to get item name and stats
+    private String getItemName(Object item) {
+        if (item instanceof Weapon) return ((Weapon)item).getNameEng();
+        if (item instanceof Armor) return ((Armor)item).getNameEng();
+        if (item instanceof Potion) return ((Potion)item).getNameEng();
+        return "None";
+    }
+
+    private String getItemStats(Object item) {
+        if (item instanceof Weapon) {
+            Weapon w = (Weapon)item;
+            return "DMG: " + w.getAtkValue();
+        }
+        if (item instanceof Armor) {
+            Armor a = (Armor)item;
+            return "DEF k: " + a.getDefCof();
+        }
+        if (item instanceof Potion) {
+            Potion p = (Potion)item;
+            return "HP: +" + p.getScoreVal();
+        }
+        return "";
+    }
+
+    /**
+     * Loads an item image from the resources folder.
+     * <p>
+     * If the provided image name is {@code null}, a default "no-item" placeholder image is loaded.
+     * Otherwise, it loads the image from the "tiles/" subdirectory.
+     *
+     * @param imageName the name of the image file (without path and extension), or {@code null}
+     * @return the loaded {@link Image} object
+     * @throws NullPointerException if the resource stream cannot be found
+     */
+    private Image loadItemImage(String imageName) {
+        if (imageName == null) {
+            imageName = "default-no-item.png";
+        } else {
+            imageName = "tiles/" + imageName + ".png";
+        }
+        return new Image(
+                Objects.requireNonNull(
+                        getClass().getResourceAsStream("/com/gnome/gnome/images/" + imageName)
+                )
         );
     }
 

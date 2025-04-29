@@ -54,13 +54,13 @@ public class MapLoader {
     public void showStartMap(Map selectedMap) {
         showLoadingPopup();
 
-        int armorId = UserState.getInstance().getArmorId();
-        int weaponId = UserState.getInstance().getWeaponId();
-        int potionId = UserState.getInstance().getPotionId();
+        Integer armorId = UserState.getInstance().getArmorId();
+        Integer weaponId = UserState.getInstance().getWeaponId();
+        Integer potionId = UserState.getInstance().getPotionId();
 
-        armor = armorDAO.getArmorById(armorId);
-        weapon = weaponDAO.getWeaponById(weaponId);
-        potion = potionDAO.getPotionById(potionId);
+        armor = (armorId != null) ? armorDAO.getArmorById(armorId) : null;
+        weapon = (weaponId != null) ? weaponDAO.getWeaponById(weaponId) : null;
+        potion = (potionId != null) ? potionDAO.getPotionById(potionId) : null;
 
         executor.submit(() -> {
             try {
