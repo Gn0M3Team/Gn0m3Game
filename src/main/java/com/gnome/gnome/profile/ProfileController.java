@@ -1,26 +1,27 @@
 package com.gnome.gnome.profile;
 
+import com.gnome.gnome.dao.userDAO.AuthUserDAO;
+import com.gnome.gnome.dao.MapDAO;
+import com.gnome.gnome.dao.userDAO.UserGameStateDAO;
 import com.gnome.gnome.dao.userDAO.UserSession;
+import com.gnome.gnome.models.Map;
+import com.gnome.gnome.models.user.AuthUser;
+import com.gnome.gnome.models.user.PlayerRole;
+import com.gnome.gnome.models.user.UserGameState;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
-import javafx.animation.FadeTransition;
+import com.gnome.gnome.userState.UserState;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
+import javafx.geometry.Bounds;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
-import javafx.stage.Stage;
-import javafx.scene.Node;
+import javafx.scene.layout.VBox;
+import javafx.stage.Popup;
 import javafx.event.ActionEvent;
-import javafx.util.Duration;
-
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ProfileController {
@@ -31,22 +32,39 @@ public class ProfileController {
     @FXML private Label recordLabel;
     @FXML private Label roleLabel;
     @FXML private Label gamesPlayedLabel;
-    @FXML private Label winRateLabel;
-    @FXML private ListView<String> cardListView;
+    @FXML private Label deathCounter;
+
+    @FXML
+    private Button banUserButton;
+    @FXML private Button leftButton;
+    @FXML private Button rightButton;
+    @FXML private Button confirmRoleButton;
+
+
     @FXML private ListView<String> mapListView;
     @FXML
     private BorderPane profilePage;
     private PageSwitcherInterface pageSwitch;
+    private final AuthUserDAO userDAO = new AuthUserDAO();
+    private final MapDAO MapDAO = new MapDAO();
 
-    private int currentCardPage = 1;
-    private final int cardPageSize = 10;
-    private boolean cardLoading = false;
+    private final UserState userState = UserState.getInstance();
+
 
     private int currentMapPage = 1;
     private final int mapPageSize = 5;
     private boolean mapLoading = false;
+    private List<Map> userMaps;
 
-    private String selectedPlayer;
+    private PlayerRole selectedUserRole;
+
+    private String selectedUsername;
+    private AuthUser user;
+    private final List<PlayerRole> roles = List.of(PlayerRole.USER, PlayerRole.MAP_CREATOR);
+
+    private int currentRoleIndex = 0;
+
+
 
     @FXML
     public void initialize() {
@@ -58,23 +76,70 @@ public class ProfileController {
      * This method is called when navigating from the leaderboard.
      */
     public void setPlayer(String playerData) {
-        this.selectedPlayer = playerData;
+        this.selectedUsername = playerData.split(": ")[1];
+
         logger.info("Loading profile for: " + playerData);
 
-        System.out.println(playerData);
-        nameLabel.setText("Profile of " + playerData);
-        recordLabel.setText("Record: 12345");
-        gamesPlayedLabel.setText("Games Played: 100");
-        winRateLabel.setText("Win Rate: 75%");
-        roleLabel.setText("Role: User");
 
-        cardListView.setPlaceholder(new Label("No cards available"));
-        mapListView.setPlaceholder(new Label("No maps available"));
+        user = userDAO.getAuthUserByUsername(selectedUsername);
+        userMaps = MapDAO.getMapsByUsername(selectedUsername);
 
-        loadMoreCards();
-        loadMoreMaps();
-        setupScrollPagination(cardListView, this::loadMoreCards, () -> cardLoading);
-        setupScrollPagination(mapListView, this::loadMoreMaps, () -> mapLoading);
+        UserGameStateDAO GameState = new UserGameStateDAO();
+
+        UserGameState gameState = GameState.getUserGameStateByUsername(selectedUsername);
+
+        nameLabel.setText("Profile of " + user.getUsername());
+        recordLabel.setText("Score: " + gameState.getScore());
+
+        gamesPlayedLabel.setText("MapLevel: " + gameState.getMapLevel());
+        deathCounter.setText("Death counter: " + gameState.getDeathCounter());
+
+        selectedUserRole = (user != null) ? user.getRole() : PlayerRole.USER;
+        currentRoleIndex = roles.indexOf(selectedUserRole);
+        if (currentRoleIndex == -1) currentRoleIndex = 0;
+        roleLabel.setText("Role: " + roles.get(currentRoleIndex));
+
+
+        user_test();
+
+        mapListView.getItems().clear();
+        if (userMaps.isEmpty()) {
+            mapListView.setPlaceholder(new Label("No maps available"));
+        } else {
+            loadMoreMaps();
+            setupScrollPagination(mapListView, this::loadMoreMaps, () -> mapLoading);
+        }
+//        if (userMaps.isEmpty()) {
+//            mapListView.setPlaceholder(new Label("No maps available"));
+//        } else {
+//            for (Map map : userMaps) {
+//                mapListView.getItems().add(map.toString());
+//            }
+//        }
+
+
+    }
+    /**
+     * Adjusts the visibility of buttons depending on the current user's permissions.
+     */
+    private void user_test(){
+        if ((!userState.getRole().equals(PlayerRole.ADMIN)) || selectedUserRole.equals(PlayerRole.ADMIN)){
+            banUserButton.setVisible(false);
+            banUserButton.setManaged(false);
+            roleLabel.setDisable(true);
+            leftButton.setVisible(false);
+            leftButton.setManaged(false);
+            rightButton.setVisible(false);
+            rightButton.setManaged(false);
+            confirmRoleButton.setVisible(false);
+            confirmRoleButton.setManaged(false);
+        } else {
+            banUserButton.setVisible(true);
+            roleLabel.setDisable(false);
+            leftButton.setVisible(true);
+            rightButton.setVisible(true);
+            confirmRoleButton.setVisible(true);
+        }
     }
 
     /**
@@ -96,30 +161,31 @@ public class ProfileController {
         });
     }
 
-    /**
-     * Loads a new page of cards into the card list.
-     */
-    private void loadMoreCards() {
-        cardLoading = true;
-        for (int i = 1; i <= cardPageSize; i++) {
-            int cardNumber = (currentCardPage - 1) * cardPageSize + i;
-            cardListView.getItems().add("Card " + cardNumber);
-        }
-        currentCardPage++;
-        cardLoading = false;
-    }
 
     /**
-     * Loads a new page of maps into the map list.
+     * Loads the next batch of maps into the ListView.
      */
     private void loadMoreMaps() {
+        if (userMaps == null || userMaps.isEmpty()) return;
+
         mapLoading = true;
-        for (int i = 1; i <= mapPageSize; i++) {
-            int mapNumber = (currentMapPage - 1) * mapPageSize + i;
-            mapListView.getItems().add("Map " + mapNumber);
+        int start = (currentMapPage - 1) * mapPageSize;
+        int end = Math.min(start + mapPageSize, userMaps.size());
+
+        for (int i = start; i < end; i++) {
+            mapListView.getItems().add("Map "+i+": Score Value "+userMaps.get(i).getScoreVal()+" "+
+                    userMaps.get(i).getMapNameSk()+" "+
+                    userMaps.get(i).getMapNameEng()+" "+
+                    userMaps.get(i).getLevel());
         }
+
         currentMapPage++;
-        mapLoading = false;
+
+        if (end >= userMaps.size()) {
+            mapLoading = true;
+        } else {
+            mapLoading = false;
+        }
     }
 
     /**
@@ -132,36 +198,97 @@ public class ProfileController {
     }
 
     /**
-     * Simulates banning a user.
-     * Currently displays an alert and logs the action.
+     * Handles the ban/delete user button click.
+     * Shows confirmation popup before deleting the user.
      */
     @FXML
     private void handleBanUser(ActionEvent event) {
-        logger.warning("Ban user requested for: " + selectedPlayer);
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Ban User");
-        alert.setHeaderText(null);
-        alert.setContentText("User '" + selectedPlayer + "' has been banned (simulated).");
-        alert.showAndWait();
+        Popup confirmPopup = new Popup();
+        confirmPopup.setAutoHide(true);
+
+        VBox menuBox = new VBox(20);
+        menuBox.getStylesheets().add(getClass().getResource("/com/gnome/gnome/pages/css/new-game.css").toExternalForm());
+        menuBox.setAlignment(Pos.CENTER);
+        menuBox.getStyleClass().add("menu-popup");
+        menuBox.setStyle("-fx-background-color: #C0C0C0; -fx-padding: 20; -fx-background-radius: 20;");
+
+        Label title = new Label("Confirm Deletion");
+        title.getStyleClass().add("popup-title");
+
+        Label userLabel = new Label("Delete user: " + selectedUsername + "(" + selectedUserRole + ")" + "?");
+        userLabel.getStyleClass().add("popup-title");
+
+        Button yesButton = new Button("Yes, Delete");
+        yesButton.getStyleClass().add("menu-button");
+        Button noButton = new Button("Cancel");
+        noButton.getStyleClass().add("menu-button");
+
+        yesButton.setOnAction(e -> {
+            boolean deleted = userDAO.deleteUserByUsername(selectedUsername);
+            confirmPopup.hide();
+            if (deleted) {
+                logger.info("User deleted: " + selectedUserRole);
+                pageSwitch.goMainMenu(profilePage);
+            } else {
+                logger.warning("Failed to delete user: " + selectedUserRole);
+            }
+        });
+
+        noButton.setOnAction(e -> confirmPopup.hide());
+
+        menuBox.getChildren().addAll(title, userLabel, yesButton, noButton);
+        confirmPopup.getContent().add(menuBox);
+
+        Scene scene = profilePage.getScene();
+        if (scene != null) {
+            Bounds bounds = scene.getRoot().localToScreen(scene.getRoot().getBoundsInLocal());
+            double centerX = bounds.getMinX() + bounds.getWidth() / 2;
+            double centerY = bounds.getMinY() + bounds.getHeight() / 2;
+
+            confirmPopup.show(scene.getWindow());
+
+            double popupWidth = confirmPopup.getWidth();
+            double popupHeight = confirmPopup.getHeight();
+            confirmPopup.setX(centerX - popupWidth / 2);
+            confirmPopup.setY(centerY - popupHeight / 2);
+        }
+    }
+    /**
+     * Moves to the previous role in the role list.
+     */
+    @FXML
+    private void handleLeftRole() {
+        if (currentRoleIndex > 0) {
+            currentRoleIndex--;
+        } else {
+            currentRoleIndex = roles.size() - 1;
+        }
+        roleLabel.setText("Role: " + roles.get(currentRoleIndex));
     }
 
     /**
-     * Opens a dialog box to allow an admin to change the role of the user.
-     * Updates the UI and logs the role change.
+     * Moves to the next role in the role list.
      */
     @FXML
-    private void handleEditRole(ActionEvent event) {
-        List<String> choices = List.of("User", "ProUser", "Admin");
-
-        ChoiceDialog<String> dialog = new ChoiceDialog<>("User", choices);
-        dialog.setTitle("Edit Role");
-        dialog.setHeaderText("Select a new role for the user:");
-        dialog.setContentText("Role:");
-
-        Optional<String> result = dialog.showAndWait();
-        result.ifPresent(role -> {
-            roleLabel.setText("Role: " + role);
-            logger.info("Role changed to " + role + " for " + selectedPlayer);
-        });
+    private void handleRightRole() {
+        if (currentRoleIndex < roles.size() - 1) {
+            currentRoleIndex++;
+        } else {
+            currentRoleIndex = 0;
+        }
+        roleLabel.setText("Role: " + roles.get(currentRoleIndex));
     }
+    /**
+     * Confirms and updates the selected role for the user.
+     */
+    @FXML
+    private void handleConfirmRole(ActionEvent event) {
+        PlayerRole selectedRole = roles.get(currentRoleIndex);
+        logger.info("Role updated to " + selectedRole + " for user " + selectedUserRole);
+        logger.info(selectedUserRole + " " + selectedRole);
+        this.user.setRole(selectedRole);
+        userDAO.updateUserRole(this.user);
+        logger.info("Role updated to " + selectedRole + " for user " + selectedUserRole);
+    }
+
 }

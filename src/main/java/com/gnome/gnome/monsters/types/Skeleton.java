@@ -84,7 +84,7 @@ public class Skeleton extends Monster {
 
         // Check if the post-removal delay has expired
         // If less than 1 second (POST_REMOVAL_DELAY_NS) has passed since the last arrow was removed, skip the attack
-        if (now - lastAttackTime < POST_REMOVAL_DELAY_NS) {
+        if (now - lastArrowRemovedTime < POST_REMOVAL_DELAY_NS) {
             System.out.println("Skeleton at (" + getX() + ", " + getY() + ") waiting for post-removal delay");
             return null;
         }

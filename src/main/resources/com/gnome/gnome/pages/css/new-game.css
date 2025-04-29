@@ -19,4 +19,10 @@
     -fx-font-weight: bold;
     -fx-font-family: "Press Start 2P", -apple-system;
 }
+.popup-title {
+    -fx-text-fill: #000000;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Press Start 2P", -apple-system;
+}
 

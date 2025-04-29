@@ -18,4 +18,5 @@ public class Armor {
     private String nameSk;
     private String detailsEng;
     private String detailsSk;
+    private String img;
 }

@@ -17,6 +17,7 @@ module com.gnome.gnome {
     requires software.amazon.awssdk.awscore;
     requires jbcrypt;
 
+    opens com.gnome.gnome.game to javafx.fxml;
 
     opens com.gnome.gnome to javafx.fxml;
     exports com.gnome.gnome;
@@ -26,6 +27,9 @@ module com.gnome.gnome {
     opens com.gnome.gnome.dao to javafx.fxml;
     exports com.gnome.gnome.models;
     opens com.gnome.gnome.models to javafx.fxml;
+
+    opens com.gnome.gnome.newGame to javafx.fxml;
+    exports com.gnome.gnome.newGame;
 
     opens com.gnome.gnome.editor.controller to javafx.fxml;
     exports com.gnome.gnome.editor.controller;
@@ -37,20 +41,17 @@ module com.gnome.gnome {
     opens com.gnome.gnome.profile to javafx.fxml;
     exports com.gnome.gnome.profile;
 
-    opens com.gnome.gnome.continueGame to javafx.fxml;
-    exports com.gnome.gnome.continueGame;
-
     exports com.gnome.gnome.dao.userDAO;
     opens com.gnome.gnome.dao.userDAO to javafx.fxml;
 
     opens com.gnome.gnome.loginRegistration.controller to javafx.fxml;
     exports com.gnome.gnome.loginRegistration.controller;
 
-    opens com.gnome.gnome.newGame to javafx.fxml;
-    exports com.gnome.gnome.newGame;
-
     opens com.gnome.gnome.setting to javafx.fxml;
     exports com.gnome.gnome.setting;
+
+    opens com.gnome.gnome.storyMaps to javafx.fxml;
+    exports com.gnome.gnome.storyMaps;
 
     exports com.gnome.gnome.shop.service;
     opens com.gnome.gnome.shop.service to javafx.fxml;

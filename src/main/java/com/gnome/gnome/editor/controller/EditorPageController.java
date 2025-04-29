@@ -11,8 +11,10 @@ import com.gnome.gnome.editor.utils.CategoryGenerator;
 import com.gnome.gnome.editor.utils.GenerateGrid;
 import com.gnome.gnome.editor.utils.GridManager;
 import com.gnome.gnome.exceptions.DataAccessException;
+import com.gnome.gnome.models.user.PlayerRole;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
+import com.gnome.gnome.userState.UserState;
 import com.gnome.gnome.utils.annotation.MyValueInjection;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -101,6 +103,8 @@ public class EditorPageController {
     private CategoryGenerator categoryGenerator = new CategoryGenerator();
 
     private boolean autoCenterEnabled = true;
+
+    private final UserState userState = UserState.getInstance();
 
     /**
      * Default constructor, initializes the level grid.
@@ -559,24 +563,46 @@ public class EditorPageController {
 
 
     /**
-     * Handles loading a map from the database.
+     * Loads maps from the database based on the user's role.
+     * <ul>
+     *     <li>If the user is an ADMIN, all maps are available.</li>
+     *     <li>If the user is a MAP_CREATOR, only maps created by the user are available.</li>
+     *     <li>Other roles are not allowed to load maps.</li>
+     * </ul>
      *
+     * Displays a selection dialog for the user to choose a map to load.
+     *
+     * @param event the action event triggered by the UI interaction
      */
     @FXML
     protected void onLoadMapFromDatabase(ActionEvent event) {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         MapDAO mapDAO = new MapDAO();
-//        String currentUsername = getCurrentUsername(); // Implement this method to get the logged-in user
-        String currentUsername = "Admin"; // Admin for now
+        String currentUsername = userState.getUsername();
 
         try {
-            List<Map> userMaps = mapDAO.getMapsByUsername(currentUsername);
-            if (userMaps.isEmpty()) {
-                logger.info("No maps have been created by user: " + currentUsername);
-                return;
+            List<Map> userMaps;
+
+            if (userState.getRole() == PlayerRole.ADMIN) {
+                userMaps = mapDAO.getAllMaps();
+            } else {
+                userMaps = mapDAO.getMapsByUsername(currentUsername);
             }
+//            } else if (userState.getRole() == PlayerRole.MAP_CREATOR) {
+//                userMaps = mapDAO.getMapsByUsername(currentUsername);
+//            }
+//            else {
+//                logger.warning("User does not have permission to load maps.");
+//                return;
+//            }
+
+            if (userMaps.isEmpty()) {
+                logger.info("No maps available for user: " + currentUsername);
+//                return;
+            }
+
             List<String> mapNames = userMaps.stream()
-                    .map(Map::getMapNameEng)
+                    .map(map -> "ID: " + map.getId() + " - Name: " + map.getMapNameEng())
                     .collect(Collectors.toList());
 
             SelectorMapDialogBox mapDialog = new SelectorMapDialogBox(mapNames);
@@ -586,17 +612,16 @@ public class EditorPageController {
                 logger.info("Selected map: " + selectedItem);
 
                 Map selectedMap = userMaps.stream()
-                        .filter(map -> (map.getMapNameEng()).equals(selectedItem))
+                        .filter(map -> ("ID: " + map.getId() + " - Name: " + map.getMapNameEng()).equals(selectedItem))
                         .findFirst()
                         .orElse(null);
 
                 if (selectedMap != null) {
                     int[][] levelGrid = selectedMap.getMapData();
-
                     setupGrid(levelGrid, levelGrid[0].length, levelGrid.length);
                     logger.info("Map loaded successfully: " + selectedItem);
                 } else {
-                    logger.log(Level.SEVERE,"Error", "Selected map not found in user maps.");
+                    logger.log(Level.SEVERE,"Selected map not found in user maps.");
                 }
             });
 
@@ -604,6 +629,7 @@ public class EditorPageController {
             logger.log(Level.SEVERE, "Error loading maps from database", e);
         }
     }
+
 
     /**
      * Handles saving the map to a local device.
@@ -647,6 +673,7 @@ public class EditorPageController {
         Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         SaveMapDialogBox mapDialog = new SaveMapDialogBox();
         Optional<String> result = mapDialog.showDialog(primaryStage);
+
         result.ifPresent(fileName -> {
             try {
                 int[][] mapGrid = GenerateGrid.getInstance().getMapGrid();
@@ -654,21 +681,38 @@ public class EditorPageController {
                     return;
                 }
 
+                int level = 0;
+
                 Map map = new Map(
-                        "Admin", // Using Admin for now
+                        "Admin",
                         mapGrid,
                         0,
                         fileName,
                         fileName,
-                        1
+                        level
+
                 );
-                mapDAO.insertMap(map);
-                logger.info("Map saved to database successfully for username: " + fileName);
+
+                if (mapDialog.isStoryMap()) {
+                    List<Map> maps = mapDAO.getMapsOrderedByLevelDesc();
+                    if (!maps.isEmpty()) {
+                        Map lastMap = maps.getFirst();
+                        level = lastMap.getLevel() + 1;
+                        map.setLevel(level);
+                    }
+                    mapDAO.insertMap(map, true);
+                    logger.info("Story map saved to database: " + fileName);
+                } else {
+                    mapDAO.insertMap(map, false);
+                    logger.info("Map saved to database: " + fileName);
+                }
+
             } catch (DataAccessException e) {
                 logger.log(Level.SEVERE, "Failed to save map to database", e);
             }
         });
     }
+
 
     /**
      * Clear current map by clicking.
@@ -735,4 +779,70 @@ public class EditorPageController {
             }
         });
     }
+
+
+    /**
+     * Deletes a map from the database based on the user's role.
+     * <ul>
+     *     <li>If the user is an ADMIN, they can delete any map.</li>
+     *     <li>If the user is a MAP_CREATOR, they can only delete their own maps.</li>
+     *     <li>Other roles are not allowed to delete maps.</li>
+     * </ul>
+     *
+     * Displays a selection dialog for the user to choose which map to delete.
+     *
+     * @param event the action event triggered by the UI interaction
+     */
+    @FXML
+    protected void onDeleteMapFromDatabase(ActionEvent event) {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        MapDAO mapDAO = new MapDAO();
+        String currentUsername = userState.getUsername(); // <-- теперь правильный юзернейм
+
+        try {
+            List<Map> userMaps;
+
+            if (userState.getRole() == PlayerRole.ADMIN) {
+                userMaps = mapDAO.getAllMaps(); // Админ видит все карты
+            } else if (userState.getRole() == PlayerRole.MAP_CREATOR) {
+                userMaps = mapDAO.getMapsByUsername(currentUsername); // Создатель карт — только свои
+            } else {
+                logger.warning("User does not have permission to delete maps.");
+                return;
+            }
+
+            if (userMaps.isEmpty()) {
+                logger.info("No maps available for user: " + currentUsername);
+                return;
+            }
+
+            // Создаем список для отображения
+            List<String> mapDisplayList = userMaps.stream()
+                    .map(map -> "ID: " + map.getId() + " - Name: " + map.getMapNameEng())
+                    .collect(Collectors.toList());
+
+            SelectorMapDialogBox mapDialog = new SelectorMapDialogBox(mapDisplayList);
+            Optional<String> result = mapDialog.showDialog(stage);
+
+            result.ifPresent(selectedItem -> {
+                logger.info("Selected map for deletion: " + selectedItem);
+
+                Map selectedMap = userMaps.stream()
+                        .filter(map -> ("ID: " + map.getId() + " - Name: " + map.getMapNameEng()).equals(selectedItem))
+                        .findFirst()
+                        .orElse(null);
+
+                if (selectedMap != null) {
+                    mapDAO.deleteMapById(selectedMap.getId());
+                    logger.info("Map deleted successfully: " + selectedItem);
+                } else {
+                    logger.log(Level.SEVERE, "Selected map not found in user maps.");
+                }
+            });
+
+        } catch (DataAccessException e) {
+            logger.log(Level.SEVERE, "Error deleting map from database", e);
+        }
+    }
+
 }

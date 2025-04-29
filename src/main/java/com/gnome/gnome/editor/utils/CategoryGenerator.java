@@ -43,11 +43,37 @@ public class CategoryGenerator {
 
     // Local categories for test = true
     private final Map<String, List<String>> localCategoryMap = Map.of(
-            "Monsters",     List.of("Demon", "Butterfly", "Goblin", "Scorpion", "Skeleton"),
-            "Props",        List.of("Hatch", "Tree", "Cactus", "Rock", "Blocked", "Table", "Bookshelf"),
-            "Walls",        List.of("Wall_1", "Wall_2", "Wall_3", "Wall_4", "Wall_5"),
-            "Environment",  List.of("Mountain", "River", "Floor", "Web")
+            "Start/Finish", List.of("Start_Point", "Finish_Point"),
+
+            "Monsters", List.of(
+                    "Demon", "Butterfly", "Goblin", "Scorpion", "Skeleton"
+            ),
+
+            "Props", List.of(
+                    "Floor", "Blocked", "Bookshelf", "Table"
+            ),
+
+            "Environment", List.of(
+                    "Tree", "Rock", "River", "Cactus", "Web", "Stump", "Mountain"
+            ),
+
+            "Walls", List.of(
+                    "Wall_1", "Wall_2", "Wall_3", "Wall_4", "Wall_5",
+                    "Wall_6", "Wall_7", "Wall_8", "Wall_9", "Wall_10", "Wall_11"
+            ),
+
+            "Chests", List.of(
+                    "Chest_1", "Chest_2", "Chest_3", "Chest_4",
+                    "Chest_5", "Chest_6", "Chest_7"
+            ),
+
+            "Doors", List.of(
+                    "Door_1", "Door_2", "Door_3", "Door_4",
+                    "Door_5", "Door_6", "Door_7", "Door_8",
+                    "Door_9", "Door_10", "Door_11", "Door_12", "Door_13"
+            )
     );
+
 
     // Reference to your S3 utility class
     private final S3Actions s3Actions = new S3Actions();

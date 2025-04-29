@@ -1,15 +1,12 @@
 package com.gnome.gnome;
 
 import com.gnome.gnome.config.EditorLogger;
-import com.gnome.gnome.dao.MonsterDAO;
 import com.gnome.gnome.db.DatabaseWrapper;
-import com.gnome.gnome.models.Monster;
+import com.gnome.gnome.loginRegistration.controller.LoginRegistrationController;
 import com.gnome.gnome.utils.ImageParser;
 import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -19,19 +16,28 @@ import java.sql.Connection;
 import java.util.Map;
 import java.util.Properties;
 
-public class HelloApplication extends Application {
+public class MainApplication extends Application {
     private boolean skip_db;
-    @Override
     public void start(Stage stage) throws IOException {
-        // If parameter skip_log is true then start with menu page, otherwise start with logging
+
         Map<String, Boolean> properties = getProperties();
         skip_db = properties.get("skip_db");
+        System.out.println(skip_db);
 
-        FXMLLoader fxmlLoader = getFxmlLoader(properties.get("skip_logging"));
-        Scene scene = new Scene(fxmlLoader.load());
+        boolean skipLogging = properties.get("skip_logging");
 
+        FXMLLoader fxmlLoader = getFxmlLoader(skipLogging);
+        Parent root = fxmlLoader.load();
+
+        if (skipLogging) {
+            MainController controller = fxmlLoader.getController();
+            controller.setPrimaryStage(stage);
+        }
+
+
+        Scene scene = new Scene(root);
         stage.setFullScreen(true);
-        stage.setTitle("Hello!");
+        stage.setTitle("Dark Rifter");
         stage.setScene(scene);
         stage.show();
     }
@@ -66,29 +72,25 @@ public class HelloApplication extends Application {
     private FXMLLoader getFxmlLoader(boolean skip_logging){
         FXMLLoader fxmlLoader;
         if (skip_logging)
-            fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("pages/main-menu.fxml"));
+            fxmlLoader = new FXMLLoader(MainApplication.class.getResource("pages/main-menu.fxml"));
         else {
             connect_db();
-            fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("pages/login-registration.fxml"));
+            fxmlLoader = new FXMLLoader(MainApplication.class.getResource("pages/login-registration.fxml"));
         }
         return fxmlLoader;
     }
 
 
     private void connect_db() {
-        if (skip_db) {
+        if (!skip_db) {
             Connection conn = DatabaseWrapper.getInstance().getConnection();
 
             if (conn != null) {
                 System.out.println("✅ Database connection successful!");
+
             } else {
                 System.out.println("❌ Failed to connect to database.");
             }
-
-            MonsterDAO monsterDAO = new MonsterDAO();
-
-            Monster monster = monsterDAO.getMonsterById(1);
-            System.out.println(monster);
         }
     }
 

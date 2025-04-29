@@ -1,141 +1,238 @@
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+/* profile.css */
 
+@font-face {
+    font-family: 'Press Start 2P';
+    src: url('../fonts/PressStart2P-Regular.ttf') format('truetype');
+}
+
+/* Root pane styling */
 .profile-root {
-    -fx-background-color: #f8f8f8;
+    -fx-background-image: url('../../images/background-2.jpg');
+    -fx-background-size: cover;
+    -fx-background-color: rgba(42, 26, 42, 0.5);
+    -fx-background-position: center;
+    -fx-background-repeat: no-repeat;
 }
 
+/* Profile container (top section) */
+.profile-container {
+    -fx-background-color: rgba(74, 58, 74, 0.8); /* Matches map-entry */
+    -fx-background-radius: 10px;
+    -fx-padding: 20px;
+    -fx-border-color: black;
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
+}
+
+/* Profile name label */
 .profile-name {
-    -fx-font-family: "Press Start 2P", sans-serif;
-    -fx-font-size: 20px;
-    -fx-text-fill: #2c3e50;
+    -fx-text-fill: #ffffff;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-padding: 10px 0;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.8), 5, 0, 2, 2);
 }
 
+/* Profile record/score label */
 .profile-record {
-    -fx-font-family: "Press Start 2P", sans-serif;
-    -fx-font-size: 16px;
-    -fx-text-fill: #2c3e50;
+    -fx-text-fill: #e0e0e0;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 18px;
+    -fx-padding: 8px 0;
 }
 
-.profile-role {
-    -fx-font-family: "Press Start 2P", sans-serif;
-    -fx-font-size: 16px;
-    -fx-text-fill: #2c3e50;
+/* Stats container (map level, death counter) */
+.stats-container {
+    -fx-background-color: rgba(74, 58, 74, 0.6);
+    -fx-background-radius: 5px;
+    -fx-padding: 10px;
+    -fx-border-color: black;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
 }
 
+/* Profile stats (games played, death counter) */
 .profile-stats {
-    -fx-font-family: "Press Start 2P", sans-serif;
+    -fx-text-fill: #ffffff;
+    -fx-font-family: "Press Start 2P";
     -fx-font-size: 14px;
-    -fx-text-fill: #2c3e50;
+    -fx-padding: 5px 0;
 }
 
-
-.cards-title {
-    -fx-font-family: "Press Start 2P", sans-serif;
-    -fx-font-size: 18px;
-    -fx-text-fill: #2c3e50;
-    -fx-underline: true;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 2, 0, 0, 1);
+/* Role container */
+.role-container {
+    -fx-background-color: rgba(74, 58, 74, 0.6);
+    -fx-background-radius: 5px;
+    -fx-padding: 10px;
+    -fx-border-color: black;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
 }
 
+/* Profile role label */
+.profile-role {
+    -fx-text-fill: #ffffff;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 16px;
+    -fx-padding: 5px 10px;
+}
+
+/* Action buttons (left, right, confirm, back) */
+.action-button {
+    -fx-background-color: transparent;
+    -fx-background-image: url('../../images/button-background.png');
+    -fx-background-size: cover;
+    -fx-text-fill: #ffffff;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 14px;
+    -fx-padding: 12px 25px;
+    -fx-background-radius: 10px;
+    -fx-border-color: black;
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
+    -fx-cursor: hand;
+}
+
+.action-button:hover {
+    -fx-background-image: url('../../images/button-background-05.jpg');
+}
+
+/* Ban user button */
+.profile-ban-button {
+    -fx-background-color: transparent;
+    -fx-background-image: url('../../images/button-background.png');
+    -fx-background-size: cover;
+    -fx-text-fill: #ff6666;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 14px;
+    -fx-padding: 12px 25px;
+    -fx-background-radius: 10px;
+    -fx-border-color: black;
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
+    -fx-cursor: hand;
+}
+
+.profile-ban-button:hover {
+    -fx-background-image: url('../../images/button-background-05.jpg');
+    -fx-text-fill: #ff9999;
+}
+
+/* Maps container */
+.maps-container {
+    -fx-background-color: transparent;
+    -fx-padding: 20px;
+}
+
+/* Maps title label */
 .maps-title {
-    -fx-font-family: "Press Start 2P", sans-serif;
-    -fx-font-size: 18px;
-    -fx-text-fill: #2c3e50;
-    -fx-underline: true;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 2, 0, 0, 1);
+    -fx-text-fill: #ffffff;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-padding: 10px 0;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.8), 3, 0, 1, 1);
 }
 
-.card-list {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #bdc3c7;
-    -fx-border-radius: 5;
-    -fx-background-insets: 0;
-
-    -fx-control-inner-background: #ffffff;
-    -fx-control-inner-background-alt: #f2f2f2;
-
-    -fx-focus-color: transparent;
-    -fx-faint-focus-color: transparent;
-}
-
-.map-list {
-    -fx-background-color: linear-gradient(to bottom, #ffffff, #f0f0f0);
-    -fx-border-color: #a0a0a0;
+/* ScrollPane for map list */
+.map-scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: #6B4657; /* Darker pink border */
     -fx-border-width: 2;
     -fx-border-radius: 10;
     -fx-background-radius: 10;
-    -fx-control-inner-background: linear-gradient(to bottom, #ffffff, #f0f0f0);
-    -fx-control-inner-background-alt: #e0e0e0;
-    -fx-focus-color: transparent;
-    -fx-faint-focus-color: transparent;
+    -fx-padding: 10px;
 }
 
-.card-list .list-cell {
-    -fx-font-family: "Press Start 2P", sans-serif;
-    -fx-font-size: 14px;
-    -fx-text-fill: #2c3e50;
-    -fx-padding: 5 10;
+/* Map list view */
+.map-list {
     -fx-background-color: transparent;
+    -fx-background: transparent;
 }
 
+/* ListView cell styling */
 .map-list .list-cell {
-    -fx-font-family: "Press Start 2P", sans-serif;
-    -fx-font-size: 14px;
-    -fx-text-fill: #2c3e50;
-    -fx-padding: 8 12;
-    -fx-background-color: transparent;
-}
-
-.card-list .list-cell:filled:hover {
-    -fx-background-color: #e8e8e8;
-}
-
-.card-list .list-cell:filled:selected,
-.card-list .list-cell:filled:selected:focused {
-    -fx-background-color: #d0d0d0;
-    -fx-text-fill: #2c3e50;
+    -fx-background-color: rgba(74, 58, 74, 0.8); /* Matches map-entry */
+    -fx-background-radius: 5px;
+    -fx-text-fill: #ffffff;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 12px;
+    -fx-padding: 8px;
+    -fx-alignment: center-left;
+    -fx-border-color: black;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+    -fx-margin: 5px 0;
 }
 
 .map-list .list-cell:filled:hover {
-    -fx-background-color: rgba(200, 200, 255, 0.3);
+    -fx-background-color: rgba(106, 90, 106, 0.7);
+    -fx-background-radius: 5px;
 }
 
-.map-list .list-cell:filled:selected,
-.map-list .list-cell:filled:selected:focused {
-    -fx-background-color: rgba(150, 150, 255, 0.5);
-    -fx-text-fill: #1a1a2e;
-}
-
-.profile-back-button {
-    -fx-font-family: "Press Start 2P", sans-serif;
-    -fx-font-size: 14px;
-    -fx-background-color: #e0e0e0;
-    -fx-border-color: #bdc3c7;
-    -fx-border-radius: 5;
-    -fx-background-radius: 5;
-    -fx-padding: 5 10;
-}
-
-.profile-ban-button {
-    -fx-font-family: "Press Start 2P", sans-serif;
-    -fx-font-size: 14px;
-    -fx-background-color: #ff4d4d;
+.map-list .list-cell:filled:selected {
+    -fx-background-color: rgba(106, 90, 106, 0.9);
     -fx-text-fill: #ffffff;
-    -fx-border-color: #d63333;
-    -fx-border-radius: 5;
-    -fx-background-radius: 5;
-    -fx-padding: 5 10;
-    -fx-cursor: hand;
 }
 
-.profile-edit-role-button {
-    -fx-font-family: "Press Start 2P", sans-serif;
-    -fx-font-size: 14px;
-    -fx-background-color: #00b300;
-    -fx-text-fill: #ffffff;
-    -fx-border-color: #009900;
-    -fx-border-radius: 5;
+/* Scroll bar styling for ScrollPane */
+.map-scroll-pane .scroll-bar:vertical, .map-scroll-pane .scroll-bar:horizontal {
+    -fx-background-color: #2E1C26; /* Darker pink track background */
     -fx-background-radius: 5;
-    -fx-padding: 5 10;
-    -fx-cursor: hand;
+    -fx-border-color: #4F2F3F;
+    -fx-border-width: 1;
+    -fx-border-radius: 5;
+}
+
+.map-scroll-pane .scroll-bar .thumb {
+    -fx-background-color: #6B4657; /* Dark pink thumb */
+    -fx-background-radius: 5;
+    -fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0, 0, 1);
+}
+
+.map-scroll-pane .scroll-bar .thumb:hover {
+    -fx-background-color: #8F5B71; /* Lighter pink on hover */
+}
+
+.map-scroll-pane .scroll-bar .thumb:pressed {
+    -fx-background-color: #A35474; /* Slightly brighter pink when pressed */
+}
+
+.map-scroll-pane .scroll-bar .track {
+    -fx-background-color: #2E1C26; /* Dark pink track */
+    -fx-background-radius: 5;
+}
+
+.map-scroll-pane .scroll-bar .increment-button, .map-scroll-pane .scroll-bar .decrement-button {
+    -fx-background-color: #472D3C; /* Dark pink buttons */
+    -fx-background-radius: 5;
+    -fx-border-color: #4F2F3F;
+    -fx-border-width: 1;
+    -fx-padding: 2;
+}
+
+.map-scroll-pane .scroll-bar .increment-button:hover, .map-scroll-pane .scroll-bar .decrement-button:hover {
+    -fx-background-color: #6B4657; /* Lighter pink on hover */
+}
+
+.map-scroll-pane .scroll-bar .increment-button:pressed, .map-scroll-pane .scroll-bar .decrement-button:pressed {
+    -fx-background-color: #8F5B71; /* Brighter pink when pressed */
+}
+
+.map-scroll-pane .scroll-bar .increment-arrow, .map-scroll-pane .scroll-bar .decrement-arrow {
+    -fx-shape: "M 0 0 L 6 6 L 12 0 Z"; /* Triangle shape */
+    -fx-background-color: #F4C8D4; /* Light pink arrow */
+    -fx-padding: 4;
+}
+
+/* Bottom container */
+.bottom-container {
+    -fx-background-color: rgba(74, 58, 74, 0.8); /* Matches map-entry */
+    -fx-background-radius: 10px;
+    -fx-padding: 15px;
+    -fx-border-color: black;
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
 }

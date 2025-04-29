@@ -24,7 +24,7 @@ public class UserSession {
     private static UserSession instance;
     private AuthUser currentUser;
 
-    private UserSession(){}
+    private UserSession() {}
 
     /**
      * Returns the singleton instance of the {@code UserSession} class.
@@ -32,9 +32,9 @@ public class UserSession {
      *
      * @return the single instance of {@code UserSession}
      */
-    public static UserSession getInstance(){
-        if (instance==null){
-            instance=new UserSession();
+    public static UserSession getInstance() {
+        if (instance == null){
+            instance = new UserSession();
         }
         return instance;
     }

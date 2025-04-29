@@ -34,7 +34,8 @@ public class MonsterDAO extends BaseDAO<Monster> {
                 rs.getFloat("health"),
                 rs.getFloat("radius"),
                 rs.getInt("score_val"),
-                rs.getFloat("cost")
+                rs.getFloat("cost"),
+                rs.getString("img")
         );
     }
 
@@ -47,9 +48,9 @@ public class MonsterDAO extends BaseDAO<Monster> {
     public void insertMonster(Monster monster) {
         try {
             db.beginTransaction();
-            String sql = "INSERT INTO \"Monsters\" (name_eng, name_sk, details_eng, details_sk, attack, health, radius, score_val, cost) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO \"Monsters\" (name_eng, name_sk, details_eng, details_sk, attack, health, radius, score_val, cost, img) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             executeUpdate(sql, monster.getName(), monster.getName_sk(), monster.getDetails(), monster.getDetails_sk(),
-                    monster.getAttack(), monster.getHealth(), monster.getRadius(), monster.getScore_val(), monster.getCost());
+                    monster.getAttack(), monster.getHealth(), monster.getRadius(), monster.getScore_val(), monster.getCost(), monster.getImg());
             db.commitTransaction();
         } catch (DataAccessException e) {
             db.rollBackTransaction();

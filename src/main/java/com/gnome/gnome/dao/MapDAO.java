@@ -23,6 +23,7 @@ public class MapDAO extends BaseDAO<Map> {
     @Override
     protected Map mapResultSet(ResultSet rs) throws SQLException {
         return new Map(
+                rs.getInt("map_id"),
                 rs.getString("username"),
                 MapParser.convertStringToMap(rs.getString("map_string")),
                 rs.getInt("score_val"),
@@ -37,18 +38,22 @@ public class MapDAO extends BaseDAO<Map> {
      * The map data is converted to a string before storage.
      *
      * @param map the Map object to insert
-     * @return the Map object with the generated ID
      * @throws DataAccessException if the insertion fails
      */
-    public Map insertMap(Map map) {
+    public void insertMap(Map map, Boolean isStory ) {
         try {
             db.beginTransaction();
             String mapString = MapParser.convertMapToString(map.getMapData());
-            if (mapString == null) {
-                throw new IllegalArgumentException("mapString cannot be null");
+
+            String sql = "";
+
+            if (isStory){
+                sql = "INSERT INTO \"Maps\" (username, map_string, score_val, map_name_eng, map_name_sk, level) " +
+                        "VALUES (?, ?, ?, ?, ?, ?)";
+            } else {
+                sql = "INSERT INTO \"Maps\" (username, map_string, score_val, map_name_eng, map_name_sk, level) " +
+                        "VALUES (?, ?, ?, ?, ?, ?)";
             }
-            String sql = "INSERT INTO \"Maps\" (username, map_string, score_val, map_name_eng, map_name_sk, level) " +
-                    "VALUES (?, ?, ?, ?, ?, ?)";
 
             int rowsAffected = executeUpdate(sql, map.getUsername(), mapString, map.getScoreVal(),
                     map.getMapNameEng(), map.getMapNameSk(), map.getLevel());
@@ -58,7 +63,6 @@ public class MapDAO extends BaseDAO<Map> {
             }
 
             db.commitTransaction();
-            return map;
 
         } catch (SQLException | DataAccessException e) {
             db.rollBackTransaction();
@@ -76,7 +80,20 @@ public class MapDAO extends BaseDAO<Map> {
     public Map getMapById(int id) {
         String sql = "SELECT * FROM \"Maps\" WHERE map_id = ?";
         List<Map> maps = findAll(sql, id);
-        return maps.isEmpty() ? null : maps.get(0);
+        return maps.isEmpty() ? null : maps.getFirst();
+    }
+
+    /**
+     * Retrieves a Map from the database by its Level.
+     *
+     * @param level the level of the Map to retrieve
+     * @return the Map object, or null if not found
+     * @throws DataAccessException if retrieval fails
+     */
+    public Map getMapByLevel(int level) {
+        String sql = "SELECT * FROM \"Maps\" WHERE level = ?";
+        List<Map> maps = findAll(sql, level);
+        return maps.isEmpty() ? null : maps.getFirst();
     }
 
     /**
@@ -105,6 +122,30 @@ public class MapDAO extends BaseDAO<Map> {
     }
 
     /**
+     * Retrieves all level Maps from the database.
+     *
+     * @return a list of all Map objects, which has the level > 0, where each map's data is parsed into a 2D int array
+     * @throws DataAccessException if retrieval fails
+     */
+    public List<Map> getAllLevelMaps() {
+        String sql = "SELECT * FROM \"Maps\" WHERE level > 0 ORDER BY level";
+        return findAll(sql);
+    }
+
+
+    /**
+     * Retrieves the last level of the map story.
+     *
+     * @return a list of all Map objects, which has the level > 0, where each map's data is parsed into a 2D int array
+     * @throws DataAccessException if retrieval fails
+     */
+    public List<Map> getMapsOrderedByLevelDesc() {
+        String sql = "SELECT * FROM \"Maps\" ORDER BY level DESC";
+        return findAll(sql);
+    }
+
+
+    /**
      * Retrieves all Maps from the database.
      *
      * @return a list of all Map objects, where each map's data is parsed into a 2D int array
@@ -127,6 +168,31 @@ public class MapDAO extends BaseDAO<Map> {
             } catch (SQLException e) {
                 // ignore; this is cleanup
             }
+        }
+    }
+
+    /**
+     * Deletes a Map from the database by its ID.
+     *
+     * @param id the ID of the Map to delete
+     * @throws DataAccessException if deletion fails
+     */
+    public void deleteMapById(int id) {
+        try {
+            db.beginTransaction();
+            String sql = "DELETE FROM \"Maps\" WHERE map_id = ?";
+
+            int rowsAffected = executeUpdate(sql, id);
+
+            if (rowsAffected != 1) {
+                throw new SQLException("Failed to delete map; no rows affected for map_id: " + id);
+            }
+
+            db.commitTransaction();
+
+        } catch (SQLException | DataAccessException e) {
+            db.rollBackTransaction();
+            throw new DataAccessException("Failed to delete map with map_id: " + id, e);
         }
     }
 }

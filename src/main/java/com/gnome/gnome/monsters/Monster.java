@@ -251,6 +251,7 @@ public abstract class Monster {
      * @param cameraStartRow The starting row of the camera's viewport (used for positioning the effect).
      * @param currentTime The current time (in nanoseconds), used to enforce the attack cooldown.
      */
+    // TODO: HERE ALSO CHANGE TILE_SIZE.
     public void meleeAttack(Player player, Pane gameObjectsPane, int cameraStartCol, int cameraStartRow, long currentTime) {
         // Check if the monster is already dead (health <= 0). If so, do not attack
         if (health <= 0) return;
@@ -281,7 +282,7 @@ public abstract class Monster {
 
             // Load the attack effect GIF (among-us.gif) to display during the attack
             // Objects.requireNonNull ensures the image resource exists, or it throws an exception
-            Image attackEffectImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/gnome/gnome/effects/among-us.gif")));
+            Image attackEffectImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/gnome/gnome/effects/red_monster.gif")));
             // Create an ImageView to display the attack effect GIF
             ImageView attackEffectView = new ImageView(attackEffectImage);
             attackEffectView.setFitWidth(TILE_SIZE); // Set the width of the GIF to match the tile size (50 pixels)

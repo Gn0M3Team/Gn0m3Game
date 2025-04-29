@@ -21,7 +21,7 @@ public class SwitchPage implements PageSwitcherInterface {
 
     @Override
     public void goContinueGame(BorderPane anchorPane) {
-        new SceneSwitch(anchorPane, "/com/gnome/gnome/pages/continueGame.fxml");
+        new SceneSwitch(anchorPane, "/com/gnome/gnome/pages/game.fxml");
     }
 
     @Override
@@ -40,7 +40,7 @@ public class SwitchPage implements PageSwitcherInterface {
     }
     @Override
     public void goNewGame(BorderPane anchorPane)  {
-        new SceneSwitch(anchorPane, "/com/gnome/gnome/pages/new-game.fxml");
+        new SceneSwitch(anchorPane, "/com/gnome/gnome/pages/main-new-game-page.fxml");
     }
     @Override
     public void goSetting(BorderPane anchorPane)  {
@@ -50,6 +50,11 @@ public class SwitchPage implements PageSwitcherInterface {
     @Override
     public void goShopPopUp(BorderPane anchorPane)  {
         new SceneSwitch(anchorPane, "/com/gnome/gnome/pages/shop-pop-up.fxml");
+    }
+
+    @Override
+    public void goStoryMaps(BorderPane anchorPane)  {
+        new SceneSwitch(anchorPane, "/com/gnome/gnome/pages/story-mode-page.fxml");
     }
 
 
