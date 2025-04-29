@@ -230,7 +230,7 @@ public class Camera {
 
         // Draw coin amount
         int coinCount = coins.size(); // Assuming this represents the player's coin count
-        Image coinImage = coins.isEmpty() ? null : coins.get(0).getImageView().getImage(); // Use the coin image
+        Image coinImage = loadItemImage("tile_522");
         drawCoinAmount(gc, coinImage, coinCount, coinX, coinY, boxSize, cornerRadius, shadowOffset, canvas);
     }
 

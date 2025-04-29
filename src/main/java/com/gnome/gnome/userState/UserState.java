@@ -1,7 +1,9 @@
 package com.gnome.gnome.userState;
 
+import com.gnome.gnome.dao.UserStatisticsDAO;
 import com.gnome.gnome.dao.userDAO.AuthUserDAO;
 import com.gnome.gnome.dao.userDAO.UserGameStateDAO;
+import com.gnome.gnome.models.UserStatistics;
 import com.gnome.gnome.models.user.AuthUser;
 import com.gnome.gnome.models.user.PlayerRole;
 import com.gnome.gnome.models.user.UserGameState;
@@ -21,9 +23,15 @@ public class UserState {
     private Integer weaponId;
     private Integer potionId;
     private Integer armorId;
+    // statistics data
+    private int totalMapsPlayed;
+    private int totalDeaths;
+    private int totalMonstersKilled;
+    private int totalChestsOpened;
 
     private final UserGameStateDAO userGameStateDAO = new UserGameStateDAO();
     private final AuthUserDAO authUserDAO = new AuthUserDAO();
+    private final UserStatisticsDAO userStatisticsDAO = new UserStatisticsDAO();
 
     private UserState() {
     }
@@ -35,14 +43,13 @@ public class UserState {
         return instance;
     }
 
-    public static void init(AuthUser authUser, UserGameState userGameState) {
+    public static void init(AuthUser authUser, UserGameState userGameState, UserStatistics userStatistics) {
         UserState userState = getInstance();
         userState.username = authUser.getUsername();
         userState.role = authUser.getRole();
         userState.balance = userGameState.getBalance();
         userState.health = userGameState.getHealth();
         userState.score = userGameState.getScore();
-        userState.deathCounter = userGameState.getDeathCounter();
         userState.mapLevel = userGameState.getMapLevel();
         userState.weaponId = userGameState.getWeaponId();
         userState.potionId = userGameState.getPotionId();
@@ -102,12 +109,22 @@ public class UserState {
                 balance,
                 health,
                 score,
-                deathCounter,
                 mapLevel,
                 weaponId,
                 potionId,
                 armorId
         );
         userGameStateDAO.updateUserGameState(userGameState);
+    }
+
+    private void updateUserStatistics() {
+        UserStatistics userStatistics = new UserStatistics(
+                username,
+                totalMapsPlayed,
+                totalDeaths,
+                totalMonstersKilled,
+                totalChestsOpened
+        );
+        userStatisticsDAO.updateUserStatistics(userStatistics);
     }
 }

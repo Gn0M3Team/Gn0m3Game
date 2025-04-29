@@ -92,7 +92,6 @@ public class ProfileController {
         recordLabel.setText("Score: " + gameState.getScore());
 
         gamesPlayedLabel.setText("MapLevel: " + gameState.getMapLevel());
-        deathCounter.setText("Death counter: " + gameState.getDeathCounter());
 
         selectedUserRole = (user != null) ? user.getRole() : PlayerRole.USER;
         currentRoleIndex = roles.indexOf(selectedUserRole);

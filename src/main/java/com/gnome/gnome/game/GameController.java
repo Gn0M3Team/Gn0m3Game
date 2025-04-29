@@ -152,8 +152,6 @@ public class GameController {
     private boolean debug_mod_game;
 
     public void initializeWithLoadedMap(int[][] mapData, List<com.gnome.gnome.models.Monster> monsterList, Armor armor, Weapon weapon, Potion potion) {
-        System.out.println("----------------------------------------------");
-        System.out.println("MAP DATA: "+ Arrays.deepToString(mapData));
         setupProperties();
 
         this.baseMap = mapData;
@@ -165,16 +163,9 @@ public class GameController {
 
         setupMap(monsterList);
 
-        System.out.println("Player info: " + player);
-        System.out.println("Player X info: " + player.getX());
-        System.out.println("Player Y info: " + player.getY());
-
-        if (player == null)
-            throw new RuntimeException("player is null");
-
         camera      = Camera.getInstance(fieldMap, player.getX(), player.getY(), player, armor, weapon, potion); // Initialize the camera to follow the player
         camera.updateCameraCenter();
-        updateMapWithMonsters(); // Update the field map with monster positions
+        camera.setMapGrid(fieldMap);
         instance = this; //Fill singleton instance ONLY on initialization. BECAUSE OTHERWISE THERE IS NO DATA THAT IS REQUIRED IN OTHER CLASSES
 
         viewportCanvas = new Canvas();
@@ -260,7 +251,7 @@ public class GameController {
 
 
 
-    private void onSceneExit() {
+    private void onSceneExit(boolean isRestart) {
         if (monsterMovementTimer != null) {
             monsterMovementTimer.stop();
         }
@@ -268,25 +259,26 @@ public class GameController {
 
         Camera.resetInstance();
         Player.resetInstance();
-        GameController.instance = null;
+
+        if (!isRestart)
+            GameController.instance = null;
 
         viewportCanvas = null;
         monsterList.clear();
         coinsOnMap.clear();
         activeArrows.clear();
-        dbMonsters.clear();
+        gameObjectsPane.getChildren().clear();
     }
 
 
     private void setupMap(List<com.gnome.gnome.models.Monster> importedMonsterList) {
-        boolean flag = false;
-        for (int row = 0; row < baseMap.length; row++) {
-            for (int col = 0; col < baseMap[row].length; col++) {
-                int tile = baseMap[row][col];
+        for (int row = 0; row < fieldMap.length; row++) {
+            for (int col = 0; col < fieldMap[row].length; col++) {
+                int tile = fieldMap[row][col];
 
                 if (tile == TypeOfObjects.START_POINT.getValue()) {
                     player = Player.getInstance(col, row, PLAYER_MAX_HEALTH);
-                    baseMap[row][col] = TypeOfObjects.FLOOR.getValue();
+                    fieldMap[row][col] = TypeOfObjects.START_POINT.getValue();
                 }
 
                 if (tile < 0) {
@@ -298,14 +290,10 @@ public class GameController {
 
                     Monster m = MonsterFactory.createMonster(TypeOfObjects.fromValue(tile), col, row, dbMonster);
 
-                    baseMap[row][col] = TypeOfObjects.FLOOR.getValue();
+                    fieldMap[row][col] = TypeOfObjects.FLOOR.getValue();
                     monsterList.add(m);
                 }
             }
-        }
-
-        if (!flag) {
-            throw new RuntimeException("User cann't be createds");
         }
     }
 
@@ -352,17 +340,6 @@ public class GameController {
             System.arraycopy(src[i], 0, dest[i], 0, src[i].length);
         }
         return dest;
-    }
-
-
-    /**
-     * Updates the fieldMap by copying the baseMap and adding the current positions of all monsters.
-     * Each monster's position is marked on the fieldMap with its monster value (e.g., -1 for a goblin).
-     */
-    private void updateMapWithMonsters() {
-        // Just refresh baseMap
-        fieldMap = copyMap(baseMap);
-        camera.setMapGrid(fieldMap);
     }
 
 
@@ -564,7 +541,7 @@ public class GameController {
         }
 
         // Update the fieldMap with the remaining monsters
-        updateMapWithMonsters();
+        camera.setMapGrid(fieldMap);
         // Redraw the viewport to reflect the changes (e.g., monster removed, coin added)
         updateCameraViewport();
     }
@@ -862,7 +839,7 @@ public class GameController {
             // Define the action for "Go Back" (loads the main menu scene)
             goBackButton.setOnAction(e -> {
                 try {
-                    onSceneExit();
+                    onSceneExit(false);
                     URL fxmlUrl = getClass().getResource("/com/gnome/gnome/pages/main-menu.fxml");
                     Parent mainRoot = FXMLLoader.load(Objects.requireNonNull(fxmlUrl));
                     Stage stage = (Stage) centerMenuButton.getScene().getWindow();
@@ -943,7 +920,7 @@ public class GameController {
      */
     private void restartGame() {
         try {
-            onSceneExit();
+            onSceneExit(true);
 
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/gnome/gnome/pages/game.fxml")
