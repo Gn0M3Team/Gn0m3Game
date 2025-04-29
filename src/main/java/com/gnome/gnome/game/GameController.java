@@ -68,6 +68,10 @@ public class GameController {
      */
     private Canvas viewportCanvas;
 
+    private Weapon weapon;
+    private Armor armor;
+    private Potion potion;
+
     /**
      * The initial game map (static terrain).
      */
@@ -144,6 +148,11 @@ public class GameController {
     private boolean debug_mod_game;
 
     public void initializeWithLoadedMap(int[][] mapData, Armor armor, Weapon weapon, Potion potion) {
+
+        this.armor = armor;
+        this.weapon = weapon;
+        this.potion = potion;
+
         setupProperties();
         this.baseMap = mapData;
         this.fieldMap = copyMap(baseMap);
@@ -889,7 +898,7 @@ public class GameController {
 
             GameController ctrl = loader.getController();
 
-            ctrl.initializeWithLoadedMap(this.baseMap);
+            ctrl.initializeWithLoadedMap(this.baseMap, armor, weapon, potion);
 
             Stage stage = (Stage) rootBorder.getScene().getWindow();
             stage.getScene().setRoot(newRoot);
