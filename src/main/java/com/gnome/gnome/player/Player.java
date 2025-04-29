@@ -1,5 +1,6 @@
 package com.gnome.gnome.player;
 
+import com.gnome.gnome.game.GameController;
 import com.gnome.gnome.monsters.Monster;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
@@ -94,6 +95,12 @@ public class Player {
     public void takeDamage(int damage) {
         currentHealth -= damage;
         if (currentHealth < 0) currentHealth = 0;
+
+        GameController ctrl = GameController.getGameController();
+        if (ctrl != null) {
+            ctrl.shakeCamera(); // <-- трясіння камери при пошкодженні
+            ctrl.updatePlayerHealthBar(); // оновити здоров'я на панелі
+        }
     }
 
     /**

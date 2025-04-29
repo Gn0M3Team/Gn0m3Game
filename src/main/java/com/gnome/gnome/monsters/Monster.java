@@ -4,7 +4,9 @@ package com.gnome.gnome.monsters;
 import com.gnome.gnome.camera.Camera;
 import com.gnome.gnome.monsters.movements.MovementStrategy;
 import com.gnome.gnome.player.Player;
+import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
+import javafx.animation.Timeline;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -82,6 +84,8 @@ public abstract class Monster {
     protected boolean debug_mode = false; // A flag for enabling debug mode. If true, the monster might print additional debug information (though not used in this code)
 
     protected ImageView representation;
+
+    protected Timeline activeAttackAnimation; // для зупинки атаки вручну
 
     /**
      * Constructor for the Monster class. This method is called when a new Monster object is created.
@@ -282,7 +286,7 @@ public abstract class Monster {
      * @param gameObjectsPane The JavaFX Pane where the attack effect will be displayed.
      * @param currentTime The current time (in nanoseconds), used to enforce the attack cooldown.
      */
-    public void meleeAttack(Player player, Pane gameObjectsPane,long currentTime) {
+    public void meleeAttack(Player player, Pane gameObjectsPane, long currentTime) {
         if (health <= 0) return;
         if (currentTime - lastMeleeAttackTime < MELEE_ATTACK_COOLDOWN) return;
         if (gameObjectsPane == null) {
@@ -300,20 +304,41 @@ public abstract class Monster {
             Image attackImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream(attackImagePath)));
             representation.setImage(attackImage);
 
-            PauseTransition pause = new PauseTransition(Duration.seconds(1));
-            pause.setOnFinished(event -> {
-                representation.setImage(originalImage);
-                isMeleeAttacking = false;
+            activeAttackAnimation = new Timeline(
+                    new KeyFrame(Duration.seconds(1), e -> {
+                        representation.setImage(originalImage);
+                        isMeleeAttacking = false;
 
-                int newDx = Math.abs(player.getX() - x);
-                int newDy = Math.abs(player.getY() - y);
+                        int newDx = Math.abs(player.getX() - x);
+                        int newDy = Math.abs(player.getY() - y);
 
-                if (newDx <= attackRange && newDy <= attackRange && health > 0) {
-                    player.takeDamage(attack);
-                }
-                lastMeleeAttackTime = currentTime;
-            });
-            pause.play();
+                        if (newDx <= attackRange && newDy <= attackRange && health > 0) {
+                            player.takeDamage(attack);
+                        }
+                        lastMeleeAttackTime = currentTime;
+                        activeAttackAnimation = null;
+                    })
+            );
+            activeAttackAnimation.setCycleCount(1);
+            activeAttackAnimation.play();
+        }
+    }
+
+
+    public void cancelMeleeAttackIfPlayerOutOfRange(Player player) {
+        int dx = Math.abs(player.getX() - getX());
+        int dy = Math.abs(player.getY() - getY());
+
+        if ((dx > getAttackRange() || dy > getAttackRange()) && isMeleeAttacking) {
+            setMeleeAttacking(false);
+
+            if (activeAttackAnimation != null) {
+                activeAttackAnimation.stop();
+                activeAttackAnimation = null;
+            }
+
+            Image originalImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)));
+            representation.setImage(originalImage);
         }
     }
 }

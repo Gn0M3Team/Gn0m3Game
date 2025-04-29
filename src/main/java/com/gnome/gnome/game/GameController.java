@@ -450,6 +450,10 @@ public class GameController {
                     // Update the camera to follow the player and redraw the viewport
                     camera.updateCameraCenter();
                     updateCameraViewport();
+
+                    for (Monster m : monsterList) {
+                        m.cancelMeleeAttackIfPlayerOutOfRange(player);
+                    }
                 } else {
                     if (debug_mod_game)
                         System.out.println("Player cannot move to (" + newX + ", " + newY + ") - tile type: " + tileType);
@@ -697,6 +701,7 @@ public class GameController {
 
             if (!(monster instanceof Skeleton)) {
                 monster.meleeAttack(player, gameObjectsPane, currentTime);
+                monster.cancelMeleeAttackIfPlayerOutOfRange(player);
             }
 
             if (monster.isHitEffectPlaying() || monster.isMeleeAttacking()) {
@@ -756,6 +761,42 @@ public class GameController {
 
         removeMonsters(toRemove);
     }
+
+
+    public void shakeCamera() {
+        double originalTranslateX = centerStack.getTranslateX();
+        double originalTranslateY = centerStack.getTranslateY();
+
+        Random random = new Random();
+        int shakeDurationMillis = 500; // Тривалість трусіння 0.5 секунди
+        int shakeIntervalMillis = 20;  // Кожні 20 мс
+        int shakeTimes = shakeDurationMillis / shakeIntervalMillis;
+
+        Timer timer = new Timer();
+        TimerTask task = new TimerTask() {
+            int count = 0;
+
+            @Override
+            public void run() {
+                Platform.runLater(() -> {
+                    if (count < shakeTimes) {
+                        double offsetX = (random.nextDouble() - 0.5) * 10; // від -5 до 5 пікселів
+                        double offsetY = (random.nextDouble() - 0.5) * 10;
+                        centerStack.setTranslateX(originalTranslateX + offsetX);
+                        centerStack.setTranslateY(originalTranslateY + offsetY);
+                        count++;
+                    } else {
+                        centerStack.setTranslateX(originalTranslateX);
+                        centerStack.setTranslateY(originalTranslateY);
+                        timer.cancel();
+                    }
+                });
+            }
+        };
+        timer.scheduleAtFixedRate(task, 0, shakeIntervalMillis);
+    }
+
+
 
 
     /**
@@ -821,7 +862,7 @@ public class GameController {
      * Updates the player's health bar to reflect their current health.
      * If the player's health reaches 0, the game over overlay is shown.
      */
-    private void updatePlayerHealthBar() {
+    public void updatePlayerHealthBar() {
         // Run the update on the JavaFX Application Thread (required for UI updates)
         Platform.runLater(() -> {
             // Calculate the fraction of health remaining (currentHealth / maxHealth)
