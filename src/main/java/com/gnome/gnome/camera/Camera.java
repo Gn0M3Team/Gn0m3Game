@@ -66,7 +66,6 @@ public class Camera {
 
     private double tileWidth, tileHeight;
 
-
     /**
      * Constructor of the Camera class. Used to create a new Camera object.
      *
@@ -92,6 +91,14 @@ public class Camera {
         if (instance == null) {
             instance = new Camera(fieldMap, cameraCenterX, cameraCenterY, player, armor, weapon, potion);
         }
+        return instance;
+    }
+
+    public static Camera getInstance() {
+        if (instance == null) {
+            throw new IllegalStateException("Camera not initialized");
+        }
+
         return instance;
     }
 
@@ -172,6 +179,7 @@ public class Camera {
 
             if (gx >= startCol && gx < startCol + viewportSize &&
                     gy >= startRow && gy < startRow + viewportSize) {
+
                 Image img = coin.getImageView().getImage();
                 double w = coin.getImageView().getFitWidth();
                 double h = coin.getImageView().getFitHeight();
@@ -195,6 +203,7 @@ public class Camera {
         double padding = canvas.getWidth() * 0.015;
         double canvasWidth = canvas.getWidth();
         double canvasHeight = canvas.getHeight();
+
         double cornerRadius = 10.0;
         double shadowOffset = 3.0;
 

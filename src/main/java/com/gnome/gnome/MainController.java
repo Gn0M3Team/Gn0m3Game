@@ -1,10 +1,12 @@
 package com.gnome.gnome;
 
 import com.gnome.gnome.dao.MapDAO;
+import com.gnome.gnome.dao.MonsterDAO;
 import com.gnome.gnome.dao.userDAO.AuthUserDAO;
+import com.gnome.gnome.game.MapLoaderService;
+import com.gnome.gnome.game.MapLoaderUIHandler;
 import com.gnome.gnome.models.user.PlayerRole;
 import com.gnome.gnome.userState.UserState;
-import com.gnome.gnome.game.MapLoader;
 import com.gnome.gnome.models.Map;
 import com.gnome.gnome.models.user.AuthUser;
 import com.gnome.gnome.music.MusicWizard;
@@ -27,6 +29,7 @@ import javafx.util.Duration;
 import java.util.Objects;
 
 public class MainController {
+// TODO: If we have time, we need to change logic with creating DAO, because we in two places crete monster dao, map dao, and for me we need to change this.
 
     @FXML private ImageView musicIcon;
     @FXML
@@ -47,7 +50,7 @@ public class MainController {
 
     Stage primaryStage;
 
-    MapLoader mapLoader;
+    MapLoaderService mapLoaderService;
 
 
     /**
@@ -81,14 +84,16 @@ public class MainController {
 
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
-        this.mapLoader = new MapLoader(primaryStage);
+
+        MapDAO mapDAO = new MapDAO();
+        MonsterDAO monsterDAO = new MonsterDAO();
+
+        this.mapLoaderService = new MapLoaderService(mapDAO, monsterDAO);
 
         continueGameButton.setOnAction(e -> {
-            if (mapLoader != null) {
-                int currentLevel = UserState.getInstance().getMapLevel();
-                MapDAO levelMapDAO = new MapDAO();
-                Map selectedMap = levelMapDAO.getMapByLevel(currentLevel);
-                mapLoader.showStartMap(selectedMap);
+            if (mapLoaderService != null) {
+                Map selectedMap = mapDAO.getMapByLevel(1);
+                new MapLoaderUIHandler(mapLoaderService, primaryStage).showStartMap(selectedMap.getId());
             }
         });
     }

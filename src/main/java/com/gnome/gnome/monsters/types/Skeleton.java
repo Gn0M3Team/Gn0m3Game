@@ -49,8 +49,20 @@ public class Skeleton extends Monster {
      * @param startX the X grid position of the skeleton
      * @param startY the Y grid position of the skeleton
      */
-    public Skeleton(int startX, int startY) {
-        super(30, 80, 50, 4,"Skeleton", "Skeleton", startX, startY, TypeOfObjects.SKELETON.getValue(), new RandomMovement(), "tile_125.png");
+    public Skeleton(int startX, int startY, com.gnome.gnome.models.Monster dbMonster) {
+        super(dbMonster.getAttack(),
+                dbMonster.getHealth(),
+                dbMonster.getCost(),
+                dbMonster.getRadius(),
+                dbMonster.getName(),
+                dbMonster.getName_sk(),
+                startX,
+                startY,
+                TypeOfObjects.SKELETON.getValue(),
+                new RandomMovement(),
+                TypeOfObjects.SKELETON.getImagePath(),
+                "/com/gnome/gnome/effects/demon_damaged.gif",
+                "/com/gnome/gnome/effects/red_monster.gif");
     }
 
     /**
