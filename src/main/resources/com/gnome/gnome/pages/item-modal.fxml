@@ -22,7 +22,7 @@
         </HBox>
         <HBox alignment="CENTER_RIGHT" spacing="20" styleClass="dialog-buttons">
             <Button fx:id="cancelButton" onAction="#onCancel" styleClass="button-cancel" text="Cancel" />
-            <Button fx:id="buyButton" styleClass="button-buy" text="Buy" />
+            <Button fx:id="buyButton" onAction="#onBuy" styleClass="button-buy" text="Buy" />
         </HBox>
     </VBox>
 </StackPane>

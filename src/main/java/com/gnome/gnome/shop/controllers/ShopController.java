@@ -1,6 +1,6 @@
 package com.gnome.gnome.shop.controllers;
 
-import com.gnome.gnome.shop.controllers.ItemController;
+import com.gnome.gnome.continueGame.ContinueGameController;
 import com.gnome.gnome.shop.service.ShopItem;
 import com.gnome.gnome.shop.service.ShopService;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
@@ -21,6 +21,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Controller class for the Shop Pop-Up view in the application.
@@ -30,6 +31,7 @@ import java.util.List;
  * to handle page transitions.
  */
 public class ShopController {
+    private static final Logger logger = Logger.getLogger(ShopController.class.getName());
 
     @FXML
     private Button ReturnGameButton;
@@ -89,7 +91,7 @@ public class ShopController {
 
             String resourcePath = String.format(
                     "/com/gnome/gnome/images/items/%s/%s.png",
-                    item.getFolder(),
+                    item.getCategory(),
                     item.getId()
             );
 
@@ -104,6 +106,7 @@ public class ShopController {
                     iconContainer.getChildren().add(iv);
                 }
             } catch(IOException ex) {
+                logger.severe("Failed to load item's image: " + ex.getMessage());
                 ex.printStackTrace();
             }
 
@@ -128,6 +131,7 @@ public class ShopController {
             popup.setScene(new Scene(root));
             popup.showAndWait();
         } catch (IOException e) {
+            logger.severe("Failed to load item's data popup: " + e.getMessage());
             e.printStackTrace();
         }
     }

@@ -1,6 +1,9 @@
 package com.gnome.gnome.shop.service;
 
+import com.gnome.gnome.player.Player;
 import lombok.Getter;
+
+import java.util.function.BiConsumer;
 
 public class ShopItem {
     @Getter
@@ -16,7 +19,8 @@ public class ShopItem {
     @Getter
     private String detailsSk;
     @Getter
-    private String folder;
+    private String category;
+    private final BiConsumer<Player, Integer> assignItemToPlayer;
 
     public ShopItem(int id,
                     float cost,
@@ -24,13 +28,19 @@ public class ShopItem {
                     String nameSk,
                     String detailsEng,
                     String detailsSk,
-                    String folder) {
+                    String category,
+                    BiConsumer<Player, Integer> assignItemToPlayer) {
         this.id          = id;
         this.cost        = cost;
         this.nameEng     = nameEng;
         this.nameSk      = nameSk;
         this.detailsEng  = detailsEng;
         this.detailsSk   = detailsSk;
-        this.folder      = folder;
+        this.category    = category;
+        this.assignItemToPlayer = assignItemToPlayer;
+    }
+
+    public void buy(Player player) {
+        assignItemToPlayer.accept(player, this.id);
     }
 }

@@ -6,6 +6,7 @@ import com.gnome.gnome.dao.WeaponDAO;
 import com.gnome.gnome.models.Armor;
 import com.gnome.gnome.models.Potion;
 import com.gnome.gnome.models.Weapon;
+import com.gnome.gnome.player.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,7 +26,8 @@ public class ShopItems<T> {
                         a.getNameSk(),
                         a.getDetailsEng(),
                         a.getDetailsSk(),
-                        "armors"
+                        "armors",
+                        Player::setArmorId
                 ));
             }
             return;
@@ -42,7 +44,8 @@ public class ShopItems<T> {
                         w.getNameSk(),
                         w.getDetailsEng(),
                         w.getDetailsSk(),
-                        "weapons"
+                        "weapons",
+                        Player::setWeaponId
                 ));
             }
             return;
@@ -58,13 +61,14 @@ public class ShopItems<T> {
                         p.getNameSk(),
                         p.getDetailsEng(),
                         p.getDetailsSk(),
-                        "potions"
+                        "potions",
+                        Player::setPotionId
                 ));
             }
             return;
         }
 
-        throw new IllegalArgumentException("Unsupported DAO type: " + dao.getClass());
+        throw new RuntimeException("Unsupported DAO type: " + dao.getClass());
     }
 
     /**

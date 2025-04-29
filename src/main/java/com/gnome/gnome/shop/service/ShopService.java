@@ -1,18 +1,32 @@
 package com.gnome.gnome.shop.service;
 
+import com.gnome.gnome.continueGame.ContinueGameController;
 import com.gnome.gnome.dao.ArmorDAO;
 import com.gnome.gnome.dao.PotionDAO;
 import com.gnome.gnome.dao.WeaponDAO;
+import com.gnome.gnome.exceptions.BalanceException;
+import com.gnome.gnome.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.gnome.gnome.continueGame.ContinueGameController.getContinueGameController;
 
 public class ShopService {
     private final WeaponDAO weaponDAO = new WeaponDAO();
     private final PotionDAO potionDAO = new PotionDAO();
     private final ArmorDAO armorDAO = new ArmorDAO();
+    private final Player player;
 
     private List<ShopItem> items = new ArrayList<>();
+
+    public ShopService() {
+        ContinueGameController controller = getContinueGameController();
+        if (controller == null) {
+            throw new RuntimeException("Controller does not exist");
+        }
+        this.player = controller.getPlayer();
+    }
 
     public List<ShopItem> get_shop_items() {
         ShopItems<WeaponDAO> weapons = new ShopItems<>(weaponDAO);
@@ -24,5 +38,20 @@ public class ShopService {
         items.addAll(weapons.randomSelect(5));
 
         return items;
+    }
+
+    public void buy(ShopItem item) {
+//        float playerCoinsRemainder = player.getPlayerCoins() - item.getCost();
+//        if (playerCoinsRemainder < 0) {
+//            throw new BalanceException("Not enough money");
+//        }
+
+        player.setPlayerCoins((int) 900);
+        item.buy(player);
+
+        System.out.println();
+        System.out.println("ArmorId: " + player.getArmorId());
+        System.out.println("Weapon: " + player.getWeaponId());
+        System.out.println("PotionId: " + player.getPotionId());
     }
 }

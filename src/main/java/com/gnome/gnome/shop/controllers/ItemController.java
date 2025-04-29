@@ -1,12 +1,17 @@
 package com.gnome.gnome.shop.controllers;
 
+import com.gnome.gnome.continueGame.ContinueGameController;
+import com.gnome.gnome.player.Player;
 import com.gnome.gnome.shop.service.ShopItem;
+import com.gnome.gnome.shop.service.ShopService;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
+
+import static com.gnome.gnome.continueGame.ContinueGameController.getContinueGameController;
 
 public class ItemController {
     @FXML
@@ -19,6 +24,8 @@ public class ItemController {
     private StackPane itemImageContainer;
     @FXML
     private Button cancelButton;
+
+    private ShopService shopService = new ShopService();
 
     private ShopItem item;
     public void setItemData(ShopItem data, ImageView image) {
@@ -38,5 +45,7 @@ public class ItemController {
         stage.close();
     }
 
-    public void onBuy() {}
+    public void onBuy() {
+        shopService.buy(item);
+    }
 }
