@@ -88,7 +88,7 @@ public class UserGameStateDAO extends BaseDAO<UserGameState> {
      * @throws DataAccessException if retrieval fails
      */
     public List<UserGameState> getAllUserGameStates() {
-        String sql = "SELECT balance, health, score, death_counter, map_level, weapon_id, potion_id, armor_id FROM \"Users\"";
+        String sql = "SELECT username, balance, health, score, death_counter, map_level, weapon_id, potion_id, armor_id FROM \"Users\"";
         return findAll(sql);
     }
 

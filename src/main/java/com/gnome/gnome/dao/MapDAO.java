@@ -40,13 +40,20 @@ public class MapDAO extends BaseDAO<Map> {
      * @param map the Map object to insert
      * @throws DataAccessException if the insertion fails
      */
-    public void insertMap(Map map) {
+    public void insertMap(Map map, Boolean isStory ) {
         try {
             db.beginTransaction();
             String mapString = MapParser.convertMapToString(map.getMapData());
 
-            String sql = "INSERT INTO \"Maps\" (username, map_string, score_val, map_name_eng, map_name_sk, level) " +
-                    "VALUES (?, ?, ?, ?, ?, ?)";
+            String sql = "";
+
+            if (isStory){
+                sql = "INSERT INTO \"Maps\" (username, map_string, score_val, map_name_eng, map_name_sk, level) " +
+                        "VALUES (?, ?, ?, ?, ?, ?)";
+            } else {
+                sql = "INSERT INTO \"Maps\" (username, map_string, score_val, map_name_eng, map_name_sk, level) " +
+                        "VALUES (?, ?, ?, ?, ?, ?)";
+            }
 
             int rowsAffected = executeUpdate(sql, map.getUsername(), mapString, map.getScoreVal(),
                     map.getMapNameEng(), map.getMapNameSk(), map.getLevel());
@@ -124,6 +131,19 @@ public class MapDAO extends BaseDAO<Map> {
         String sql = "SELECT * FROM \"Maps\" WHERE level > 0 ORDER BY level";
         return findAll(sql);
     }
+
+
+    /**
+     * Retrieves the last level of the map story.
+     *
+     * @return a list of all Map objects, which has the level > 0, where each map's data is parsed into a 2D int array
+     * @throws DataAccessException if retrieval fails
+     */
+    public List<Map> getMapsOrderedByLevelDesc() {
+        String sql = "SELECT * FROM \"Maps\" ORDER BY level DESC";
+        return findAll(sql);
+    }
+
 
     /**
      * Retrieves all Maps from the database.

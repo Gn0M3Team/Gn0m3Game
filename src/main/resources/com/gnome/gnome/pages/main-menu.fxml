@@ -21,7 +21,7 @@
             <Button onAction="#onLeaderBoardButtonClick" styleClass="top-button" text="Leader board">
             </Button>
 
-            <Label fx:id="nicknameLabel" styleClass="top-label" text="User: Admin" />
+            <Label fx:id="nicknameLabel" styleClass="top-label" />
 
             <Pane HBox.hgrow="ALWAYS" />
 

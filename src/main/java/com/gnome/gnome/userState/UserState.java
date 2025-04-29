@@ -3,6 +3,7 @@ package com.gnome.gnome.userState;
 import com.gnome.gnome.dao.userDAO.AuthUserDAO;
 import com.gnome.gnome.dao.userDAO.UserGameStateDAO;
 import com.gnome.gnome.models.user.AuthUser;
+import com.gnome.gnome.models.user.PlayerRole;
 import com.gnome.gnome.models.user.UserGameState;
 import lombok.Getter;
 
@@ -11,7 +12,7 @@ public class UserState {
     private static UserState instance;
 
     private String username;
-    private String role;
+    private PlayerRole role;
     private float balance;
     private float health;
     private int score;
@@ -49,11 +50,11 @@ public class UserState {
     }
 
     // Setters with immediate database update
-    public void setRole(String role) {
-        this.role = role;
-        AuthUser authUser = new AuthUser(username, null, role);
-        authUserDAO.updateUserRole(authUser);
-    }
+//    public void setRole(String role) {
+//        this.role = role;
+//        AuthUser authUser = new AuthUser(username, null, role);
+//        authUserDAO.updateUserRole(authUser);
+//    }
 
     public void setBalance(float balance) {
         this.balance = balance;
