@@ -60,6 +60,7 @@ public class LoginRegistrationController {
             return;
         }
 
+
         LoginResult result = LoginRegistrationService.loginOrRegisterUser(username, password);
 
         if (result.getUser() != null) {

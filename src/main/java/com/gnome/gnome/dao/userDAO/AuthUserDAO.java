@@ -45,7 +45,7 @@ public class AuthUserDAO extends BaseDAO<AuthUser> {
         try {
             db.beginTransaction();
             String sql = "INSERT INTO \"Users\" (username, password, role) VALUES (?, ?, ?)";
-            executeUpdate(sql, authUser.getUsername(), authUser.getPassword(), authUser.getRole());
+            executeUpdate(sql, authUser.getUsername(), authUser.getPassword(), authUser.getRole().toString());
             db.commitTransaction();
         } catch (DataAccessException e) {
             db.rollBackTransaction();
