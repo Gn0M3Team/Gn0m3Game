@@ -208,8 +208,6 @@ public class GameController {
         healthBarContainer.getChildren().add(healthBar); // Add the health bar to its container
         updatePlayerHealthBar(); // Update the health bar to reflect the player's initial health
 
-        // Add a coin to the map at position (9, 9) with a value of 100
-        coinsOnMap.add(new Coin(9, 9, 100));
         drawCoinCounter(); // Update the coin counter label to show the player's initial coin count (0)
 
         // Set up the center menu button to show the popup menu when clicked
@@ -346,7 +344,7 @@ public class GameController {
      * Each monster's position is marked on the fieldMap with its monster value (e.g., -1 for a goblin).
      */
     private void updateMapWithMonsters() {
-        // 🧹 Just refresh baseMap - don't insert monsters manually anymore
+        // Just refresh baseMap
         fieldMap = copyMap(baseMap);
         camera.setMapGrid(fieldMap);
     }
@@ -681,7 +679,7 @@ public class GameController {
         int rows = fieldMap.length;
         int cols = fieldMap[0].length;
 
-        // Do NOT recreate fieldMap, only update monsters visually now
+        // Update monsters visually
         List<Monster> toRemove = new ArrayList<>();
 
         for (Monster monster : monsterList) {
@@ -698,7 +696,7 @@ public class GameController {
             }
 
             if (!(monster instanceof Skeleton)) {
-//                monster.meleeAttack(player, gameObjectsPane, camera.getStartCol(), camera.getStartRow(), currentTime);
+                monster.meleeAttack(player, gameObjectsPane, currentTime);
             }
 
             if (monster.isHitEffectPlaying() || monster.isMeleeAttacking()) {

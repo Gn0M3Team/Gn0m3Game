@@ -16,8 +16,10 @@ public class Demon extends Monster {
                 startX,
                 startY,
                 TypeOfObjects.DEMON.getValue(),
-                new OmnidirectionalMovement(), TypeOfObjects.DEMON.getImagePath(), "/com/gnome/gnome/effects/demon_damaged.gif"
-        );
+                new OmnidirectionalMovement(),
+                TypeOfObjects.DEMON.getImagePath(),
+                "/com/gnome/gnome/effects/demon_damaged.gif",
+                "/com/gnome/gnome/effects/red_monster.gif");
     }
 
     @Override

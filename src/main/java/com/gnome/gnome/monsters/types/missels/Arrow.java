@@ -3,9 +3,12 @@ package com.gnome.gnome.monsters.types.missels;
 import com.gnome.gnome.monsters.types.Skeleton;
 import com.gnome.gnome.player.Player;
 import javafx.animation.AnimationTimer;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import lombok.Getter;
 
+import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
 
@@ -27,7 +30,7 @@ public class Arrow {
      * The visual representation of the arrow as a colored rectangle.
      */
     @Getter
-    private final Rectangle view;
+    private final ImageView view;
     /**
      * Absolute coordinates of the arrow (in tiles).
      */
@@ -59,8 +62,6 @@ public class Arrow {
     @Setter
     private Skeleton skeleton;
     private int cameraStartCol, cameraStartRow;
-
-    @Setter
     private double dynamicTileSize;
 
 
@@ -86,21 +87,15 @@ public class Arrow {
         this.targetY = targetY; // Set the target Y coordinate
         System.out.println("Creating arrow " + arrowId + " at (" + startX + ", " + startY + ") with velocity (" + vx + ", " + vy + ") towards (" + targetX + ", " + targetY + ")");
 
-        // Create a Rectangle to visually represent the arrow
-        // The rectangle is 30x30 pixels for simplicity
-        view = new Rectangle(30, 30);
-
-        // Generate a random color for the rectangle (for debugging purposes)
-        // In a real game, this would likely be an image of an arrow instead of a colored rectangle
-        Random rand = new Random();
-        // Set the fill color of the rectangle to a random RGB color
-        view.setFill(Color.rgb(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256)));
+        Image arrowImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/gnome/gnome/images/arrow.png")));
+        this.view = new ImageView(arrowImage);
     }
 
     public void setDynamicTileSize(double dynamicTileSize) {
         this.dynamicTileSize = dynamicTileSize;
-        view.setWidth(dynamicTileSize * 0.6);
-        view.setHeight(dynamicTileSize * 0.6);
+        double viewSize = dynamicTileSize * 0.6;
+        view.setFitHeight(viewSize);
+        view.setFitWidth(viewSize);
     }
 
     /**
@@ -124,8 +119,6 @@ public class Arrow {
 
         view.setTranslateX(pixelX);
         view.setTranslateY(pixelY);
-        view.setWidth(viewSize);
-        view.setHeight(viewSize);
     }
 
 
@@ -147,17 +140,16 @@ public class Arrow {
 
         // Very important: set initial dynamic size BEFORE adding to layer
         double viewSize = dynamicTileSize * 0.6;
-        view.setWidth(viewSize);
-        view.setHeight(viewSize);
+        view.setFitWidth(viewSize);
+        view.setFitHeight(viewSize);
 
-        // Correct starting pixel position:
         double offset = (dynamicTileSize - viewSize) / 2.0;
         double pixelX = (x - cameraStartCol) * dynamicTileSize + offset;
         double pixelY = (y - cameraStartRow) * dynamicTileSize + offset;
         view.setTranslateX(pixelX);
         view.setTranslateY(pixelY);
 
-        // Now add the view to scene
+        // Add the view to scene
         layer.getChildren().add(view);
 
         new AnimationTimer() {
@@ -174,31 +166,31 @@ public class Arrow {
                 double paneWidth = layer.getWidth();
                 double paneHeight = layer.getHeight();
 
-                if (pixelX < 0 || pixelX > paneWidth || pixelY < 0 || pixelY > paneHeight ||
-                        (vx > 0 && x >= targetX) || (vx < 0 && x <= targetX) ||
-                        (vy > 0 && y >= targetY) || (vy < 0 && y <= targetY)) {
+                boolean outOfBounds = pixelX < 0 || pixelX > paneWidth || pixelY < 0 || pixelY > paneHeight;
+                boolean reachedTarget = (vx > 0 && x >= targetX) || (vx < 0 && x <= targetX) ||
+                        (vy > 0 && y >= targetY) || (vy < 0 && y <= targetY);
+
+                if (outOfBounds || reachedTarget) {
 
                     System.out.println("Arrow " + arrowId + " removed: reached bounds or target at (" + x + ", " + y + ")");
                     layer.getChildren().remove(view);
                     stop();
                     isAnimating = false;
 
-                    if (skeleton != null) {
+                    if (skeleton != null)
                         skeleton.clearActiveArrow();
-                    }
                     return;
                 }
 
-                if (view.getBoundsInParent().intersects(player.getBounds())) {
+                if (view.getBoundsInParent().intersects(player.getRepresentation().getBoundsInParent())) {
                     System.out.println("Arrow " + arrowId + " hit player at (" + x + ", " + y + ")");
                     player.takeDamage(DAMAGE);
                     layer.getChildren().remove(view);
                     stop();
                     isAnimating = false;
 
-                    if (skeleton != null) {
+                    if (skeleton != null)
                         skeleton.clearActiveArrow();
-                    }
                 }
             }
         }.start();

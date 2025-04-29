@@ -713,7 +713,7 @@ public class ContinueGameController implements Initializable {
 
             // If the monster is not a skeleton, attempt a melee attack on the player
             if (!(monster instanceof Skeleton)) {
-                monster.meleeAttack(player, gameObjectsPane, camera.getStartCol(), camera.getStartRow(), currentTime);
+                monster.meleeAttack(player, gameObjectsPane,currentTime);
             }
 
             // Check if the monster is currently playing a hit effect or melee attack animation

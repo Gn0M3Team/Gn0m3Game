@@ -99,7 +99,7 @@ public abstract class Monster {
      * @param movementStrategy The strategy that determines how the monster moves.
      * @param imagePath The file path to the monster's image.
      */
-    public Monster(int attack, int health, int cost, int attackRange, String nameEng, String nameSk, int startX, int startY, int value, MovementStrategy movementStrategy, String  imagePath, String hitGifPath) {
+    public Monster(int attack, int health, int cost, int attackRange, String nameEng, String nameSk, int startX, int startY, int value, MovementStrategy movementStrategy, String  imagePath, String hitGifPath, String attackGifPath) {
         this.attack = attack; // Set the monster's attack damage
         this.health = health; // Set the monster's initial health
         this.cost = cost; // Set the coin reward for defeating the monster
@@ -112,6 +112,7 @@ public abstract class Monster {
         this.movementStrategy = movementStrategy; // Set the movement strategy
         this.imagePath = imagePath; // Set the path to the monster's image
         this.hitGifPath = hitGifPath;
+        this.attackImagePath = attackGifPath;
 
         initRepresentation();
     }
@@ -237,15 +238,9 @@ public abstract class Monster {
      * The effect is shown as a GIF (red_monster.gif) at the monster's position on the screen.
      * The animation lasts for 1 second, during which the monster cannot move.
      *
-     * @param gameObjectsPane The JavaFX Pane where the hit effect will be displayed.
-     * @param cameraStartCol The starting column of the camera's viewport (used for positioning the effect).
-     * @param cameraStartRow The starting row of the camera's viewport (used for positioning the effect).
      * @param onFinish A callback function (Runnable) that is executed when the hit effect animation finishes.
      */
-    public void showHitEffect(Pane gameObjectsPane,
-                              int cameraStartCol,
-                              int cameraStartRow,
-                              Runnable onFinish) {
+    public void showHitEffect(Runnable onFinish) {
         if (representation == null) {
             if (onFinish != null) onFinish.run();
             return;
@@ -262,13 +257,13 @@ public abstract class Monster {
         }
 
         Image gifImage = new Image(gifStream);
-        Image originalImage = ((ImageView) representation).getImage();
+        Image originalImage = representation.getImage();
 
-        ((ImageView) representation).setImage(gifImage);
+        representation.setImage(gifImage);
 
         PauseTransition delay = new PauseTransition(Duration.seconds(1));
         delay.setOnFinished(evt -> {
-            ((ImageView) representation).setImage(originalImage);
+            representation.setImage(originalImage);
             isHitEffectPlaying = false;
             if (onFinish != null) onFinish.run();
         });
@@ -285,12 +280,9 @@ public abstract class Monster {
      *
      * @param player The Player object to attack.
      * @param gameObjectsPane The JavaFX Pane where the attack effect will be displayed.
-     * @param cameraStartCol The starting column of the camera's viewport (used for positioning the effect).
-     * @param cameraStartRow The starting row of the camera's viewport (used for positioning the effect).
      * @param currentTime The current time (in nanoseconds), used to enforce the attack cooldown.
      */
-    public void meleeAttack(Player player, Pane gameObjectsPane,
-                            int cameraStartCol, int cameraStartRow, long currentTime) {
+    public void meleeAttack(Player player, Pane gameObjectsPane,long currentTime) {
         if (health <= 0) return;
         if (currentTime - lastMeleeAttackTime < MELEE_ATTACK_COOLDOWN) return;
         if (gameObjectsPane == null) {
@@ -303,31 +295,19 @@ public abstract class Monster {
         int dy = Math.abs(player.getY() - y);
         if (dx <= attackRange && dy <= attackRange) {
             isMeleeAttacking = true;
-            double tileSize = Camera.getInstance(null, 0, 0, null).getDynamicTileSize();
 
-            Image attackEffectImage = new Image(Objects.requireNonNull(
-                    getClass().getResourceAsStream(hitGifPath)
-            ));
-            ImageView attackEffectView = new ImageView(attackEffectImage);
-            attackEffectView.setFitWidth(tileSize);
-            attackEffectView.setFitHeight(tileSize);
-
-            double pixelX = (x - cameraStartCol) * tileSize;
-            double pixelY = (y - cameraStartRow) * tileSize;
-            attackEffectView.setTranslateX(pixelX);
-            attackEffectView.setTranslateY(pixelY);
-
-            attackEffectView.getProperties().put("absoluteX", x * tileSize);
-            attackEffectView.getProperties().put("absoluteY", y * tileSize);
-
-            gameObjectsPane.getChildren().add(attackEffectView);
+            Image originalImage = representation.getImage();
+            Image attackImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream(attackImagePath)));
+            representation.setImage(attackImage);
 
             PauseTransition pause = new PauseTransition(Duration.seconds(1));
             pause.setOnFinished(event -> {
-                gameObjectsPane.getChildren().remove(attackEffectView);
+                representation.setImage(originalImage);
                 isMeleeAttacking = false;
+
                 int newDx = Math.abs(player.getX() - x);
                 int newDy = Math.abs(player.getY() - y);
+
                 if (newDx <= attackRange && newDy <= attackRange && health > 0) {
                     player.takeDamage(attack);
                 }

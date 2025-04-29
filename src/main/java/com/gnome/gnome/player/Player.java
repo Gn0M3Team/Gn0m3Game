@@ -152,7 +152,7 @@ public class Player {
             // Show a visual hit effect for the monster (animation)
             // The hit effect is displayed on the gameObjectsPane at the monster's position, adjusted for the camera's viewport
             // The lambda expression () -> {...} is a callback that runs when the hit effect finishes
-            monster.showHitEffect(gameObjectsPane, cameraStartCol, cameraStartRow, () -> {
+            monster.showHitEffect(() -> {
                 // Check if this monster was eliminated (killed) during the attack
                 if (eliminated.contains(monster)) {
                     // If the monster was eliminated, call the callback function to handle post-elimination actions

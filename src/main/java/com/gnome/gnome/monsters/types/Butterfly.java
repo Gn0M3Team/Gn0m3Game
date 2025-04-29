@@ -16,7 +16,10 @@ public class Butterfly extends Monster {
                 startX,
                 startY,
                 TypeOfObjects.BUTTERFLY.getValue(),
-                new RandomMovement(), TypeOfObjects.BUTTERFLY.getImagePath(), "/com/gnome/gnome/effects/butterfly_damage.gif");
+                new RandomMovement(),
+                TypeOfObjects.BUTTERFLY.getImagePath(),
+                "/com/gnome/gnome/effects/butterfly_damage.gif",
+                "/com/gnome/gnome/effects/red_monster.gif");
     }
 
     @Override
