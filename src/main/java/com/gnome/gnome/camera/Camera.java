@@ -165,7 +165,7 @@ public class Camera {
             }
         }
 
-        // Draw coins
+        // Draw coins on the map
         for (Coin coin : coins) {
             int gx = coin.getGridX();
             int gy = coin.getGridY();
@@ -198,10 +198,10 @@ public class Camera {
         double cornerRadius = 10.0;
         double shadowOffset = 3.0;
 
-        // Position items in the bottom-middle with small bottom margin
-        double bottomMargin = 10; // Small margin from the bottom
-        double totalItemsWidth = 3 * boxSize + 2 * padding; // Total width for 3 items and padding between them
-        double startX = (canvasWidth - totalItemsWidth) / 2; // Center the items horizontally
+        // Position items in the bottom-middle
+        double bottomMargin = 10;
+        double totalItemsWidth = 3 * boxSize + 2 * padding; // 3 items + padding between them
+        double startX = (canvasWidth - totalItemsWidth) / 2; // Center horizontally
         double itemY = canvasHeight - boxSize - padding - bottomMargin - 40; // Position at bottom with space for text
 
         // Item positions (side by side)
@@ -213,12 +213,74 @@ public class Camera {
         drawItemBox(gc, weaponImage, weapon, weaponX, itemY, boxSize, cornerRadius, shadowOffset, canvas);
         drawItemBox(gc, potionImage, potion, potionX, itemY, boxSize, cornerRadius, shadowOffset, canvas);
         drawItemBox(gc, armorImage, armor, armorX, itemY, boxSize, cornerRadius, shadowOffset, canvas);
+
+        // Position coin amount in the bottom-left with small margins
+        double sideMargin = 10;
+        double coinX = sideMargin;
+        double coinY = canvasHeight - boxSize - padding - bottomMargin; // Reduced height due to horizontal layout
+
+        // Draw coin amount
+        int coinCount = coins.size(); // Assuming this represents the player's coin count
+        Image coinImage = coins.isEmpty() ? null : coins.get(0).getImageView().getImage(); // Use the coin image
+        drawCoinAmount(gc, coinImage, coinCount, coinX, coinY, boxSize, cornerRadius, shadowOffset, canvas);
+    }
+
+    // Helper method to draw coin amount (horizontal layout)
+    private void drawCoinAmount(GraphicsContext gc, Image coinImage, int coinCount, double x, double y,
+                                double boxSize, double cornerRadius, double shadowOffset, Canvas canvas) {
+        gc.save();
+
+        // Calculate box dimensions for horizontal layout
+        double boxWidth = boxSize * 2.5; // Wider to accommodate horizontal layout
+        double boxHeight = boxSize; // Shorter since no stacking
+
+        // Draw shadow
+        gc.setFill(Color.color(0, 0, 0, 0.3));
+        gc.fillRoundRect(x + shadowOffset, y + shadowOffset, boxWidth, boxHeight,
+                cornerRadius, cornerRadius);
+
+        // Draw gradient background with #6B4657 base color
+        LinearGradient gradient = new LinearGradient(
+                0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
+                new Stop(0, Color.web("#8B6677", 0.9)),
+                new Stop(1, Color.web("#6B4657", 0.9))
+        );
+        gc.setFill(gradient);
+        gc.fillRoundRect(x, y, boxWidth, boxHeight, cornerRadius, cornerRadius);
+
+        // Draw border
+        gc.setStroke(Color.rgb(100, 100, 120, 0.7));
+        gc.setLineWidth(1.5);
+        gc.strokeRoundRect(x, y, boxWidth, boxHeight, cornerRadius, cornerRadius);
+
+        // Draw coin image on the left
+        if (coinImage != null) {
+            double imageSize = boxSize * 0.75;
+            double imageX = x + (boxSize - imageSize) / 2;
+            double imageY = y + (boxSize - imageSize) / 2;
+            gc.drawImage(coinImage, imageX, imageY, imageSize, imageSize);
+        }
+
+        // Draw coin count text to the right of the image
+//        String coinText = "x" + coinCount;
+        String coinText = "x" + player.getPlayerCoins();
+        gc.setFill(Color.WHITE);
+        gc.setFont(Font.font("Arial", FontWeight.BOLD, 12));
+        double textX = x + boxSize + 5; // Position after the image with a small gap
+        double textY = y + boxSize / 2 + 5; // Center vertically
+        gc.fillText(coinText, textX, textY);
+
+        // Draw label "Coins" to the right of the count
+        gc.setFont(Font.font("Arial", FontWeight.NORMAL, 10));
+        gc.setFill(Color.rgb(200, 200, 200));
+        gc.fillText("Coins", textX + 30, textY); // Adjust position based on text width
+
+        gc.restore();
     }
 
     // Helper method to draw item box
     private void drawItemBox(GraphicsContext gc, Image image, Object item, double x, double y,
                              double boxSize, double cornerRadius, double shadowOffset, Canvas canvas) {
-        // Save graphics context state
         gc.save();
 
         // Draw shadow
@@ -229,8 +291,8 @@ public class Camera {
         // Draw gradient background with #6B4657 base color
         LinearGradient gradient = new LinearGradient(
                 0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
-                new Stop(0, Color.web("#8B6677", 0.9)), // Lighter shade of #6B4657
-                new Stop(1, Color.web("#6B4657", 0.9))  // Base color #6B4657
+                new Stop(0, Color.web("#8B6677", 0.9)),
+                new Stop(1, Color.web("#6B4657", 0.9))
         );
         gc.setFill(gradient);
         gc.fillRoundRect(x, y, boxSize, boxSize + 40, cornerRadius, cornerRadius);
@@ -240,7 +302,7 @@ public class Camera {
         gc.setLineWidth(1.5);
         gc.strokeRoundRect(x, y, boxSize, boxSize + 40, cornerRadius, cornerRadius);
 
-        // Draw item image with slight scale effect
+        // Draw item image
         if (image != null) {
             double imageSize = boxSize * 0.75;
             double imageX = x + (boxSize - imageSize) / 2;
@@ -260,7 +322,6 @@ public class Camera {
         gc.setFill(Color.rgb(200, 200, 200));
         gc.fillText(stats, x + 5, y + boxSize + 28);
 
-        // Restore graphics context
         gc.restore();
     }
 
@@ -275,18 +336,15 @@ public class Camera {
     private String getItemStats(Object item) {
         if (item instanceof Weapon) {
             Weapon w = (Weapon)item;
-            return "DMG: " + 10;
-//            return "DMG: " + w.getDamage();
+            return "DMG: " + w.getAtkValue();
         }
         if (item instanceof Armor) {
             Armor a = (Armor)item;
-            return "DEF: " + 10;
-//            return "DEF: " + a.getDefense();
+            return "DEF k: " + a.getDefCof();
         }
         if (item instanceof Potion) {
             Potion p = (Potion)item;
-            return "HP: +" + 10;
-//            return "HP: +" + p.getHealthBoost();
+            return "HP: +" + p.getScoreVal();
         }
         return "";
     }
