@@ -1,9 +1,10 @@
 package com.gnome.gnome.storyMaps;
 
-import com.gnome.gnome.dao.MapDAO;
+import com.gnome.gnome.dao.*;
+import com.gnome.gnome.game.MapLoaderService;
+import com.gnome.gnome.game.MapLoaderUIHandler;
 import com.gnome.gnome.userState.UserState;
 import com.gnome.gnome.models.Map;
-import com.gnome.gnome.game.MapLoader;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import javafx.event.ActionEvent;
@@ -28,7 +29,7 @@ public class StoryModeController {
     @FXML
     private VBox mapsContainer;
 
-    private MapLoader mapLoader;
+    private MapLoaderService mapLoaderService;
 
     private PageSwitcherInterface pageSwitch;
 
@@ -95,13 +96,18 @@ public class StoryModeController {
                 mapButton.setDisable(true);
             }
 
+            MonsterDAO monsterDAO = new MonsterDAO();
+            ArmorDAO armorDAO = new ArmorDAO();
+            WeaponDAO weaponDAO = new WeaponDAO();
+            PotionDAO potionDAO = new PotionDAO();
+
             mapButton.setOnAction(e -> {
                 if (!mapButton.isDisabled()) {
-                    if (mapLoader == null) {
+                    if (mapLoaderService == null) {
                         Stage stage = (Stage) storyMapsBorderPane.getScene().getWindow();
-                        mapLoader = new MapLoader(stage);
+                        mapLoaderService = new MapLoaderService(monsterDAO, armorDAO, weaponDAO, potionDAO);
+                        new MapLoaderUIHandler(mapLoaderService, stage).showStartMap(selectedMap);
                     }
-                    mapLoader.showStartMap(selectedMap);
                 }
             });
 

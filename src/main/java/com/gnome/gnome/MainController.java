@@ -1,7 +1,6 @@
 package com.gnome.gnome;
 
-import com.gnome.gnome.dao.MapDAO;
-import com.gnome.gnome.dao.MonsterDAO;
+import com.gnome.gnome.dao.*;
 import com.gnome.gnome.dao.userDAO.AuthUserDAO;
 import com.gnome.gnome.game.MapLoaderService;
 import com.gnome.gnome.game.MapLoaderUIHandler;
@@ -87,13 +86,17 @@ public class MainController {
 
         MapDAO mapDAO = new MapDAO();
         MonsterDAO monsterDAO = new MonsterDAO();
+        ArmorDAO armorDAO = new ArmorDAO();
+        WeaponDAO weaponDAO = new WeaponDAO();
+        PotionDAO potionDAO = new PotionDAO();
 
-        this.mapLoaderService = new MapLoaderService(mapDAO, monsterDAO);
+        this.mapLoaderService = new MapLoaderService(monsterDAO, armorDAO, weaponDAO, potionDAO);
+
 
         continueGameButton.setOnAction(e -> {
             if (mapLoaderService != null) {
                 Map selectedMap = mapDAO.getMapByLevel(1);
-                new MapLoaderUIHandler(mapLoaderService, primaryStage).showStartMap(selectedMap.getId());
+                new MapLoaderUIHandler(mapLoaderService, primaryStage).showStartMap(selectedMap);
             }
         });
     }

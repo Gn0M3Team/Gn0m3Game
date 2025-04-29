@@ -141,6 +141,10 @@ public class GameController {
 
     private static GameController instance; //Singleton Instance
 
+    private final Map<String, Label> tableHints = new HashMap<>();
+
+    private Popup tablePopup;
+
     public static GameController getGameController(){
         if (GameController.instance == null)
             return new GameController();
@@ -152,8 +156,6 @@ public class GameController {
     private boolean debug_mod_game;
 
     public void initializeWithLoadedMap(int[][] mapData, List<com.gnome.gnome.models.Monster> monsterList, Armor armor, Weapon weapon, Potion potion) {
-        System.out.println("----------------------------------------------");
-        System.out.println("MAP DATA: "+ Arrays.deepToString(mapData));
         setupProperties();
 
         this.baseMap = mapData;
@@ -165,16 +167,9 @@ public class GameController {
 
         setupMap(monsterList);
 
-        System.out.println("Player info: " + player);
-        System.out.println("Player X info: " + player.getX());
-        System.out.println("Player Y info: " + player.getY());
-
-        if (player == null)
-            throw new RuntimeException("player is null");
-
         camera      = Camera.getInstance(fieldMap, player.getX(), player.getY(), player, armor, weapon, potion); // Initialize the camera to follow the player
         camera.updateCameraCenter();
-        updateMapWithMonsters(); // Update the field map with monster positions
+        camera.setMapGrid(fieldMap);
         instance = this; //Fill singleton instance ONLY on initialization. BECAUSE OTHERWISE THERE IS NO DATA THAT IS REQUIRED IN OTHER CLASSES
 
         viewportCanvas = new Canvas();
@@ -260,7 +255,7 @@ public class GameController {
 
 
 
-    private void onSceneExit() {
+    private void onSceneExit(boolean isRestart) {
         if (monsterMovementTimer != null) {
             monsterMovementTimer.stop();
         }
@@ -268,25 +263,25 @@ public class GameController {
 
         Camera.resetInstance();
         Player.resetInstance();
-        GameController.instance = null;
+        if (!isRestart)
+            GameController.instance = null;
 
         viewportCanvas = null;
         monsterList.clear();
         coinsOnMap.clear();
         activeArrows.clear();
-        dbMonsters.clear();
+        gameObjectsPane.getChildren().clear();
     }
 
 
     private void setupMap(List<com.gnome.gnome.models.Monster> importedMonsterList) {
-        boolean flag = false;
-        for (int row = 0; row < baseMap.length; row++) {
-            for (int col = 0; col < baseMap[row].length; col++) {
-                int tile = baseMap[row][col];
+        for (int row = 0; row < fieldMap.length; row++) {
+            for (int col = 0; col < fieldMap[row].length; col++) {
+                int tile = fieldMap[row][col];
 
                 if (tile == TypeOfObjects.START_POINT.getValue()) {
                     player = Player.getInstance(col, row, PLAYER_MAX_HEALTH);
-                    baseMap[row][col] = TypeOfObjects.FLOOR.getValue();
+                    fieldMap[row][col] = TypeOfObjects.START_POINT.getValue();
                 }
 
                 if (tile < 0) {
@@ -298,14 +293,10 @@ public class GameController {
 
                     Monster m = MonsterFactory.createMonster(TypeOfObjects.fromValue(tile), col, row, dbMonster);
 
-                    baseMap[row][col] = TypeOfObjects.FLOOR.getValue();
+                    fieldMap[row][col] = TypeOfObjects.FLOOR.getValue();
                     monsterList.add(m);
                 }
             }
-        }
-
-        if (!flag) {
-            throw new RuntimeException("User cann't be createds");
         }
     }
 
@@ -356,17 +347,6 @@ public class GameController {
 
 
     /**
-     * Updates the fieldMap by copying the baseMap and adding the current positions of all monsters.
-     * Each monster's position is marked on the fieldMap with its monster value (e.g., -1 for a goblin).
-     */
-    private void updateMapWithMonsters() {
-        // Just refresh baseMap
-        fieldMap = copyMap(baseMap);
-        camera.setMapGrid(fieldMap);
-    }
-
-
-    /**
      * Registers key event handlers on the Scene to handle player input (e.g., movement, attacking).
      * The player can move using W, A, S, D (or arrow keys) and attack using the spacebar.
      *
@@ -402,6 +382,11 @@ public class GameController {
                 }
                 case DOWN, S -> {
                     if (oldY < maxRow - 1) newY = oldY + 1; // Only move if not at the bottom edge
+                }
+                case E -> {
+                    if (isNearTable(player.getX(), player.getY())) {
+                        showTablePopup();
+                    }
                 }
                 case SPACE -> {
                     // Check if the gameObjectsPane is initialized (needed for attack effects)
@@ -479,6 +464,50 @@ public class GameController {
 
         // Request focus on the scene's root to ensure it receives key events
         scene.getRoot().requestFocus();
+    }
+
+    private boolean isNearTable(int x, int y) {
+        int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+        for (int[] dir : directions) {
+            int nx = x + dir[0];
+            int ny = y + dir[1];
+
+            if (nx >= 0 && ny >= 0 && ny < baseMap.length && nx < baseMap[0].length) {
+                if (TypeOfObjects.fromValue(baseMap[ny][nx]) == TypeOfObjects.TABLE) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private void showTablePopup() {
+        if (tablePopup != null && tablePopup.isShowing()) return;
+
+        VBox box = new VBox(15);
+        box.setAlignment(Pos.CENTER);
+        box.setStyle("-fx-background-color: #444; -fx-padding: 20px; -fx-background-radius: 10;");
+
+        Label info = new Label("RANDOM TEXT BITCH");
+        info.setStyle("-fx-text-fill: white; -fx-font-size: 16px;");
+
+        Button closeBtn = new Button("CLOSE THIS POPUP FUCKING IDIOTS");
+        closeBtn.setOnAction(e -> tablePopup.hide());
+
+        box.getChildren().addAll(info, closeBtn);
+
+        tablePopup = new Popup();
+        tablePopup.getContent().add(box);
+        tablePopup.setAutoHide(true);
+
+        Scene scene = rootBorder.getScene();
+        if (scene != null) {
+            Bounds bounds = scene.getRoot().localToScreen(scene.getRoot().getBoundsInLocal());
+            tablePopup.show(scene.getWindow(),
+                    bounds.getMinX() + bounds.getWidth() / 2 - 100,
+                    bounds.getMinY() + bounds.getHeight() / 2 - 75
+            );
+        }
     }
 
     // TODO: Here we need to implement shop
@@ -564,7 +593,7 @@ public class GameController {
         }
 
         // Update the fieldMap with the remaining monsters
-        updateMapWithMonsters();
+        camera.setMapGrid(fieldMap);
         // Redraw the viewport to reflect the changes (e.g., monster removed, coin added)
         updateCameraViewport();
     }
@@ -578,6 +607,7 @@ public class GameController {
         GraphicsContext gc = viewportCanvas.getGraphicsContext2D();
         camera.updateCameraCenter();
         camera.drawViewport(viewportCanvas, coinsOnMap);
+        showTableHintsNearPlayer();
         drawAttackRange(gc, 1);
         double tw = camera.getTileWidth();
         double th = camera.getTileHeight();
@@ -607,6 +637,53 @@ public class GameController {
 //        drawCoinCounter();
         updatePlayerHealthBar();
     }
+
+    private void showTableHintsNearPlayer() {
+        int px = player.getX();
+        int py = player.getY();
+
+        int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+
+        Set<String> visibleHints = new HashSet<>();
+
+        for (int[] dir : directions) {
+            int nx = px + dir[0];
+            int ny = py + dir[1];
+
+            if (nx >= 0 && nx < baseMap[0].length && ny >= 0 && ny < baseMap.length) {
+                int val = baseMap[ny][nx];
+                if (TypeOfObjects.fromValue(val) == TypeOfObjects.TABLE) {
+                    String key = nx + "," + ny;
+                    visibleHints.add(key);
+
+                    Label hintLabel = tableHints.get(key);
+                    if (hintLabel == null) {
+                        hintLabel = new Label("Press E");
+                        hintLabel.setStyle("-fx-background-color: rgba(0,0,0,0.7); -fx-text-fill: white; -fx-padding: 4px;");
+                        hintLabel.setMouseTransparent(true);
+                        tableHints.put(key, hintLabel);
+                        gameObjectsPane.getChildren().add(hintLabel);
+                    }
+
+                    double tileSize = camera.getDynamicTileSize();
+                    double tx = (nx - camera.getStartCol()) * tileSize;
+                    double ty = (ny - camera.getStartRow()) * tileSize;
+
+                    hintLabel.setTranslateX(tx);
+                    hintLabel.setTranslateY(ty - 20);
+                    hintLabel.setVisible(true);
+                }
+            }
+        }
+
+        // Ховаємо всі підказки, які більше не біля гравця
+        for (Map.Entry<String, Label> entry : tableHints.entrySet()) {
+            if (!visibleHints.contains(entry.getKey())) {
+                entry.getValue().setVisible(false);
+            }
+        }
+    }
+
 
 //    private void drawCoinCounter() {
 //        GraphicsContext gc = viewportCanvas.getGraphicsContext2D();
@@ -862,7 +939,7 @@ public class GameController {
             // Define the action for "Go Back" (loads the main menu scene)
             goBackButton.setOnAction(e -> {
                 try {
-                    onSceneExit();
+                    onSceneExit(false);
                     URL fxmlUrl = getClass().getResource("/com/gnome/gnome/pages/main-menu.fxml");
                     Parent mainRoot = FXMLLoader.load(Objects.requireNonNull(fxmlUrl));
                     Stage stage = (Stage) centerMenuButton.getScene().getWindow();
@@ -943,7 +1020,7 @@ public class GameController {
      */
     private void restartGame() {
         try {
-            onSceneExit();
+            onSceneExit(true);
 
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/gnome/gnome/pages/game.fxml")
