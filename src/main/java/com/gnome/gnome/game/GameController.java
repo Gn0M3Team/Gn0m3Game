@@ -96,6 +96,8 @@ public class GameController {
      */
     private final List<Arrow> activeArrows = new ArrayList<>();
 
+    private final List<com.gnome.gnome.models.Monster> dbMonsters = new ArrayList<>();
+
     private static final Logger logger = Logger.getLogger(ContinueGameController.class.getName());
 
     /**
@@ -143,14 +145,15 @@ public class GameController {
 
     private boolean debug_mod_game;
 
-    public void initializeWithLoadedMap(int[][] mapData) {
+    public void initializeWithLoadedMap(int[][] mapData, List<com.gnome.gnome.models.Monster> monsterList) {
         System.out.println("----------------------------------------------");
         System.out.println("MAP DATA: "+ Arrays.deepToString(mapData));
         setupProperties();
         this.baseMap = mapData;
         this.fieldMap = copyMap(baseMap);
+        this.dbMonsters.addAll(monsterList);
 
-        setupMap();
+        setupMap(monsterList);
 
         System.out.println("Player info: " + player);
         System.out.println("Player X info: " + player.getX());
@@ -267,10 +270,11 @@ public class GameController {
         monsterList.clear();
         coinsOnMap.clear();
         activeArrows.clear();
+        dbMonsters.clear();
     }
 
 
-    private void setupMap() {
+    private void setupMap(List<com.gnome.gnome.models.Monster> importedMonsterList) {
         boolean flag = false;
         for (int row = 0; row < baseMap.length; row++) {
             for (int col = 0; col < baseMap[row].length; col++) {
@@ -278,14 +282,19 @@ public class GameController {
 
                 if (tile == TypeOfObjects.START_POINT.getValue()) {
                     flag = true;
-                    System.out.println("Player is created");
                     player = Player.getInstance(col, row, PLAYER_MAX_HEALTH);
                     baseMap[row][col] = TypeOfObjects.FLOOR.getValue();
                 }
 
                 if (tile < 0) {
-                    Monster m = MonsterFactory
-                            .createMonster(TypeOfObjects.fromValue(tile), col, row);
+                    com.gnome.gnome.models.Monster dbMonster = findMonsterById(importedMonsterList, tile);
+
+                    if (dbMonster == null) {
+                        throw new RuntimeException("Monster with id " + tile + " not found in importedMonsterList");
+                    }
+
+                    Monster m = MonsterFactory.createMonster(TypeOfObjects.fromValue(tile), col, row, dbMonster);
+
                     baseMap[row][col] = TypeOfObjects.FLOOR.getValue();
                     monsterList.add(m);
                 }
@@ -295,6 +304,10 @@ public class GameController {
         if (!flag) {
             throw new RuntimeException("User cann't be createds");
         }
+    }
+
+    private com.gnome.gnome.models.Monster findMonsterById(List<com.gnome.gnome.models.Monster> list, int id) {
+        return list.stream().filter(monster -> monster.getId() == id).findFirst().orElse(null);
     }
 
 
@@ -921,7 +934,7 @@ public class GameController {
 
             GameController ctrl = loader.getController();
 
-            ctrl.initializeWithLoadedMap(this.baseMap);
+            ctrl.initializeWithLoadedMap(this.baseMap, dbMonsters);
 
             Stage stage = (Stage) rootBorder.getScene().getWindow();
             stage.getScene().setRoot(newRoot);

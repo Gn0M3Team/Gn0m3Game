@@ -1,8 +1,10 @@
 package com.gnome.gnome;
 
 import com.gnome.gnome.dao.MapDAO;
+import com.gnome.gnome.dao.MonsterDAO;
 import com.gnome.gnome.dao.userDAO.AuthUserDAO;
-import com.gnome.gnome.game.MapLoader;
+import com.gnome.gnome.game.MapLoaderService;
+import com.gnome.gnome.game.MapLoaderUIHandler;
 import com.gnome.gnome.models.Map;
 import com.gnome.gnome.models.user.AuthUser;
 import com.gnome.gnome.music.MusicWizard;
@@ -11,7 +13,6 @@ import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import com.gnome.gnome.components.LeaderBoardView;
 import javafx.animation.FadeTransition;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -24,6 +25,7 @@ import javafx.util.Duration;
 
 import java.util.Objects;
 
+// TODO: If we have time, we need to change logic with creating DAO, because we in two places crete monster dao, map dao, and for me we need to change this.
 public class HelloController {
 
     @FXML private ImageView musicIcon;
@@ -44,7 +46,7 @@ public class HelloController {
 
     Stage primaryStage;
 
-    MapLoader mapLoader;
+    MapLoaderService mapLoaderService;
 
 
     /**
@@ -94,13 +96,16 @@ public class HelloController {
 
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
-        this.mapLoader = new MapLoader(primaryStage);
+
+        MapDAO mapDAO = new MapDAO();
+        MonsterDAO monsterDAO = new MonsterDAO();
+
+        this.mapLoaderService = new MapLoaderService(mapDAO, monsterDAO);
 
         continueGameButton.setOnAction(e -> {
-            if (mapLoader != null) {
-                MapDAO levelMapDAO = new MapDAO();
-                Map selectedMap = levelMapDAO.getMapByLevel(1);
-                mapLoader.showStartMap(selectedMap.getId());
+            if (mapLoaderService != null) {
+                Map selectedMap = mapDAO.getMapByLevel(1);
+                new MapLoaderUIHandler(mapLoaderService, primaryStage).showStartMap(selectedMap.getId());
             }
         });
     }
@@ -149,10 +154,13 @@ public class HelloController {
      */
     @FXML
     public void onContinueGameButtonClick(ActionEvent event) {
-        MapDAO levelMapDAO = new MapDAO();
-        Map selectedMap = levelMapDAO.getMapByLevel(1);
-//        pageSwitch.goContinueGame(helloPage);
-        mapLoader.showStartMap(selectedMap.getId());
+        if (mapLoaderService != null) {
+            MapDAO mapDAO = new MapDAO();
+            Map selectedMap = mapDAO.getMapByLevel(1);
+
+            new MapLoaderUIHandler(mapLoaderService, primaryStage)
+                    .showStartMap(selectedMap.getId());
+        }
     }
 
     /**

@@ -6,13 +6,13 @@ import com.gnome.gnome.monsters.movements.RandomMovement;
 import javafx.scene.Node;
 
 public class Butterfly extends Monster {
-    public Butterfly(int startX, int startY) {
-        super(10,
-                50,
-                20,
-                2,
-                "Butterfly",
-                "motýľ",
+    public Butterfly(int startX, int startY, com.gnome.gnome.models.Monster dbMonster) {
+        super(dbMonster.getAttack(),
+                dbMonster.getHealth(),
+                dbMonster.getCost(),
+                dbMonster.getRadius(),
+                dbMonster.getName(),
+                dbMonster.getName_sk(),
                 startX,
                 startY,
                 TypeOfObjects.BUTTERFLY.getValue(),

@@ -6,13 +6,13 @@ import com.gnome.gnome.monsters.movements.OmnidirectionalMovement;
 import javafx.scene.Node;
 
 public class Goblin extends Monster {
-    public Goblin(int startX, int startY) {
-        super(20,
-                100,
-                40,
-                2,
-                "Goblin",
-                "Goblin",
+    public Goblin(int startX, int startY, com.gnome.gnome.models.Monster dbMonster) {
+        super(dbMonster.getAttack(),
+                dbMonster.getHealth(),
+                dbMonster.getCost(),
+                dbMonster.getRadius(),
+                dbMonster.getName(),
+                dbMonster.getName_sk(),
                 startX,
                 startY,
                 TypeOfObjects.GOBLIN.getValue(),

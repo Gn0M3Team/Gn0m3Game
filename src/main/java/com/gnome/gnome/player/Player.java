@@ -36,7 +36,7 @@ public class Player {
     /**
      * The current health of the player.
      */
-    private int currentHealth;
+    private double currentHealth;
     /**
      * Node representing the player visually on screen.
      */
@@ -44,7 +44,7 @@ public class Player {
     /**
      * Total number of coins the player has collected.
      */
-    private int playerCoins = 0;
+    private double playerCoins = 0;
 
     private static Player instance;
 
@@ -92,7 +92,7 @@ public class Player {
      * Reduces player's health by a given damage amount.
      * Health cannot go below 0.
      */
-    public void takeDamage(int damage) {
+    public void takeDamage(double damage) {
         currentHealth -= damage;
         if (currentHealth < 0) currentHealth = 0;
 
@@ -188,7 +188,7 @@ public class Player {
      *
      * @param coin the number of coins to add
      */
-    public void addCoin(int coin) {
+    public void addCoin(double coin) {
         playerCoins += coin; // Increase the player's coin count by the specified amount
     }
 

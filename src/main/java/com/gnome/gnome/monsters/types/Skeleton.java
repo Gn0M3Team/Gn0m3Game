@@ -49,13 +49,13 @@ public class Skeleton extends Monster {
      * @param startX the X grid position of the skeleton
      * @param startY the Y grid position of the skeleton
      */
-    public Skeleton(int startX, int startY) {
-        super(30,
-                80,
-                50,
-                4,
-                "Skeleton",
-                "Skeleton",
+    public Skeleton(int startX, int startY, com.gnome.gnome.models.Monster dbMonster) {
+        super(dbMonster.getAttack(),
+                dbMonster.getHealth(),
+                dbMonster.getCost(),
+                dbMonster.getRadius(),
+                dbMonster.getName(),
+                dbMonster.getName_sk(),
                 startX,
                 startY,
                 TypeOfObjects.SKELETON.getValue(),

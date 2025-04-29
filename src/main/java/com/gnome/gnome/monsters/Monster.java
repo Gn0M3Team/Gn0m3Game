@@ -34,19 +34,19 @@ public abstract class Monster {
     /**
      * The amount of damage the monster can deal.
      */
-    protected int attack;
+    protected double attack;
     /**
      * The current health of the monster.
      */
-    protected int health;
+    protected double health;
     /**
      * The coin value awarded to the player upon defeating the monster.
      */
-    protected int cost;
+    protected double cost;
     /**
      * The attack range of the monster (in tiles).
      */
-    protected int attackRange;
+    protected double attackRange;
     /**
      * The English name of the monster.
      */
@@ -103,7 +103,7 @@ public abstract class Monster {
      * @param movementStrategy The strategy that determines how the monster moves.
      * @param imagePath The file path to the monster's image.
      */
-    public Monster(int attack, int health, int cost, int attackRange, String nameEng, String nameSk, int startX, int startY, int value, MovementStrategy movementStrategy, String  imagePath, String hitGifPath, String attackGifPath) {
+    public Monster(double attack, double health, double cost, double attackRange, String nameEng, String nameSk, int startX, int startY, int value, MovementStrategy movementStrategy, String  imagePath, String hitGifPath, String attackGifPath) {
         this.attack = attack; // Set the monster's attack damage
         this.health = health; // Set the monster's initial health
         this.cost = cost; // Set the coin reward for defeating the monster
