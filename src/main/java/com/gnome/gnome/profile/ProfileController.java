@@ -6,9 +6,11 @@ import com.gnome.gnome.dao.userDAO.UserGameStateDAO;
 import com.gnome.gnome.dao.userDAO.UserSession;
 import com.gnome.gnome.models.Map;
 import com.gnome.gnome.models.user.AuthUser;
+import com.gnome.gnome.models.user.PlayerRole;
 import com.gnome.gnome.models.user.UserGameState;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
+import com.gnome.gnome.userState.UserState;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
@@ -46,16 +48,23 @@ public class ProfileController {
     private final AuthUserDAO userDAO = new AuthUserDAO();
     private final MapDAO MapDAO = new MapDAO();
 
+    private final UserState userState = UserState.getInstance();
+
 
     private int currentMapPage = 1;
     private final int mapPageSize = 5;
     private boolean mapLoading = false;
     private List<Map> userMaps;
 
-    private String selectedPlayer;
+    private PlayerRole selectedUserRole;
+
+    private String selectedUsername;
     private AuthUser user;
-    private final List<String> roles = List.of("user", "map_creator");
+    private final List<PlayerRole> roles = List.of(PlayerRole.USER, PlayerRole.MAP_CREATOR);
+
     private int currentRoleIndex = 0;
+
+
 
     @FXML
     public void initialize() {
@@ -67,25 +76,28 @@ public class ProfileController {
      * This method is called when navigating from the leaderboard.
      */
     public void setPlayer(String playerData) {
-        this.selectedPlayer = playerData.split("-")[0];
+        this.selectedUsername = playerData.split(": ")[1];
+
         logger.info("Loading profile for: " + playerData);
-        user = userDAO.getAuthUserByUsername(playerData);
-        userMaps = MapDAO.getMapsByUsername(playerData);
+
+
+        user = userDAO.getAuthUserByUsername(selectedUsername);
+        userMaps = MapDAO.getMapsByUsername(selectedUsername);
 
         UserGameStateDAO GameState = new UserGameStateDAO();
 
-        UserGameState gameState=GameState.getUserGameStateByUsername(selectedPlayer);
+        UserGameState gameState = GameState.getUserGameStateByUsername(selectedUsername);
 
         nameLabel.setText("Profile of " + user.getUsername());
-        recordLabel.setText("Score: " +gameState.getScore());
+        recordLabel.setText("Score: " + gameState.getScore());
 
-        gamesPlayedLabel.setText("MapLevel: "+gameState.getMapLevel());
-        deathCounter.setText("Death counter: "+gameState.getDeathCounter());
+        gamesPlayedLabel.setText("MapLevel: " + gameState.getMapLevel());
+        deathCounter.setText("Death counter: " + gameState.getDeathCounter());
 
-        String userRole = user != null ? user.getRole() : "user";
-        currentRoleIndex = roles.indexOf(userRole);
+        selectedUserRole = (user != null) ? user.getRole() : PlayerRole.USER;
+        currentRoleIndex = roles.indexOf(selectedUserRole);
         if (currentRoleIndex == -1) currentRoleIndex = 0;
-        roleLabel.setText("Role: "+roles.get(currentRoleIndex));
+        roleLabel.setText("Role: " + roles.get(currentRoleIndex));
 
 
         user_test();
@@ -111,29 +123,22 @@ public class ProfileController {
      * Adjusts the visibility of buttons depending on the current user's permissions.
      */
     private void user_test(){
-        AuthUser authUser=UserSession.getInstance().getCurrentUser();
-        if (authUser.getRole().equals("user")||authUser.getRole().equals("map_creator")){
+        if ((!userState.getRole().equals(PlayerRole.ADMIN)) || selectedUserRole.equals(PlayerRole.ADMIN)){
             banUserButton.setVisible(false);
+            banUserButton.setManaged(false);
             roleLabel.setDisable(true);
-
             leftButton.setVisible(false);
+            leftButton.setManaged(false);
             rightButton.setVisible(false);
+            rightButton.setManaged(false);
             confirmRoleButton.setVisible(false);
-        }else{
+            confirmRoleButton.setManaged(false);
+        } else {
             banUserButton.setVisible(true);
             roleLabel.setDisable(false);
-
             leftButton.setVisible(true);
             rightButton.setVisible(true);
             confirmRoleButton.setVisible(true);
-        }
-        if (selectedPlayer.equals("Admin")&&authUser.getRole().equals("admin")){
-            banUserButton.setVisible(false);
-            roleLabel.setVisible(false);
-
-            leftButton.setVisible(false);
-            rightButton.setVisible(false);
-            confirmRoleButton.setVisible(false);
         }
     }
 
@@ -210,7 +215,7 @@ public class ProfileController {
         Label title = new Label("Confirm Deletion");
         title.getStyleClass().add("popup-title");
 
-        Label userLabel = new Label("Delete user: " + selectedPlayer + "?");
+        Label userLabel = new Label("Delete user: " + selectedUsername + "(" + selectedUserRole + ")" + "?");
         userLabel.getStyleClass().add("popup-title");
 
         Button yesButton = new Button("Yes, Delete");
@@ -219,13 +224,13 @@ public class ProfileController {
         noButton.getStyleClass().add("menu-button");
 
         yesButton.setOnAction(e -> {
-            boolean deleted = userDAO.deleteUserByUsername(selectedPlayer);
+            boolean deleted = userDAO.deleteUserByUsername(selectedUsername);
             confirmPopup.hide();
             if (deleted) {
-                logger.info("User deleted: " + selectedPlayer);
+                logger.info("User deleted: " + selectedUserRole);
                 pageSwitch.goMainMenu(profilePage);
             } else {
-                logger.warning("Failed to delete user: " + selectedPlayer);
+                logger.warning("Failed to delete user: " + selectedUserRole);
             }
         });
 
@@ -258,7 +263,7 @@ public class ProfileController {
         } else {
             currentRoleIndex = roles.size() - 1;
         }
-        roleLabel.setText("Role: "+roles.get(currentRoleIndex));
+        roleLabel.setText("Role: " + roles.get(currentRoleIndex));
     }
 
     /**
@@ -271,19 +276,19 @@ public class ProfileController {
         } else {
             currentRoleIndex = 0;
         }
-        roleLabel.setText("Role: "+roles.get(currentRoleIndex));
+        roleLabel.setText("Role: " + roles.get(currentRoleIndex));
     }
     /**
      * Confirms and updates the selected role for the user.
      */
     @FXML
     private void handleConfirmRole(ActionEvent event) {
-        String selectedRole = roles.get(currentRoleIndex);
-        logger.info("Role updated to " + selectedRole + " for user " + selectedPlayer);
-        logger.info(selectedPlayer+" "+selectedRole);
+        PlayerRole selectedRole = roles.get(currentRoleIndex);
+        logger.info("Role updated to " + selectedRole + " for user " + selectedUserRole);
+        logger.info(selectedUserRole + " " + selectedRole);
         this.user.setRole(selectedRole);
         userDAO.updateUserRole(this.user);
-        logger.info("Role updated to " + selectedRole + " for user " + selectedPlayer);
+        logger.info("Role updated to " + selectedRole + " for user " + selectedUserRole);
     }
 
 }

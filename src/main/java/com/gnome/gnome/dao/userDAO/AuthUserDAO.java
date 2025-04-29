@@ -4,6 +4,7 @@ import com.gnome.gnome.dao.BaseDAO;
 import com.gnome.gnome.db.DatabaseWrapper;
 import com.gnome.gnome.exceptions.DataAccessException;
 import com.gnome.gnome.models.user.AuthUser;
+import com.gnome.gnome.models.user.PlayerRole;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -29,7 +30,7 @@ public class AuthUserDAO extends BaseDAO<AuthUser> {
         return new AuthUser(
                 rs.getString("username"),
                 rs.getString("password"),
-                rs.getString("role")
+                PlayerRole.fromString(rs.getString("role"))
         );
     }
 
@@ -44,7 +45,7 @@ public class AuthUserDAO extends BaseDAO<AuthUser> {
         try {
             db.beginTransaction();
             String sql = "INSERT INTO \"Users\" (username, password, role) VALUES (?, ?, ?)";
-            executeUpdate(sql, authUser.getUsername(), authUser.getPassword(), authUser.getRole());
+            executeUpdate(sql, authUser.getUsername(), authUser.getPassword(), authUser.getRole().toString());
             db.commitTransaction();
         } catch (DataAccessException e) {
             db.rollBackTransaction();
@@ -100,7 +101,7 @@ public class AuthUserDAO extends BaseDAO<AuthUser> {
         try {
             db.beginTransaction();
             String sql = "UPDATE \"Users\" SET role = ? WHERE username = ?";
-            executeUpdate(sql, authUser.getRole(), authUser.getUsername());
+            executeUpdate(sql, authUser.getRole().toString(), authUser.getUsername());
             db.commitTransaction();
         } catch (DataAccessException e) {
             db.rollBackTransaction();

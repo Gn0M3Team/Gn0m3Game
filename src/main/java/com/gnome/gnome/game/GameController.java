@@ -2,10 +2,12 @@ package com.gnome.gnome.game;
 
 import com.gnome.gnome.camera.Camera;
 import com.gnome.gnome.components.PlayerHealthBar;
-import com.gnome.gnome.continueGame.ContinueGameController;
 import com.gnome.gnome.continueGame.component.Coin;
 import com.gnome.gnome.continueGame.component.ObjectsConstants;
 import com.gnome.gnome.editor.utils.TypeOfObjects;
+import com.gnome.gnome.models.Armor;
+import com.gnome.gnome.models.Potion;
+import com.gnome.gnome.models.Weapon;
 import com.gnome.gnome.monsters.Monster;
 import com.gnome.gnome.monsters.MonsterFactory;
 import com.gnome.gnome.monsters.movements.FollowingMovement;
@@ -66,6 +68,10 @@ public class GameController {
      */
     private Canvas viewportCanvas;
 
+    private Weapon weapon;
+    private Armor armor;
+    private Potion potion;
+
     /**
      * The initial game map (static terrain).
      */
@@ -98,7 +104,7 @@ public class GameController {
 
     private final List<com.gnome.gnome.models.Monster> dbMonsters = new ArrayList<>();
 
-    private static final Logger logger = Logger.getLogger(ContinueGameController.class.getName());
+    private static final Logger logger = Logger.getLogger(GameController.class.getName());
 
     /**
      * Timer for updating monster behavior periodically.
@@ -145,13 +151,17 @@ public class GameController {
 
     private boolean debug_mod_game;
 
-    public void initializeWithLoadedMap(int[][] mapData, List<com.gnome.gnome.models.Monster> monsterList) {
+    public void initializeWithLoadedMap(int[][] mapData, List<com.gnome.gnome.models.Monster> monsterList, Armor armor, Weapon weapon, Potion potion) {
         System.out.println("----------------------------------------------");
         System.out.println("MAP DATA: "+ Arrays.deepToString(mapData));
         setupProperties();
+
         this.baseMap = mapData;
         this.fieldMap = copyMap(baseMap);
         this.dbMonsters.addAll(monsterList);
+        this.armor = armor;
+        this.weapon = weapon;
+        this.potion = potion;
 
         setupMap(monsterList);
 
@@ -162,9 +172,8 @@ public class GameController {
         if (player == null)
             throw new RuntimeException("player is null");
 
-        camera = Camera.getInstance(fieldMap, player.getX(), player.getY(), player); // Initialize the camera to follow the player
+        camera      = Camera.getInstance(fieldMap, player.getX(), player.getY(), player, armor, weapon, potion); // Initialize the camera to follow the player
         camera.updateCameraCenter();
-
         updateMapWithMonsters(); // Update the field map with monster positions
         instance = this; //Fill singleton instance ONLY on initialization. BECAUSE OTHERWISE THERE IS NO DATA THAT IS REQUIRED IN OTHER CLASSES
 
@@ -211,8 +220,6 @@ public class GameController {
         healthBarContainer.getChildren().add(healthBar); // Add the health bar to its container
         updatePlayerHealthBar(); // Update the health bar to reflect the player's initial health
 
-        drawCoinCounter(); // Update the coin counter label to show the player's initial coin count (0)
-
         // Set up the center menu button to show the popup menu when clicked
         centerMenuButton.setOnAction(e -> showCenterMenu());
 
@@ -230,7 +237,7 @@ public class GameController {
     }
 
     private void addMonstersToGameObjectsPane() {
-        camera.updateCameraCenter(); // Оновити камеру перед додаванням монстрів!
+        camera.updateCameraCenter();
 
         double tileSize = camera.getDynamicTileSize();
 
@@ -239,7 +246,6 @@ public class GameController {
             monsterView.getProperties().put("gridX", monster.getX());
             monsterView.getProperties().put("gridY", monster.getY());
 
-            // Обов'язково оновлюємо розміри і координати тут:
             monsterView.setFitWidth(tileSize);
             monsterView.setFitHeight(tileSize);
 
@@ -255,7 +261,6 @@ public class GameController {
 
 
     private void onSceneExit() {
-        // 1) stop the game‐loop timer if it’s running
         if (monsterMovementTimer != null) {
             monsterMovementTimer.stop();
         }
@@ -265,7 +270,6 @@ public class GameController {
         Player.resetInstance();
         GameController.instance = null;
 
-        // 3) drop any scene‐specific nodes
         viewportCanvas = null;
         monsterList.clear();
         coinsOnMap.clear();
@@ -281,7 +285,6 @@ public class GameController {
                 int tile = baseMap[row][col];
 
                 if (tile == TypeOfObjects.START_POINT.getValue()) {
-                    flag = true;
                     player = Player.getInstance(col, row, PLAYER_MAX_HEALTH);
                     baseMap[row][col] = TypeOfObjects.FLOOR.getValue();
                 }
@@ -517,7 +520,7 @@ public class GameController {
         // Remove all collected coins from the map
         coinsOnMap.removeAll(collected);
         // Update the coin counter label to reflect the new total
-        drawCoinCounter();
+//        drawCoinCounter();
     }
 
     private void drawAttackRange(GraphicsContext gc, int range) {
@@ -601,38 +604,38 @@ public class GameController {
             arrow.updateCameraOffset(camera.getStartCol(), camera.getStartRow());
         }
 
-        drawCoinCounter();
+//        drawCoinCounter();
         updatePlayerHealthBar();
     }
 
-    private void drawCoinCounter() {
-        GraphicsContext gc = viewportCanvas.getGraphicsContext2D();
-        double canvasWidth = viewportCanvas.getWidth();
-        double canvasHeight = viewportCanvas.getHeight();
-        double padding = 20;
-
-        double panelWidth = canvasWidth * 0.15;
-        double panelHeight = canvasHeight * 0.07;
-
-        double panelX = padding;
-        double panelY = canvasHeight - panelHeight - padding;
-
-        gc.setFill(Color.color(0, 0, 0, 0.5));
-        gc.fillRoundRect(panelX, panelY, panelWidth, panelHeight, 15, 15);
-
-        if (coinImage == null) {
-            coinImage = new Image(Objects.requireNonNull(
-                    Coin.class.getResourceAsStream("/com/gnome/gnome/images/tiles/" + ObjectsConstants.COIN_IMAGE)
-            ));
-        }
-
-        double coinSize = viewportCanvas.getWidth() * 0.05;
-        gc.drawImage(coinImage, panelX + 10, panelY + (panelHeight - coinSize) / 2, coinSize, coinSize);
-
-        gc.setFill(Color.WHITE);
-        gc.setFont(javafx.scene.text.Font.font(20));
-        gc.fillText("x " + player.getPlayerCoins(), panelX + 50, panelY + panelHeight / 2 + 7);
-    }
+//    private void drawCoinCounter() {
+//        GraphicsContext gc = viewportCanvas.getGraphicsContext2D();
+//        double canvasWidth = viewportCanvas.getWidth();
+//        double canvasHeight = viewportCanvas.getHeight();
+//        double padding = 20;
+//
+//        double panelWidth = canvasWidth * 0.15;
+//        double panelHeight = canvasHeight * 0.07;
+//
+//        double panelX = padding;
+//        double panelY = canvasHeight - panelHeight - padding;
+//
+//        gc.setFill(Color.color(0, 0, 0, 0.5));
+//        gc.fillRoundRect(panelX, panelY, panelWidth, panelHeight, 15, 15);
+//
+//        if (coinImage == null) {
+//            coinImage = new Image(Objects.requireNonNull(
+//                    Coin.class.getResourceAsStream("/com/gnome/gnome/images/tiles/" + ObjectsConstants.COIN_IMAGE)
+//            ));
+//        }
+//
+//        double coinSize = viewportCanvas.getWidth() * 0.05;
+//        gc.drawImage(coinImage, panelX + 10, panelY + (panelHeight - coinSize) / 2, coinSize, coinSize);
+//
+//        gc.setFill(Color.WHITE);
+//        gc.setFont(javafx.scene.text.Font.font(20));
+//        gc.fillText("x " + player.getPlayerCoins(), panelX + 50, panelY + panelHeight / 2 + 7);
+//    }
 
     /**
      * Starts the game loop using an AnimationTimer.
@@ -693,12 +696,13 @@ public class GameController {
      * @param currentTime The current timestamp (in nanoseconds), used for melee attack cooldowns.
      */
     private void handleMonsterMovement(long currentTime) {
-        int rows = fieldMap.length;
-        int cols = fieldMap[0].length;
+        int rows = fieldMap.length; // Number of rows in the map
+        int cols = fieldMap[0].length; // Number of columns in the map
 
         // Update monsters visually
         List<Monster> toRemove = new ArrayList<>();
 
+        // Iterate through all monsters to update their positions and behavior
         for (Monster monster : monsterList) {
             int dx = Math.abs(player.getX() - monster.getX());
             int dy = Math.abs(player.getY() - monster.getY());
@@ -712,19 +716,28 @@ public class GameController {
                 }
             }
 
+            // If the monster is not a skeleton, attempt a melee attack on the player
             if (!(monster instanceof Skeleton)) {
                 monster.meleeAttack(player, gameObjectsPane, currentTime);
                 monster.cancelMeleeAttackIfPlayerOutOfRange(player);
             }
 
+            // Check if the monster is currently playing a hit effect or melee attack animation
+            // If so, it cannot move
             if (monster.isHitEffectPlaying() || monster.isMeleeAttacking()) {
+                if (debug_mod_game)
+                    System.out.println("Monster at (" + monster.getX() + ", " + monster.getY() + ") cannot move due to " + (monster.isHitEffectPlaying() ? "hit effect" : "melee attack"));
                 continue;
             }
 
             if (dx <= monster.getAttackRange() && dy <= monster.getAttackRange()) {
-                continue; // Player is nearby, monster stays
+                if (debug_mod_game) {
+                    System.out.println("Monster at (" + monster.getX() + ", " + monster.getY() + ") will not move - player is within attack range (" + dx + ", " + dy + ")");
+                }
+                continue; // Гравець у зоні досяжності, монстр не рухається
             }
 
+            // Store the monster's current position
             int oldX = monster.getX();
             int oldY = monster.getY();
             int newX, newY;
@@ -733,12 +746,19 @@ public class GameController {
             newX = monster.getX();
             newY = monster.getY();
 
+            // Check if the new position is outside the map bounds
+            // If so, revert the monster to its old position
             if (newX < 0 || newX >= cols || newY < 0 || newY >= rows) {
                 monster.setPosition(oldX, oldY);
                 continue;
             }
 
+            // Check if the new position is occupied by the player
+            // If so, revert the monster to its old position (monsters cannot move onto the player's tile)
             if (newX == player.getX() && newY == player.getY()) {
+                if (debug_mod_game) {
+                    System.out.println("Monster at (" + oldX + ", " + oldY + ") cannot move to (" + newX + ", " + newY + ") - position occupied by player");
+                }
                 monster.setPosition(oldX, oldY);
                 continue;
             }
@@ -766,7 +786,6 @@ public class GameController {
                 if (tileType == TypeOfObjects.RIVER) {
                     toRemove.add(monster);
                 }
-                // Good move — no action needed
             } else {
                 monster.setPosition(oldX, oldY);
             }
@@ -934,7 +953,7 @@ public class GameController {
 
             GameController ctrl = loader.getController();
 
-            ctrl.initializeWithLoadedMap(this.baseMap, dbMonsters);
+            ctrl.initializeWithLoadedMap(this.baseMap, dbMonsters, armor, weapon, potion);
 
             Stage stage = (Stage) rootBorder.getScene().getWindow();
             stage.getScene().setRoot(newRoot);

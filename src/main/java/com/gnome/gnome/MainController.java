@@ -5,6 +5,8 @@ import com.gnome.gnome.dao.MonsterDAO;
 import com.gnome.gnome.dao.userDAO.AuthUserDAO;
 import com.gnome.gnome.game.MapLoaderService;
 import com.gnome.gnome.game.MapLoaderUIHandler;
+import com.gnome.gnome.models.user.PlayerRole;
+import com.gnome.gnome.userState.UserState;
 import com.gnome.gnome.models.Map;
 import com.gnome.gnome.models.user.AuthUser;
 import com.gnome.gnome.music.MusicWizard;
@@ -13,6 +15,7 @@ import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import com.gnome.gnome.components.LeaderBoardView;
 import javafx.animation.FadeTransition;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -25,14 +28,14 @@ import javafx.util.Duration;
 
 import java.util.Objects;
 
+public class MainController {
 // TODO: If we have time, we need to change logic with creating DAO, because we in two places crete monster dao, map dao, and for me we need to change this.
-public class HelloController {
 
     @FXML private ImageView musicIcon;
     @FXML
     private Button musicButton;
     @FXML
-    private BorderPane helloPage;
+    private BorderPane mainBorderPane;
     @FXML
     private Button editorButton;
     @FXML
@@ -43,6 +46,7 @@ public class HelloController {
     private PageSwitcherInterface pageSwitch;
     private LeaderBoardView leaderboard;
     private final AuthUserDAO userDAO = new AuthUserDAO();
+    private final UserState userState = UserState.getInstance();
 
     Stage primaryStage;
 
@@ -55,30 +59,7 @@ public class HelloController {
      */
     @FXML
     public void initialize() {
-//        pageSwitch=new SwitchPage();
-//
-//        musicButton = new Button();
-//
-//        musicIcon.setImage(
-//                new Image(
-//                        Objects.requireNonNull(
-//                                getClass().getResourceAsStream("/com/gnome/gnome/images/musicicon.png")
-//                        )
-//                )
-//        );
-//
-//        User_test_for_creation();
-//        user_test();
-//
-//
-//        Platform.runLater(() -> {
-//            primaryStage = (Stage) .getScene().getWindow();
-//            mapLoader = new MapLoader(primaryStage);
-//        });
         pageSwitch = new SwitchPage();
-
-        // НЕ СОЗДАЕМ НОВУЮ КНОПКУ!!! Используем ту, что пришла из FXML
-        // musicButton = new Button(); ❌ Убрать эту строку!
 
         musicIcon.setImage(
                 new Image(
@@ -89,9 +70,16 @@ public class HelloController {
         );
 
         User_test_for_creation();
-        user_test();
+//        checkUserRole();
 
         musicButton.setGraphic(musicIcon);
+
+        Platform.runLater(() -> {
+            primaryStage = (Stage) continueGameButton.getScene().getWindow();
+            this.setPrimaryStage(primaryStage);
+        });
+
+        nicknameLabel.setText(userState.getUsername() + ": " + userState.getRole());
     }
 
     public void setPrimaryStage(Stage primaryStage) {
@@ -110,13 +98,14 @@ public class HelloController {
         });
     }
 
+//    TODO: delete in final
     /**
      * Checks if there is a current user. If not, sets a default user (Admin).
      */
     private void User_test_for_creation(){
         System.out.println("Current User:" + UserSession.getInstance().getCurrentUser());
-        if (UserSession.getInstance().getCurrentUser()==null){
-            AuthUser admin=userDAO.getAuthUserByUsername("Admin");
+        if (UserSession.getInstance().getCurrentUser() == null){
+            AuthUser admin = userDAO.getAuthUserByUsername("Admin");
             UserSession.getInstance().setCurrentUser(admin);
             System.out.println("Current User:" + UserSession.getInstance().getCurrentUser());
         }
@@ -124,11 +113,12 @@ public class HelloController {
     /**
      * Displays the current user's username and sets visibility of the editor button based on user role.
      */
-    private void user_test(){
-        AuthUser authUser=UserSession.getInstance().getCurrentUser();
-        nicknameLabel.setText("User: "+authUser.getUsername());
-        if (authUser.getRole().equals("user")){
-            editorButton.setVisible(false);
+    private void checkUserRole() {
+        if (userState.getRole() != null) {
+            if (userState.getRole() == PlayerRole.USER) {
+                editorButton.setVisible(false);
+                editorButton.setManaged(false);
+            }
         }
     }
 
@@ -138,7 +128,7 @@ public class HelloController {
      */
     @FXML
     protected void onEditorButtonClick(ActionEvent event){
-        pageSwitch.goEditor(helloPage);
+        pageSwitch.goEditor(mainBorderPane);
     }
 
     /**
@@ -146,21 +136,7 @@ public class HelloController {
      */
     @FXML
     protected void onNewGameButtonClick(ActionEvent event){
-        pageSwitch.goNewGame(helloPage);
-    }
-
-    /**
-     * Placeholder for handling continue game logic (to be implemented).
-     */
-    @FXML
-    public void onContinueGameButtonClick(ActionEvent event) {
-        if (mapLoaderService != null) {
-            MapDAO mapDAO = new MapDAO();
-            Map selectedMap = mapDAO.getMapByLevel(1);
-
-            new MapLoaderUIHandler(mapLoaderService, primaryStage)
-                    .showStartMap(selectedMap.getId());
-        }
+        pageSwitch.goNewGame(mainBorderPane);
     }
 
     /**
@@ -168,7 +144,7 @@ public class HelloController {
      */
     @FXML
     public void onSettingsButtonClick(ActionEvent event) {
-        pageSwitch.goSetting(helloPage);
+        pageSwitch.goSetting(mainBorderPane);
     }
 
     /**
@@ -177,8 +153,8 @@ public class HelloController {
      * @return the BorderPane representing the Hello page UI.
      */
     @FXML
-    public BorderPane getHelloPage() {
-        return helloPage;
+    public BorderPane getMainBorderPane() {
+        return mainBorderPane;
     }
 
     /**
@@ -191,13 +167,13 @@ public class HelloController {
             FadeTransition fadeOut = new FadeTransition(Duration.millis(500), this.leaderboard);
             fadeOut.setFromValue(1.0);
             fadeOut.setToValue(0.0);
-            fadeOut.setOnFinished(e -> helloPage.setLeft(null));
+            fadeOut.setOnFinished(e -> mainBorderPane.setLeft(null));
             fadeOut.play();
         });
 
         this.leaderboard.setOpacity(0.0);
 
-        helloPage.setLeft(this.leaderboard);
+        mainBorderPane.setLeft(this.leaderboard);
 
         FadeTransition fadeIn = new FadeTransition(Duration.millis(300), this.leaderboard);
         fadeIn.setFromValue(0.0);
@@ -228,7 +204,6 @@ public class HelloController {
     @FXML
     public void onExitButtonClick(ActionEvent event) {
         MusicWizard.stop = true;
-//        Platform.exit();
-        pageSwitch.goLogin(helloPage);
+        pageSwitch.goLogin(mainBorderPane);
     }
 }

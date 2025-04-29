@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 /**
@@ -18,6 +19,7 @@ import javafx.util.Duration;
 public class SceneSwitch {
 
     private static Object dataToPass;
+    private static Stage primaryStage;
 
     public static void setGlobalData(Object data) {
         dataToPass = data;
@@ -28,8 +30,6 @@ public class SceneSwitch {
             if (getClass().getResource(fxml) == null) {
                 throw new IOException("FXML file not found: " + fxml);
             }
-//            System.out.println(fxml);
-
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
             BorderPane nextBorderPane = loader.load();
 

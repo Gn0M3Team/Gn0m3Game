@@ -1,9 +1,7 @@
 package com.gnome.gnome.monsters.movements;
 
-import com.gnome.gnome.continueGame.ContinueGameController;
 import com.gnome.gnome.game.GameController;
 import com.gnome.gnome.monsters.Monster;
-import com.gnome.gnome.player.Player;
 
 import java.util.*;
 
@@ -53,6 +51,7 @@ public class FollowingMovement implements MovementStrategy {
             playerY = GameController.getGameController().getPlayer().getY();
 
             map = GameController.getGameController().getBaseMap();
+
         }
         else{
             //Game is not started??? SHOULD NOT HAPPEN

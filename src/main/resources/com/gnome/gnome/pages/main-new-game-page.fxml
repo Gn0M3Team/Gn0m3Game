@@ -11,7 +11,8 @@
         styleClass="root-pane"
         xmlns="http://javafx.com/javafx/17.0.2-ea"
         xmlns:fx="http://javafx.com/fxml"
-        fx:controller="com.gnome.gnome.newNewGame.NewNewGameController"
+        fx:id="newGameBorderPane"
+        fx:controller="com.gnome.gnome.newGame.NewGameController"
         stylesheets="@./css/new_game.css"
 >
 
@@ -26,7 +27,7 @@
             <VBox alignment="CENTER" maxWidth="400" spacing="20">
                 <Label styleClass="menu-title" text="New Game" />
 
-                <Button fx:id="storyModeButton" styleClass="menu-button" text="Story Mode" maxWidth="Infinity"/>
+                <Button fx:id="storyModeButton" onAction="#showStoryMaps" styleClass="menu-button" text="Story Mode" maxWidth="Infinity"/>
                 <Button fx:id="otherModeButton" styleClass="menu-button" text="Other Mode" maxWidth="Infinity"/>
             </VBox>
         </StackPane>
