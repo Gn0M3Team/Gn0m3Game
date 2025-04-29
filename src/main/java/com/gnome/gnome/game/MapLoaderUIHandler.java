@@ -1,7 +1,6 @@
 package com.gnome.gnome.game;
 
-import com.gnome.gnome.models.Map;
-import com.gnome.gnome.models.Monster;
+import com.gnome.gnome.models.*;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -25,14 +24,13 @@ public class MapLoaderUIHandler {
         this.primaryStage = stage;
     }
 
-    public void showStartMap(int mapId) {
+    public void showStartMap(Map map) {
         showLoadingPopup();
 
         service.loadMapAsync(
-                mapId,
-                (map, monsters) -> Platform.runLater(() -> {
+                (monsters, armor, weapon, potion) -> Platform.runLater(() -> {
                     hideLoadingPopup();
-                    loadGamePage(map, monsters);
+                    loadGamePage(map, monsters, armor, weapon, potion);
                 }),
                 ex -> Platform.runLater(() -> {
                     hideLoadingPopup();
@@ -62,12 +60,12 @@ public class MapLoaderUIHandler {
         }
     }
 
-    private void loadGamePage(Map selectedMap, List<Monster> monsters) {
+    private void loadGamePage(Map selectedMap, List<Monster> monsters, Armor armor, Weapon weapon, Potion potion) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/gnome/gnome/pages/game.fxml"));
             Parent root = loader.load();
             GameController controller = loader.getController();
-            controller.initializeWithLoadedMap(selectedMap.getMapData(), monsters); // ✅ Передаєш карту + монстрів
+            controller.initializeWithLoadedMap(selectedMap.getMapData(), monsters, armor, weapon, potion); // ✅ Передаєш карту + монстрів
             primaryStage.getScene().setRoot(root);
         } catch (Exception e) {
             showError("Failed to load game view: " + e.getMessage());
