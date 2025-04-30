@@ -119,6 +119,8 @@ public class GameController {
      */
     private long lastMonsterUpdateTime = 0;
 
+    private boolean is_end = false;
+
     // Player instance
     @Getter
     private Player player;
@@ -162,11 +164,11 @@ public class GameController {
         this.potion = potion;
 
         camera = Camera.getInstance(fieldMap, 0, 0, null, armor, weapon, potion); // Temporary init
-        camera.setPlayer(player); // We'll update player reference later
-        setupMap(monsterList); // Initializes player
-        camera.setPlayer(player); // Re-assign player
-        camera.updateCameraCenter(); // Now it can follow player correctly
-        camera.setMapGrid(fieldMap); // Set after map is ready
+        camera.setPlayer(player);
+        setupMap(monsterList);
+        camera.setPlayer(player);
+        camera.updateCameraCenter();
+        camera.setMapGrid(fieldMap);
 
         instance = this; //Fill singleton instance ONLY on initialization. BECAUSE OTHERWISE THERE IS NO DATA THAT IS REQUIRED IN OTHER CLASSES
 
@@ -175,28 +177,23 @@ public class GameController {
         BorderPane.setAlignment(centerStack, Pos.CENTER);
         BorderPane.setMargin(centerStack, new Insets(0));
 
-        // Центр займає всю доступну ширину і висоту
         centerStack.prefWidthProperty().bind(rootBorder.widthProperty());
         centerStack.prefHeightProperty().bind(rootBorder.heightProperty());
-        centerStack.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE); // <-- Додаємо обов'язково
+        centerStack.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
-        // Явно вставляємо в центр BorderPane
         rootBorder.setCenter(centerStack);
 
-        // Створюємо Canvas без фіксованого розміру
         viewportCanvas = new Canvas();
         viewportCanvas.widthProperty().bind(centerStack.widthProperty());
         viewportCanvas.heightProperty().bind(centerStack.heightProperty());
         viewportCanvas.setFocusTraversable(true);
         viewportCanvas.requestFocus();
 
-    // Pane для об'єктів
         gameObjectsPane = new Pane();
         gameObjectsPane.prefWidthProperty().bind(centerStack.widthProperty());
         gameObjectsPane.prefHeightProperty().bind(centerStack.heightProperty());
         gameObjectsPane.setPickOnBounds(false);
 
-        // Комбінуємо канвас і об'єкти
         Pane viewportRoot = new Pane(viewportCanvas, gameObjectsPane);
         centerStack.getChildren().setAll(viewportRoot);
         StackPane.setAlignment(viewportRoot, Pos.CENTER);
@@ -392,6 +389,7 @@ public class GameController {
         scene.setOnKeyPressed(event -> {
             // If the center menu popup is showing, ignore key presses (player cannot move while the menu is open)
             if (centerMenuPopup != null && centerMenuPopup.isShowing()) return;
+            if (is_end) return;
 
             // Get the dimensions of the map to ensure the player stays within bounds
             int maxRow = baseMap.length; // Number of rows in the map
@@ -1033,8 +1031,9 @@ public class GameController {
      */
     private void showGameOverOverlay() {
         if (gameOverOverlay != null) return;
-
+        if (is_end) return;
         monsterMovementTimer.stop();
+        is_end = true;
 
         gameOverOverlay = new VBox(20);
         gameOverOverlay.setAlignment(Pos.CENTER);
