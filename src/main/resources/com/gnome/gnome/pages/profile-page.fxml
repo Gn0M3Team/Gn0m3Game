@@ -20,8 +20,14 @@
             <Label fx:id="nameLabel" text="Profile Name" styleClass="profile-name"/>
             <Label fx:id="recordLabel" text="Score: 0" styleClass="profile-record"/>
             <VBox alignment="CENTER" spacing="10" styleClass="stats-container">
-                <Label fx:id="gamesPlayedLabel" text="MapLevel: 0" styleClass="profile-stats"/>
-                <Label fx:id="deathCounter" text="Death counter: 0" styleClass="profile-stats"/>
+                <Label fx:id="mapLevel" styleClass="profile-stats"/>
+                <Label fx:id="totalMapsPlayed" styleClass="profile-stats"/>
+                <Label fx:id="deathCounter" styleClass="profile-stats"/>
+                <Label fx:id="totalWins" styleClass="profile-stats"/>
+                <Label fx:id="totalDeaths" styleClass="profile-stats"/>
+                <Label fx:id="totalMonsterKilled" styleClass="profile-stats"/>
+                <Label fx:id="totalChestOpened" styleClass="profile-stats"/>
+                <Label fx:id="winningPercentage" styleClass="profile-stats"/>
             </VBox>
 
             <HBox spacing="10" alignment="CENTER" styleClass="role-container">

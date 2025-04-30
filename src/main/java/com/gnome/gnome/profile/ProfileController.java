@@ -1,10 +1,12 @@
 package com.gnome.gnome.profile;
 
+import com.gnome.gnome.dao.UserStatisticsDAO;
 import com.gnome.gnome.dao.userDAO.AuthUserDAO;
 import com.gnome.gnome.dao.MapDAO;
 import com.gnome.gnome.dao.userDAO.UserGameStateDAO;
 import com.gnome.gnome.dao.userDAO.UserSession;
 import com.gnome.gnome.models.Map;
+import com.gnome.gnome.models.UserStatistics;
 import com.gnome.gnome.models.user.AuthUser;
 import com.gnome.gnome.models.user.PlayerRole;
 import com.gnome.gnome.models.user.UserGameState;
@@ -31,8 +33,15 @@ public class ProfileController {
     @FXML private Label nameLabel;
     @FXML private Label recordLabel;
     @FXML private Label roleLabel;
-    @FXML private Label gamesPlayedLabel;
-    @FXML private Label deathCounter;
+
+    @FXML private Label mapLevel;
+
+    @FXML private Label totalMapsPlayed;
+    @FXML private Label totalWins;
+    @FXML private Label totalDeaths;
+    @FXML private Label totalMonsterKilled;
+    @FXML private Label totalChestOpened;
+    @FXML private Label winningPercentage;
 
     @FXML
     private Button banUserButton;
@@ -84,14 +93,26 @@ public class ProfileController {
         user = userDAO.getAuthUserByUsername(selectedUsername);
         userMaps = MapDAO.getMapsByUsername(selectedUsername);
 
-        UserGameStateDAO GameState = new UserGameStateDAO();
+        UserGameStateDAO gameStateDAO = new UserGameStateDAO();
+        UserStatisticsDAO userStatisticsDAO = new UserStatisticsDAO();
 
-        UserGameState gameState = GameState.getUserGameStateByUsername(selectedUsername);
+        UserGameState gameState = gameStateDAO.getUserGameStateByUsername(selectedUsername);
+        UserStatistics userStatistics = userStatisticsDAO.getUserStatisticsByUsername(selectedUsername);
 
         nameLabel.setText("Profile of " + user.getUsername());
         recordLabel.setText("Score: " + gameState.getScore());
 
-        gamesPlayedLabel.setText("MapLevel: " + gameState.getMapLevel());
+        totalMapsPlayed.setText("Total amount games played: " + userStatistics.getTotalMapsPlayed());
+        totalWins.setText("Total wins: " + userStatistics.getTotalWins());
+        totalDeaths.setText("Total deaths: " + userStatistics.getTotalDeaths());
+        totalMonsterKilled.setText("Total monster killed: " + userStatistics.getTotalMonstersKilled());
+        totalChestOpened.setText("Total chest opened: " + userStatistics.getTotalChestsOpened());
+
+        double ratio = (double) userStatistics.getTotalWins() / userStatistics.getTotalMapsPlayed();
+        double rounded = Math.round(ratio * 100.0) / 100.0;
+        winningPercentage.setText("Winning percentage: " + rounded);
+
+        mapLevel.setText("MapLevel: " + gameState.getMapLevel());
 
         selectedUserRole = (user != null) ? user.getRole() : PlayerRole.USER;
         currentRoleIndex = roles.indexOf(selectedUserRole);
