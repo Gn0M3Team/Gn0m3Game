@@ -10,6 +10,9 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
+/**
+ * Controller class for the shop item's detail modal window
+ */
 public class ItemController {
     @FXML
     private Label itemName;
@@ -22,9 +25,15 @@ public class ItemController {
     @FXML
     private Button cancelButton;
 
-    private ShopService shopService = new ShopService();
-
+    private final ShopService shopService = new ShopService();
     private ShopItem item;
+
+    /**
+     * Loads data into the item's details modal window
+     *
+     * @param data item to load data
+     * @param image ImgaeView for the item's image
+     */
     public void setItemData(ShopItem data, ImageView image) {
         this.item = data;
         itemName.setText(item.getNameEng());
@@ -36,16 +45,26 @@ public class ItemController {
         image.setPreserveRatio(true);
         itemImageContainer.getChildren().add(image);
     }
+
+    /**
+     * Cancel button click event listener
+     * Close item's modal window
+     */
     @FXML
     private void onCancel() {
         Stage stage = (Stage) cancelButton.getScene().getWindow();
         stage.close();
     }
 
+    /**
+     * Buy button click event listener
+     * If player has enough money - buys item and close the window
+     * If player does not have enough money, shows error message
+     */
     public void onBuy() {
         try {
             shopService.buy(item);
-            // Automatically close the modal after successful buying
+            // Automatically close the modal after buying success
             onCancel();
         } catch (BalanceException ex) {
             System.out.println("Not enough money");

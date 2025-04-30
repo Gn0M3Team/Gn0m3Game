@@ -23,9 +23,8 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * Controller class for the Shop Pop-Up view in the application.
- *
- * This class manages user interaction within the shop pop-up,
+ * Controller class for the Shop view in the application.
+ * This class manages user interaction within the shop,
  * such as returning to the game. It utilizes a {@link PageSwitcherInterface}
  * to handle page transitions.
  */
@@ -64,20 +63,28 @@ public class ShopController {
         pageSwitch.goNewGame(shopPopUpPage);
     }
 
+    /**
+     * Handles the action of exiting the application.
+     *
+     * @param e the action event triggered by the exit button
+     */
     @FXML
     public void onExit(ActionEvent e) {
         pageSwitch.goMainMenu(shopPopUpPage);
     }
 
+    /**
+     * Loads random items for shop
+     * Render items into the UI
+     */
     @FXML
     public void loadItems() {
         int cellIndex = 0;
         List<ShopItem> items = shopService.get_shop_items();
 
         for (var node : itemsContainer.getChildren()) {
-            if (!(node instanceof VBox)) continue;
+            if (!(node instanceof VBox cell)) continue;
 
-            VBox cell = (VBox)node;
             ShopItem item = items.get(cellIndex);
             System.out.println(item.getNameEng());
             cellIndex++;
@@ -110,11 +117,21 @@ public class ShopController {
             }
 
             Image itemImage = image;
-            cell.setOnMouseClicked(e -> showPurchasePopup(item, itemImage));
+            cell.setOnMouseClicked(e -> showItemModal(item, itemImage));
         }
     }
 
-    private void showPurchasePopup(ShopItem item, Image image) {
+    /**
+     * Displays a modal dialog for the selected item.
+     * The dialog shows the item's name and description,
+     * a “Buy” button for purchasing the item.
+     * a "Cancel" to close the modal window.
+     *
+     * @param item  the {@link ShopItem} whose details are to be displayed
+     * @param image the {@link Image} to be used as the item's icon in the modal
+     * @throws RuntimeException if the FXML resource or controller cannot be loaded
+     */
+    private void showItemModal(ShopItem item, Image image) {
         try {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/gnome/gnome/pages/item-modal.fxml")

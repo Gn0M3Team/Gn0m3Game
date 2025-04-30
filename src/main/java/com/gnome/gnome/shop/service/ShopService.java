@@ -8,22 +8,35 @@ import com.gnome.gnome.player.Player;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class to handle shop functionality: items loading, item purchasing and so on
+ */
 public class ShopService {
     private final WeaponDAO weaponDAO = new WeaponDAO();
     private final PotionDAO potionDAO = new PotionDAO();
     private final ArmorDAO armorDAO = new ArmorDAO();
     private final Player player;
 
-    private List<ShopItem> items = new ArrayList<>();
+    private final List<ShopItem> items = new ArrayList<>();
 
     public ShopService() {
         this.player = Player.getInstance(0, 0, 0);
     }
 
+    /**
+     * Retrieves a randomized list of shop items composed of:
+     * <ul>
+     *   <li>1 random potion</li>
+     *   <li>2 random armors</li>
+     *   <li>5 random weapons</li>
+     * </ul>
+     *
+     * @return a {@link List} of {@link ShopItem} objects to display in the shop
+     */
     public List<ShopItem> get_shop_items() {
-        ShopItems<WeaponDAO> weapons = new ShopItems<>(weaponDAO);
-        ShopItems<PotionDAO> potions = new ShopItems<>(potionDAO);
-        ShopItems<ArmorDAO> armors = new ShopItems<>(armorDAO);
+        ItemsSelector<WeaponDAO> weapons = new ItemsSelector<>(weaponDAO);
+        ItemsSelector<PotionDAO> potions = new ItemsSelector<>(potionDAO);
+        ItemsSelector<ArmorDAO> armors = new ItemsSelector<>(armorDAO);
 
         items.addAll(potions.randomSelect(1));
         items.addAll(armors.randomSelect(2));
@@ -32,19 +45,22 @@ public class ShopService {
         return items;
     }
 
+    /**
+     * Attempts to buy particular item for the player
+     * If the player does not have enough coins, throws {@link BalanceException}
+     * Otherwise, deducts the item cost from the player's balance
+     * and assign bought item for the character
+     *
+     * @param item the {@link ShopItem} to buy
+     * @throws BalanceException if the player's coin balance is insufficient
+     */
     public void buy(ShopItem item) {
         float playerCoinsRemainder = player.getPlayerCoins() - item.getCost();
         if (playerCoinsRemainder < 0) {
             throw new BalanceException("Not enough money");
         }
 
-        System.out.println("playerCoinsRemainder" + playerCoinsRemainder);
         player.setPlayerCoins((int) playerCoinsRemainder);
         item.buy(player);
-
-        System.out.println();
-        System.out.println("ArmorId: " + player.getArmorId());
-        System.out.println("Weapon: " + player.getWeaponId());
-        System.out.println("PotionId: " + player.getPotionId());
     }
 }

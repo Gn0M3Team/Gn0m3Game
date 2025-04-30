@@ -1,10 +1,11 @@
 package com.gnome.gnome.shop.service;
-
 import com.gnome.gnome.player.Player;
 import lombok.Getter;
-
 import java.util.function.BiConsumer;
 
+/**
+ * Represents shop item
+ */
 public class ShopItem {
     @Getter
     private int id;

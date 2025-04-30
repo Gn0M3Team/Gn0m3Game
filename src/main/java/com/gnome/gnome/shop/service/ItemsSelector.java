@@ -12,10 +12,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ShopItems<T> {
+/**
+ * A generic selector for shop items of a given category.
+ * This class loads all corresponding items from the database into a unified list of {@link ShopItem},
+ * and allows selection of a random subset of those items.
+ *
+ * @param <T> the type of DAO used to load items ({@link ArmorDAO}, {@link WeaponDAO}, or {@link PotionDAO})
+ */
+public class ItemsSelector<T> {
     private final List<ShopItem> items = new ArrayList<>();
 
-    public ShopItems(T dao) {
+    public ItemsSelector(T dao) {
         if (dao instanceof ArmorDAO) {
             ArmorDAO armorDao = (ArmorDAO) dao;
             for (Armor a : armorDao.getAllArmors()) {
@@ -73,12 +80,9 @@ public class ShopItems<T> {
 
     /**
      * Select n random items to render them in the shop
+     * @param n number of randomly selected items
      * */
     List<ShopItem> randomSelect(int n) {
-        for (ShopItem item: items) {
-            System.out.println("fgcwifwdfwdf" + item.getNameEng() + " " + item.getCost());
-        }
-
         Collections.shuffle(items);
         return items.subList(0, Math.min(n, items.size()));
     }
