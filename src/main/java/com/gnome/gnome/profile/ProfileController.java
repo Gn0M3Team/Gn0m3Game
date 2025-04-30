@@ -18,11 +18,14 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Popup;
 import javafx.event.ActionEvent;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
@@ -33,62 +36,44 @@ public class ProfileController {
     @FXML private Label nameLabel;
     @FXML private Label recordLabel;
     @FXML private Label roleLabel;
-
     @FXML private Label mapLevel;
-
     @FXML private Label totalMapsPlayed;
     @FXML private Label totalWins;
     @FXML private Label totalDeaths;
     @FXML private Label totalMonsterKilled;
     @FXML private Label totalChestOpened;
     @FXML private Label winningPercentage;
-
-    @FXML
-    private Button banUserButton;
+    @FXML private Label deathCounter;
+    @FXML private ImageView avatarImage;
+    @FXML private Button banUserButton;
     @FXML private Button leftButton;
     @FXML private Button rightButton;
     @FXML private Button confirmRoleButton;
-
-
     @FXML private ListView<String> mapListView;
-    @FXML
-    private BorderPane profilePage;
+    @FXML private BorderPane profilePage;
+
     private PageSwitcherInterface pageSwitch;
     private final AuthUserDAO userDAO = new AuthUserDAO();
     private final MapDAO MapDAO = new MapDAO();
-
     private final UserState userState = UserState.getInstance();
-
-
     private int currentMapPage = 1;
     private final int mapPageSize = 5;
     private boolean mapLoading = false;
     private List<Map> userMaps;
-
     private PlayerRole selectedUserRole;
-
     private String selectedUsername;
     private AuthUser user;
     private final List<PlayerRole> roles = List.of(PlayerRole.USER, PlayerRole.MAP_CREATOR);
-
     private int currentRoleIndex = 0;
-
-
 
     @FXML
     public void initialize() {
         pageSwitch = new SwitchPage();
     }
 
-    /**
-     * Initializes the profile page with data for the selected player.
-     * This method is called when navigating from the leaderboard.
-     */
     public void setPlayer(String playerData) {
         this.selectedUsername = playerData.split(": ")[1];
-
         logger.info("Loading profile for: " + playerData);
-
 
         user = userDAO.getAuthUserByUsername(selectedUsername);
         userMaps = MapDAO.getMapsByUsername(selectedUsername);
@@ -102,23 +87,24 @@ public class ProfileController {
         nameLabel.setText("Profile of " + user.getUsername());
         recordLabel.setText("Score: " + gameState.getScore());
 
-        totalMapsPlayed.setText("Total amount games played: " + userStatistics.getTotalMapsPlayed());
-        totalWins.setText("Total wins: " + userStatistics.getTotalWins());
-        totalDeaths.setText("Total deaths: " + userStatistics.getTotalDeaths());
-        totalMonsterKilled.setText("Total monster killed: " + userStatistics.getTotalMonstersKilled());
-        totalChestOpened.setText("Total chest opened: " + userStatistics.getTotalChestsOpened());
-
-        double ratio = (double) userStatistics.getTotalWins() / userStatistics.getTotalMapsPlayed();
+        totalMapsPlayed.setText("Games Played: " + userStatistics.getTotalMapsPlayed());
+        totalWins.setText("Wins: " + userStatistics.getTotalWins());
+        totalDeaths.setText("Deaths: " + userStatistics.getTotalDeaths());
+        totalMonsterKilled.setText("Monsters Killed: " + userStatistics.getTotalMonstersKilled());
+        totalChestOpened.setText("Chests Opened: " + userStatistics.getTotalChestsOpened());
+        double ratio = userStatistics.getTotalMapsPlayed() > 0 ? (double) userStatistics.getTotalWins() / userStatistics.getTotalMapsPlayed() : 0;
         double rounded = Math.round(ratio * 100.0) / 100.0;
-        winningPercentage.setText("Winning percentage: " + rounded);
+        winningPercentage.setText("Win Rate: " + rounded + "%");
+        mapLevel.setText("Map Level: " + gameState.getMapLevel());
+        deathCounter.setText("Death Count: " + userStatistics.getTotalDeaths());
 
-        mapLevel.setText("MapLevel: " + gameState.getMapLevel());
+        // Set default avatar image
+        avatarImage.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/gnome/gnome/images/default-no-item.png"))));
 
         selectedUserRole = (user != null) ? user.getRole() : PlayerRole.USER;
         currentRoleIndex = roles.indexOf(selectedUserRole);
         if (currentRoleIndex == -1) currentRoleIndex = 0;
         roleLabel.setText("Role: " + roles.get(currentRoleIndex));
-
 
         user_test();
 
@@ -129,21 +115,10 @@ public class ProfileController {
             loadMoreMaps();
             setupScrollPagination(mapListView, this::loadMoreMaps, () -> mapLoading);
         }
-//        if (userMaps.isEmpty()) {
-//            mapListView.setPlaceholder(new Label("No maps available"));
-//        } else {
-//            for (Map map : userMaps) {
-//                mapListView.getItems().add(map.toString());
-//            }
-//        }
-
-
     }
-    /**
-     * Adjusts the visibility of buttons depending on the current user's permissions.
-     */
-    private void user_test(){
-        if ((!userState.getRole().equals(PlayerRole.ADMIN)) || selectedUserRole.equals(PlayerRole.ADMIN)){
+
+    private void user_test() {
+        if (!userState.getRole().equals(PlayerRole.ADMIN) || selectedUserRole.equals(PlayerRole.ADMIN)) {
             banUserButton.setVisible(false);
             banUserButton.setManaged(false);
             roleLabel.setDisable(true);
@@ -155,17 +130,17 @@ public class ProfileController {
             confirmRoleButton.setManaged(false);
         } else {
             banUserButton.setVisible(true);
+            banUserButton.setManaged(true);
             roleLabel.setDisable(false);
             leftButton.setVisible(true);
+            leftButton.setManaged(true);
             rightButton.setVisible(true);
+            rightButton.setManaged(true);
             confirmRoleButton.setVisible(true);
+            confirmRoleButton.setManaged(true);
         }
     }
 
-    /**
-     * Adds lazy-loading behavior to a ListView by monitoring its vertical scroll bar.
-     * When user scrolls to the bottom, new data is fetched if not already loading.
-     */
     private void setupScrollPagination(ListView<String> listView, Runnable loader, Supplier<Boolean> isLoading) {
         listView.skinProperty().addListener((obs, oldSkin, newSkin) -> {
             if (newSkin != null) {
@@ -181,10 +156,6 @@ public class ProfileController {
         });
     }
 
-
-    /**
-     * Loads the next batch of maps into the ListView.
-     */
     private void loadMoreMaps() {
         if (userMaps == null || userMaps.isEmpty()) return;
 
@@ -193,34 +164,20 @@ public class ProfileController {
         int end = Math.min(start + mapPageSize, userMaps.size());
 
         for (int i = start; i < end; i++) {
-            mapListView.getItems().add("Map "+i+": Score Value "+userMaps.get(i).getScoreVal()+" "+
-                    userMaps.get(i).getMapNameSk()+" "+
-                    userMaps.get(i).getMapNameEng()+" "+
-                    userMaps.get(i).getLevel());
+            Map map = userMaps.get(i);
+            mapListView.getItems().add(String.format("Map %d: %s (Score: %d, Level: %d)",
+                    i + 1, map.getMapNameEng(), map.getScoreVal(), map.getLevel()));
         }
 
         currentMapPage++;
-
-        if (end >= userMaps.size()) {
-            mapLoading = true;
-        } else {
-            mapLoading = false;
-        }
+        mapLoading = end >= userMaps.size();
     }
 
-    /**
-     * Handles the "Back" button click to return to the main menu (hello-view.fxml).
-     * Adds a fade transition effect during scene switch.
-     */
     @FXML
     private void handleBack(ActionEvent event) {
         pageSwitch.goMainMenu(profilePage);
     }
 
-    /**
-     * Handles the ban/delete user button click.
-     * Shows confirmation popup before deleting the user.
-     */
     @FXML
     private void handleBanUser(ActionEvent event) {
         Popup confirmPopup = new Popup();
@@ -235,7 +192,7 @@ public class ProfileController {
         Label title = new Label("Confirm Deletion");
         title.getStyleClass().add("popup-title");
 
-        Label userLabel = new Label("Delete user: " + selectedUsername + "(" + selectedUserRole + ")" + "?");
+        Label userLabel = new Label("Delete user: " + selectedUsername + " (" + selectedUserRole + ")?");
         userLabel.getStyleClass().add("popup-title");
 
         Button yesButton = new Button("Yes, Delete");
@@ -266,16 +223,11 @@ public class ProfileController {
             double centerY = bounds.getMinY() + bounds.getHeight() / 2;
 
             confirmPopup.show(scene.getWindow());
-
-            double popupWidth = confirmPopup.getWidth();
-            double popupHeight = confirmPopup.getHeight();
-            confirmPopup.setX(centerX - popupWidth / 2);
-            confirmPopup.setY(centerY - popupHeight / 2);
+            confirmPopup.setX(centerX - menuBox.getWidth() / 2);
+            confirmPopup.setY(centerY - menuBox.getHeight() / 2);
         }
     }
-    /**
-     * Moves to the previous role in the role list.
-     */
+
     @FXML
     private void handleLeftRole() {
         if (currentRoleIndex > 0) {
@@ -286,9 +238,6 @@ public class ProfileController {
         roleLabel.setText("Role: " + roles.get(currentRoleIndex));
     }
 
-    /**
-     * Moves to the next role in the role list.
-     */
     @FXML
     private void handleRightRole() {
         if (currentRoleIndex < roles.size() - 1) {
@@ -298,17 +247,13 @@ public class ProfileController {
         }
         roleLabel.setText("Role: " + roles.get(currentRoleIndex));
     }
-    /**
-     * Confirms and updates the selected role for the user.
-     */
+
     @FXML
     private void handleConfirmRole(ActionEvent event) {
         PlayerRole selectedRole = roles.get(currentRoleIndex);
-        logger.info("Role updated to " + selectedRole + " for user " + selectedUserRole);
-        logger.info(selectedUserRole + " " + selectedRole);
+        logger.info("Updating role to " + selectedRole + " for user " + selectedUsername);
         this.user.setRole(selectedRole);
         userDAO.updateUserRole(this.user);
-        logger.info("Role updated to " + selectedRole + " for user " + selectedUserRole);
+        logger.info("Role updated to " + selectedRole + " for user " + selectedUsername);
     }
-
 }
