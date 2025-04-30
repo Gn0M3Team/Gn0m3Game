@@ -101,6 +101,7 @@ public class MainController {
         });
     }
 
+
 //    TODO: delete in final
     /**
      * Checks if there is a current user. If not, sets a default user (Admin).

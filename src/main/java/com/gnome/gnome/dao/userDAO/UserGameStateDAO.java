@@ -27,7 +27,6 @@ public class UserGameStateDAO extends BaseDAO<UserGameState> {
                 rs.getFloat("balance"),
                 rs.getFloat("health"),
                 rs.getInt("score"),
-                rs.getInt("death_counter"),
                 rs.getInt("map_level"),
                 (Integer) rs.getObject("weapon_id"), // Nullable
                 (Integer) rs.getObject("potion_id"), // Nullable
@@ -45,10 +44,10 @@ public class UserGameStateDAO extends BaseDAO<UserGameState> {
     public void insertUserGameState(UserGameState userGameState) {
         try {
             db.beginTransaction();
-            String sql = "INSERT INTO \"Users\" (username, balance, health, score, death_counter, map_level, weapon_id, potion_id, armor_id) " +
+            String sql = "INSERT INTO \"Users\" (username, balance, health, score, map_level, weapon_id, potion_id, armor_id) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
             executeUpdate(sql, userGameState.getUsername(), userGameState.getBalance(), userGameState.getHealth(),
-                    userGameState.getScore(), userGameState.getDeathCounter(), userGameState.getMapLevel(),
+                    userGameState.getScore(), userGameState.getMapLevel(),
                     userGameState.getWeaponId(), userGameState.getPotionId(), userGameState.getArmorId());
             db.commitTransaction();
         } catch (DataAccessException e) {
@@ -101,10 +100,10 @@ public class UserGameStateDAO extends BaseDAO<UserGameState> {
     public void updateUserGameState(UserGameState userGameState) {
         try {
             db.beginTransaction();
-            String sql = "UPDATE \"Users\" SET balance = ?, health = ?, score = ?, death_counter = ?, map_level = ?, " +
+            String sql = "UPDATE \"Users\" SET balance = ?, health = ?, score = ?, map_level = ?, " +
                     "weapon_id = ?, potion_id = ?, armor_id = ? WHERE username = ?";
             executeUpdate(sql, userGameState.getBalance(), userGameState.getHealth(), userGameState.getScore(),
-                    userGameState.getDeathCounter(), userGameState.getMapLevel(),
+                    userGameState.getMapLevel(),
                     userGameState.getWeaponId(), userGameState.getPotionId(), userGameState.getArmorId(),
                     userGameState.getUsername());
             db.commitTransaction();

@@ -166,10 +166,10 @@ public class GameController {
         camera = Camera.getInstance(fieldMap, 0, 0, null, armor, weapon, potion); // Temporary init
         camera.setPlayer(player);
         setupMap(monsterList);
+
         camera.setPlayer(player);
         camera.updateCameraCenter();
         camera.setMapGrid(fieldMap);
-
         instance = this; //Fill singleton instance ONLY on initialization. BECAUSE OTHERWISE THERE IS NO DATA THAT IS REQUIRED IN OTHER CLASSES
 
         viewportCanvas = new Canvas();

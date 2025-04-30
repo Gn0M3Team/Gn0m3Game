@@ -32,7 +32,7 @@ public class MapLoaderService {
         executor.submit(() -> {
             try {
                 List<Monster> monsters = monsterDAO.getAllMonsters().stream().peek((value) -> value.setId(value.getId() * -1)).toList();
-
+              
                 Integer armorId = UserState.getInstance().getArmorId();
                 Armor armor = null;
                 if (armorId != null)
@@ -58,6 +58,5 @@ public class MapLoaderService {
             }
         });
     }
-
 
 }
