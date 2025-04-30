@@ -61,6 +61,6 @@ public class ShopService {
         }
 
         player.setPlayerCoins((int) playerCoinsRemainder);
-        item.buy(player);
+        item.buy();
     }
 }

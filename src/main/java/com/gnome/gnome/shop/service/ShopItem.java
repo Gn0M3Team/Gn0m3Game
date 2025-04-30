@@ -1,7 +1,6 @@
 package com.gnome.gnome.shop.service;
-import com.gnome.gnome.player.Player;
+import com.gnome.gnome.shop.utils.ItemCategory;
 import lombok.Getter;
-import java.util.function.BiConsumer;
 
 /**
  * Represents shop item
@@ -19,9 +18,7 @@ public class ShopItem {
     private String detailsEng;
     @Getter
     private String detailsSk;
-    @Getter
-    private String category;
-    private final BiConsumer<Player, Integer> assignItemToPlayer;
+    private ItemCategory category;
 
     public ShopItem(int id,
                     float cost,
@@ -29,8 +26,7 @@ public class ShopItem {
                     String nameSk,
                     String detailsEng,
                     String detailsSk,
-                    String category,
-                    BiConsumer<Player, Integer> assignItemToPlayer) {
+                    ItemCategory category) {
         this.id          = id;
         this.cost        = cost;
         this.nameEng     = nameEng;
@@ -38,10 +34,18 @@ public class ShopItem {
         this.detailsEng  = detailsEng;
         this.detailsSk   = detailsSk;
         this.category    = category;
-        this.assignItemToPlayer = assignItemToPlayer;
     }
 
-    public void buy(Player player) {
-        assignItemToPlayer.accept(player, this.id);
+    public void buy() {
+        category.applyBuy(this.id);
+    }
+
+    public String getImagePath() {
+        String folderName = category.getFolder();
+        return String.format(
+                "/com/gnome/gnome/images/items/%s/%s.png",
+                folderName,
+                this.id
+        );
     }
 }

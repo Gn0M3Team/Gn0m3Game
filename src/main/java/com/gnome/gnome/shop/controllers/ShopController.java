@@ -95,11 +95,7 @@ public class ShopController {
             StackPane iconContainer = (StackPane) cell.getChildren().get(0);
             iconContainer.getChildren().clear();
 
-            String resourcePath = String.format(
-                    "/com/gnome/gnome/images/items/%s/%s.png",
-                    item.getCategory(),
-                    item.getId()
-            );
+            String resourcePath = item.getImagePath();
 
             Image image = null;
             try (InputStream is = getClass().getResourceAsStream(resourcePath)) {

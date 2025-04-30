@@ -6,7 +6,7 @@ import com.gnome.gnome.dao.WeaponDAO;
 import com.gnome.gnome.models.Armor;
 import com.gnome.gnome.models.Potion;
 import com.gnome.gnome.models.Weapon;
-import com.gnome.gnome.player.Player;
+import com.gnome.gnome.shop.utils.ItemCategory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,8 +23,7 @@ public class ItemsSelector<T> {
     private final List<ShopItem> items = new ArrayList<>();
 
     public ItemsSelector(T dao) {
-        if (dao instanceof ArmorDAO) {
-            ArmorDAO armorDao = (ArmorDAO) dao;
+        if (dao instanceof ArmorDAO armorDao) {
             for (Armor a : armorDao.getAllArmors()) {
                 items.add(new ShopItem(
                         a.getId(),
@@ -33,15 +32,13 @@ public class ItemsSelector<T> {
                         a.getNameSk(),
                         a.getDetailsEng(),
                         a.getDetailsSk(),
-                        "armors",
-                        Player::setArmorId
+                        ItemCategory.ARMOR
                 ));
             }
             return;
         }
 
-        if (dao instanceof WeaponDAO) {
-            WeaponDAO weaponDao = (WeaponDAO) dao;
+        if (dao instanceof WeaponDAO weaponDao) {
             for (Weapon w : weaponDao.getAllWeapons()) {
                 System.out.println(w.getCost());
                 items.add(new ShopItem(
@@ -51,15 +48,13 @@ public class ItemsSelector<T> {
                         w.getNameSk(),
                         w.getDetailsEng(),
                         w.getDetailsSk(),
-                        "weapons",
-                        Player::setWeaponId
+                        ItemCategory.WEAPON
                 ));
             }
             return;
         }
 
-        else if (dao instanceof PotionDAO) {
-            PotionDAO potionDao = (PotionDAO) dao;
+        else if (dao instanceof PotionDAO potionDao) {
             for (Potion p : potionDao.getAllPotions()) {
                 items.add(new ShopItem(
                         p.getId(),
@@ -68,8 +63,7 @@ public class ItemsSelector<T> {
                         p.getNameSk(),
                         p.getDetailsEng(),
                         p.getDetailsSk(),
-                        "potions",
-                        Player::setPotionId
+                        ItemCategory.POTION
                 ));
             }
             return;

@@ -10,10 +10,14 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
+import java.util.logging.Logger;
+
 /**
  * Controller class for the shop item's detail modal window
  */
 public class ItemController {
+    private static final Logger logger = Logger.getLogger(ShopController.class.getName());
+
     @FXML
     private Label itemName;
     @FXML
@@ -64,9 +68,11 @@ public class ItemController {
     public void onBuy() {
         try {
             shopService.buy(item);
+            logger.severe(String.format("Player successfully bought item (%d, %s)", item.getId(), item.getNameEng()));
             // Automatically close the modal after buying success
             onCancel();
         } catch (BalanceException ex) {
+            logger.severe("Failed to buy item: " + ex.getMessage());
             System.out.println("Not enough money");
         }
     }
