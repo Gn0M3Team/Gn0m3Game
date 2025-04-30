@@ -1,7 +1,9 @@
 package com.gnome.gnome.loginRegistration.service;
 
+import com.gnome.gnome.dao.UserStatisticsDAO;
 import com.gnome.gnome.dao.userDAO.AuthUserDAO;
 import com.gnome.gnome.dao.userDAO.PasswordUtils;
+import com.gnome.gnome.models.UserStatistics;
 import com.gnome.gnome.models.user.AuthUser;
 import com.gnome.gnome.models.user.PlayerRole;
 
@@ -34,6 +36,7 @@ import java.util.regex.Matcher;
 public class LoginRegistrationService {
 
     private static final AuthUserDAO authUserDAO = new AuthUserDAO();
+    private static final UserStatisticsDAO userStatisticsDAO = new UserStatisticsDAO();
     /**
      *length ≥ 12, at least 1 capital letter, 1 number, 1 special character
      */
@@ -80,9 +83,12 @@ public class LoginRegistrationService {
                 }
             } else {
                 AuthUser newUser = new AuthUser(username, PasswordUtils.hashPassword(password), PlayerRole.USER);
-                System.out.println(newUser);
                 authUserDAO.insertAuthUser(newUser);
-                System.out.println("User not found.User creation: "+username);
+
+                UserStatistics newUserStatistics = new UserStatistics(username);
+                userStatisticsDAO.insertUserStatistics(newUserStatistics);
+
+                System.out.println("User not found. User creation: " + username);
 
                 user = authUserDAO.getAuthUserByUsername(username);
                 if (user != null) {

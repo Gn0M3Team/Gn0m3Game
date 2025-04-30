@@ -29,7 +29,9 @@ public class MapDAO extends BaseDAO<Map> {
                 rs.getInt("score_val"),
                 rs.getString("map_name_eng"),
                 rs.getString("map_name_sk"),
-                rs.getInt("level")
+                rs.getInt("level"),
+                rs.getInt("times_played"),
+                rs.getInt("times_completed")
         );
     }
 
@@ -105,6 +107,11 @@ public class MapDAO extends BaseDAO<Map> {
      */
     public List<Map> getMapsByUsername(String username) {
         String sql = "SELECT * FROM \"Maps\" WHERE username = ?";
+        return findAll(sql, username);
+    }
+
+    public List<Map> getMapsByUsernameOrdered(String username) {
+        String sql = "SELECT * FROM \"Maps\" WHERE username = ? ORDER BY times_completed DESC, times_played";
         return findAll(sql, username);
     }
 

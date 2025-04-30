@@ -40,7 +40,7 @@ public class LeaderBoardView extends VBox {
 
     // Pagination state for the list items
     private int currentPage = 1;
-    private final int pageSize = 17;
+    private final int pageSize = 100;
     private boolean loading = false;
     private final MainController parentController;
     private PageSwitcherInterface pageSwitch;
@@ -229,12 +229,25 @@ public class LeaderBoardView extends VBox {
      * Filters the list to show only the current user's record.
      */
     private void filterOnlyMyUser() {
-        filteredUsers = allUsers.stream()
-                .filter(user -> user.getUsername().equals(currentUser.getUsername()))
-                .collect(Collectors.toList());
+        if (allUsers == null) return;
 
-        updateListView(filteredUsers);
+        int actualRank = 1;
+        for (int i = 0; i < allUsers.size(); i++) {
+            if (allUsers.get(i).getUsername().equals(currentUser.getUsername())) {
+                actualRank = i + 1;
+                break;
+            }
+        }
+
+        filteredUsers = List.of(currentUser);
+
+        listView.getItems().clear();
+        UserGameState gameState = userGameStatesByUsername.get(currentUser.getUsername());
+        int score = (gameState != null) ? gameState.getScore() : 0;
+        String display = String.format("TOP-%-3d | %d - %-10s", actualRank, score, currentUser.getUsername());
+        listView.getItems().add(display);
     }
+
     /**
      * Updates the ListView with a new set of AuthUser objects.
      *
@@ -242,13 +255,17 @@ public class LeaderBoardView extends VBox {
      */
     private void updateListView(List<AuthUser> users) {
         listView.getItems().clear();
+
+        int rank = 1;
         for (AuthUser user : users) {
             UserGameState gameState = userGameStatesByUsername.get(user.getUsername());
             int score = (gameState != null) ? gameState.getScore() : 0;
-            String display = score + ": " + user.getUsername();
+            String display = String.format("TOP-%-2d | %-3d - %-10s", rank, score, user.getUsername());
             listView.getItems().add(display);
+            rank++;
         }
     }
+
 
     /**
      * Handles mouse clicks on the ListView. When a record is double-clicked,
@@ -261,10 +278,10 @@ public class LeaderBoardView extends VBox {
             String selected = listView.getSelectionModel().getSelectedItem();
             if (selected != null) {
                 logger.info("Opening profile for: " + selected);
-                BorderPane helloPage = parentController.getMainBorderPane();
-                String username = selected.split(" - ")[0];
+                BorderPane mainPage = parentController.getMainBorderPane();
+                String username = selected.split("- ")[1];
                 logger.info(username);
-                pageSwitch.goProfile(helloPage, username);
+                pageSwitch.goProfile(mainPage, username);
             }
         }
     }

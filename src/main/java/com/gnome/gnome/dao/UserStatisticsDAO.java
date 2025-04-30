@@ -25,6 +25,7 @@ public class UserStatisticsDAO extends BaseDAO<UserStatistics> {
                 rs.getInt("id"),
                 rs.getString("username"),
                 rs.getInt("total_maps_played"),
+                rs.getInt("total_wins"),
                 rs.getInt("total_deaths"),
                 rs.getInt("total_monsters_killed"),
                 rs.getInt("total_chests_opened")

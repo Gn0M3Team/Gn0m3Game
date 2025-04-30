@@ -1,5 +1,3 @@
-/* profile.css */
-
 @font-face {
     font-family: 'Press Start 2P';
     src: url('../fonts/PressStart2P-Regular.ttf') format('truetype');
@@ -9,76 +7,156 @@
 .profile-root {
     -fx-background-image: url('../../images/background-2.jpg');
     -fx-background-size: cover;
-    -fx-background-color: rgba(42, 26, 42, 0.5);
+    -fx-background-color: rgba(42, 26, 42, 0.6);
     -fx-background-position: center;
     -fx-background-repeat: no-repeat;
 }
 
+/* Main ScrollPane styling */
+.main-scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+/* Main content container */
+.main-content {
+    -fx-background-color: transparent;
+    -fx-padding: 20px;
+}
+
+/* Scroll bar styling for main ScrollPane */
+.main-scroll-pane .scroll-bar:vertical, .main-scroll-pane .scroll-bar:horizontal {
+    -fx-background-color: #2E1C26;
+    -fx-background-radius: 6px;
+    -fx-border-color: #4F2F3F;
+    -fx-border-width: 1px;
+    -fx-border-radius: 6px;
+}
+
+.main-scroll-pane .scroll-bar .thumb {
+    -fx-background-color: #6B4657;
+    -fx-background-radius: 6px;
+    -fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0, 0, 1);
+}
+
+.main-scroll-pane .scroll-bar .thumb:hover {
+    -fx-background-color: #8F5B71;
+}
+
+.main-scroll-pane .scroll-bar .thumb:pressed {
+    -fx-background-color: #A35474;
+}
+
+.main-scroll-pane .scroll-bar .track {
+    -fx-background-color: #2E1C26;
+    -fx-background-radius: 6px;
+}
+
+.main-scroll-pane .scroll-bar .increment-button, .main-scroll-pane .scroll-bar .decrement-button {
+    -fx-background-color: #472D3C;
+    -fx-background-radius: 6px;
+    -fx-border-color: #4F2F3F;
+    -fx-border-width: 1px;
+    -fx-padding: 3px;
+}
+
+.main-scroll-pane .scroll-bar .increment-button:hover, .main-scroll-pane .scroll-bar .decrement-button:hover {
+    -fx-background-color: #6B4657;
+}
+
+.main-scroll-pane .scroll-bar .increment-button:pressed, .main-scroll-pane .scroll-bar .decrement-button:pressed {
+    -fx-background-color: #8F5B71;
+}
+
+.main-scroll-pane .scroll-bar .increment-arrow, .main-scroll-pane .scroll-bar .decrement-arrow {
+    -fx-shape: "M 0 0 L 6 6 L 12 0 Z";
+    -fx-background-color: #F4C8D4;
+    -fx-padding: 5px;
+}
+
 /* Profile container (top section) */
 .profile-container {
-    -fx-background-color: rgba(74, 58, 74, 0.8); /* Matches map-entry */
+    -fx-background-color: rgba(74, 58, 74, 0.85);
+    -fx-background-radius: 15px;
+    -fx-padding: 25px;
+    -fx-border-color: #2E1C26;
+    -fx-border-width: 3px;
+    -fx-border-radius: 15px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0, 0, 2);
+}
+
+/* Header container */
+.header-container {
+    -fx-background-color: rgba(106, 90, 106, 0.7);
     -fx-background-radius: 10px;
-    -fx-padding: 20px;
-    -fx-border-color: black;
+    -fx-padding: 15px;
+    -fx-border-color: #2E1C26;
     -fx-border-width: 2px;
     -fx-border-radius: 10px;
 }
 
 /* Profile name label */
 .profile-name {
-    -fx-text-fill: #ffffff;
+    -fx-text-fill: #F4C8D4;
     -fx-font-family: "Press Start 2P";
-    -fx-font-size: 28px;
+    -fx-font-size: 30px;
     -fx-font-weight: bold;
     -fx-padding: 10px 0;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.8), 5, 0, 2, 2);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.8), 6, 0, 2, 2);
 }
 
 /* Profile record/score label */
 .profile-record {
     -fx-text-fill: #e0e0e0;
     -fx-font-family: "Press Start 2P";
-    -fx-font-size: 18px;
-    -fx-padding: 8px 0;
+    -fx-font-size: 20px;
+    -fx-padding: 5px 0;
 }
 
-/* Stats container (map level, death counter) */
+/* Stats container */
 .stats-container {
-    -fx-background-color: rgba(74, 58, 74, 0.6);
-    -fx-background-radius: 5px;
-    -fx-padding: 10px;
-    -fx-border-color: black;
-    -fx-border-width: 1px;
-    -fx-border-radius: 5px;
+    -fx-background-color: rgba(74, 58, 74, 0.7);
+    -fx-background-radius: 10px;
+    -fx-padding: 15px;
+    -fx-border-color: #2E1C26;
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
 }
 
-/* Profile stats (games played, death counter) */
+/* Profile stats */
 .profile-stats {
     -fx-text-fill: #ffffff;
     -fx-font-family: "Press Start 2P";
     -fx-font-size: 14px;
-    -fx-padding: 5px 0;
+    -fx-padding: 8px;
+    -fx-background-color: rgba(106, 90, 106, 0.5);
+    -fx-background-radius: 5px;
+    -fx-alignment: center;
 }
 
 /* Role container */
 .role-container {
-    -fx-background-color: rgba(74, 58, 74, 0.6);
-    -fx-background-radius: 5px;
-    -fx-padding: 10px;
-    -fx-border-color: black;
-    -fx-border-width: 1px;
-    -fx-border-radius: 5px;
+    -fx-background-color: rgba(74, 58, 74, 0.7);
+    -fx-background-radius: 10px;
+    -fx-padding: 15px;
+    -fx-border-color: #2E1C26;
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
 }
 
 /* Profile role label */
 .profile-role {
-    -fx-text-fill: #ffffff;
+    -fx-text-fill: #F4C8D4;
     -fx-font-family: "Press Start 2P";
-    -fx-font-size: 16px;
-    -fx-padding: 5px 10px;
+    -fx-font-size: 18px;
+    -fx-padding: 10px 15px;
+    -fx-background-color: rgba(106, 90, 106, 0.5);
+    -fx-background-radius: 5px;
 }
 
-/* Action buttons (left, right, confirm, back) */
+/* Action buttons */
 .action-button {
     -fx-background-color: transparent;
     -fx-background-image: url('../../images/button-background.png');
@@ -86,16 +164,20 @@
     -fx-text-fill: #ffffff;
     -fx-font-family: "Press Start 2P";
     -fx-font-size: 14px;
-    -fx-padding: 12px 25px;
-    -fx-background-radius: 10px;
-    -fx-border-color: black;
-    -fx-border-width: 2px;
-    -fx-border-radius: 10px;
+    -fx-padding: 12px 30px;
+    -fx-background-radius: 12px;
+    -fx-border-color: #2E1C26;
+    -fx-border-width: 3px;
+    -fx-border-radius: 12px;
     -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 5, 0, 0, 1);
 }
 
 .action-button:hover {
     -fx-background-image: url('../../images/button-background-05.jpg');
+    -fx-text-fill: #F4C8D4;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
 }
 
 /* Ban user button */
@@ -106,43 +188,51 @@
     -fx-text-fill: #ff6666;
     -fx-font-family: "Press Start 2P";
     -fx-font-size: 14px;
-    -fx-padding: 12px 25px;
-    -fx-background-radius: 10px;
-    -fx-border-color: black;
-    -fx-border-width: 2px;
-    -fx-border-radius: 10px;
+    -fx-padding: 12px 30px;
+    -fx-background-radius: 12px;
+    -fx-border-color: #2E1C26;
+    -fx-border-width: 3px;
+    -fx-border-radius: 12px;
     -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 5, 0, 0, 1);
 }
 
 .profile-ban-button:hover {
     -fx-background-image: url('../../images/button-background-05.jpg');
     -fx-text-fill: #ff9999;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
 }
 
 /* Maps container */
 .maps-container {
-    -fx-background-color: transparent;
-    -fx-padding: 20px;
+    -fx-background-color: rgba(74, 58, 74, 0.85);
+    -fx-background-radius: 15px;
+    -fx-padding: 25px;
+    -fx-border-color: #2E1C26;
+    -fx-border-width: 3px;
+    -fx-border-radius: 15px;
+    -fx-max-height: 400px; /* Limit the height of the maps section */
 }
 
 /* Maps title label */
 .maps-title {
-    -fx-text-fill: #ffffff;
+    -fx-text-fill: #F4C8D4;
     -fx-font-family: "Press Start 2P";
-    -fx-font-size: 20px;
+    -fx-font-size: 24px;
     -fx-font-weight: bold;
-    -fx-padding: 10px 0;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.8), 3, 0, 1, 1);
+    -fx-padding: 15px 0;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.8), 4, 0, 1, 1);
 }
 
 /* ScrollPane for map list */
 .map-scroll-pane {
     -fx-background-color: transparent;
     -fx-background: transparent;
-    -fx-border-color: #6B4657; /* Darker pink border */
-    -fx-border-width: 2;
-    -fx-border-radius: 10;
-    -fx-background-radius: 10;
+    -fx-border-color: #6B4657;
+    -fx-border-width: 3px;
+    -fx-border-radius: 12px;
+    -fx-background-radius: 12px;
     -fx-padding: 10px;
 }
 
@@ -150,89 +240,91 @@
 .map-list {
     -fx-background-color: transparent;
     -fx-background: transparent;
+    -fx-pref-height: 280px; /* Ensure ListView fits within ScrollPane */
 }
 
 /* ListView cell styling */
 .map-list .list-cell {
-    -fx-background-color: rgba(74, 58, 74, 0.8); /* Matches map-entry */
-    -fx-background-radius: 5px;
+    -fx-background-color: rgba(74, 58, 74, 0.85);
+    -fx-background-radius: 8px;
     -fx-text-fill: #ffffff;
     -fx-font-family: "Press Start 2P";
-    -fx-font-size: 12px;
-    -fx-padding: 8px;
+    -fx-font-size: 13px;
+    -fx-padding: 12px;
     -fx-alignment: center-left;
-    -fx-border-color: black;
-    -fx-border-width: 1px;
-    -fx-border-radius: 5px;
-    -fx-margin: 5px 0;
+    -fx-border-color: #2E1C26;
+    -fx-border-width: 2px;
+    -fx-border-radius: 8px;
+    -fx-margin: 8px 0;
 }
 
 .map-list .list-cell:filled:hover {
-    -fx-background-color: rgba(106, 90, 106, 0.7);
-    -fx-background-radius: 5px;
+    -fx-background-color: rgba(106, 90, 106, 0.8);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
 }
 
 .map-list .list-cell:filled:selected {
-    -fx-background-color: rgba(106, 90, 106, 0.9);
-    -fx-text-fill: #ffffff;
+    -fx-background-color: rgba(106, 90, 106, 0.95);
+    -fx-text-fill: #F4C8D4;
 }
 
-/* Scroll bar styling for ScrollPane */
+/* Scroll bar styling for map ScrollPane */
 .map-scroll-pane .scroll-bar:vertical, .map-scroll-pane .scroll-bar:horizontal {
-    -fx-background-color: #2E1C26; /* Darker pink track background */
-    -fx-background-radius: 5;
+    -fx-background-color: #2E1C26;
+    -fx-background-radius: 6px;
     -fx-border-color: #4F2F3F;
-    -fx-border-width: 1;
-    -fx-border-radius: 5;
+    -fx-border-width: 1px;
+    -fx-border-radius: 6px;
 }
 
 .map-scroll-pane .scroll-bar .thumb {
-    -fx-background-color: #6B4657; /* Dark pink thumb */
-    -fx-background-radius: 5;
+    -fx-background-color: #6B4657;
+    -fx-background-radius: 6px;
     -fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0, 0, 1);
 }
 
 .map-scroll-pane .scroll-bar .thumb:hover {
-    -fx-background-color: #8F5B71; /* Lighter pink on hover */
+    -fx-background-color: #8F5B71;
 }
 
 .map-scroll-pane .scroll-bar .thumb:pressed {
-    -fx-background-color: #A35474; /* Slightly brighter pink when pressed */
+    -fx-background-color: #A35474;
 }
 
 .map-scroll-pane .scroll-bar .track {
-    -fx-background-color: #2E1C26; /* Dark pink track */
-    -fx-background-radius: 5;
+    -fx-background-color: #2E1C26;
+    -fx-background-radius: 6px;
 }
 
 .map-scroll-pane .scroll-bar .increment-button, .map-scroll-pane .scroll-bar .decrement-button {
-    -fx-background-color: #472D3C; /* Dark pink buttons */
-    -fx-background-radius: 5;
+    -fx-background-color: #472D3C;
+    -fx-background-radius: 6px;
     -fx-border-color: #4F2F3F;
-    -fx-border-width: 1;
-    -fx-padding: 2;
+    -fx-border-width: 1px;
+    -fx-padding: 3px;
 }
 
 .map-scroll-pane .scroll-bar .increment-button:hover, .map-scroll-pane .scroll-bar .decrement-button:hover {
-    -fx-background-color: #6B4657; /* Lighter pink on hover */
+    -fx-background-color: #6B4657;
 }
 
-.map-scroll-pane .scroll-bar .increment-button:pressed, .map-scroll-pane .scroll-bar .decrement-button:pressed {
-    -fx-background-color: #8F5B71; /* Brighter pink when pressed */
+.map-scroll-pane . map-scroll-pane .scroll-bar .increment-button:pressed, .map-scroll-pane .scroll-bar .decrement-button:pressed {
+    -fx-background-color: #8F5B71;
 }
 
 .map-scroll-pane .scroll-bar .increment-arrow, .map-scroll-pane .scroll-bar .decrement-arrow {
-    -fx-shape: "M 0 0 L 6 6 L 12 0 Z"; /* Triangle shape */
-    -fx-background-color: #F4C8D4; /* Light pink arrow */
-    -fx-padding: 4;
+    -fx-shape: "M 0 0 L 6 6 L 12 0 Z";
+    -fx-background-color: #F4C8D4;
+    -fx-padding: 5px;
 }
 
 /* Bottom container */
 .bottom-container {
-    -fx-background-color: rgba(74, 58, 74, 0.8); /* Matches map-entry */
-    -fx-background-radius: 10px;
-    -fx-padding: 15px;
-    -fx-border-color: black;
-    -fx-border-width: 2px;
-    -fx-border-radius: 10px;
+    -fx-background-color: rgba(74, 58, 74, 0.85);
+    -fx-background-radius: 15px;
+    -fx-padding: 20px;
+    -fx-border-color: #2E1C26;
+    -fx-border-width: 3px;
+    -fx-border-radius: 15px;
 }

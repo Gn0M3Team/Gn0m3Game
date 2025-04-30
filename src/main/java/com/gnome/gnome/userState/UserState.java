@@ -25,6 +25,7 @@ public class UserState {
     private Integer armorId;
     // statistics data
     private int totalMapsPlayed;
+    private int totalWins;
     private int totalDeaths;
     private int totalMonstersKilled;
     private int totalChestsOpened;
@@ -43,10 +44,15 @@ public class UserState {
         return instance;
     }
 
-    public static void init(AuthUser authUser, UserGameState userGameState, UserStatistics userStatistics) {
+    public static void init(
+            AuthUser authUser,
+            UserGameState userGameState,
+            UserStatistics userStatistics
+    ) {
         UserState userState = getInstance();
         userState.username = authUser.getUsername();
         userState.role = authUser.getRole();
+
         userState.balance = userGameState.getBalance();
         userState.health = userGameState.getHealth();
         userState.score = userGameState.getScore();
@@ -54,6 +60,12 @@ public class UserState {
         userState.weaponId = userGameState.getWeaponId();
         userState.potionId = userGameState.getPotionId();
         userState.armorId = userGameState.getArmorId();
+
+        userState.totalDeaths = userStatistics.getTotalDeaths();
+        userState.totalMapsPlayed = userStatistics.getTotalMapsPlayed();
+        userState.totalChestsOpened = userStatistics.getTotalChestsOpened();
+        userState.totalWins = userStatistics.getTotalWins();
+        userState.totalMonstersKilled = userStatistics.getTotalMonstersKilled();
     }
 
     // Setters with immediate database update
@@ -121,6 +133,7 @@ public class UserState {
         UserStatistics userStatistics = new UserStatistics(
                 username,
                 totalMapsPlayed,
+                totalWins,
                 totalDeaths,
                 totalMonstersKilled,
                 totalChestsOpened
