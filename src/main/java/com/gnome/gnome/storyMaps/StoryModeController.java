@@ -100,8 +100,7 @@ public class StoryModeController {
             ArmorDAO armorDAO = new ArmorDAO();
             WeaponDAO weaponDAO = new WeaponDAO();
             PotionDAO potionDAO = new PotionDAO();
-
-
+          
             mapButton.setOnAction(e -> {
                 if (!mapButton.isDisabled()) {
                     if (mapLoaderService == null) {

@@ -1,14 +1,12 @@
-package com.gnome.gnome.continueGame.component;
+package com.gnome.gnome.game.component;
 
-import com.gnome.gnome.editor.utils.GenerateGrid;
-import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import lombok.Getter;
 
 import java.util.Objects;
 
-import static com.gnome.gnome.continueGame.component.ObjectsConstants.*;
+import static com.gnome.gnome.game.component.ObjectsConstants.*;
 import static com.gnome.gnome.editor.utils.EditorConstants.TILE_SIZE;
 
 /**
