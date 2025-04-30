@@ -41,10 +41,13 @@ public class Chest {
                         )
                 )
         );
-        imageView.setFitWidth(TILE_SIZE * 0.6);
-        imageView.setFitHeight(TILE_SIZE * 0.6);
 
         this.gifPath = gifPath;
+    }
+
+    public void setImageSize(int width, int height) {
+        imageView.setFitWidth(width);
+        imageView.setFitHeight(height);
     }
 
     // This function should change image to gif(/effects/animated_chest_1s.gif. And this animation should play only one time

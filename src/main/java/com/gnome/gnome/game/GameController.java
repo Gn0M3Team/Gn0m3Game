@@ -142,6 +142,8 @@ public class GameController {
 
     private Popup tablePopup;
 
+    private final Map<String, Label> chestHints = new HashMap<>();
+
     public static GameController getGameController(){
         if (GameController.instance == null)
             return new GameController();
@@ -463,6 +465,16 @@ public class GameController {
                     return;
                 }
 
+                int finalNewX = newX;
+                int finalNewY = newY;
+                boolean isChestAtNewPos = activeChests.stream()
+                        .anyMatch(ch -> ch.getGridX() == finalNewX && ch.getGridY() == finalNewY);
+                if (isChestAtNewPos) {
+                    if (debug_mod_game)
+                        System.out.println("Player cannot move to (" + newX + ", " + newY + ") - chest blocking");
+                    return;
+                }
+
                 // Get the tile type at the new position
                 int tileValue = fieldMap[newY][newX];
                 // If the tile value is negative (indicating a monster), get the underlying base map value
@@ -532,6 +544,48 @@ public class GameController {
                 gameObjectsPane.getChildren().remove(chest.getImageView());
                 iter.remove();  // remove from activeChests
                 break;
+            }
+        }
+    }
+
+    private void showChestHintsNearPlayer() {
+        int px = player.getX();
+        int py = player.getY();
+        int[][] directions = {{-1,0},{1,0},{0,-1},{0,1}};
+        Set<String> visibleHints = new HashSet<>();
+
+        for (int[] d : directions) {
+            int nx = px + d[0];
+            int ny = py + d[1];
+
+            for (Chest chest : activeChests) {
+                if (chest.getGridX() == nx && chest.getGridY() == ny) {
+                    String key = nx + "," + ny;
+                    visibleHints.add(key);
+
+                    Label hint = chestHints.get(key);
+                    if (hint == null) {
+                        hint = new Label("Press E");
+                        hint.setStyle("-fx-background-color: rgba(0,0,0,0.7); -fx-text-fill: yellow; -fx-padding: 4px;");
+                        hint.setMouseTransparent(true);
+                        chestHints.put(key, hint);
+                        gameObjectsPane.getChildren().add(hint);
+                    }
+
+                    double tileSize = camera.getDynamicTileSize();
+                    double tx = (nx - camera.getStartCol()) * tileSize;
+                    double ty = (ny - camera.getStartRow()) * tileSize;
+
+                    hint.setTranslateX(tx);
+                    hint.setTranslateY(ty - 20);
+                    hint.setVisible(true);
+                }
+            }
+        }
+
+        for (Map.Entry<String, Label> entry : chestHints.entrySet()) {
+            if (!visibleHints.contains(entry.getKey())) {
+                entry.getValue().setVisible(false);
             }
         }
     }
@@ -678,7 +732,8 @@ public class GameController {
         GraphicsContext gc = viewportCanvas.getGraphicsContext2D();
         camera.updateCameraCenter();
         camera.drawViewport(viewportCanvas, coinsOnMap);
-        showTableHintsNearPlayer();
+        camera.drawPressEHints(gc, baseMap, player.getX(), player.getY());
+        showChestHintsNearPlayer();
         drawAttackRange(gc, 1);
         double tw = camera.getTileWidth();
         double th = camera.getTileHeight();
@@ -708,51 +763,6 @@ public class GameController {
         updatePlayerHealthBar();
     }
 
-    private void showTableHintsNearPlayer() {
-        int px = player.getX();
-        int py = player.getY();
-
-        int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-
-        Set<String> visibleHints = new HashSet<>();
-
-        for (int[] dir : directions) {
-            int nx = px + dir[0];
-            int ny = py + dir[1];
-
-            if (nx >= 0 && nx < baseMap[0].length && ny >= 0 && ny < baseMap.length) {
-                int val = baseMap[ny][nx];
-                if (TypeOfObjects.fromValue(val) == TypeOfObjects.TABLE) {
-                    String key = nx + "," + ny;
-                    visibleHints.add(key);
-
-                    Label hintLabel = tableHints.get(key);
-                    if (hintLabel == null) {
-                        hintLabel = new Label("Press E");
-                        hintLabel.setStyle("-fx-background-color: rgba(0,0,0,0.7); -fx-text-fill: white; -fx-padding: 4px;");
-                        hintLabel.setMouseTransparent(true);
-                        tableHints.put(key, hintLabel);
-                        gameObjectsPane.getChildren().add(hintLabel);
-                    }
-
-                    double tileSize = camera.getDynamicTileSize();
-                    double tx = (nx - camera.getStartCol()) * tileSize;
-                    double ty = (ny - camera.getStartRow()) * tileSize;
-
-                    hintLabel.setTranslateX(tx);
-                    hintLabel.setTranslateY(ty - 20);
-                    hintLabel.setVisible(true);
-                }
-            }
-        }
-
-        // Ховаємо всі підказки, які більше не біля гравця
-        for (Map.Entry<String, Label> entry : tableHints.entrySet()) {
-            if (!visibleHints.contains(entry.getKey())) {
-                entry.getValue().setVisible(false);
-            }
-        }
-    }
 
     public boolean isLineOfSightClear(int x1, int y1, int x2, int y2) {
         int dx = x2 - x1;
@@ -762,7 +772,7 @@ public class GameController {
         double stepX = dx / (double) steps;
         double stepY = dy / (double) steps;
 
-        for (int i = 1; i < steps; i++) { // exclude source and target tiles
+        for (int i = 1; i < steps; i++) {
             int ix = (int) Math.round(x1 + i * stepX);
             int iy = (int) Math.round(y1 + i * stepY);
 
@@ -776,36 +786,6 @@ public class GameController {
         return false;
     }
 
-
-
-//    private void drawCoinCounter() {
-//        GraphicsContext gc = viewportCanvas.getGraphicsContext2D();
-//        double canvasWidth = viewportCanvas.getWidth();
-//        double canvasHeight = viewportCanvas.getHeight();
-//        double padding = 20;
-//
-//        double panelWidth = canvasWidth * 0.15;
-//        double panelHeight = canvasHeight * 0.07;
-//
-//        double panelX = padding;
-//        double panelY = canvasHeight - panelHeight - padding;
-//
-//        gc.setFill(Color.color(0, 0, 0, 0.5));
-//        gc.fillRoundRect(panelX, panelY, panelWidth, panelHeight, 15, 15);
-//
-//        if (coinImage == null) {
-//            coinImage = new Image(Objects.requireNonNull(
-//                    Coin.class.getResourceAsStream("/com/gnome/gnome/images/tiles/" + ObjectsConstants.COIN_IMAGE)
-//            ));
-//        }
-//
-//        double coinSize = viewportCanvas.getWidth() * 0.05;
-//        gc.drawImage(coinImage, panelX + 10, panelY + (panelHeight - coinSize) / 2, coinSize, coinSize);
-//
-//        gc.setFill(Color.WHITE);
-//        gc.setFont(javafx.scene.text.Font.font(20));
-//        gc.fillText("x " + player.getPlayerCoins(), panelX + 50, panelY + panelHeight / 2 + 7);
-//    }
 
     /**
      * Starts the game loop using an AnimationTimer.

@@ -228,6 +228,40 @@ public class Camera {
         drawCoinAmount(gc, coinImage, coinCount, coinX, coinY, boxSize, cornerRadius, shadowOffset, canvas);
     }
 
+
+    public void drawPressEHints(GraphicsContext gc, int[][] baseMap, int px, int py) {
+        int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+        double tw = getTileWidth();
+        double th = getTileHeight();
+
+        gc.setFont(Font.font("Arial", FontWeight.BOLD, 12));
+        gc.setFill(Color.WHITE);
+
+        for (int[] d : directions) {
+            int nx = px + d[0];
+            int ny = py + d[1];
+
+            if (nx >= 0 && nx < baseMap[0].length && ny >= 0 && ny < baseMap.length) {
+                if (TypeOfObjects.fromValue(baseMap[ny][nx]) == TypeOfObjects.TABLE || TypeOfObjects.fromValue(baseMap[nx][ny]).isChest()) {
+                    int dx = nx - getStartCol();
+                    int dy = ny - getStartRow();
+
+                    if (dx >= 0 && dx < viewportSize && dy >= 0 && dy < viewportSize) {
+                        double x = dx * tw + tw / 2;
+                        double y = dy * th;
+
+                        gc.setFill(Color.rgb(0, 0, 0, 0.7));
+                        gc.fillRoundRect(x - 30, y - 5, 60, 20, 5, 5);
+
+                        gc.setFill(Color.WHITE);
+                        gc.fillText("Press E", x - 20, y + 7);
+                    }
+                }
+            }
+        }
+    }
+
+
     // Helper method to draw coin amount (horizontal layout)
     private void drawCoinAmount(GraphicsContext gc, Image coinImage, int coinCount, double x, double y,
                                 double boxSize, double cornerRadius, double shadowOffset, Canvas canvas) {
