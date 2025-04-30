@@ -1,13 +1,12 @@
 package com.gnome.gnome.monsters;
 
 
-import com.gnome.gnome.camera.Camera;
+import com.gnome.gnome.game.GameController;
 import com.gnome.gnome.monsters.movements.MovementStrategy;
 import com.gnome.gnome.player.Player;
 import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
-import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -213,15 +212,6 @@ public abstract class Monster {
     }
 
     /**
-     * Returns the integer value used to represent the monster on the map.
-     *
-     * @return monster type value
-     */
-    public int getMonsterValue() {
-        return value; // Return the monster's identifier
-    }
-
-    /**
      * Reduces the monster's health by a given amount.
      *
      * @param damage the amount of damage taken
@@ -292,6 +282,10 @@ public abstract class Monster {
         if (gameObjectsPane == null) {
             System.err.println("Error: gameObjectsPane is null in meleeAttack for Monster at (" + x + ", " + y + ")");
             isMeleeAttacking = false;
+            return;
+        }
+
+        if (GameController.getGameController().isLineOfSightClear(x, y, player.getX(), player.getY())) {
             return;
         }
 

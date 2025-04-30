@@ -1,15 +1,10 @@
 package com.gnome.gnome.camera;
-import com.gnome.gnome.continueGame.component.Coin;
-import com.gnome.gnome.dao.ArmorDAO;
-import com.gnome.gnome.dao.MapDAO;
-import com.gnome.gnome.dao.PotionDAO;
-import com.gnome.gnome.dao.WeaponDAO;
+import com.gnome.gnome.game.component.Coin;
 import com.gnome.gnome.editor.utils.TypeOfObjects;
 import com.gnome.gnome.models.Armor;
 import com.gnome.gnome.models.Potion;
 import com.gnome.gnome.models.Weapon;
 import com.gnome.gnome.player.Player;
-import com.gnome.gnome.userState.UserState;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
@@ -25,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import static com.gnome.gnome.editor.utils.EditorConstants.TILE_SIZE;
 
 /**
  * The Camera class is responsible for rendering a 15x15 viewport of the map,

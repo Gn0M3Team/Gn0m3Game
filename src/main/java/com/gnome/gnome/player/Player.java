@@ -139,6 +139,10 @@ public class Player {
             // Check if the monster is within the attack range (e.g., if range=1, the monster must be 1 tile away or closer)
             // This checks for monsters in a square area around the player, not just in a straight line
             if (dx <= range && dy <= range) {
+                if (GameController.getGameController().isLineOfSightClear(this.x, this.y, monster.getX(), monster.getY())) {
+                    continue; // монстр за об'єктом, пропустити
+                }
+
                 hitMonsters.add(monster);
             }
         }

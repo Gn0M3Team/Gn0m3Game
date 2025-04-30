@@ -2,8 +2,8 @@ package com.gnome.gnome.game;
 
 import com.gnome.gnome.camera.Camera;
 import com.gnome.gnome.components.PlayerHealthBar;
-import com.gnome.gnome.continueGame.component.Coin;
-import com.gnome.gnome.continueGame.component.ObjectsConstants;
+import com.gnome.gnome.game.component.Chest;
+import com.gnome.gnome.game.component.Coin;
 import com.gnome.gnome.editor.utils.TypeOfObjects;
 import com.gnome.gnome.models.Armor;
 import com.gnome.gnome.models.Potion;
@@ -15,7 +15,6 @@ import com.gnome.gnome.monsters.types.Skeleton;
 import com.gnome.gnome.monsters.types.missels.Arrow;
 import com.gnome.gnome.player.Player;
 import javafx.animation.AnimationTimer;
-import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -35,10 +34,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 import lombok.Getter;
 
 import java.io.IOException;
@@ -47,7 +44,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.logging.Logger;
 
-import static com.gnome.gnome.editor.utils.EditorConstants.TILE_SIZE;
+import static com.gnome.gnome.editor.utils.TypeOfObjects.*;
 
 public class GameController {
 
@@ -102,6 +99,8 @@ public class GameController {
      */
     private final List<Arrow> activeArrows = new ArrayList<>();
 
+    private final List<Chest> activeChests = new ArrayList<>();
+
     private final List<com.gnome.gnome.models.Monster> dbMonsters = new ArrayList<>();
 
     private static final Logger logger = Logger.getLogger(GameController.class.getName());
@@ -136,8 +135,6 @@ public class GameController {
      * Overlay shown when the game is over.
      */
     private VBox gameOverOverlay;
-
-    private Image coinImage;
 
     private static GameController instance; //Singleton Instance
 
@@ -204,6 +201,7 @@ public class GameController {
         StackPane.setAlignment(viewportRoot, Pos.CENTER);
 
         addMonstersToGameObjectsPane();
+        addChestsToGameObjectsPane();
 
         // Додаємо в centerStack
         centerStack.getChildren().setAll(viewportRoot);
@@ -230,6 +228,26 @@ public class GameController {
         // Initial update of the camera viewport to render the map and player
         updateCameraViewport();
     }
+
+    private void addChestsToGameObjectsPane() {
+        camera.updateCameraCenter();
+
+        double tileSize = camera.getDynamicTileSize();
+
+        for (Chest chest : activeChests) {
+            ImageView chestView = chest.getImageView();
+
+            chestView.setFitWidth(tileSize);
+            chestView.setFitHeight(tileSize);
+            chestView.setTranslateX((chest.getGridX() - camera.getStartCol()) * tileSize);
+            chestView.setTranslateY((chest.getGridY() - camera.getStartRow()) * tileSize);
+
+            if (!gameObjectsPane.getChildren().contains(chestView)) {
+                gameObjectsPane.getChildren().add(chestView);
+            }
+        }
+    }
+
 
     private void addMonstersToGameObjectsPane() {
         camera.updateCameraCenter();
@@ -278,10 +296,17 @@ public class GameController {
         for (int row = 0; row < fieldMap.length; row++) {
             for (int col = 0; col < fieldMap[row].length; col++) {
                 int tile = fieldMap[row][col];
+                TypeOfObjects tileType = TypeOfObjects.fromValue(tile);
 
                 if (tile == TypeOfObjects.START_POINT.getValue()) {
                     player = Player.getInstance(col, row, PLAYER_MAX_HEALTH);
                     fieldMap[row][col] = TypeOfObjects.START_POINT.getValue();
+                }
+
+                if (tileType.isChest()) {
+                    double val = returnBasedChestTypeValue(tileType);
+                    activeChests.add(new Chest(row, col, val,tileType.getImagePath(), "/com/gnome/gnome/effects/animated_chest.gif"));
+                    fieldMap[row][col] = TypeOfObjects.FLOOR.getValue();
                 }
 
                 if (tile < 0) {
@@ -291,13 +316,27 @@ public class GameController {
                         throw new RuntimeException("Monster with id " + tile + " not found in importedMonsterList");
                     }
 
-                    Monster m = MonsterFactory.createMonster(TypeOfObjects.fromValue(tile), col, row, dbMonster);
+                    Monster m = MonsterFactory.createMonster(tileType, col, row, dbMonster);
 
                     fieldMap[row][col] = TypeOfObjects.FLOOR.getValue();
                     monsterList.add(m);
                 }
             }
         }
+    }
+
+    private double returnBasedChestTypeValue(TypeOfObjects type) {
+        Random random = new Random();
+        return switch (type) {
+            case CHEST_1 -> 1 + random.nextDouble() * 10;   // Range: 10.0 - 20.0
+            case CHEST_2 -> 2 + random.nextDouble() * 10;   // Range: 20.0 - 30.0
+            case CHEST_3 -> 3 + random.nextDouble() * 10;   // Range: 30.0 - 40.0
+            case CHEST_4 -> 4 + random.nextDouble() * 10;   // Range: 40.0 - 50.0
+            case CHEST_5 -> 5 + random.nextDouble() * 10;   // Range: 50.0 - 60.0
+            case CHEST_6 -> 6 + random.nextDouble() * 10;   // Range: 60.0 - 70.0
+            case CHEST_7 -> 7 + random.nextDouble() * 10;   // Range: 70.0 - 80.0
+            default -> throw new IllegalStateException("Unexpected value: " + type);
+        };
     }
 
     private com.gnome.gnome.models.Monster findMonsterById(List<com.gnome.gnome.models.Monster> list, int id) {
@@ -386,6 +425,8 @@ public class GameController {
                 case E -> {
                     if (isNearTable(player.getX(), player.getY())) {
                         showTablePopup();
+                    } else if (isNearChest(player.getX(), player.getY())) {
+                        openNearbyChest();
                     }
                 }
                 case SPACE -> {
@@ -464,6 +505,35 @@ public class GameController {
 
         // Request focus on the scene's root to ensure it receives key events
         scene.getRoot().requestFocus();
+    }
+
+    private boolean isNearChest(int x, int y) {
+        for (Chest chest : activeChests) {
+            int cx = chest.getGridX();
+            int cy = chest.getGridY();
+            if ((Math.abs(cx - x) == 1 && cy == y) || (Math.abs(cy - y) == 1 && cx == x)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void openNearbyChest() {
+        Iterator<Chest> iter = activeChests.iterator();
+        while (iter.hasNext()) {
+            Chest chest = iter.next();
+            int cx = chest.getGridX();
+            int cy = chest.getGridY();
+            if ((Math.abs(cx - player.getX()) == 1 && cy == player.getY()) ||
+                    (Math.abs(cy - player.getY()) == 1 && cx == player.getX())) {
+
+                chest.animate();
+                player.addCoin(chest.getValue());
+                gameObjectsPane.getChildren().remove(chest.getImageView());
+                iter.remove();  // remove from activeChests
+                break;
+            }
+        }
     }
 
     private boolean isNearTable(int x, int y) {
@@ -590,6 +660,7 @@ public class GameController {
             Coin coin = new Coin(x, y, monster.getCost());
             coinsOnMap.add(coin); // Add the coin to the map
             monsterList.remove(monster); // Remove the monster from the list
+            gameObjectsPane.getChildren().remove(monster.getRepresentation());
         }
 
         // Update the fieldMap with the remaining monsters
@@ -634,7 +705,6 @@ public class GameController {
             arrow.updateCameraOffset(camera.getStartCol(), camera.getStartRow());
         }
 
-//        drawCoinCounter();
         updatePlayerHealthBar();
     }
 
@@ -683,6 +753,29 @@ public class GameController {
             }
         }
     }
+
+    public boolean isLineOfSightClear(int x1, int y1, int x2, int y2) {
+        int dx = x2 - x1;
+        int dy = y2 - y1;
+
+        int steps = Math.max(Math.abs(dx), Math.abs(dy));
+        double stepX = dx / (double) steps;
+        double stepY = dy / (double) steps;
+
+        for (int i = 1; i < steps; i++) { // exclude source and target tiles
+            int ix = (int) Math.round(x1 + i * stepX);
+            int iy = (int) Math.round(y1 + i * stepY);
+
+            if (ix < 0 || iy < 0 || iy >= fieldMap.length || ix >= fieldMap[0].length) return true;
+
+            TypeOfObjects type = TypeOfObjects.fromValue(baseMap[iy][ix]);
+            if (!type.isTransparent()) {
+                return true; // Obstacle blocks the view
+            }
+        }
+        return false;
+    }
+
 
 
 //    private void drawCoinCounter() {
