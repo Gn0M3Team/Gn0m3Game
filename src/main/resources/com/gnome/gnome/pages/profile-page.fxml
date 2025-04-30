@@ -17,58 +17,58 @@
             stylesheets="@./css/profile.css"
             styleClass="profile-root">
 
-    <top>
-        <VBox alignment="CENTER" spacing="20" styleClass="profile-container">
-            <!-- Profile Header -->
-            <HBox alignment="CENTER" spacing="15" styleClass="header-container">
-                <ImageView fx:id="avatarImage" fitWidth="80" fitHeight="80" preserveRatio="true"/>
-                <VBox alignment="CENTER_LEFT" spacing="5">
-                    <Label fx:id="nameLabel" text="Profile Name" styleClass="profile-name"/>
-                    <Label fx:id="recordLabel" text="Score: 0" styleClass="profile-record"/>
-                </VBox>
-            </HBox>
-
-            <!-- Role Selection -->
-            <HBox spacing="15" alignment="CENTER" styleClass="role-container">
-                <Button fx:id="leftButton" text="←" onAction="#handleLeftRole" styleClass="action-button"/>
-                <Label fx:id="roleLabel" text="Role: User" styleClass="profile-role"/>
-                <Button fx:id="rightButton" text="→" onAction="#handleRightRole" styleClass="action-button"/>
-                <Button fx:id="confirmRoleButton" text="Confirm Role" onAction="#handleConfirmRole" styleClass="action-button"/>
-            </HBox>
-
-            <!-- Stats Grid -->
-            <GridPane fx:id="statsGrid" hgap="15" vgap="10" alignment="CENTER" styleClass="stats-container">
-                <Label fx:id="mapLevel" styleClass="profile-stats" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                <Label fx:id="totalMapsPlayed" styleClass="profile-stats" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                <Label fx:id="totalWins" styleClass="profile-stats" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-                <Label fx:id="winningPercentage" styleClass="profile-stats" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-                <Label fx:id="totalDeaths" styleClass="profile-stats" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-                <Label fx:id="deathCounter" styleClass="profile-stats" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                <Label fx:id="totalMonsterKilled" styleClass="profile-stats" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-                <Label fx:id="totalChestOpened" styleClass="profile-stats" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
-            </GridPane>
-
-            <!-- Ban Button -->
-            <Button fx:id="banUserButton" text="Ban User" onAction="#handleBanUser" styleClass="profile-ban-button"/>
-        </VBox>
-    </top>
-
     <center>
-        <VBox alignment="CENTER" spacing="20" styleClass="maps-container">
-            <Label text="Your Maps" styleClass="maps-title"/>
-            <ScrollPane fitToWidth="true" styleClass="map-scroll-pane">
-                <content>
-                    <ListView fx:id="mapListView" styleClass="map-list" prefHeight="300"/>
-                </content>
-            </ScrollPane>
-        </VBox>
-    </center>
+        <ScrollPane fx:id="mainScrollPane" fitToWidth="true" pannable="true" styleClass="main-scroll-pane">
+            <content>
+                <VBox alignment="CENTER" spacing="20" styleClass="main-content">
+                    <!-- Profile Header -->
+                    <VBox alignment="CENTER" spacing="20" styleClass="profile-container">
+                        <HBox alignment="CENTER" spacing="15" styleClass="header-container">
+                            <ImageView fx:id="avatarImage" fitWidth="80" fitHeight="80" preserveRatio="true"/>
+                            <VBox alignment="CENTER_LEFT" spacing="5">
+                                <Label fx:id="nameLabel" text="Profile Name" styleClass="profile-name"/>
+                                <Label fx:id="recordLabel" text="Score: 0" styleClass="profile-record"/>
+                            </VBox>
+                        </HBox>
 
-    <bottom>
-        <HBox alignment="CENTER" spacing="20" styleClass="bottom-container">
-            <Button text="Back" onAction="#handleBack" styleClass="action-button"/>
-        </HBox>
-    </bottom>
+                        <!-- Role Selection -->
+                        <HBox spacing="15" alignment="CENTER" styleClass="role-container">
+                            <Button fx:id="leftButton" text="←" onAction="#handleLeftRole" styleClass="action-button"/>
+                            <Label fx:id="roleLabel" text="Role: User" styleClass="profile-role"/>
+                            <Button fx:id="rightButton" text="→" onAction="#handleRightRole" styleClass="action-button"/>
+                            <Button fx:id="confirmRoleButton" text="Confirm Role" onAction="#handleConfirmRole" styleClass="action-button"/>
+                        </HBox>
+
+                        <!-- Stats Grid -->
+                        <GridPane fx:id="statsGrid" hgap="15" vgap="10" alignment="CENTER" styleClass="stats-container">
+                            <Label fx:id="mapLevel" styleClass="profile-stats" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                            <Label fx:id="totalMapsPlayed" styleClass="profile-stats" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                            <Label fx:id="totalWins" styleClass="profile-stats" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                            <Label fx:id="winningPercentage" styleClass="profile-stats" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                            <Label fx:id="totalDeaths" styleClass="profile-stats" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                            <Label fx:id="deathCounter" styleClass="profile-stats" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                            <Label fx:id="totalMonsterKilled" styleClass="profile-stats" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                            <Label fx:id="totalChestOpened" styleClass="profile-stats" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                        </GridPane>
+
+                        <!-- Ban Button -->
+                        <Button fx:id="banUserButton" text="Ban User" onAction="#handleBanUser" styleClass="profile-ban-button"/>
+                    </VBox>
+
+                    <!-- Maps Section -->
+                    <VBox alignment="CENTER" spacing="20" styleClass="maps-container">
+                        <Label text="Your Maps" styleClass="maps-title"/>
+                                <ListView fx:id="mapListView" styleClass="map-list"/>
+                    </VBox>
+
+                    <!-- Bottom Section -->
+                    <HBox alignment="CENTER" spacing="20" styleClass="bottom-container">
+                        <Button text="Back" onAction="#handleBack" styleClass="action-button"/>
+                    </HBox>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
 
     <padding>
         <Insets top="25" right="25" bottom="25" left="25"/>

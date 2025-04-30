@@ -14,6 +14,8 @@ public class Map {
     private String mapNameEng;
     private String mapNameSk;
     private int level;
+    private int timesPlayed;
+    private int timesCompleted;
 
     public Map(String username, int[][] mapData, int scoreVal, String mapNameEng, String mapNameSk, int level) {
         this.username = username;
@@ -22,5 +24,7 @@ public class Map {
         this.mapNameEng = mapNameEng;
         this.mapNameSk = mapNameSk;
         this.level = level;
+        this.timesPlayed = 0;
+        this.timesCompleted = 0;
     }
 }

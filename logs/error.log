@@ -6,4 +6,5 @@
 [0m[33mTue Apr 29 17:49:13 CEST 2025 WARNING [com.gnome.gnome.editor.controller.EditorPageController] - User does not have permission to load maps.
 [0m[33mTue Apr 29 17:49:13 CEST 2025 WARNING [com.gnome.gnome.editor.controller.EditorPageController] - User does not have permission to load maps.
 [0m[33mTue Apr 29 17:49:14 CEST 2025 WARNING [com.gnome.gnome.editor.controller.EditorPageController] - User does not have permission to load maps.
+[0m[31mWed Apr 30 14:58:04 CEST 2025 SEVERE [com.gnome.gnome.db.DatabaseWrapper] - Cannot begin transaction
 [0m

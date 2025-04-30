@@ -12,6 +12,70 @@
     -fx-background-repeat: no-repeat;
 }
 
+/* Main ScrollPane styling */
+.main-scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+/* Main content container */
+.main-content {
+    -fx-background-color: transparent;
+    -fx-padding: 20px;
+}
+
+/* Scroll bar styling for main ScrollPane */
+.main-scroll-pane .scroll-bar:vertical, .main-scroll-pane .scroll-bar:horizontal {
+    -fx-background-color: #2E1C26;
+    -fx-background-radius: 6px;
+    -fx-border-color: #4F2F3F;
+    -fx-border-width: 1px;
+    -fx-border-radius: 6px;
+}
+
+.main-scroll-pane .scroll-bar .thumb {
+    -fx-background-color: #6B4657;
+    -fx-background-radius: 6px;
+    -fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0, 0, 1);
+}
+
+.main-scroll-pane .scroll-bar .thumb:hover {
+    -fx-background-color: #8F5B71;
+}
+
+.main-scroll-pane .scroll-bar .thumb:pressed {
+    -fx-background-color: #A35474;
+}
+
+.main-scroll-pane .scroll-bar .track {
+    -fx-background-color: #2E1C26;
+    -fx-background-radius: 6px;
+}
+
+.main-scroll-pane .scroll-bar .increment-button, .main-scroll-pane .scroll-bar .decrement-button {
+    -fx-background-color: #472D3C;
+    -fx-background-radius: 6px;
+    -fx-border-color: #4F2F3F;
+    -fx-border-width: 1px;
+    -fx-padding: 3px;
+}
+
+.main-scroll-pane .scroll-bar .increment-button:hover, .main-scroll-pane .scroll-bar .decrement-button:hover {
+    -fx-background-color: #6B4657;
+}
+
+.main-scroll-pane .scroll-bar .increment-button:pressed, .main-scroll-pane .scroll-bar .decrement-button:pressed {
+    -fx-background-color: #8F5B71;
+}
+
+.main-scroll-pane .scroll-bar .increment-arrow, .main-scroll-pane .scroll-bar .decrement-arrow {
+    -fx-shape: "M 0 0 L 6 6 L 12 0 Z";
+    -fx-background-color: #F4C8D4;
+    -fx-padding: 5px;
+}
+
 /* Profile container (top section) */
 .profile-container {
     -fx-background-color: rgba(74, 58, 74, 0.85);
@@ -148,6 +212,7 @@
     -fx-border-color: #2E1C26;
     -fx-border-width: 3px;
     -fx-border-radius: 15px;
+    -fx-max-height: 400px; /* Limit the height of the maps section */
 }
 
 /* Maps title label */
@@ -175,6 +240,7 @@
 .map-list {
     -fx-background-color: transparent;
     -fx-background: transparent;
+    -fx-pref-height: 280px; /* Ensure ListView fits within ScrollPane */
 }
 
 /* ListView cell styling */
@@ -203,7 +269,7 @@
     -fx-text-fill: #F4C8D4;
 }
 
-/* Scroll bar styling */
+/* Scroll bar styling for map ScrollPane */
 .map-scroll-pane .scroll-bar:vertical, .map-scroll-pane .scroll-bar:horizontal {
     -fx-background-color: #2E1C26;
     -fx-background-radius: 6px;
@@ -243,7 +309,7 @@
     -fx-background-color: #6B4657;
 }
 
-.map-scroll-pane .scroll-bar .increment-button:pressed, .map-scroll-pane .scroll-bar .decrement-button:pressed {
+.map-scroll-pane . map-scroll-pane .scroll-bar .increment-button:pressed, .map-scroll-pane .scroll-bar .decrement-button:pressed {
     -fx-background-color: #8F5B71;
 }
 
