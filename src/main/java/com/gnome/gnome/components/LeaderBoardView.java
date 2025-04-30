@@ -239,14 +239,12 @@ public class LeaderBoardView extends VBox {
             }
         }
 
-        // Один элемент: только текущий юзер
         filteredUsers = List.of(currentUser);
 
-        // Обновляем отображение с реальным TOP-местом
         listView.getItems().clear();
         UserGameState gameState = userGameStatesByUsername.get(currentUser.getUsername());
         int score = (gameState != null) ? gameState.getScore() : 0;
-        String display = String.format("TOP-%-3d | %-3d - %-10s", actualRank, score, currentUser.getUsername());
+        String display = String.format("TOP-%-3d | %d - %-10s", actualRank, score, currentUser.getUsername());
         listView.getItems().add(display);
     }
 
@@ -280,10 +278,10 @@ public class LeaderBoardView extends VBox {
             String selected = listView.getSelectionModel().getSelectedItem();
             if (selected != null) {
                 logger.info("Opening profile for: " + selected);
-                BorderPane helloPage = parentController.getMainBorderPane();
-                String username = selected.split(" - ")[0];
+                BorderPane mainPage = parentController.getMainBorderPane();
+                String username = selected.split("- ")[1];
                 logger.info(username);
-                pageSwitch.goProfile(helloPage, username);
+                pageSwitch.goProfile(mainPage, username);
             }
         }
     }

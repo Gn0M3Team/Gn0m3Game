@@ -7,4 +7,25 @@
 [0m[33mTue Apr 29 17:49:13 CEST 2025 WARNING [com.gnome.gnome.editor.controller.EditorPageController] - User does not have permission to load maps.
 [0m[33mTue Apr 29 17:49:14 CEST 2025 WARNING [com.gnome.gnome.editor.controller.EditorPageController] - User does not have permission to load maps.
 [0m[31mWed Apr 30 14:58:04 CEST 2025 SEVERE [com.gnome.gnome.db.DatabaseWrapper] - Cannot begin transaction
+[0m[33mWed Apr 30 17:53:08 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - Invalid playerData: TOP-18  | 0
+[0m[33mWed Apr 30 17:53:16 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - Invalid playerData: TOP-1  | 100
+[0m[33mWed Apr 30 17:53:29 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - Invalid playerData: TOP-18  | 0
+[0m[33mWed Apr 30 17:55:03 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - Invalid playerData: TOP-18 | 0  
+[0m[33mWed Apr 30 17:55:26 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - Invalid playerData: TOP-18  | 0
+[0m[33mWed Apr 30 17:57:46 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - Invalid playerData: TOP-1  | 100
+[0m[33mWed Apr 30 18:00:48 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - Invalid playerData: TOP-18  | 0
+[0m[33mWed Apr 30 18:01:35 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - Invalid playerData: TOP-18  | 0
+[0m[33mWed Apr 30 18:10:15 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - Invalid playerData: artem_test_4
+[0m[33mWed Apr 30 18:22:12 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - User statistics not found for: artem_test_3
+[0m[33mWed Apr 30 18:26:42 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - mapScrollPane is null during initialization
+[0m[33mWed Apr 30 18:26:42 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - Invalid playerData: artem_test_4
+[0m[33mWed Apr 30 18:28:08 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - mapScrollPane is null during initialization
+[0m[33mWed Apr 30 18:33:54 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - User statistics not found for: artem_test_3
+[0m[33mWed Apr 30 18:37:10 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - User statistics not found for: artem_test_3
+[0m[33mWed Apr 30 18:41:35 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - User statistics not found for: artem_test_3
+[0m[33mWed Apr 30 18:42:44 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - User statistics not found for: artem_test_3
+[0m[33mWed Apr 30 18:43:59 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - User statistics not found for: artem_test_3
+[0m[33mWed Apr 30 18:46:03 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - User statistics not found for: artem_test_3
+[0m[33mWed Apr 30 18:46:49 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - User statistics not found for: artem_test_3
+[0m[33mWed Apr 30 18:48:09 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - User statistics not found for: artem_test_3
 [0m

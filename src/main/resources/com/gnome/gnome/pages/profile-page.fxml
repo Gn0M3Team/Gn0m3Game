@@ -52,7 +52,7 @@
                         </GridPane>
 
                         <!-- Ban Button -->
-                        <Button fx:id="banUserButton" text="Ban User" onAction="#handleBanUser" styleClass="profile-ban-button"/>
+                        <Button fx:id="banUserButton" text="Delete User" onAction="#handleBanUser" styleClass="profile-ban-button"/>
                     </VBox>
 
                     <!-- Maps Section -->

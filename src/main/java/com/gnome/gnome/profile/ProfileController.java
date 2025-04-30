@@ -12,6 +12,7 @@ import com.gnome.gnome.models.user.UserGameState;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import com.gnome.gnome.userState.UserState;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
@@ -20,8 +21,10 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Popup;
+import javafx.stage.Stage;
 import javafx.event.ActionEvent;
 import java.util.List;
 import java.util.Objects;
@@ -86,12 +89,13 @@ public class ProfileController {
      * @param playerData The player data string in the format "Score: username"
      */
     public void setPlayer(String playerData) {
-        if (playerData == null || !playerData.contains(": ")) {
+        if (playerData == null) {
             logger.warning("Invalid playerData: " + playerData);
+            System.out.println("Invalid playerData: ");
             return;
         }
 
-        this.selectedUsername = playerData.split(": ")[1];
+        this.selectedUsername = playerData;
         logger.info("Loading profile for: " + selectedUsername);
 
         // Load user data
@@ -191,7 +195,7 @@ public class ProfileController {
 
         System.out.println("ROLE: " + selectedUserRole);
 
-        if ((!isAdmin || isTargetAdmin)) {
+        if (!isAdmin || isTargetAdmin) {
             banUserButton.setVisible(false);
             banUserButton.setManaged(false);
             roleLabel.setDisable(true);
@@ -247,8 +251,6 @@ public class ProfileController {
             double successPercent = map.getTimesPlayed() > 0
                     ? (double) map.getTimesCompleted() / map.getTimesPlayed()
                     : 0;
-//            double rounded = Math.round(successPercent * 100.0) / 100.0;
-
 
             mapListView.getItems().add(String.format(
                     "Map %s: Success Percent -> %.2f%% # Score -> %d # Times Played -> %d # Times Completed -> %d",
@@ -282,14 +284,15 @@ public class ProfileController {
         confirmPopup.setAutoHide(true);
 
         VBox menuBox = new VBox(20);
-        menuBox.getStylesheets().add(getClass().getResource("/com/gnome/gnome/pages/css/new-game.css").toExternalForm());
+        menuBox.getStylesheets().add(getClass().getResource("/com/gnome/gnome/pages/css/profile-delete-user.css").toExternalForm());
         menuBox.setAlignment(Pos.CENTER);
         menuBox.getStyleClass().add("menu-popup");
-        menuBox.setStyle("-fx-background-color: #C0C0C0; -fx-padding: 20; -fx-background-radius: 20;");
+//        menuBox.setStyle("-fx-padding: 20; -fx-background-radius: 20;");
 
         Label title = new Label("Confirm Deletion");
         title.getStyleClass().add("popup-title");
-        Label userLabel = new Label("Delete user: " + selectedUsername + " (" + selectedUserRole + ")?");
+
+        Label userLabel = new Label("Delete user: " + selectedUsername + "(" + selectedUserRole + ")" + "?");
         userLabel.getStyleClass().add("popup-title");
 
         Button yesButton = new Button("Yes, Delete");
@@ -301,10 +304,10 @@ public class ProfileController {
             boolean deleted = userDAO.deleteUserByUsername(selectedUsername);
             confirmPopup.hide();
             if (deleted) {
-                logger.info("User deleted: " + selectedUsername);
+                logger.info("User deleted: " + selectedUserRole);
                 pageSwitch.goMainMenu(profilePage);
             } else {
-                logger.warning("Failed to delete user: " + selectedUsername);
+                logger.warning("Failed to delete user: " + selectedUserRole);
             }
         });
 
@@ -318,14 +321,15 @@ public class ProfileController {
             Bounds bounds = scene.getRoot().localToScreen(scene.getRoot().getBoundsInLocal());
             double centerX = bounds.getMinX() + bounds.getWidth() / 2;
             double centerY = bounds.getMinY() + bounds.getHeight() / 2;
+
             confirmPopup.show(scene.getWindow());
-            confirmPopup.setX(centerX - menuBox.getWidth() / 2);
-            confirmPopup.setY(centerY - menuBox.getHeight() / 2);
-        } else {
-            logger.warning("Cannot show ban user popup: scene is null");
+
+            double popupWidth = confirmPopup.getWidth();
+            double popupHeight = confirmPopup.getHeight();
+            confirmPopup.setX(centerX - popupWidth / 2);
+            confirmPopup.setY(centerY - popupHeight / 2);
         }
     }
-
     /**
      * Moves to the previous role in the role list.
      */
