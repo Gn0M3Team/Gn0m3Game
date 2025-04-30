@@ -1,4 +1,5 @@
 package com.gnome.gnome.camera;
+import com.gnome.gnome.game.component.Chest;
 import com.gnome.gnome.game.component.Coin;
 import com.gnome.gnome.editor.utils.TypeOfObjects;
 import com.gnome.gnome.models.Armor;
@@ -229,7 +230,7 @@ public class Camera {
     }
 
 
-    public void drawPressEHints(GraphicsContext gc, int[][] baseMap, int px, int py) {
+    public void drawPressEHints(GraphicsContext gc, int[][] baseMap, int px, int py, List<Chest> activeChests) {
         int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
         double tw = getTileWidth();
         double th = getTileHeight();
@@ -242,13 +243,17 @@ public class Camera {
             int ny = py + d[1];
 
             if (nx >= 0 && nx < baseMap[0].length && ny >= 0 && ny < baseMap.length) {
-                if (TypeOfObjects.fromValue(baseMap[ny][nx]) == TypeOfObjects.TABLE || TypeOfObjects.fromValue(baseMap[nx][ny]).isChest()) {
+                TypeOfObjects tileType = TypeOfObjects.fromValue(baseMap[ny][nx]);
+                boolean isTable = tileType == TypeOfObjects.TABLE;
+                boolean isChest = activeChests.stream().anyMatch(c -> c.getGridX() == nx && c.getGridY() == ny);
+
+                if (isTable || isChest) {
                     int dx = nx - getStartCol();
                     int dy = ny - getStartRow();
 
                     if (dx >= 0 && dx < viewportSize && dy >= 0 && dy < viewportSize) {
                         double x = dx * tw + tw / 2;
-                        double y = dy * th;
+                        double y = dy * th - th * 0.4;
 
                         gc.setFill(Color.rgb(0, 0, 0, 0.7));
                         gc.fillRoundRect(x - 30, y - 5, 60, 20, 5, 5);

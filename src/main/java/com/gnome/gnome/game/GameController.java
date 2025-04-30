@@ -15,6 +15,7 @@ import com.gnome.gnome.monsters.types.Skeleton;
 import com.gnome.gnome.monsters.types.missels.Arrow;
 import com.gnome.gnome.player.Player;
 import javafx.animation.AnimationTimer;
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -138,11 +139,7 @@ public class GameController {
 
     private static GameController instance; //Singleton Instance
 
-    private final Map<String, Label> tableHints = new HashMap<>();
-
     private Popup tablePopup;
-
-    private final Map<String, Label> chestHints = new HashMap<>();
 
     public static GameController getGameController(){
         if (GameController.instance == null)
@@ -164,11 +161,13 @@ public class GameController {
         this.weapon = weapon;
         this.potion = potion;
 
-        setupMap(monsterList);
+        camera = Camera.getInstance(fieldMap, 0, 0, null, armor, weapon, potion); // Temporary init
+        camera.setPlayer(player); // We'll update player reference later
+        setupMap(monsterList); // Initializes player
+        camera.setPlayer(player); // Re-assign player
+        camera.updateCameraCenter(); // Now it can follow player correctly
+        camera.setMapGrid(fieldMap); // Set after map is ready
 
-        camera      = Camera.getInstance(fieldMap, player.getX(), player.getY(), player, armor, weapon, potion); // Initialize the camera to follow the player
-        camera.updateCameraCenter();
-        camera.setMapGrid(fieldMap);
         instance = this; //Fill singleton instance ONLY on initialization. BECAUSE OTHERWISE THERE IS NO DATA THAT IS REQUIRED IN OTHER CLASSES
 
         viewportCanvas = new Canvas();
@@ -237,15 +236,9 @@ public class GameController {
         double tileSize = camera.getDynamicTileSize();
 
         for (Chest chest : activeChests) {
-            ImageView chestView = chest.getImageView();
-
-            chestView.setFitWidth(tileSize);
-            chestView.setFitHeight(tileSize);
-            chestView.setTranslateX((chest.getGridX() - camera.getStartCol()) * tileSize);
-            chestView.setTranslateY((chest.getGridY() - camera.getStartRow()) * tileSize);
-
-            if (!gameObjectsPane.getChildren().contains(chestView)) {
-                gameObjectsPane.getChildren().add(chestView);
+            chest.updatePositionWithCamera(camera.getStartCol(), camera.getStartRow(), tileSize, tileSize);
+            if (!gameObjectsPane.getChildren().contains(chest.getImageView())) {
+                gameObjectsPane.getChildren().add(chest.getImageView());
             }
         }
     }
@@ -307,7 +300,8 @@ public class GameController {
 
                 if (tileType.isChest()) {
                     double val = returnBasedChestTypeValue(tileType);
-                    activeChests.add(new Chest(row, col, val,tileType.getImagePath(), "/com/gnome/gnome/effects/animated_chest.gif"));
+                    activeChests.add(new Chest(col, row, val,tileType.getImagePath(), "/com/gnome/gnome/effects/animated_chest.gif"));
+                    System.out.println("Creating chest at: " + col + "," + row);
                     fieldMap[row][col] = TypeOfObjects.FLOOR.getValue();
                 }
 
@@ -536,59 +530,27 @@ public class GameController {
             Chest chest = iter.next();
             int cx = chest.getGridX();
             int cy = chest.getGridY();
-            if ((Math.abs(cx - player.getX()) == 1 && cy == player.getY()) ||
-                    (Math.abs(cy - player.getY()) == 1 && cx == player.getX())) {
 
+            boolean isAdjacent = (Math.abs(cx - player.getX()) == 1 && cy == player.getY()) ||
+                    (Math.abs(cy - player.getY()) == 1 && cx == player.getX());
+
+            if (isAdjacent) {
                 chest.animate();
                 player.addCoin(chest.getValue());
-                gameObjectsPane.getChildren().remove(chest.getImageView());
-                iter.remove();  // remove from activeChests
+
+                PauseTransition delay = new PauseTransition(javafx.util.Duration.seconds(1));
+                delay.setOnFinished(event -> {
+                    gameObjectsPane.getChildren().remove(chest.getImageView());
+                    activeChests.remove(chest);
+                    updateCameraViewport();
+                });
+                delay.play();
+
                 break;
             }
         }
     }
 
-    private void showChestHintsNearPlayer() {
-        int px = player.getX();
-        int py = player.getY();
-        int[][] directions = {{-1,0},{1,0},{0,-1},{0,1}};
-        Set<String> visibleHints = new HashSet<>();
-
-        for (int[] d : directions) {
-            int nx = px + d[0];
-            int ny = py + d[1];
-
-            for (Chest chest : activeChests) {
-                if (chest.getGridX() == nx && chest.getGridY() == ny) {
-                    String key = nx + "," + ny;
-                    visibleHints.add(key);
-
-                    Label hint = chestHints.get(key);
-                    if (hint == null) {
-                        hint = new Label("Press E");
-                        hint.setStyle("-fx-background-color: rgba(0,0,0,0.7); -fx-text-fill: yellow; -fx-padding: 4px;");
-                        hint.setMouseTransparent(true);
-                        chestHints.put(key, hint);
-                        gameObjectsPane.getChildren().add(hint);
-                    }
-
-                    double tileSize = camera.getDynamicTileSize();
-                    double tx = (nx - camera.getStartCol()) * tileSize;
-                    double ty = (ny - camera.getStartRow()) * tileSize;
-
-                    hint.setTranslateX(tx);
-                    hint.setTranslateY(ty - 20);
-                    hint.setVisible(true);
-                }
-            }
-        }
-
-        for (Map.Entry<String, Label> entry : chestHints.entrySet()) {
-            if (!visibleHints.contains(entry.getKey())) {
-                entry.getValue().setVisible(false);
-            }
-        }
-    }
 
     private boolean isNearTable(int x, int y) {
         int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
@@ -732,8 +694,7 @@ public class GameController {
         GraphicsContext gc = viewportCanvas.getGraphicsContext2D();
         camera.updateCameraCenter();
         camera.drawViewport(viewportCanvas, coinsOnMap);
-        camera.drawPressEHints(gc, baseMap, player.getX(), player.getY());
-        showChestHintsNearPlayer();
+        camera.drawPressEHints(gc, baseMap, player.getX(), player.getY(), activeChests);
         drawAttackRange(gc, 1);
         double tw = camera.getTileWidth();
         double th = camera.getTileHeight();
@@ -742,6 +703,12 @@ public class GameController {
             monster.updatePositionWithCamera(camera.getStartCol(), camera.getStartRow(),
                     camera.getTileWidth(), camera.getTileHeight());
         }
+
+        for (Chest chest : activeChests) {
+            chest.updatePositionWithCamera(camera.getStartCol(), camera.getStartRow(),
+                    camera.getTileWidth(), camera.getTileHeight());
+        }
+
 
         player.setDynamicTileSize(Math.min(tw, th));
         player.updatePositionWithCamera(
