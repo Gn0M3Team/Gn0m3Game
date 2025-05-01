@@ -32,6 +32,9 @@ public class Player {
     private double currentHealth;
     private final Node representation;
     private double playerCoins = 0;
+    private int score = 0;
+    private int countOfOpenedChest = 0;
+    private int countOfKilledMonsters = 0;
     private static Player instance;
     @Setter
     private double dynamicTileSize;
@@ -109,6 +112,18 @@ public class Player {
 
     public void addCoin(double coin) {
         playerCoins += coin;
+    }
+
+    public void addScore(int score) {
+        this.score += score;
+    }
+
+    public void addCountOfOpenedChest() {
+        countOfOpenedChest++;
+    }
+
+    public void addCountOfKilledMonsters() {
+        countOfKilledMonsters++;
     }
 
     public Bounds getBounds() {

@@ -158,17 +158,6 @@ public class GameController {
         camera.drawViewport(viewportCanvas, coinsOnMap);
     }
 
-    private void loadMainMenu() {
-        try {
-            URL fxmlUrl = getClass().getResource("/com/gnome/gnome/pages/main-menu.fxml");
-            Parent mainRoot = FXMLLoader.load(Objects.requireNonNull(fxmlUrl));
-            Stage stage = (Stage) centerMenuButton.getScene().getWindow();
-            stage.getScene().setRoot(mainRoot);
-        } catch (IOException ex) {
-            logger.severe("Failed to load main page: " + ex.getMessage());
-        }
-    }
-
     private void addGameEntitiesToPane() {
         camera.updateCameraCenter();
         double tileSize = camera.getDynamicTileSize();
@@ -258,6 +247,7 @@ public class GameController {
                 chest.setOpened(true);
                 chest.animate();
                 player.addCoin(Math.round(chest.getValue()));
+                player.addCountOfOpenedChest();
                 break;
             }
         }
@@ -411,6 +401,8 @@ public class GameController {
         eliminated.forEach(monster -> {
             int x = monster.getX(), y = monster.getY();
             coinsOnMap.add(new Coin(x, y, monster.getCost()));
+            player.addScore(monster.getValue());
+            player.addCountOfKilledMonsters();
             gameObjectsPane.getChildren().remove(monster.getRepresentation());
         });
 
@@ -494,7 +486,7 @@ public class GameController {
     }
 
     private void updateMonsters(double delta) {
-        if (isGameOver) return;
+        if (isGameOver || isStop) return;
 
         List<Monster> toRemove = new ArrayList<>();
 

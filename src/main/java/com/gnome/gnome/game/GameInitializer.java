@@ -73,7 +73,6 @@ public class GameInitializer {
             case CHEST_4 -> 4 + random.nextDouble() * 10;
             case CHEST_5 -> 5 + random.nextDouble() * 10;
             case CHEST_6 -> 6 + random.nextDouble() * 10;
-            case CHEST_7 -> 7 + random.nextDouble() * 10;
             default -> throw new IllegalStateException("Unexpected chest type: " + type);
         };
     }

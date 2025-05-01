@@ -1,6 +1,8 @@
 package com.gnome.gnome.game;
 
 import com.gnome.gnome.components.PlayerHealthBar;
+import com.gnome.gnome.player.Player;
+import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
@@ -9,16 +11,14 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Objects;
-import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class GameUIManager {
@@ -43,6 +43,8 @@ public class GameUIManager {
         controller.setStop(true);
         controller.setGameOver(true);
 
+        Player player = controller.getPlayer();
+
         VBox overlay = new VBox(20);
         overlay.setAlignment(Pos.CENTER);
         overlay.setStyle("-fx-background-color: rgba(0,0,0,0.7);");
@@ -52,13 +54,31 @@ public class GameUIManager {
         Label gameOverLabel = new Label("GAME OVER");
         gameOverLabel.setStyle("-fx-font-size: 48px; -fx-text-fill: red;");
 
-        Button exitButton = new Button("Exit");
-        exitButton.setOnAction(e -> Platform.exit());
+        Label coinsLabel = new Label("Coins collected: " + (int) player.getPlayerCoins());
+        Label scoreLabel = new Label("Score: " + player.getScore());
+        Label chestsLabel = new Label("Opened chests: " + player.getCountOfOpenedChest());
+        Label killedLabel = new Label("Monsters killed: " + player.getCountOfKilledMonsters());
+
+        for (Label statLabel : List.of(coinsLabel, scoreLabel, chestsLabel, killedLabel)) {
+            statLabel.setStyle("-fx-text-fill: white; -fx-font-size: 20px;");
+        }
 
         Button restartButton = new Button("Restart");
         restartButton.setOnAction(e -> controller.restartGame());
 
-        overlay.getChildren().addAll(gameOverLabel, restartButton, exitButton);
+        Button exitButton = new Button("Exit");
+        exitButton.setOnAction(e -> Platform.exit());
+
+        overlay.getChildren().addAll(
+                gameOverLabel,
+                coinsLabel,
+                scoreLabel,
+                chestsLabel,
+                killedLabel,
+                restartButton,
+                exitButton
+        );
+
         controller.getCenterStack().getChildren().add(overlay);
         controller.setGameOverOverlay(overlay);
     }
@@ -70,6 +90,12 @@ public class GameUIManager {
         controller.getGameLoop().stop();
         controller.setStop(true);
         popup.setAutoHide(true);
+
+        Pane darkOverlay = new Pane();
+        darkOverlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.6);");
+        darkOverlay.prefWidthProperty().bind(controller.getCenterStack().widthProperty());
+        darkOverlay.prefHeightProperty().bind(controller.getCenterStack().heightProperty());
+        controller.getCenterStack().getChildren().add(darkOverlay);
 
         VBox menuBox = new VBox(20);
         menuBox.setAlignment(Pos.CENTER);
@@ -84,27 +110,24 @@ public class GameUIManager {
             popup.hide();
             controller.getGameLoop().start();
             controller.setStop(false);
+            controller.getCenterStack().getChildren().remove(darkOverlay);
+        });
+
+        Button settingsButton = new Button("Settings");
+        settingsButton.setOnAction(e -> {
+            new SwitchPage().goSetting(controller.getRootBorder());
+            popup.hide();
+            controller.getCenterStack().getChildren().remove(darkOverlay);
         });
 
         Button goBackButton = new Button("Go Back");
         goBackButton.setOnAction(e -> {
-            try {
-                controller.onSceneExit(false);
-                URL fxmlUrl = GameUIManager.class.getResource("/com/gnome/gnome/pages/main-menu.fxml");
-                if (fxmlUrl == null) {
-                    logger.severe("main-menu.fxml not found!");
-                    return;
-                }
-                Parent mainRoot = FXMLLoader.load(fxmlUrl);
-                Stage stage = (Stage) controller.getCenterMenuButton().getScene().getWindow();
-                stage.getScene().setRoot(mainRoot);
-            } catch (IOException ex) {
-                logger.severe("Failed to load main page: " + ex.getMessage());
-            }
-            popup.hide();
+            new SwitchPage().goMainMenu(controller.getRootBorder());
+            popup.hide();  // Закриваємо попап
+            controller.getCenterStack().getChildren().remove(darkOverlay);
         });
 
-        menuBox.getChildren().addAll(title, resumeButton, goBackButton);
+        menuBox.getChildren().addAll(title, resumeButton, settingsButton, goBackButton);
         popup.getContent().add(menuBox);
 
         Scene scene = controller.getCenterMenuButton().getScene();
