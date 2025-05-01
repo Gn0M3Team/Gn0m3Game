@@ -43,21 +43,13 @@ public class Player {
     /**
      * Total number of coins the player has collected.
      */
-    @Setter @Getter
-    private int playerCoins = 10000;
+    private int playerCoins;
 
     @Getter
     private static Player instance;
 
     @Setter
     private double dynamicTileSize;
-
-    @Setter @Getter
-    private int weaponId;
-    @Setter @Getter
-    private int armorId;
-    @Setter @Getter
-    private int potionId;
 
     /**
      * Creates a new player at the specified position with the given maximum health.

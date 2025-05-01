@@ -19,6 +19,8 @@ public class ShopItem {
     @Getter
     private String detailsSk;
     private ItemCategory category;
+    @Getter
+    private String characteristics;
 
     public ShopItem(int id,
                     float cost,
@@ -26,7 +28,8 @@ public class ShopItem {
                     String nameSk,
                     String detailsEng,
                     String detailsSk,
-                    ItemCategory category) {
+                    ItemCategory category,
+                    String characteristics) {
         this.id          = id;
         this.cost        = cost;
         this.nameEng     = nameEng;
@@ -34,6 +37,7 @@ public class ShopItem {
         this.detailsEng  = detailsEng;
         this.detailsSk   = detailsSk;
         this.category    = category;
+        this.characteristics = characteristics;
     }
 
     public void buy() {

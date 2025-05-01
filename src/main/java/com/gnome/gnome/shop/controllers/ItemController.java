@@ -21,6 +21,8 @@ public class ItemController {
     @FXML
     private Label itemName;
     @FXML
+    private Label itemValue;
+    @FXML
     private Label itemDetails;
     @FXML
     private Label itemPrice;
@@ -41,6 +43,7 @@ public class ItemController {
     public void setItemData(ShopItem data, ImageView image) {
         this.item = data;
         itemName.setText(item.getNameEng());
+        itemValue.setText(item.getCharacteristics());
         itemDetails.setText("Details: " + item.getDetailsEng());
         itemPrice.setText(String.valueOf(item.getCost()));
         itemImageContainer.getChildren().clear();

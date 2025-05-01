@@ -37,6 +37,8 @@ public class ShopController {
     private BorderPane shopPopUpPage;
     @FXML
     private GridPane itemsContainer;
+    @FXML
+    private HBox inventoryContainer;
 
     private PageSwitcherInterface pageSwitch;
 

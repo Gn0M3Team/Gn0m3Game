@@ -14,7 +14,7 @@
                 <StackPane fx:id="itemImageContainer" prefHeight="200.0" prefWidth="200.0" />
                 <Label fx:id="itemPrice" prefWidth="200.0" styleClass="item-price" />
             </VBox>
-            <VBox alignment="TOP_LEFT" prefWidth="480.0" spacing="10.0" styleClass="detail-box">
+            <VBox alignment="TOP_LEFT" prefWidth="480.0" spacing="20.0" styleClass="detail-box">
                 <Label fx:id="itemName" styleClass="item-name" />
                 <Label fx:id="itemValue" styleClass="item-value" />
                 <Label fx:id="itemDetails" styleClass="item-details" wrapText="true" />

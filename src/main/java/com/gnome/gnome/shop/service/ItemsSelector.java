@@ -32,7 +32,8 @@ public class ItemsSelector<T> {
                         a.getNameSk(),
                         a.getDetailsEng(),
                         a.getDetailsSk(),
-                        ItemCategory.ARMOR
+                        ItemCategory.ARMOR,
+                        String.format("Def coef.: %.2f", a.getDefCof())
                 ));
             }
             return;
@@ -48,7 +49,8 @@ public class ItemsSelector<T> {
                         w.getNameSk(),
                         w.getDetailsEng(),
                         w.getDetailsSk(),
-                        ItemCategory.WEAPON
+                        ItemCategory.WEAPON,
+                        String.format("DMG: %.2f", w.getAtkValue())
                 ));
             }
             return;
@@ -63,7 +65,8 @@ public class ItemsSelector<T> {
                         p.getNameSk(),
                         p.getDetailsEng(),
                         p.getDetailsSk(),
-                        ItemCategory.POTION
+                        ItemCategory.POTION,
+                        String.format("HP: %+d", p.getScoreVal())
                 ));
             }
             return;
