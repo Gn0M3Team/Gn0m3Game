@@ -65,7 +65,7 @@ public class MapLoaderUIHandler {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/gnome/gnome/pages/game.fxml"));
             Parent root = loader.load();
             GameController controller = loader.getController();
-            controller.initializeWithLoadedMap(selectedMap.getMapData(), monsters, armor, weapon, potion);
+            controller.initializeWithLoadedMap(selectedMap,selectedMap.getMapData(), monsters, armor, weapon, potion);
             primaryStage.getScene().setRoot(root);
         } catch (Exception e) {
             showError("Failed to load game view: " + e.getMessage());

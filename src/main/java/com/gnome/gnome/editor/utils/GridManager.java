@@ -151,7 +151,6 @@ public class GridManager {
             case "Chest_4"      -> TypeOfObjects.CHEST_4.getValue();
             case "Chest_5"      -> TypeOfObjects.CHEST_5.getValue();
             case "Chest_6"      -> TypeOfObjects.CHEST_6.getValue();
-            case "Chest_7"      -> TypeOfObjects.CHEST_7.getValue();
 
             // Doors
             case "Door_1"       -> TypeOfObjects.DOOR_1.getValue();

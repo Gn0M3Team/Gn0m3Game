@@ -17,7 +17,7 @@ public class MovementService {
     }
 
     public void handleKeyPress(KeyEvent event) {
-        if (controller.isGameOver()) return;
+        if (controller.isGameOver() || controller.isStop()) return;
         switch (event.getCode()) {
             case LEFT, A, RIGHT, D, UP, W, DOWN, S -> handleMovement(event);
             case E -> handleInteraction();

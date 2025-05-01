@@ -19,6 +19,7 @@ public class Goblin extends Monster {
                 new OmnidirectionalMovement(),
                 TypeOfObjects.GOBLIN.getImagePath(),
                 "/com/gnome/gnome/effects/goblin_damaged.gif",
-                "/com/gnome/gnome/effects/red_monster.gif");
+                "/com/gnome/gnome/effects/red_monster.gif",
+                dbMonster.getScore_val());
     }
 }

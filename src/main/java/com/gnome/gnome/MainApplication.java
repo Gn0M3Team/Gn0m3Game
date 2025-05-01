@@ -45,10 +45,6 @@ public class MainApplication extends Application {
             controller.setPrimaryStage(stage);
         }
 
-        MonsterDAO monsterDAO = new MonsterDAO();
-        monsterDAO.getAllMonsters();
-
-
         Scene scene = new Scene(root);
         stage.setFullScreen(true);
         stage.setTitle("Dark Rifter");
