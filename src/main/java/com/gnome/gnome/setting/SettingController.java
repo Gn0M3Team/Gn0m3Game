@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 
+import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 public class SettingController {
@@ -28,11 +29,19 @@ public class SettingController {
     private double soundVolume = 50.0;
     private char selectedLanguage;
 
+    private ResourceBundle bundle;
 
     @FXML
     public void initialize() {
         pageSwitch = new SwitchPage();
         selectedLanguage = MainApplication.lang;
+
+        if (MainApplication.lang == 'S'){
+            this.bundle = ResourceBundle.getBundle("slovak");
+        }
+        else {
+            this.bundle = ResourceBundle.getBundle("english");
+        }
 
         // Language
         languageComboBox.getItems().addAll("English (eng)", "Slovak (sk)");
@@ -49,14 +58,14 @@ public class SettingController {
 
         // Ambient
         ambientToggleButton.setSelected(MainApplication.ambientEnabled);
-        ambientToggleButton.setText(MainApplication.ambientEnabled ? "Ambient: ON" : "Ambient: OFF");
+        ambientToggleButton.setText(MainApplication.ambientEnabled ? bundle.getString("settings.ambient.on") : bundle.getString("settings.ambient.off"));
         if (MainApplication.ambientEnabled && !MusicWizard.ambientRunning) {
             MusicWizard.start_ambient();
         }
 
         // Music
         musicToggleButton.setSelected(MainApplication.musicEnabled);
-        musicToggleButton.setText(MainApplication.musicEnabled ? "Music: ON" : "Music: OFF");
+        musicToggleButton.setText(MainApplication.musicEnabled ? bundle.getString("settings.music.on")  : bundle.getString("settings.music.off"));
         if (MainApplication.musicEnabled && !MusicWizard.musicRunning) {
             MusicWizard.start_music_loop();
         }
@@ -67,7 +76,7 @@ public class SettingController {
     @FXML
     public void handleMusicToggle(ActionEvent e) {
         MainApplication.musicEnabled = musicToggleButton.isSelected();
-        musicToggleButton.setText(MainApplication.musicEnabled ? "Music: ON" : "Music: OFF");
+        musicToggleButton.setText(MainApplication.musicEnabled ? bundle.getString("settings.music.on") : bundle.getString("settings.music.off") );
 
         if (MainApplication.musicEnabled) {
             if (!MusicWizard.musicRunning) {
@@ -82,7 +91,7 @@ public class SettingController {
     @FXML
     public void handleAmbientToggle(ActionEvent e) {
         MainApplication.ambientEnabled = ambientToggleButton.isSelected();
-        ambientToggleButton.setText(MainApplication.ambientEnabled ? "Ambient: ON" : "Ambient: OFF");
+        ambientToggleButton.setText(MainApplication.ambientEnabled ? bundle.getString("settings.ambient.on") : bundle.getString("settings.ambient.off"));
 
         if (MainApplication.ambientEnabled) {
             if (!MusicWizard.ambientRunning) {

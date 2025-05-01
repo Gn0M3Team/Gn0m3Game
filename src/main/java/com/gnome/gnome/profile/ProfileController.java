@@ -1,5 +1,6 @@
 package com.gnome.gnome.profile;
 
+import com.gnome.gnome.MainApplication;
 import com.gnome.gnome.dao.UserStatisticsDAO;
 import com.gnome.gnome.dao.userDAO.AuthUserDAO;
 import com.gnome.gnome.dao.MapDAO;
@@ -31,6 +32,7 @@ import javafx.event.ActionEvent;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
+import java.util.ResourceBundle;
 
 public class ProfileController {
 
@@ -58,6 +60,8 @@ public class ProfileController {
     @FXML private BorderPane profilePage;
     @FXML private ScrollPane mainScrollPane;
 
+    private ResourceBundle bundle;
+
     // Dependencies
     private PageSwitcherInterface pageSwitch;
     private final AuthUserDAO userDAO = new AuthUserDAO();
@@ -77,6 +81,14 @@ public class ProfileController {
     public void initialize() {
         // Initialize page switcher
         pageSwitch = new SwitchPage();
+
+        if (MainApplication.lang == 'S'){
+            this.bundle = ResourceBundle.getBundle("slovak");
+        }
+        else {
+            this.bundle = ResourceBundle.getBundle("english");
+        }
+
 
         // Configure main ScrollPane
         if (mainScrollPane != null) {
@@ -118,32 +130,65 @@ public class ProfileController {
         UserStatistics userStatistics = userStatisticsDAO.getUserStatisticsByUsername(selectedUsername);
 
         // Update UI with user data
-        nameLabel.setText("Profile of " + user.getUsername());
-        recordLabel.setText("Score: " + (gameState != null ? gameState.getScore() : 0));
-        mapOwner.setText(Objects.equals(userState.getUsername(), user.getUsername()) ? "Your Maps"  : user.getUsername() + " Maps");
+        nameLabel.setText(String.format(bundle.getString("profile.title"), user.getUsername()));
+        recordLabel.setText(String.format(bundle.getString("profile.score") ,  (gameState != null ? gameState.getScore() : 0)));
+
+        String mapsProp = Objects.equals(userState.getUsername(), user.getUsername())
+                ? "profile.maps.your"
+                : "profile.maps.user";
+
+        mapOwner.setText(Objects.equals(userState.getUsername(), user.getUsername())
+                ? bundle.getString(mapsProp)
+                : String.format(bundle.getString(mapsProp), user.getUsername()));
 
 
         if (userStatistics != null) {
-            totalMapsPlayed.setText("Games Played: " + userStatistics.getTotalMapsPlayed());
-            totalWins.setText("Wins: " + userStatistics.getTotalWins());
-            totalDeaths.setText("Deaths: " + userStatistics.getTotalDeaths());
-            totalMonsterKilled.setText("Monsters Killed: " + userStatistics.getTotalMonstersKilled());
-            totalChestOpened.setText("Chests Opened: " + userStatistics.getTotalChestsOpened());
+            totalMapsPlayed.setText(
+                    String.format(bundle.getString("profile.stats.gamesplayed"),
+                    userStatistics.getTotalMapsPlayed()));
+
+            totalWins.setText(
+                    String.format(bundle.getString("profile.stats.wins"),
+                    userStatistics.getTotalWins()));
+
+            totalDeaths.setText(
+                    String.format(bundle.getString("profile.stats.deaths"),
+                    userStatistics.getTotalDeaths()));
+
+            totalMonsterKilled.setText(
+                    String.format(bundle.getString("profile.stats.monsterskilled"),
+                    userStatistics.getTotalMonstersKilled()));
+
+            totalChestOpened.setText(
+                    String.format(bundle.getString("profile.stats.chestsopened"),
+                    userStatistics.getTotalChestsOpened()));
+
             double ratio = userStatistics.getTotalMapsPlayed() > 0
                     ? (double) userStatistics.getTotalWins() / userStatistics.getTotalMapsPlayed()
                     : 0;
             double rounded = Math.round(ratio * 100.0) / 100.0;
-            winningPercentage.setText("Win Rate: " + rounded + "%");
-            deathCounter.setText("Death Count: " + userStatistics.getTotalDeaths());
+            winningPercentage.setText(
+                    String.format(bundle.getString("profile.stats.winrate"),
+                    rounded));
+            deathCounter.setText(
+                    String.format(bundle.getString("profile.stats.deathcount"),
+                    userStatistics.getTotalDeaths()));
+
         } else {
             logger.warning("User statistics not found for: " + selectedUsername);
             resetStats();
         }
 
         if (gameState != null) {
-            mapLevel.setText("Map Level: " + gameState.getMapLevel());
+            mapLevel.setText(String.format(
+                    bundle.getString("profile.stats.maplevel"),
+                    gameState.getMapLevel()
+            ));
         } else {
-            mapLevel.setText("Map Level: 0");
+            mapLevel.setText(String.format(
+                    bundle.getString("profile.stats.maplevel"),
+                    0
+            ));
         }
 
         // Set default avatar
@@ -167,7 +212,7 @@ public class ProfileController {
         // Load maps
         mapListView.getItems().clear();
         if (userMaps == null || userMaps.isEmpty()) {
-            mapListView.setPlaceholder(new Label("No maps available"));
+            mapListView.setPlaceholder(new Label(bundle.getString("profile.maps.empty")));
         } else {
             loadAllMaps();
             if (mapListView != null) {
@@ -182,13 +227,13 @@ public class ProfileController {
      * Resets stats labels to default values if user statistics are unavailable.
      */
     private void resetStats() {
-        totalMapsPlayed.setText("Games Played: 0");
-        totalWins.setText("Wins: 0");
-        totalDeaths.setText("Deaths: 0");
-        totalMonsterKilled.setText("Monsters Killed: 0");
-        totalChestOpened.setText("Chests Opened: 0");
-        winningPercentage.setText("Win Rate: 0%");
-        deathCounter.setText("Death Count: 0");
+        totalMapsPlayed.setText(String.format(bundle.getString("profile.stats.gamesplayed"), 0));
+        totalWins.setText(String.format(bundle.getString("profile.stats.wins"), 0));
+        totalDeaths.setText(String.format(bundle.getString("profile.stats.deaths"), 0));
+        totalMonsterKilled.setText(String.format(bundle.getString("profile.stats.monsterskilled"), 0));
+        totalChestOpened.setText(String.format(bundle.getString("profile.stats.chestsopened"), 0));
+        winningPercentage.setText(String.format(bundle.getString("profile.stats.winrate"), 0.0));
+        deathCounter.setText(String.format(bundle.getString("profile.stats.deathcount"), 0));
     }
 
     /**
@@ -258,7 +303,7 @@ public class ProfileController {
                     : 0;
 
             mapListView.getItems().add(String.format(
-                    "Map %s: Success Percent -> %.2f%% # Score -> %d # Times Played -> %d # Times Completed -> %d",
+                    bundle.getString("profile.maps.entry"),
                     map.getMapNameEng(),
                     successPercent,
                     map.getScoreVal(),
@@ -296,15 +341,19 @@ public class ProfileController {
         menuBox.getStyleClass().add("menu-popup");
 //        menuBox.setStyle("-fx-padding: 20; -fx-background-radius: 20;");
 
-        Label title = new Label("Confirm Deletion");
+        Label title = new Label(bundle.getString("profile.delete.title"));
         title.getStyleClass().add("popup-title");
 
-        Label userLabel = new Label("Delete user: " + selectedUsername + "(" + selectedUserRole + ")" + "?");
+        Label userLabel = new Label(String.format(
+                bundle.getString("profile.delete.message"),
+                selectedUsername,
+                selectedUserRole
+        ));
         userLabel.getStyleClass().add("popup-title");
 
-        Button yesButton = new Button("Yes, Delete");
+        Button yesButton = new Button(bundle.getString("button.delete.yes"));
         yesButton.getStyleClass().add("menu-button");
-        Button noButton = new Button("Cancel");
+        Button noButton = new Button(bundle.getString("button.cancel"));
         noButton.getStyleClass().add("menu-button");
 
         yesButton.setOnAction(e -> {
@@ -313,10 +362,10 @@ public class ProfileController {
             if (deleted) {
                 logger.info("User deleted: " + selectedUserRole);
                 pageSwitch.goMainMenu(profilePage);
-                CustomPopupUtil.showSuccess(stage, "User was deleted successfully!");
+                CustomPopupUtil.showSuccess(stage, bundle.getString("popup.user.deleted.success"));
             } else {
                 logger.warning("Failed to delete user: " + selectedUserRole);
-                CustomPopupUtil.showError(stage, "Failed to delete user: " + selectedUserRole);
+                CustomPopupUtil.showError(stage, String.format(bundle.getString("popup.user.delete.failed"),selectedUserRole) );
             }
         });
 
@@ -365,7 +414,7 @@ public class ProfileController {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         if (user == null) {
             logger.warning("Cannot update role: user is null");
-            CustomPopupUtil.showError(stage, "Cannot update role: user is null");
+            CustomPopupUtil.showError(stage, bundle.getString("popup.user.update.null"));
             return;
         }
 
@@ -374,12 +423,19 @@ public class ProfileController {
         boolean updated = userDAO.updateUserRole(user);
         if (updated) {
             logger.info("Role updated to " + selectedRole + " for user " + selectedUsername);
-            CustomPopupUtil.showSuccess(stage, "Role updated to " + selectedRole + " for user " + selectedUsername);
+            CustomPopupUtil.showSuccess(stage, String.format(
+                    bundle.getString("popup.role.updated.success"),
+                    selectedRole.toString(),  // Преобразуем enum в строку
+                    selectedUsername
+            ));
             selectedUserRole = selectedRole;
             updateButtonVisibility();
         } else {
             logger.warning("Failed to update role for user: " + selectedUsername);
-            CustomPopupUtil.showError(stage, "Failed to update role for user: " + selectedUsername);
+            CustomPopupUtil.showError(stage, String.format(
+                    bundle.getString("popup.role.update.failed"),
+                    selectedUsername
+            ));
         }
     }
 }

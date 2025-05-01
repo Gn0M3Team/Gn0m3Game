@@ -26,7 +26,7 @@ public class MainApplication extends Application {
     public void start(Stage stage) throws IOException {
 
         MusicWizard.start_music_loop();
-        MusicWizard.start_ambient();
+//        MusicWizard.start_ambient();
 
         Map<String, Boolean> properties = getProperties();
         skip_db = properties.get("skip_db");

@@ -1,5 +1,6 @@
 package com.gnome.gnome.music;
 
+import com.gnome.gnome.MainApplication;
 import lombok.SneakyThrows;
 
 import javax.sound.sampled.*;
@@ -315,7 +316,7 @@ public class MusicWizard {
             }
             setup_music(filePath);
             music.loop(Clip.LOOP_CONTINUOUSLY);
-            shiftVolumeTo(1);
+            shiftVolumeTo(0.1);
             musicRunning = true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -327,11 +328,7 @@ public class MusicWizard {
      */
     public static void stop_music() {
         stop = true;
-        if (music != null && music.isRunning()) {
-            music.stop();
-            music.close();
-        }
-        musicRunning = false;
+
     }
 
 }
