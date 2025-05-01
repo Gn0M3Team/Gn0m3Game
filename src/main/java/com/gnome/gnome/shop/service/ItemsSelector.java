@@ -8,7 +8,6 @@ import com.gnome.gnome.models.Potion;
 import com.gnome.gnome.models.Weapon;
 import com.gnome.gnome.shop.utils.ItemCategory;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

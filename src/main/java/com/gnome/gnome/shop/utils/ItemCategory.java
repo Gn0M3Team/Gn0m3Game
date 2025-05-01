@@ -18,7 +18,7 @@ public enum ItemCategory {
     POTION("potions", UserState.getInstance()::setPotionId);
 
     @Getter
-    private final String folder;
+    private final String categoryName;
     /**
      * Function to assign the bought item to the user:
      * accepts the item ID and calls the corresponding method
@@ -28,8 +28,8 @@ public enum ItemCategory {
      */
     private final Consumer<Integer> assigner;
 
-    ItemCategory(String folder, Consumer<Integer> assigner) {
-        this.folder = folder;
+    ItemCategory(String categoryName, Consumer<Integer> assigner) {
+        this.categoryName = categoryName;
         this.assigner = assigner;
     }
 

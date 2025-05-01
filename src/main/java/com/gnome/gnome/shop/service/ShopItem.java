@@ -39,6 +39,9 @@ public class ShopItem {
         this.imageName = imageName != null ? "tiles/" + imageName + ".png" : "default-no-item.png";
     }
 
+    /**
+     * Assign the item to the corresponding field in UserState
+     */
     public void buy() {
         category.applyBuy(this.id);
     }

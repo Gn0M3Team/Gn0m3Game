@@ -32,7 +32,6 @@ public class UserState {
     public static UserState getInstance() {
         if (instance == null) {
             instance = new UserState();
-            instance.setBalance(10000);
         }
         return instance;
     }

@@ -16,7 +16,6 @@
                 <Button fx:id="backGameButton" onAction="#backToGameButtonClick" prefWidth="230" styleClass="menu-button" text="back to game" />
                 <Button fx:id="mainMenuButton" onAction="#mainMenuButtonClick" prefWidth="230" styleClass="menu-button" text="mein menu" />
             </HBox>
-         <Button mnemonicParsing="false" onAction="#switchToShop" text="Shop" />
         </VBox>
     </top>
     <center>
