@@ -95,6 +95,8 @@ public abstract class Monster {
     private long lastMoveTime = 0;
     private static final long MOVE_COOLDOWN = 500_000_000L; // 0.5 seconds
 
+    private Image defaultImage;
+
     /**
      * Constructor for the Monster class. This method is called when a new Monster object is created.
      * It initializes all the monster's attributes with the provided values.
@@ -181,7 +183,6 @@ public abstract class Monster {
      */
     public void move() {
         if (movementStrategy != null) {
-            System.out.println("Monster " + nameEng + " moving from (" + x + ", " + y + ")");
             movementStrategy.move(this);
             if (representation != null) {
                 representation.getProperties().put("gridX", x);
@@ -197,8 +198,8 @@ public abstract class Monster {
         if (imageStream == null) {
             throw new RuntimeException("Missing monster image: " + imagePath);
         }
-        Image img = new Image(imageStream);
-        representation = new ImageView(img);
+        defaultImage = new Image(imageStream);
+        representation = new ImageView(defaultImage);
         representation.setFitWidth(TILE_SIZE * 0.6);
         representation.setFitHeight(TILE_SIZE * 0.6);
 
@@ -263,13 +264,12 @@ public abstract class Monster {
         }
 
         Image gifImage = new Image(gifStream);
-        Image originalImage = representation.getImage();
 
         representation.setImage(gifImage);
 
         PauseTransition delay = new PauseTransition(Duration.seconds(1));
         delay.setOnFinished(evt -> {
-            representation.setImage(originalImage);
+            representation.setImage(defaultImage);
             isHitEffectPlaying = false;
             if (onFinish != null) onFinish.run();
         });
@@ -306,14 +306,14 @@ public abstract class Monster {
         if (dx <= attackRange && dy <= attackRange) {
             isMeleeAttacking = true;
 
-            Image originalImage = representation.getImage();
             Image attackImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream(attackImagePath)));
             representation.setImage(attackImage);
 
             activeAttackAnimation = new Timeline(
                     new KeyFrame(Duration.seconds(1), e -> {
-                        representation.setImage(originalImage);
+                        representation.setImage(defaultImage);
                         isMeleeAttacking = false;
+                        activeAttackAnimation = null;
 
                         int newDx = Math.abs(player.getX() - x);
                         int newDy = Math.abs(player.getY() - y);
@@ -322,29 +322,12 @@ public abstract class Monster {
                             player.takeDamage(attack);
                         }
                         lastMeleeAttackTime = currentTime;
-                        activeAttackAnimation = null;
+
+                        System.out.println("Finished attack animation for " + nameEng);
                     })
             );
             activeAttackAnimation.setCycleCount(1);
             activeAttackAnimation.play();
-        }
-    }
-
-
-    public void cancelMeleeAttackIfPlayerOutOfRange(Player player) {
-        int dx = Math.abs(player.getX() - getX());
-        int dy = Math.abs(player.getY() - getY());
-
-        if ((dx > getAttackRange() || dy > getAttackRange()) && isMeleeAttacking) {
-            setMeleeAttacking(false);
-
-            if (activeAttackAnimation != null) {
-                activeAttackAnimation.stop();
-                activeAttackAnimation = null;
-            }
-
-            Image originalImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)));
-            representation.setImage(originalImage);
         }
     }
 
@@ -371,6 +354,8 @@ public abstract class Monster {
 
             TypeOfObjects type = TypeOfObjects.fromValue(tile);
             boolean chestOnTile = GameController.getGameController().isBlocked(newX, newY, this);
+
+            if (type == TypeOfObjects.RIVER) takeDamage(health * 0.1);
 
             if (type.isObstacle() || chestOnTile) {
                 setPosition(oldX, oldY);

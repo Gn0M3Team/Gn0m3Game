@@ -37,7 +37,7 @@ public class GameUIManager {
     }
 
     public void showGameOverOverlay() {
-        if (controller.getGameOverOverlay() != null || controller.isStop()) return;
+        if (controller.getGameOverOverlay() != null || !controller.isGameOver()) return;
 
         controller.getGameLoop().stop();
         controller.setStop(true);

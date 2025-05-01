@@ -70,6 +70,7 @@ public class GameController {
     private final long UPDATE_INTERVAL = 16_666_666L;
     private long lastTime = 0;
     private boolean isStop = false;
+    private boolean isGameOver = false;
 
     private Player player;
     private Pane gameObjectsPane;
@@ -224,7 +225,6 @@ public class GameController {
 
         checkCoinPickup();
         renderGame();
-        monsterList.forEach(m -> m.cancelMeleeAttackIfPlayerOutOfRange(player));
     }
 
     boolean isNearChest(int x, int y) {
@@ -295,7 +295,8 @@ public class GameController {
      */
     private void onRiverStepped() {
         if (debugModGame) System.out.println("Player stepped on river at (" + player.getX() + ", " + player.getY() + ")");
-        player.takeDamage(player.getCurrentHealth());
+        double damage = player.getCurrentHealth() * 0.1;
+        player.takeDamage(damage);
         updatePlayerHealthBar();
     }
 
@@ -426,6 +427,7 @@ public class GameController {
     }
 
     private void updateMonsters(double delta) {
+        if (isGameOver) return;
         for (Monster monster : monsterList) {
             if (monster.getRepresentation().getParent() == null) {
                 gameObjectsPane.getChildren().add(monster.getRepresentation());
@@ -444,7 +446,6 @@ public class GameController {
                 }
             } else {
                 monster.meleeAttack(player, gameObjectsPane, System.nanoTime());
-                monster.cancelMeleeAttackIfPlayerOutOfRange(player);
             }
         }
     }

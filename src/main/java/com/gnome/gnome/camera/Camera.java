@@ -110,10 +110,10 @@ public class Camera {
                         double y = dy * th - th * 0.4;
 
                         gc.setFill(Color.rgb(0, 0, 0, 0.7));
-                        gc.fillRoundRect(x - 30, y - 5, 60, 20, 5, 5);
+                        gc.fillRoundRect(x - 30, y + 14, 60, 20, 5, 5);
 
                         gc.setFill(Color.WHITE);
-                        gc.fillText("Press E", x - 20, y + 7);
+                        gc.fillText("Press E", x - 20, y + 22);
                     }
                 }
             }
