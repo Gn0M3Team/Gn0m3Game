@@ -1,5 +1,6 @@
 package com.gnome.gnome.models;
 
+import com.gnome.gnome.MainApplication;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -18,4 +19,17 @@ public class Weapon {
     private String detailsEng;
     private String detailsSk;
     private String img;
+
+    public String getDetails() {
+        if (MainApplication.lang == 'E')
+            return detailsEng;
+        else
+            return detailsSk;
+    }
+    public String getName() {
+        if (MainApplication.lang == 'E')
+            return nameEng;
+        else
+            return nameSk;
+    }
 }

@@ -1,10 +1,11 @@
 package com.gnome.gnome;
 
-import com.gnome.gnome.dao.MapDAO;
+import com.gnome.gnome.dao.*;
 import com.gnome.gnome.dao.userDAO.AuthUserDAO;
+import com.gnome.gnome.game.MapLoaderService;
+import com.gnome.gnome.game.MapLoaderUIHandler;
 import com.gnome.gnome.models.user.PlayerRole;
 import com.gnome.gnome.userState.UserState;
-import com.gnome.gnome.game.MapLoader;
 import com.gnome.gnome.models.Map;
 import com.gnome.gnome.models.user.AuthUser;
 import com.gnome.gnome.music.MusicWizard;
@@ -27,7 +28,11 @@ import javafx.util.Duration;
 import java.util.Objects;
 
 public class MainController {
+// TODO: If we have time, we need to change logic with creating DAO, because we in two places crete monster dao, map dao, and for me we need to change this.
 
+    @FXML private Button newGameButton;
+    @FXML private Label menuLabel;
+    @FXML private Button LeaderBoardButton;
     @FXML private ImageView musicIcon;
     @FXML
     private Button musicButton;
@@ -47,7 +52,7 @@ public class MainController {
 
     Stage primaryStage;
 
-    MapLoader mapLoader;
+    MapLoaderService mapLoaderService;
 
 
     /**
@@ -81,17 +86,24 @@ public class MainController {
 
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
-        this.mapLoader = new MapLoader(primaryStage);
+
+        MapDAO mapDAO = new MapDAO();
+        MonsterDAO monsterDAO = new MonsterDAO();
+        ArmorDAO armorDAO = new ArmorDAO();
+        WeaponDAO weaponDAO = new WeaponDAO();
+        PotionDAO potionDAO = new PotionDAO();
+
+        this.mapLoaderService = new MapLoaderService(monsterDAO, armorDAO, weaponDAO, potionDAO);
+
 
         continueGameButton.setOnAction(e -> {
-            if (mapLoader != null) {
-                int currentLevel = UserState.getInstance().getMapLevel();
-                MapDAO levelMapDAO = new MapDAO();
-                Map selectedMap = levelMapDAO.getMapByLevel(currentLevel);
-                mapLoader.showStartMap(selectedMap);
+            if (mapLoaderService != null) {
+                Map selectedMap = mapDAO.getMapByLevel(1);
+                new MapLoaderUIHandler(mapLoaderService, primaryStage).showStartMap(selectedMap);
             }
         });
     }
+
 
 //    TODO: delete in final
     /**
@@ -192,6 +204,9 @@ public class MainController {
             MusicWizard.stop_ambient();
         }
     }
+
+    @FXML
+    public void switchToShop() { pageSwitch.goShop(mainBorderPane); }
 
     /**
      * Closes the application.

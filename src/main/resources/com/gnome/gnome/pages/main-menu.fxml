@@ -18,7 +18,7 @@
 
     <top>
         <HBox alignment="CENTER_LEFT" spacing="10" styleClass="top-bar">
-            <Button onAction="#onLeaderBoardButtonClick" styleClass="top-button" text="Leader board">
+            <Button fx:id="LeaderBoardButton" onAction="#onLeaderBoardButtonClick" styleClass="top-button" text="%leaderboard.button">
             </Button>
 
             <Label fx:id="nicknameLabel" styleClass="top-label" />
@@ -37,18 +37,18 @@
     <center>
         <StackPane>
             <VBox alignment="CENTER" maxWidth="400" spacing="20">
-                <Label styleClass="menu-title" text="Dark Rifter" />
+                <Label fx:id="menuLabel" styleClass="menu-title" text="Dark Rifter" />
 
-                <Button maxWidth="Infinity" onAction="#onNewGameButtonClick" styleClass="menu-button" text="New game" />
+                <Button fx:id="newGameButton" maxWidth="Infinity" onAction="#onNewGameButtonClick" styleClass="menu-button" text="%newgame.button" />
 
-                <Button fx:id="continueGameButton" maxWidth="Infinity" styleClass="menu-button" text="Continue the game" />
+                <Button fx:id="continueGameButton" maxWidth="Infinity" styleClass="menu-button" text="%continue.button" />
 
-                <Button fx:id="editorButton" maxWidth="Infinity" onAction="#onEditorButtonClick" styleClass="menu-button" text="Create a map" />
+                <Button fx:id="editorButton" maxWidth="Infinity" onAction="#onEditorButtonClick" styleClass="menu-button" text="%editor.button" />
 
                 <HBox alignment="CENTER" maxWidth="400" spacing="10">
-                    <Button maxWidth="Infinity" onAction="#onSettingsButtonClick" prefHeight="18.0" prefWidth="236.0" styleClass="menu-button" text="Settings" />
+                    <Button maxWidth="Infinity" onAction="#onSettingsButtonClick" prefHeight="18.0" prefWidth="236.0" styleClass="menu-button" text="%settings.button" />
 
-                    <Button maxWidth="Infinity" onAction="#onExitButtonClick" prefHeight="18.0" prefWidth="224.0" styleClass="menu-button" text="Exit" />
+                    <Button maxWidth="Infinity" onAction="#onExitButtonClick" prefHeight="18.0" prefWidth="224.0" styleClass="menu-button" text="%exit.button" />
                 </HBox>
 
             </VBox>

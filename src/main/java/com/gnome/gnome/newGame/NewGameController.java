@@ -1,6 +1,8 @@
 package com.gnome.gnome.newGame;
 
-import com.gnome.gnome.game.MapLoader;
+import com.gnome.gnome.dao.*;
+import com.gnome.gnome.game.MapLoaderService;
+import com.gnome.gnome.game.MapLoaderUIHandler;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import javafx.application.Platform;
@@ -21,7 +23,7 @@ public class NewGameController {
 
     Stage primaryStage;
 
-    MapLoader mapLoader;
+    MapLoaderService mapLoaderService;
 
 
 
@@ -31,9 +33,14 @@ public class NewGameController {
         pageSwitch = new SwitchPage();
         otherModeButton.setOnAction(e -> showUnderDevelopmentAlert());
         backButton.setOnAction(e -> goBackToMainMenu());
+        MonsterDAO monsterDAO = new MonsterDAO();
+        ArmorDAO armorDAO = new ArmorDAO();
+        WeaponDAO weaponDAO = new WeaponDAO();
+        PotionDAO potionDAO = new PotionDAO();
         Platform.runLater(() -> {
             primaryStage = (Stage) storyModeButton.getScene().getWindow();
-            mapLoader = new MapLoader(primaryStage);
+            mapLoaderService = new MapLoaderService(monsterDAO, armorDAO, weaponDAO, potionDAO);
+            new MapLoaderUIHandler(mapLoaderService, primaryStage);
         });
     }
 

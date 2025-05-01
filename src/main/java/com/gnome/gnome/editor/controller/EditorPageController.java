@@ -2,19 +2,18 @@ package com.gnome.gnome.editor.controller;
 
 import com.gnome.gnome.dao.MapDAO;
 import com.gnome.gnome.editor.javafxobj.TemplateMapDialog;
-import com.gnome.gnome.editor.utils.BotType;
+import com.gnome.gnome.editor.utils.*;
 import com.gnome.gnome.dao.userDAO.UserSession;
 import com.gnome.gnome.models.Map;
 import com.gnome.gnome.editor.javafxobj.SaveMapDialogBox;
 import com.gnome.gnome.editor.javafxobj.SelectorMapDialogBox;
-import com.gnome.gnome.editor.utils.CategoryGenerator;
-import com.gnome.gnome.editor.utils.GenerateGrid;
-import com.gnome.gnome.editor.utils.GridManager;
 import com.gnome.gnome.exceptions.DataAccessException;
 import com.gnome.gnome.models.user.PlayerRole;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import com.gnome.gnome.userState.UserState;
+import com.gnome.gnome.utils.AlertUtil;
+import com.gnome.gnome.utils.CustomPopupUtil;
 import com.gnome.gnome.utils.annotation.MyValueInjection;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -22,6 +21,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
@@ -160,96 +160,6 @@ public class EditorPageController {
     }
 
     /**
-     * Handles clicks on any main category button.
-     * <p>
-     * This method uses CategoryGenerator to asynchronously retrieve the items for the selected category.
-     * Items are either strings (in test mode) or ImageViews (from S3). After the items are retrieved,
-     * the method dynamically creates inline buttons or adds images, then shows the inline scroll pane
-     * while hiding the main category row.
-     *
-     * @param event the button click event
-     */
-    @FXML
-    private void onCategoryButtonClick(ActionEvent event) {
-        Button clickedButton = (Button) event.getSource();
-        String category = (String) clickedButton.getUserData();
-
-        // Clear previous inline buttons.
-        inlineButtonsBox.getChildren().clear();
-
-        // Used the CategoryGenerator to retrieve items for the given category.
-        // The returned items will be Strings (when test==true) or ImageViews (when test==false).
-        CompletableFuture<List<Object>> futureItems = categoryGenerator.getItemsForCategory(category);
-        futureItems.thenAccept(items -> {
-            Platform.runLater(() -> {
-                // Loop through the retrieved items.
-                for (Object item : items) {
-                    if (item instanceof BotType botType) {
-                        createInlineButton(botType);
-                    }
-                }
-
-
-                // Add a "Back" button to allow returning to the main category row.
-                Button backButton = new Button("Back");
-
-                backButton.setOnAction(ev -> {
-                    onBackToMainButtonClick(ev);
-                    if (prevButtonMonster != null) {
-                        GenerateGrid.getInstance().setSelectedBotType(null);
-                    }
-                });
-
-                inlineButtonsBox.getChildren().add(backButton);
-
-                // Hide the main row and show the inline scroll pane.
-                mainButtonsBox.setVisible(false);
-                mainButtonsBox.setManaged(false);
-                inlineScrollPane.setVisible(true);
-                inlineScrollPane.setManaged(true);
-            });
-        }).exceptionally(ex -> {
-            logger.log(Level.SEVERE, "Failed to retrieve category items", ex);
-            return null;
-        });
-
-    }
-
-    /**
-     * Handles the click event on the "Back" button.
-     * <p>
-     * Clears the inline buttons and toggles the visibility so that the main category row is shown again.
-     *
-     * @param event the button click event
-     */
-    @FXML
-    private void onBackToMainButtonClick(ActionEvent event) {
-        // Save current scroll offsets
-        double currentH = inlineScrollPane.getHvalue();
-        double currentV = inlineScrollPane.getVvalue();
-
-        // Disable auto-centering temporarily
-        autoCenterEnabled = false;
-
-        // Clear inline buttons and hide the inline scroll pane
-        inlineButtonsBox.getChildren().clear();
-        inlineScrollPane.setVisible(false);
-        inlineScrollPane.setManaged(false);
-
-        // Show main category row
-        mainButtonsBox.setVisible(true);
-        mainButtonsBox.setManaged(true);
-
-        // Restore previous scroll offsets
-        Platform.runLater(() -> {
-            inlineScrollPane.setHvalue(currentH);
-            inlineScrollPane.setVvalue(currentV);
-            // Re-enable auto-centering after layout changes are done.
-            Platform.runLater(() -> autoCenterEnabled = true);
-        });
-    }
-
-    /**
      * Creates an inline button for a given {@link BotType} and adds it to the {@link HBox} container.
      * <p>
      * This method dynamically generates a button with the name of the bot type as its text. It also sets the
@@ -323,7 +233,6 @@ public class EditorPageController {
             prevButtonMonster = subButton;
         }
     }
-
 
 
     /**
@@ -437,41 +346,13 @@ public class EditorPageController {
         });
     }
 
-    /**
-     * Handles returning to the main menu when the back button is clicked.
-     *
-     * @param event Button click event.
-     */
-    @FXML
-    protected void onBackButtonClick(ActionEvent event) {
-        pageSwitch.goMainMenu(editorPage);
-        if (prevButtonMonster != null) {
-            GenerateGrid.getInstance().setSelectedBotType(null);
-        }
-    }
-
-    @FXML
-    protected void onLoadMapButtonClick(ActionEvent event) {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Choose the map");
-        fileChooser.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter("Map Files", "*.map")
-        );
-
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        File selectedFile = fileChooser.showOpenDialog(stage);
-
-        if (selectedFile != null) {
-            loadMapFromFile(selectedFile);
-        }
-    }
 
     /**
      * Loads a map from the specified file and sets up the grid accordingly.
      *
      * @param file the file containing map data
      */
-    private void loadMapFromFile(File file) {
+    private boolean loadMapFromFile(File file) {
         try {
             List<String> lines = Files.readAllLines(file.toPath());
             int rows = lines.size();
@@ -485,8 +366,10 @@ public class EditorPageController {
                 }
             }
             setupGrid(levelGrid, cols, rows);
+            return true;
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error occurred during reading the lines from file", e);
+            return false;
         }
     }
 
@@ -563,6 +446,129 @@ public class EditorPageController {
 
 
     /**
+     * Handles clicks on any main category button.
+     * <p>
+     * This method uses CategoryGenerator to asynchronously retrieve the items for the selected category.
+     * Items are either strings (in test mode) or ImageViews (from S3). After the items are retrieved,
+     * the method dynamically creates inline buttons or adds images, then shows the inline scroll pane
+     * while hiding the main category row.
+     *
+     * @param event the button click event
+     */
+    @FXML
+    private void onCategoryButtonClick(ActionEvent event) {
+        Button clickedButton = (Button) event.getSource();
+        String category = (String) clickedButton.getUserData();
+
+        // Clear previous inline buttons.
+        inlineButtonsBox.getChildren().clear();
+
+        // Used the CategoryGenerator to retrieve items for the given category.
+        // The returned items will be Strings (when test==true) or ImageViews (when test==false).
+        CompletableFuture<List<Object>> futureItems = categoryGenerator.getItemsForCategory(category);
+        futureItems.thenAccept(items -> {
+            Platform.runLater(() -> {
+                // Loop through the retrieved items.
+                for (Object item : items) {
+                    if (item instanceof BotType botType) {
+                        createInlineButton(botType);
+                    }
+                }
+
+
+                // Add a "Back" button to allow returning to the main category row.
+                Button backButton = new Button("Back");
+
+                backButton.setOnAction(ev -> {
+                    onBackToMainButtonClick(ev);
+                    if (prevButtonMonster != null) {
+                        GenerateGrid.getInstance().setSelectedBotType(null);
+                    }
+                });
+
+                inlineButtonsBox.getChildren().add(backButton);
+
+                // Hide the main row and show the inline scroll pane.
+                mainButtonsBox.setVisible(false);
+                mainButtonsBox.setManaged(false);
+                inlineScrollPane.setVisible(true);
+                inlineScrollPane.setManaged(true);
+            });
+        }).exceptionally(ex -> {
+            logger.log(Level.SEVERE, "Failed to retrieve category items", ex);
+            return null;
+        });
+
+    }
+
+    /**
+     * Handles the click event on the "Back" button.
+     * <p>
+     * Clears the inline buttons and toggles the visibility so that the main category row is shown again.
+     *
+     * @param event the button click event
+     */
+    @FXML
+    private void onBackToMainButtonClick(ActionEvent event) {
+        // Save current scroll offsets
+        double currentH = inlineScrollPane.getHvalue();
+        double currentV = inlineScrollPane.getVvalue();
+
+        // Disable auto-centering temporarily
+        autoCenterEnabled = false;
+
+        // Clear inline buttons and hide the inline scroll pane
+        inlineButtonsBox.getChildren().clear();
+        inlineScrollPane.setVisible(false);
+        inlineScrollPane.setManaged(false);
+
+        // Show main category row
+        mainButtonsBox.setVisible(true);
+        mainButtonsBox.setManaged(true);
+
+        // Restore previous scroll offsets
+        Platform.runLater(() -> {
+            inlineScrollPane.setHvalue(currentH);
+            inlineScrollPane.setVvalue(currentV);
+            // Re-enable auto-centering after layout changes are done.
+            Platform.runLater(() -> autoCenterEnabled = true);
+        });
+    }
+
+
+    /**
+     * Handles returning to the main menu when the back button is clicked.
+     *
+     * @param event Button click event.
+     */
+    @FXML
+    protected void onBackButtonClick(ActionEvent event) {
+        pageSwitch.goMainMenu(editorPage);
+        if (prevButtonMonster != null) {
+            GenerateGrid.getInstance().setSelectedBotType(null);
+        }
+    }
+
+    @FXML
+    protected void onLoadMapButtonClick(ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choose the map");
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Map Files", "*.map")
+        );
+
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        File selectedFile = fileChooser.showOpenDialog(stage);
+
+        if (selectedFile != null && loadMapFromFile(selectedFile)) {
+            CustomPopupUtil.showSuccess(stage, "Map was loaded successfully!");;
+        } else {
+            CustomPopupUtil.showError(stage, "Error map loading...");
+        }
+    }
+
+
+    /**
      * Loads maps from the database based on the user's role.
      * <ul>
      *     <li>If the user is an ADMIN, all maps are available.</li>
@@ -598,7 +604,7 @@ public class EditorPageController {
 
             if (userMaps.isEmpty()) {
                 logger.info("No maps available for user: " + currentUsername);
-//                return;
+                CustomPopupUtil.showWarning(stage, "You have no maps saved on server");
             }
 
             List<String> mapNames = userMaps.stream()
@@ -622,11 +628,13 @@ public class EditorPageController {
                     logger.info("Map loaded successfully: " + selectedItem);
                 } else {
                     logger.log(Level.SEVERE,"Selected map not found in user maps.");
+                    CustomPopupUtil.showWarning(stage, "Selected map not found in user maps.");
                 }
             });
 
         } catch (DataAccessException e) {
             logger.log(Level.SEVERE, "Error loading maps from database", e);
+            CustomPopupUtil.showError(stage, "Error loading maps from database");
         }
     }
 
@@ -641,6 +649,14 @@ public class EditorPageController {
         SaveMapDialogBox saveMapDialog = new SaveMapDialogBox();
         Optional<String> result = saveMapDialog.showDialog(primaryStage);
 
+        int[][] mapGrid = GenerateGrid.getInstance().getMapGrid();
+        MapValidator.ValidationResult resultValidator = MapValidator.validate(mapGrid);
+
+        if (!resultValidator.isSuccess()) {
+            CustomPopupUtil.showWarning(primaryStage, resultValidator.message);
+            return;
+        }
+
         result.ifPresent(fileName -> {
             DirectoryChooser directoryChooser = new DirectoryChooser();
             directoryChooser.setTitle("Select Folder to Save File");
@@ -649,16 +665,17 @@ public class EditorPageController {
             if (selectedDirectory != null) {
                 File fileToSave = new File(selectedDirectory, fileName + ".map");
                 try {
-                    int[][] map = GenerateGrid.getInstance().getMapGrid();
-                    List<String> lines = Arrays.stream(map)
+                    List<String> lines = Arrays.stream(mapGrid)
                             .map(row -> Arrays.stream(row)
                                     .mapToObj(String::valueOf)
                                     .collect(Collectors.joining(" ")))
                             .collect(Collectors.toList());
                     Files.write(fileToSave.toPath(), lines);
-                    logger.info("Map successfully saved to local device.");
+                    logger.info("Map successfully was saved to local device.");
+                    CustomPopupUtil.showSuccess(primaryStage, "Map was saved to local device successfully.");
                 } catch (IOException e) {
                     logger.log(Level.SEVERE, "Error saving map to local device", e);
+                    CustomPopupUtil.showError(primaryStage, "Error saving map to local device");
                 }
             }
         });
@@ -674,17 +691,20 @@ public class EditorPageController {
         SaveMapDialogBox mapDialog = new SaveMapDialogBox();
         Optional<String> result = mapDialog.showDialog(primaryStage);
 
+        int[][] mapGrid = GenerateGrid.getInstance().getMapGrid();
+        MapValidator.ValidationResult resultValidator = MapValidator.validate(mapGrid);
+
+        if (!resultValidator.isSuccess()) {
+            CustomPopupUtil.showWarning(primaryStage, resultValidator.message);
+            return;
+        }
+
         result.ifPresent(fileName -> {
             try {
-                int[][] mapGrid = GenerateGrid.getInstance().getMapGrid();
-                if (mapGrid == null || mapGrid.length == 0) {
-                    return;
-                }
-
                 int level = 0;
 
                 Map map = new Map(
-                        "Admin",
+                        userState.getUsername(),
                         mapGrid,
                         0,
                         fileName,
@@ -702,16 +722,88 @@ public class EditorPageController {
                     }
                     mapDAO.insertMap(map, true);
                     logger.info("Story map saved to database: " + fileName);
+                    CustomPopupUtil.showSuccess(primaryStage, "Story map was saved to database!");
+
                 } else {
                     mapDAO.insertMap(map, false);
                     logger.info("Map saved to database: " + fileName);
-                }
+                    CustomPopupUtil.showSuccess(primaryStage, "New map was saved to database!");
 
+                }
             } catch (DataAccessException e) {
                 logger.log(Level.SEVERE, "Failed to save map to database", e);
+                CustomPopupUtil.showError(primaryStage, "Failed to save map to database");
             }
         });
     }
+
+    @FXML
+    protected void onUpdateMapFromDatabase(ActionEvent event) {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        MapDAO mapDAO = new MapDAO();
+        String currentUsername = userState.getUsername();
+
+        try {
+            List<Map> userMaps;
+
+            if (userState.getRole() == PlayerRole.ADMIN) {
+                userMaps = mapDAO.getAllMaps();
+            } else {
+                userMaps = mapDAO.getMapsByUsername(currentUsername);
+            }
+
+            if (userMaps.isEmpty()) {
+                logger.info("No maps available for update for user: " + currentUsername);
+                CustomPopupUtil.showWarning(stage, "No maps available for update for user");
+                return;
+            }
+
+            int[][] mapGrid = GenerateGrid.getInstance().getMapGrid();
+            MapValidator.ValidationResult resultValidator = MapValidator.validate(mapGrid);
+
+            if (!resultValidator.isSuccess()) {
+                CustomPopupUtil.showWarning(stage, resultValidator.message);
+                return;
+            }
+
+            List<String> mapNames = userMaps.stream()
+                    .map(map -> "ID: " + map.getId() + " - Name: " + map.getMapNameEng())
+                    .collect(Collectors.toList());
+
+            SelectorMapDialogBox mapDialog = new SelectorMapDialogBox(mapNames);
+            Optional<String> result = mapDialog.showDialog(stage);
+
+            result.ifPresent(selectedItem -> {
+                logger.info("Selected map for update: " + selectedItem);
+
+                Map selectedMap = userMaps.stream()
+                        .filter(map -> ("ID: " + map.getId() + " - Name: " + map.getMapNameEng()).equals(selectedItem))
+                        .findFirst()
+                        .orElse(null);
+
+
+                if (selectedMap != null) {
+
+                    selectedMap.setMapData(mapGrid);
+                    selectedMap.setScoreVal(selectedMap.getScoreVal() + 100);
+
+                    mapDAO.updateMap(selectedMap);
+                    logger.info("Map updated successfully: " + selectedMap.getMapNameEng());
+                    CustomPopupUtil.showSuccess(stage, "Map was updated successfully!");
+
+                } else {
+                    logger.log(Level.SEVERE, "Selected map not found in user maps.");
+                    CustomPopupUtil.showWarning(stage, "Selected map not found in user maps.");
+                }
+
+            });
+
+        } catch (DataAccessException e) {
+            logger.log(Level.SEVERE, "Error updating map in database", e);
+            CustomPopupUtil.showError(stage, "Error updating map in database.");
+        }
+    }
+
 
 
     /**
@@ -720,7 +812,9 @@ public class EditorPageController {
      */
     @FXML
     private void onClearButtonClick(ActionEvent event) {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         createAndSetEmptyGrid();
+        CustomPopupUtil.showSuccess(stage, "Map was cleared successfully.");
     }
 
 
@@ -797,15 +891,15 @@ public class EditorPageController {
     protected void onDeleteMapFromDatabase(ActionEvent event) {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         MapDAO mapDAO = new MapDAO();
-        String currentUsername = userState.getUsername(); // <-- теперь правильный юзернейм
+        String currentUsername = userState.getUsername();
 
         try {
             List<Map> userMaps;
 
             if (userState.getRole() == PlayerRole.ADMIN) {
-                userMaps = mapDAO.getAllMaps(); // Админ видит все карты
+                userMaps = mapDAO.getAllMaps();
             } else if (userState.getRole() == PlayerRole.MAP_CREATOR) {
-                userMaps = mapDAO.getMapsByUsername(currentUsername); // Создатель карт — только свои
+                userMaps = mapDAO.getMapsByUsername(currentUsername);
             } else {
                 logger.warning("User does not have permission to delete maps.");
                 return;
@@ -816,7 +910,6 @@ public class EditorPageController {
                 return;
             }
 
-            // Создаем список для отображения
             List<String> mapDisplayList = userMaps.stream()
                     .map(map -> "ID: " + map.getId() + " - Name: " + map.getMapNameEng())
                     .collect(Collectors.toList());
@@ -835,14 +928,16 @@ public class EditorPageController {
                 if (selectedMap != null) {
                     mapDAO.deleteMapById(selectedMap.getId());
                     logger.info("Map deleted successfully: " + selectedItem);
+                    CustomPopupUtil.showSuccess(stage, "Map deleted successfully.");
                 } else {
                     logger.log(Level.SEVERE, "Selected map not found in user maps.");
+                    CustomPopupUtil.showWarning(stage, "Selected map not found in user maps.");
                 }
             });
 
         } catch (DataAccessException e) {
             logger.log(Level.SEVERE, "Error deleting map from database", e);
+            CustomPopupUtil.showError(stage, "Error deleting map from database");
         }
     }
-
 }

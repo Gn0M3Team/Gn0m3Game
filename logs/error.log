@@ -1,0 +1,219 @@
+[33mSun Apr 20 22:29:53 CEST 2025 WARNING [javafx.scene.CssStyleHelper] - Caught 'java.lang.ClassCastException: class java.lang.String cannot be cast to class javafx.scene.paint.Paint (java.lang.String is in module java.base of loader 'bootstrap'; javafx.scene.paint.Paint is in module javafx.graphics@21 of loader 'app')' while converting value for '-fx-background-color' from rule '*.action-button' in stylesheet file:/C:/STU/VAVA/gnome/target/classes/com/gnome/gnome/pages/css/login-registration.css
+[0m[33mSun Apr 20 22:29:53 CEST 2025 WARNING [javafx.scene.CssStyleHelper] - Caught 'java.lang.ClassCastException: class java.lang.String cannot be cast to class javafx.scene.paint.Paint (java.lang.String is in module java.base of loader 'bootstrap'; javafx.scene.paint.Paint is in module javafx.graphics@21 of loader 'app')' while converting value for '-fx-background-color' from rule '*.action-button' in stylesheet file:/C:/STU/VAVA/gnome/target/classes/com/gnome/gnome/pages/css/login-registration.css
+[33mTue Apr 29 16:52:35 CEST 2025 WARNING [javafx.css.CssParser] - CSS Error parsing file:/C:/STU/VAVA/gnome/target/classes/com/gnome/gnome/pages/css/profile.css: Expected '<color>' while parsing '-fx-effect' at [69,27]
+[0m[33mTue Apr 29 17:49:10 CEST 2025 WARNING [com.gnome.gnome.editor.controller.EditorPageController] - User does not have permission to load maps.
+[0m[33mTue Apr 29 17:49:13 CEST 2025 WARNING [com.gnome.gnome.editor.controller.EditorPageController] - User does not have permission to load maps.
+[0m[33mTue Apr 29 17:49:13 CEST 2025 WARNING [com.gnome.gnome.editor.controller.EditorPageController] - User does not have permission to load maps.
+[0m[33mTue Apr 29 17:49:13 CEST 2025 WARNING [com.gnome.gnome.editor.controller.EditorPageController] - User does not have permission to load maps.
+[0m[33mTue Apr 29 17:49:14 CEST 2025 WARNING [com.gnome.gnome.editor.controller.EditorPageController] - User does not have permission to load maps.
+[0m[31mWed Apr 30 14:58:04 CEST 2025 SEVERE [com.gnome.gnome.db.DatabaseWrapper] - Cannot begin transaction
+[0m[33mWed Apr 30 17:53:08 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - Invalid playerData: TOP-18  | 0
+[0m[33mWed Apr 30 17:53:16 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - Invalid playerData: TOP-1  | 100
+[0m[33mWed Apr 30 17:53:29 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - Invalid playerData: TOP-18  | 0
+[0m[33mWed Apr 30 17:55:03 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - Invalid playerData: TOP-18 | 0  
+[0m[33mWed Apr 30 17:55:26 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - Invalid playerData: TOP-18  | 0
+[0m[33mWed Apr 30 17:57:46 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - Invalid playerData: TOP-1  | 100
+[0m[33mWed Apr 30 18:00:48 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - Invalid playerData: TOP-18  | 0
+[0m[33mWed Apr 30 18:01:35 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - Invalid playerData: TOP-18  | 0
+[0m[33mWed Apr 30 18:10:15 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - Invalid playerData: artem_test_4
+[0m[33mWed Apr 30 18:22:12 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - User statistics not found for: artem_test_3
+[0m[33mWed Apr 30 18:26:42 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - mapScrollPane is null during initialization
+[0m[33mWed Apr 30 18:26:42 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - Invalid playerData: artem_test_4
+[0m[33mWed Apr 30 18:28:08 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - mapScrollPane is null during initialization
+[0m[33mWed Apr 30 18:33:54 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - User statistics not found for: artem_test_3
+[0m[33mWed Apr 30 18:37:10 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - User statistics not found for: artem_test_3
+[0m[33mWed Apr 30 18:41:35 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - User statistics not found for: artem_test_3
+[0m[33mWed Apr 30 18:42:44 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - User statistics not found for: artem_test_3
+[0m[33mWed Apr 30 18:43:59 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - User statistics not found for: artem_test_3
+[0m[33mWed Apr 30 18:46:03 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - User statistics not found for: artem_test_3
+[0m[33mWed Apr 30 18:46:49 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - User statistics not found for: artem_test_3
+[0m[33mWed Apr 30 18:48:09 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - User statistics not found for: artem_test_3
+[0m[31mThu May 01 10:19:09 CEST 2025 SEVERE [com.gnome.gnome.editor.controller.EditorPageController] - Error updating map in database
+com.gnome.gnome.exceptions.DataAccessException: Query execution failed: UPDATE "Maps" SET map_string = ? WHERE id = ?
+	at com.gnome.gnome/com.gnome.gnome.db.DatabaseWrapper.executeUpdate(DatabaseWrapper.java:77)
+	at com.gnome.gnome/com.gnome.gnome.dao.BaseDAO.executeUpdate(BaseDAO.java:61)
+	at com.gnome.gnome/com.gnome.gnome.dao.MapDAO.updateMap(MapDAO.java:213)
+	at com.gnome.gnome/com.gnome.gnome.editor.controller.EditorPageController.lambda$onUpdateMapFromDatabase$22(EditorPageController.java:756)
+	at java.base/java.util.Optional.ifPresent(Optional.java:178)
+	at com.gnome.gnome/com.gnome.gnome.editor.controller.EditorPageController.onUpdateMapFromDatabase(EditorPageController.java:743)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.sun.javafx.reflect.Trampoline.invoke(MethodUtil.java:72)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at javafx.base@21/com.sun.javafx.reflect.MethodUtil.invoke(MethodUtil.java:270)
+	at javafx.fxml@21/com.sun.javafx.fxml.MethodHelper.invoke(MethodHelper.java:84)
+	at javafx.fxml@21/javafx.fxml.FXMLLoader$MethodHandler.invoke(FXMLLoader.java:1853)
+	at javafx.fxml@21/javafx.fxml.FXMLLoader$ControllerMethodEventHandler.handle(FXMLLoader.java:1726)
+	at javafx.base@21/com.sun.javafx.event.CompositeEventHandler.dispatchBubblingEvent(CompositeEventHandler.java:86)
+	at javafx.base@21/com.sun.javafx.event.EventHandlerManager.dispatchBubblingEvent(EventHandlerManager.java:232)
+	at javafx.base@21/com.sun.javafx.event.EventHandlerManager.dispatchBubblingEvent(EventHandlerManager.java:189)
+	at javafx.base@21/com.sun.javafx.event.CompositeEventDispatcher.dispatchBubblingEvent(CompositeEventDispatcher.java:59)
+	at javafx.base@21/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:58)
+	at javafx.base@21/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
+	at javafx.base@21/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:56)
+	at javafx.base@21/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
+	at javafx.base@21/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:56)
+	at javafx.base@21/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
+	at javafx.base@21/com.sun.javafx.event.EventUtil.fireEventImpl(EventUtil.java:74)
+	at javafx.base@21/com.sun.javafx.event.EventUtil.fireEvent(EventUtil.java:49)
+	at javafx.base@21/javafx.event.Event.fireEvent(Event.java:198)
+	at javafx.graphics@21/javafx.scene.Node.fireEvent(Node.java:8875)
+	at javafx.controls@21/javafx.scene.control.Button.fire(Button.java:203)
+	at javafx.controls@21/com.sun.javafx.scene.control.behavior.ButtonBehavior.mouseReleased(ButtonBehavior.java:207)
+	at javafx.controls@21/com.sun.javafx.scene.control.inputmap.InputMap.handle(InputMap.java:274)
+	at javafx.base@21/com.sun.javafx.event.CompositeEventHandler$NormalEventHandlerRecord.handleBubblingEvent(CompositeEventHandler.java:247)
+	at javafx.base@21/com.sun.javafx.event.CompositeEventHandler.dispatchBubblingEvent(CompositeEventHandler.java:80)
+	at javafx.base@21/com.sun.javafx.event.EventHandlerManager.dispatchBubblingEvent(EventHandlerManager.java:232)
+	at javafx.base@21/com.sun.javafx.event.EventHandlerManager.dispatchBubblingEvent(EventHandlerManager.java:189)
+	at javafx.base@21/com.sun.javafx.event.CompositeEventDispatcher.dispatchBubblingEvent(CompositeEventDispatcher.java:59)
+	at javafx.base@21/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:58)
+	at javafx.base@21/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
+	at javafx.base@21/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:56)
+	at javafx.base@21/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
+	at javafx.base@21/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:56)
+	at javafx.base@21/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
+	at javafx.base@21/com.sun.javafx.event.EventUtil.fireEventImpl(EventUtil.java:74)
+	at javafx.base@21/com.sun.javafx.event.EventUtil.fireEvent(EventUtil.java:54)
+	at javafx.base@21/javafx.event.Event.fireEvent(Event.java:198)
+	at javafx.graphics@21/javafx.scene.Scene$MouseHandler.process(Scene.java:3984)
+	at javafx.graphics@21/javafx.scene.Scene.processMouseEvent(Scene.java:1890)
+	at javafx.graphics@21/javafx.scene.Scene$ScenePeerListener.mouseEvent(Scene.java:2708)
+	at javafx.graphics@21/com.sun.javafx.tk.quantum.GlassViewEventHandler$MouseEventNotification.run(GlassViewEventHandler.java:411)
+	at javafx.graphics@21/com.sun.javafx.tk.quantum.GlassViewEventHandler$MouseEventNotification.run(GlassViewEventHandler.java:301)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:400)
+	at javafx.graphics@21/com.sun.javafx.tk.quantum.GlassViewEventHandler.lambda$handleMouseEvent$2(GlassViewEventHandler.java:450)
+	at javafx.graphics@21/com.sun.javafx.tk.quantum.QuantumToolkit.runWithoutRenderLock(QuantumToolkit.java:424)
+	at javafx.graphics@21/com.sun.javafx.tk.quantum.GlassViewEventHandler.handleMouseEvent(GlassViewEventHandler.java:449)
+	at javafx.graphics@21/com.sun.glass.ui.View.handleMouseEvent(View.java:551)
+	at javafx.graphics@21/com.sun.glass.ui.View.notifyMouse(View.java:937)
+	at javafx.graphics@21/com.sun.glass.ui.win.WinApplication._runLoop(Native Method)
+	at javafx.graphics@21/com.sun.glass.ui.win.WinApplication.lambda$runLoop$3(WinApplication.java:185)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: org.postgresql.util.PSQLException: ERROR: column "id" does not exist
+  Position: 41
+  Location: File: parse_relation.c, Routine: errorMissingColumn, Line: 3722
+  Server SQLState: 42703
+	at org.postgresql.core.v3.QueryExecutorImpl.receiveErrorResponse(QueryExecutorImpl.java:2713)
+	at org.postgresql.core.v3.QueryExecutorImpl.processResults(QueryExecutorImpl.java:2401)
+	at org.postgresql.core.v3.QueryExecutorImpl.execute(QueryExecutorImpl.java:368)
+	at org.postgresql.jdbc.PgStatement.executeInternal(PgStatement.java:498)
+	at org.postgresql.jdbc.PgStatement.execute(PgStatement.java:415)
+	at org.postgresql.jdbc.PgPreparedStatement.executeWithFlags(PgPreparedStatement.java:190)
+	at org.postgresql.jdbc.PgPreparedStatement.executeUpdate(PgPreparedStatement.java:152)
+	at com.gnome.gnome/com.gnome.gnome.db.DatabaseWrapper.executeUpdate(DatabaseWrapper.java:75)
+	... 59 more
+[0m[31mThu May 01 10:23:51 CEST 2025 SEVERE [com.gnome.gnome.editor.controller.EditorPageController] - Error updating map in database
+com.gnome.gnome.exceptions.DataAccessException: Query execution failed: UPDATE "Maps" SET map_string = ? WHERE id = ?
+	at com.gnome.gnome/com.gnome.gnome.db.DatabaseWrapper.executeUpdate(DatabaseWrapper.java:77)
+	at com.gnome.gnome/com.gnome.gnome.dao.BaseDAO.executeUpdate(BaseDAO.java:61)
+	at com.gnome.gnome/com.gnome.gnome.dao.MapDAO.updateMap(MapDAO.java:213)
+	at com.gnome.gnome/com.gnome.gnome.editor.controller.EditorPageController.lambda$onUpdateMapFromDatabase$22(EditorPageController.java:762)
+	at java.base/java.util.Optional.ifPresent(Optional.java:178)
+	at com.gnome.gnome/com.gnome.gnome.editor.controller.EditorPageController.onUpdateMapFromDatabase(EditorPageController.java:743)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at com.sun.javafx.reflect.Trampoline.invoke(MethodUtil.java:72)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at javafx.base@21/com.sun.javafx.reflect.MethodUtil.invoke(MethodUtil.java:270)
+	at javafx.fxml@21/com.sun.javafx.fxml.MethodHelper.invoke(MethodHelper.java:84)
+	at javafx.fxml@21/javafx.fxml.FXMLLoader$MethodHandler.invoke(FXMLLoader.java:1853)
+	at javafx.fxml@21/javafx.fxml.FXMLLoader$ControllerMethodEventHandler.handle(FXMLLoader.java:1726)
+	at javafx.base@21/com.sun.javafx.event.CompositeEventHandler.dispatchBubblingEvent(CompositeEventHandler.java:86)
+	at javafx.base@21/com.sun.javafx.event.EventHandlerManager.dispatchBubblingEvent(EventHandlerManager.java:232)
+	at javafx.base@21/com.sun.javafx.event.EventHandlerManager.dispatchBubblingEvent(EventHandlerManager.java:189)
+	at javafx.base@21/com.sun.javafx.event.CompositeEventDispatcher.dispatchBubblingEvent(CompositeEventDispatcher.java:59)
+	at javafx.base@21/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:58)
+	at javafx.base@21/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
+	at javafx.base@21/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:56)
+	at javafx.base@21/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
+	at javafx.base@21/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:56)
+	at javafx.base@21/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
+	at javafx.base@21/com.sun.javafx.event.EventUtil.fireEventImpl(EventUtil.java:74)
+	at javafx.base@21/com.sun.javafx.event.EventUtil.fireEvent(EventUtil.java:49)
+	at javafx.base@21/javafx.event.Event.fireEvent(Event.java:198)
+	at javafx.graphics@21/javafx.scene.Node.fireEvent(Node.java:8875)
+	at javafx.controls@21/javafx.scene.control.Button.fire(Button.java:203)
+	at javafx.controls@21/com.sun.javafx.scene.control.behavior.ButtonBehavior.mouseReleased(ButtonBehavior.java:207)
+	at javafx.controls@21/com.sun.javafx.scene.control.inputmap.InputMap.handle(InputMap.java:274)
+	at javafx.base@21/com.sun.javafx.event.CompositeEventHandler$NormalEventHandlerRecord.handleBubblingEvent(CompositeEventHandler.java:247)
+	at javafx.base@21/com.sun.javafx.event.CompositeEventHandler.dispatchBubblingEvent(CompositeEventHandler.java:80)
+	at javafx.base@21/com.sun.javafx.event.EventHandlerManager.dispatchBubblingEvent(EventHandlerManager.java:232)
+	at javafx.base@21/com.sun.javafx.event.EventHandlerManager.dispatchBubblingEvent(EventHandlerManager.java:189)
+	at javafx.base@21/com.sun.javafx.event.CompositeEventDispatcher.dispatchBubblingEvent(CompositeEventDispatcher.java:59)
+	at javafx.base@21/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:58)
+	at javafx.base@21/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
+	at javafx.base@21/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:56)
+	at javafx.base@21/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
+	at javafx.base@21/com.sun.javafx.event.BasicEventDispatcher.dispatchEvent(BasicEventDispatcher.java:56)
+	at javafx.base@21/com.sun.javafx.event.EventDispatchChainImpl.dispatchEvent(EventDispatchChainImpl.java:114)
+	at javafx.base@21/com.sun.javafx.event.EventUtil.fireEventImpl(EventUtil.java:74)
+	at javafx.base@21/com.sun.javafx.event.EventUtil.fireEvent(EventUtil.java:54)
+	at javafx.base@21/javafx.event.Event.fireEvent(Event.java:198)
+	at javafx.graphics@21/javafx.scene.Scene$MouseHandler.process(Scene.java:3984)
+	at javafx.graphics@21/javafx.scene.Scene.processMouseEvent(Scene.java:1890)
+	at javafx.graphics@21/javafx.scene.Scene$ScenePeerListener.mouseEvent(Scene.java:2708)
+	at javafx.graphics@21/com.sun.javafx.tk.quantum.GlassViewEventHandler$MouseEventNotification.run(GlassViewEventHandler.java:411)
+	at javafx.graphics@21/com.sun.javafx.tk.quantum.GlassViewEventHandler$MouseEventNotification.run(GlassViewEventHandler.java:301)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:400)
+	at javafx.graphics@21/com.sun.javafx.tk.quantum.GlassViewEventHandler.lambda$handleMouseEvent$2(GlassViewEventHandler.java:450)
+	at javafx.graphics@21/com.sun.javafx.tk.quantum.QuantumToolkit.runWithoutRenderLock(QuantumToolkit.java:424)
+	at javafx.graphics@21/com.sun.javafx.tk.quantum.GlassViewEventHandler.handleMouseEvent(GlassViewEventHandler.java:449)
+	at javafx.graphics@21/com.sun.glass.ui.View.handleMouseEvent(View.java:551)
+	at javafx.graphics@21/com.sun.glass.ui.View.notifyMouse(View.java:937)
+	at javafx.graphics@21/com.sun.glass.ui.win.WinApplication._runLoop(Native Method)
+	at javafx.graphics@21/com.sun.glass.ui.win.WinApplication.lambda$runLoop$3(WinApplication.java:185)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: org.postgresql.util.PSQLException: ERROR: column "id" does not exist
+  Position: 41
+  Location: File: parse_relation.c, Routine: errorMissingColumn, Line: 3722
+  Server SQLState: 42703
+	at org.postgresql.core.v3.QueryExecutorImpl.receiveErrorResponse(QueryExecutorImpl.java:2713)
+	at org.postgresql.core.v3.QueryExecutorImpl.processResults(QueryExecutorImpl.java:2401)
+	at org.postgresql.core.v3.QueryExecutorImpl.execute(QueryExecutorImpl.java:368)
+	at org.postgresql.jdbc.PgStatement.executeInternal(PgStatement.java:498)
+	at org.postgresql.jdbc.PgStatement.execute(PgStatement.java:415)
+	at org.postgresql.jdbc.PgPreparedStatement.executeWithFlags(PgPreparedStatement.java:190)
+	at org.postgresql.jdbc.PgPreparedStatement.executeUpdate(PgPreparedStatement.java:152)
+	at com.gnome.gnome/com.gnome.gnome.db.DatabaseWrapper.executeUpdate(DatabaseWrapper.java:75)
+	... 59 more
+[0m[33mThu May 01 15:21:14 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
+[0m[33mThu May 01 15:21:16 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
+[0m[31mThu May 01 15:21:18 CEST 2025 SEVERE [com.gnome.gnome.shop.controllers.ItemController] - Failed to buy item: Not enough money
+[0m[31mThu May 01 15:21:20 CEST 2025 SEVERE [com.gnome.gnome.shop.controllers.ItemController] - Failed to buy item: Not enough money
+[0m[33mThu May 01 15:21:53 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
+[0m[33mThu May 01 15:21:57 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
+[0m[31mThu May 01 15:21:59 CEST 2025 SEVERE [com.gnome.gnome.shop.controllers.ItemController] - Player successfully bought item (8, Axe of God)
+[0m[33mThu May 01 15:22:00 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
+[0m[31mThu May 01 15:22:01 CEST 2025 SEVERE [com.gnome.gnome.shop.controllers.ItemController] - Player successfully bought item (7, Tomahawk)
+[0m[33mThu May 01 15:22:02 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
+[0m[31mThu May 01 15:22:03 CEST 2025 SEVERE [com.gnome.gnome.shop.controllers.ItemController] - Player successfully bought item (1, Demonic armour)
+[0m[33mThu May 01 15:22:04 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
+[0m[31mThu May 01 15:22:05 CEST 2025 SEVERE [com.gnome.gnome.shop.controllers.ItemController] - Player successfully bought item (9, Growing moon bow)
+[0m[33mThu May 01 15:22:06 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
+[0m[31mThu May 01 15:22:07 CEST 2025 SEVERE [com.gnome.gnome.shop.controllers.ItemController] - Player successfully bought item (1, Heal potion)
+[0m[33mThu May 01 15:22:08 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
+[0m[31mThu May 01 15:22:09 CEST 2025 SEVERE [com.gnome.gnome.shop.controllers.ItemController] - Player successfully bought item (2, Negotiating cudgel)
+[0m[33mThu May 01 15:22:10 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
+[0m[31mThu May 01 15:22:11 CEST 2025 SEVERE [com.gnome.gnome.shop.controllers.ItemController] - Failed to buy item: Not enough money
+[0m[31mThu May 01 15:22:12 CEST 2025 SEVERE [com.gnome.gnome.shop.controllers.ItemController] - Failed to buy item: Not enough money
+[0m[31mThu May 01 15:22:12 CEST 2025 SEVERE [com.gnome.gnome.shop.controllers.ItemController] - Failed to buy item: Not enough money
+[0m[31mThu May 01 15:22:12 CEST 2025 SEVERE [com.gnome.gnome.shop.controllers.ItemController] - Failed to buy item: Not enough money
+[0m[31mThu May 01 15:22:12 CEST 2025 SEVERE [com.gnome.gnome.shop.controllers.ItemController] - Failed to buy item: Not enough money
+[0m[31mThu May 01 15:22:12 CEST 2025 SEVERE [com.gnome.gnome.shop.controllers.ItemController] - Failed to buy item: Not enough money
+[0m[33mThu May 01 15:22:15 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
+[0m[31mThu May 01 15:22:16 CEST 2025 SEVERE [com.gnome.gnome.shop.controllers.ItemController] - Failed to buy item: Not enough money
+[0m[33mThu May 01 15:22:21 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
+[0m[33mThu May 01 15:22:23 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
+[0m[31mThu May 01 15:22:25 CEST 2025 SEVERE [com.gnome.gnome.shop.controllers.ItemController] - Player successfully bought item (2, Armour from butterfly wings)
+[0m[33mThu May 01 15:22:25 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
+[0m[31mThu May 01 15:22:27 CEST 2025 SEVERE [com.gnome.gnome.shop.controllers.ItemController] - Player successfully bought item (1, Demonic armour)
+[0m[33mThu May 01 15:22:29 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
+[0m[31mThu May 01 15:22:30 CEST 2025 SEVERE [com.gnome.gnome.shop.controllers.ItemController] - Player successfully bought item (2, Armour from butterfly wings)
+[0m[33mThu May 01 15:22:31 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
+[0m[31mThu May 01 15:22:32 CEST 2025 SEVERE [com.gnome.gnome.shop.controllers.ItemController] - Failed to buy item: Not enough money
+[0m[31mThu May 01 15:24:27 CEST 2025 SEVERE [com.gnome.gnome.game.GameUIManager] - Failed to load main page: No resources specified.
+/Users/marta/Desktop/Gn0m3Game/target/classes/com/gnome/gnome/pages/main-menu.fxml:22
+
+[0m

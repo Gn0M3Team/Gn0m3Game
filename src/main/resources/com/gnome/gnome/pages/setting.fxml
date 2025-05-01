@@ -1,28 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<BorderPane fx:id="settingPage" prefHeight="400.0" prefWidth="600.0" styleClass="root-pane" stylesheets="@./css/setting.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gnome.gnome.setting.SettingController">
+
+<BorderPane xmlns="http://javafx.com/javafx"
+                xmlns:fx="http://javafx.com/fxml"
+                fx:id="settingPage"
+                styleClass="root-pane"
+                stylesheets="@./css/setting.css"
+                fx:controller="com.gnome.gnome.setting.SettingController"
+                prefHeight="400.0" prefWidth="600.0">
 
     <top>
         <VBox alignment="CENTER" spacing="20" style="-fx-padding: 20">
-            <Label styleClass="menu-title" text="Setting" />
+            <Label text="%settings.title"  styleClass="menu-title"/>
 
             <HBox alignment="CENTER" maxWidth="500" spacing="10">
-                <Button fx:id="backGameButton" onAction="#backToGameButtonClick" prefWidth="230" styleClass="menu-button" text="back to game" />
-                <Button fx:id="mainMenuButton" onAction="#mainMenuButtonClick" prefWidth="230" styleClass="menu-button" text="mein menu" />
+                <Button fx:id="backGameButton" styleClass="menu-button" text="%settings.button.backtogame" onAction="#backToGameButtonClick" prefWidth="230"/>
+                <Button fx:id="mainMenuButton" styleClass="menu-button" text="%settings.button.mainmenu" onAction="#mainMenuButtonClick" prefWidth="230"/>
             </HBox>
         </VBox>
     </top>
     <center>
         <VBox alignment="CENTER" spacing="10">
-            <Label styleClass="menu-title" text="Here is Setting:" />
-            <Label styleClass="center-button" text="1. Setting" />
-            <Label styleClass="center-button" text="2. Setting" />
+            <Label text="%settings.titletext" styleClass="menu-title"/>
+            <Label text="%settings.text1" styleClass="center-button"/>
+            <Label text="%settings.text2" styleClass="center-button"/>
         </VBox>
     </center>
 

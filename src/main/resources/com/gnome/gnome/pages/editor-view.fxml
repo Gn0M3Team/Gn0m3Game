@@ -22,36 +22,36 @@
                 <!-- Main category buttons row -->
                 <HBox fx:id="mainButtonsBox" alignment="CENTER" spacing="10">
                     <children>
-                        <Button text="Start/Finish"
+                        <Button text="%editor.category.startfinish"
                                 onAction="#onCategoryButtonClick"
                                 userData="Start/Finish"/>
 
-                        <Button text="Monsters"
+                        <Button text="%editor.category.monsters"
                                 onAction="#onCategoryButtonClick"
                                 userData="Monsters"/>
 
-                        <Button text="Walls"
+                        <Button text="%editor.category.walls"
                                 onAction="#onCategoryButtonClick"
                                 userData="Walls"
                                 />
 
-                        <Button text="Doors"
+                        <Button text="%editor.category.doors"
                                 onAction="#onCategoryButtonClick"
                                 userData="Doors"
                         />
 
-                        <Button text="Chests"
+                        <Button text="%editor.category.chests"
                                 onAction="#onCategoryButtonClick"
                                 userData="Chests"
                         />
 
-                        <Button text="Props"
+                        <Button text="%editor.category.props"
                                 onAction="#onCategoryButtonClick"
                                 userData="Props"
                         />
 
 
-                        <Button text="Environment"
+                        <Button text="%editor.category.environment"
                                 onAction="#onCategoryButtonClick"
                                 userData="Environment"
                         />
@@ -88,25 +88,28 @@
     <bottom>
         <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
             <children>
-                <Button mnemonicParsing="false" onAction="#onBackButtonClick" text="Go Back" />
+                <Button mnemonicParsing="false" onAction="#onBackButtonClick" text="%editor.button.goback" />
             </children>
             <children>
-                <Button onAction="#onClearButtonClick" text="Clear" />
+                <Button onAction="#onClearButtonClick" text="%editor.button.clear" />
             </children>
             <children>
-                <Button onAction="#onLoadMapFromResources" text="Templates" />
+                <Button onAction="#onLoadMapFromResources" text="%editor.button.templates" />
             </children>
             <children>
-                <Button onAction="#onLoadMapButtonClick" text="Load Map" />
+                <Button onAction="#onLoadMapButtonClick" text="%editor.button.loadmap" />
             </children>
             <children>
-                <Button onAction="#onLoadMapFromDatabase" text="Load From Db" />
+                <Button onAction="#onLoadMapFromDatabase" text="%editor.button.loadfromdb" />
             </children>
             <children>
-                <Button onAction="#onSaveToLocalDevice" text="Save to local device" />
+                <Button onAction="#onSaveToLocalDevice" text="%editor.button.savelocal" />
             </children>
             <children>
-                <Button onAction="#onSaveToDatabase" text="Save to database" />
+                <Button onAction="#onSaveToDatabase" text="%editor.button.savedb" />
+            </children>
+            <children>
+                <Button onAction="#onUpdateMapFromDatabase" text="Update Map" />
             </children>
             <children>
                 <Button onAction="#onDeleteMapFromDatabase" text="Delete Map" />

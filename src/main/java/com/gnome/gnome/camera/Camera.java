@@ -1,15 +1,11 @@
 package com.gnome.gnome.camera;
-import com.gnome.gnome.continueGame.component.Coin;
-import com.gnome.gnome.dao.ArmorDAO;
-import com.gnome.gnome.dao.MapDAO;
-import com.gnome.gnome.dao.PotionDAO;
-import com.gnome.gnome.dao.WeaponDAO;
+import com.gnome.gnome.game.component.Chest;
+import com.gnome.gnome.game.component.Coin;
 import com.gnome.gnome.editor.utils.TypeOfObjects;
 import com.gnome.gnome.models.Armor;
 import com.gnome.gnome.models.Potion;
 import com.gnome.gnome.models.Weapon;
 import com.gnome.gnome.player.Player;
-import com.gnome.gnome.userState.UserState;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
@@ -20,12 +16,10 @@ import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import lombok.Data;
-
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import static com.gnome.gnome.editor.utils.EditorConstants.TILE_SIZE;
 
 /**
  * The Camera class is responsible for rendering a 15x15 viewport of the map,
@@ -34,392 +28,250 @@ import static com.gnome.gnome.editor.utils.EditorConstants.TILE_SIZE;
  */
 @Data
 public class Camera {
-    private int[][] mapGrid; // A two-dimensional array representing the game card. Each element of the array is an integer,
-                             // corresponding to a particular type of tile (for example, 0 for floor, -1 for goblin, etc.)
-    private int cameraCenterX; //    X-coordinate of the camera centre (in tiles, not pixels). This is usually the player's X position
-    private int cameraCenterY; // Y coordinate of the camera centre (in tiles). This is usually the player's Y position
-    private final int viewportSize = 20; // The size of the viewport in tiles. The camera always displays a 15x15 tile square
-                                         // This means that we see 15 tiles in width and 15 in height
-    private int startRow; // The starting line (Y) of the map, from which we start drawing tiles in the preview window
-    private int startCol; // The initial column (X) of the map from which we start drawing tiles in the preview window
-    private Player player; // A reference to the Player object. We use it to know where the player is,
-                           // and centre the camera on his position, as well as highlight his tile on the map
+    private static final int VIEWPORT_SIZE = 20;
+    private static final double ITEM_BOX_EXTRA_HEIGHT = 40;
+    private static final double COIN_BOX_WIDTH_MULTIPLIER = 2.5;
 
-    // A static variable for caching images:
-    private static final Map<String, Image> imageCache = new HashMap<>();   // Cache for images. We store tile images
-                                                                            // (e.g. floor texture) in this dictionary (Map),
-                                                                            // so that we don't have to load them from files every time we draw a map.
-                                                                            // The key is the path to the image (String), the value is the Image object itself
-
+    private static final Map<String, Image> imageCache = new HashMap<>();
     private static Camera instance;
-    private double dynamicTileSize;
 
+    private final int[][] mapGrid;
+    private final Player player;
+    private final Armor armor;
+    private final Weapon weapon;
+    private final Potion potion;
 
-    private Weapon weapon;
-    private Armor armor;
-    private Potion potion;
+    private int cameraCenterX, cameraCenterY, startRow, startCol;
+    private double tileWidth, tileHeight, dynamicTileSize;
 
-    private Image weaponImage;
-    private Image armorImage;
-    private Image potionImage;
-
-
-    private double tileWidth, tileHeight;
-
-
-    /**
-     * Constructor of the Camera class. Used to create a new Camera object.
-     *
-     * @param fieldMap A two-dimensional array representing the game map (with tiles, monsters, etc.).
-     * @param cameraCenterX The initial X coordinate of the camera centre (usually the player's position).
-     * @param cameraCenterY Initial Y coordinate of the camera centre (usually the player's position).
-     * @param player A player object so we can keep track of the player's position.
-     */
-    private Camera(int[][] fieldMap, int cameraCenterX, int cameraCenterY, Player player, Armor armor, Weapon weapon, Potion potion) {
-        this.mapGrid = fieldMap; // Initialise the map passed as a parameter
-        this.cameraCenterX = cameraCenterX; // Set the initial X-coordinate of the camera centre
-        this.cameraCenterY = cameraCenterY; // Set the initial Y-coordinate of the camera center
-        this.player = player; // Save the reference to the player object
+    private Camera(int[][] map, int centerX, int centerY, Player player, Armor armor, Weapon weapon, Potion potion) {
+        this.mapGrid = map;
+        this.cameraCenterX = centerX;
+        this.cameraCenterY = centerY;
+        this.player = player;
         this.armor = armor;
         this.weapon = weapon;
         this.potion = potion;
     }
 
-    /**
-     * Singleton access method for the Camera.
-     */
-    public static Camera getInstance(int[][] fieldMap, int cameraCenterX, int cameraCenterY, Player player, Armor armor, Weapon weapon, Potion potion) {
+    public static Camera getInstance(int[][] map, int centerX, int centerY, Player player, Armor armor, Weapon weapon, Potion potion) {
         if (instance == null) {
-            instance = new Camera(fieldMap, cameraCenterX, cameraCenterY, player, armor, weapon, potion);
+            instance = new Camera(map, centerX, centerY, player, armor, weapon, potion);
         }
         return instance;
     }
 
-    /**
-     * Reset instance
-     */
+    public static Camera getInstance() {
+        if (instance == null) throw new IllegalStateException("Camera not initialized");
+        return instance;
+    }
+
     public static void resetInstance() {
         instance = null;
     }
 
+    public void updateCameraCenter() {
+        cameraCenterX = player.getX();
+        cameraCenterY = player.getY();
+        clampCameraCenter();
+    }
 
-    /**
-     * The drawViewport method is responsible for drawing the visible part of the map (the 15x15 tile viewport) on the Canvas.
-     * It also draws the coins that are in the visible area and highlights the player's tile with a yellow border.
-     *
-     * @param canvas The Canvas object on which to draw the map (this is the area in JavaFX where you can draw graphics).
-     * @param coins A list of coins to display if they are in the visible area.
-     */
+    private void clampCameraCenter() {
+        int half = VIEWPORT_SIZE / 2;
+        int maxX = mapGrid[0].length - half;
+        int maxY = mapGrid.length - half;
+        cameraCenterX = Math.max(half, Math.min(cameraCenterX, maxX));
+        cameraCenterY = Math.max(half, Math.min(cameraCenterY, maxY));
+    }
+
+    public void drawPressEHints(GraphicsContext gc, int [][] baseMap, int px, int py, List<Chest> activeChests) {
+        int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+        double tw = getTileWidth();
+        double th = getTileHeight();
+
+        gc.setFont(Font.font("Arial", FontWeight.BOLD, 12));
+        gc.setFill(Color.WHITE);
+
+        for (int[] d : directions) {
+            int nx = px + d[0];
+            int ny = py + d[1];
+
+            if (nx >= 0 && nx < baseMap[0].length && ny >= 0 && ny < baseMap.length) {
+                TypeOfObjects tileType = TypeOfObjects.fromValue(baseMap[ny][nx]);
+                boolean isTable = tileType == TypeOfObjects.TABLE;
+                boolean isChest = activeChests.stream().anyMatch(c -> c.getGridX() == nx && c.getGridY() == ny);
+
+                if (isTable || isChest) {
+                    int dx = nx - getStartCol();
+                    int dy = ny - getStartRow();
+
+                    if (dx >= 0 && dx < VIEWPORT_SIZE && dy >= 0 && dy < VIEWPORT_SIZE) {
+                        double x = dx * tw + tw / 2;
+                        double y = dy * th - th * 0.4;
+
+                        gc.setFill(Color.rgb(0, 0, 0, 0.7));
+                        gc.fillRoundRect(x - 30, y + 14, 60, 20, 5, 5);
+
+                        gc.setFill(Color.WHITE);
+                        gc.fillText("Press E", x - 20, y + 22);
+                    }
+                }
+            }
+        }
+    }
 
     public void drawViewport(Canvas canvas, List<Coin> coins) {
-        // Calculate tile dimensions
-        double tileWidth = canvas.getWidth() / viewportSize;
-        double tileHeight = canvas.getHeight() / viewportSize;
-        this.tileWidth = tileWidth;
-        this.tileHeight = tileHeight;
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        this.tileWidth = canvas.getWidth() / VIEWPORT_SIZE;
+        this.tileHeight = canvas.getHeight() / VIEWPORT_SIZE;
         this.dynamicTileSize = Math.min(tileWidth, tileHeight);
 
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-
-        int totalRows = mapGrid.length;
-        int totalCols = mapGrid[0].length;
-        int half = viewportSize / 2;
-
-        startRow = Math.max(0, Math.min(cameraCenterY - half, totalRows - viewportSize));
-        startCol = Math.max(0, Math.min(cameraCenterX - half, totalCols - viewportSize));
+        int half = VIEWPORT_SIZE / 2;
+        startRow = Math.max(0, Math.min(cameraCenterY - half, mapGrid.length - VIEWPORT_SIZE));
+        startCol = Math.max(0, Math.min(cameraCenterX - half, mapGrid[0].length - VIEWPORT_SIZE));
 
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-        // Draw map tiles
-        for (int i = 0; i < viewportSize; i++) {
-            for (int j = 0; j < viewportSize; j++) {
-                int row = startRow + i;
-                int col = startCol + j;
+        for (int row = 0; row < VIEWPORT_SIZE; row++) {
+            for (int col = 0; col < VIEWPORT_SIZE; col++) {
+                int mapRow = startRow + row;
+                int mapCol = startCol + col;
 
-                double x = j * tileWidth;
-                double y = i * tileHeight;
+                double x = col * tileWidth;
+                double y = row * tileHeight;
 
-                if (row >= 0 && row < totalRows && col >= 0 && col < totalCols) {
-                    TypeOfObjects type = TypeOfObjects.fromValue(mapGrid[row][col]);
-                    Image tileImage = getCachedImage(type.getImagePath());
+                TypeOfObjects tileType = (mapRow >= 0 && mapRow < mapGrid.length && mapCol >= 0 && mapCol < mapGrid[0].length)
+                        ? TypeOfObjects.fromValue(mapGrid[mapRow][mapCol])
+                        : TypeOfObjects.MOUNTAIN;
 
-                    if (tileImage != null) {
-                        gc.drawImage(tileImage, x, y, tileWidth, tileHeight);
-                    } else {
-                        gc.setFill(Color.GRAY);
-                        gc.fillRect(x, y, tileWidth, tileHeight);
-                    }
+                Image img = getCachedImage(tileType.getImagePath());
+                if (img != null) {
+                    gc.drawImage(img, x, y, tileWidth, tileHeight);
                 } else {
-                    Image outOfMapImage = getCachedImage(TypeOfObjects.MOUNTAIN.getImagePath());
-                    if (outOfMapImage != null) {
-                        gc.drawImage(outOfMapImage, x, y, tileWidth, tileHeight);
-                    } else {
-                        gc.setFill(Color.DARKGRAY);
-                        gc.fillRect(x, y, tileWidth, tileHeight);
-                    }
+                    gc.setFill(Color.GRAY);
+                    gc.fillRect(x, y, tileWidth, tileHeight);
                 }
 
                 gc.setStroke(Color.BLACK);
-                gc.setLineWidth(1);
                 gc.strokeRect(x, y, tileWidth, tileHeight);
             }
         }
 
-        // Draw coins on the map
+        drawCoins(gc, coins);
+        drawItemUI(gc, canvas);
+        drawCoinUI(gc, canvas, coins.size());
+    }
+
+    private void drawCoins(GraphicsContext gc, List<Coin> coins) {
         for (Coin coin : coins) {
-            int gx = coin.getGridX();
-            int gy = coin.getGridY();
-
-            if (gx >= startCol && gx < startCol + viewportSize &&
-                    gy >= startRow && gy < startRow + viewportSize) {
-                Image img = coin.getImageView().getImage();
-                double w = coin.getImageView().getFitWidth();
-                double h = coin.getImageView().getFitHeight();
-
-                double ox = (tileWidth - w) / 2;
-                double oy = (tileHeight - h) / 2;
-                double px = (gx - startCol) * tileWidth + ox;
-                double py = (gy - startRow) * tileHeight + oy;
-
-                gc.drawImage(img, px, py, w, h);
+            int x = coin.getGridX() - startCol;
+            int y = coin.getGridY() - startRow;
+            if (x >= 0 && x < VIEWPORT_SIZE && y >= 0 && y < VIEWPORT_SIZE) {
+                double imgX = x * tileWidth + (tileWidth - coin.getImageView().getFitWidth()) / 2;
+                double imgY = y * tileHeight + (tileHeight - coin.getImageView().getFitHeight()) / 2;
+                gc.drawImage(coin.getImageView().getImage(), imgX, imgY,
+                        coin.getImageView().getFitWidth(), coin.getImageView().getFitHeight());
             }
         }
+    }
 
-        // Load item images
-        armorImage = loadItemImage(armor != null ? armor.getImg() : null);
-        weaponImage = loadItemImage(weapon != null ? weapon.getImg() : null);
-        potionImage = loadItemImage(potion != null ? potion.getImg1() : null);
-
-        // Item display parameters
+    private void drawItemUI(GraphicsContext gc, Canvas canvas) {
         double boxSize = canvas.getWidth() * 0.06;
         double padding = canvas.getWidth() * 0.015;
-        double canvasWidth = canvas.getWidth();
-        double canvasHeight = canvas.getHeight();
-        double cornerRadius = 10.0;
-        double shadowOffset = 3.0;
+        double bottomY = canvas.getHeight() - boxSize - padding - 10 - ITEM_BOX_EXTRA_HEIGHT;
 
-        // Position items in the bottom-middle
-        double bottomMargin = 10;
-        double totalItemsWidth = 3 * boxSize + 2 * padding; // 3 items + padding between them
-        double startX = (canvasWidth - totalItemsWidth) / 2; // Center horizontally
-        double itemY = canvasHeight - boxSize - padding - bottomMargin - 40; // Position at bottom with space for text
+        double totalWidth = 3 * boxSize + 2 * padding;
+        double startX = (canvas.getWidth() - totalWidth) / 2;
 
-        // Item positions (side by side)
-        double weaponX = startX;
-        double potionX = startX + boxSize + padding;
-        double armorX = startX + 2 * (boxSize + padding);
-
-        // Draw items with enhanced styling
-        drawItemBox(gc, weaponImage, weapon, weaponX, itemY, boxSize, cornerRadius, shadowOffset, canvas);
-        drawItemBox(gc, potionImage, potion, potionX, itemY, boxSize, cornerRadius, shadowOffset, canvas);
-        drawItemBox(gc, armorImage, armor, armorX, itemY, boxSize, cornerRadius, shadowOffset, canvas);
-
-        // Position coin amount in the bottom-left with small margins
-        double sideMargin = 10;
-        double coinX = sideMargin;
-        double coinY = canvasHeight - boxSize - padding - bottomMargin; // Reduced height due to horizontal layout
-
-        // Draw coin amount
-        int coinCount = coins.size(); // Assuming this represents the player's coin count
-        Image coinImage = coins.isEmpty() ? null : coins.get(0).getImageView().getImage(); // Use the coin image
-        drawCoinAmount(gc, coinImage, coinCount, coinX, coinY, boxSize, cornerRadius, shadowOffset, canvas);
+        drawItemBox(gc, loadImage(weapon), weapon, startX, bottomY, boxSize);
+        drawItemBox(gc, loadImage(potion), potion, startX + boxSize + padding, bottomY, boxSize);
+        drawItemBox(gc, loadImage(armor), armor, startX + 2 * (boxSize + padding), bottomY, boxSize);
     }
 
-    // Helper method to draw coin amount (horizontal layout)
-    private void drawCoinAmount(GraphicsContext gc, Image coinImage, int coinCount, double x, double y,
-                                double boxSize, double cornerRadius, double shadowOffset, Canvas canvas) {
+    private void drawCoinUI(GraphicsContext gc, Canvas canvas, int coinCount) {
+        double boxSize = canvas.getWidth() * 0.06;
+        Image coinImage = getCachedImage("tiles/tile_522.png");
+        double x = 10, y = canvas.getHeight() - boxSize - 10;
+
         gc.save();
-
-        // Calculate box dimensions for horizontal layout
-        double boxWidth = boxSize * 2.5; // Wider to accommodate horizontal layout
-        double boxHeight = boxSize; // Shorter since no stacking
-
-        // Draw shadow
         gc.setFill(Color.color(0, 0, 0, 0.3));
-        gc.fillRoundRect(x + shadowOffset, y + shadowOffset, boxWidth, boxHeight,
-                cornerRadius, cornerRadius);
+        gc.fillRoundRect(x + 3, y + 3, boxSize * COIN_BOX_WIDTH_MULTIPLIER, boxSize, 10, 10);
+        gc.setFill(Color.web("#8B6677"));
+        gc.fillRoundRect(x, y, boxSize * COIN_BOX_WIDTH_MULTIPLIER, boxSize, 10, 10);
+        gc.setStroke(Color.LIGHTGRAY);
+        gc.strokeRoundRect(x, y, boxSize * COIN_BOX_WIDTH_MULTIPLIER, boxSize, 10, 10);
 
-        // Draw gradient background with #6B4657 base color
-        LinearGradient gradient = new LinearGradient(
-                0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
-                new Stop(0, Color.web("#8B6677", 0.9)),
-                new Stop(1, Color.web("#6B4657", 0.9))
-        );
-        gc.setFill(gradient);
-        gc.fillRoundRect(x, y, boxWidth, boxHeight, cornerRadius, cornerRadius);
-
-        // Draw border
-        gc.setStroke(Color.rgb(100, 100, 120, 0.7));
-        gc.setLineWidth(1.5);
-        gc.strokeRoundRect(x, y, boxWidth, boxHeight, cornerRadius, cornerRadius);
-
-        // Draw coin image on the left
         if (coinImage != null) {
-            double imageSize = boxSize * 0.75;
-            double imageX = x + (boxSize - imageSize) / 2;
-            double imageY = y + (boxSize - imageSize) / 2;
-            gc.drawImage(coinImage, imageX, imageY, imageSize, imageSize);
+            gc.drawImage(coinImage, x + 5, y + 5, boxSize * 0.75, boxSize * 0.75);
         }
 
-        // Draw coin count text to the right of the image
-//        String coinText = "x" + coinCount;
-        String coinText = "x" + player.getPlayerCoins();
         gc.setFill(Color.WHITE);
         gc.setFont(Font.font("Arial", FontWeight.BOLD, 12));
-        double textX = x + boxSize + 5; // Position after the image with a small gap
-        double textY = y + boxSize / 2 + 5; // Center vertically
-        gc.fillText(coinText, textX, textY);
-
-        // Draw label "Coins" to the right of the count
-        gc.setFont(Font.font("Arial", FontWeight.NORMAL, 10));
-        gc.setFill(Color.rgb(200, 200, 200));
-        gc.fillText("Coins", textX + 30, textY); // Adjust position based on text width
-
+        gc.fillText("x" + player.getPlayerCoins(), x + boxSize, y + boxSize / 2 + 5);
         gc.restore();
     }
 
-    // Helper method to draw item box
-    private void drawItemBox(GraphicsContext gc, Image image, Object item, double x, double y,
-                             double boxSize, double cornerRadius, double shadowOffset, Canvas canvas) {
+    private void drawItemBox(GraphicsContext gc, Image img, Object item, double x, double y, double size) {
         gc.save();
 
-        // Draw shadow
         gc.setFill(Color.color(0, 0, 0, 0.3));
-        gc.fillRoundRect(x + shadowOffset, y + shadowOffset, boxSize, boxSize + 40,
-                cornerRadius, cornerRadius);
+        gc.fillRoundRect(x + 3, y + 3, size, size + ITEM_BOX_EXTRA_HEIGHT, 10, 10);
 
-        // Draw gradient background with #6B4657 base color
         LinearGradient gradient = new LinearGradient(
                 0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
                 new Stop(0, Color.web("#8B6677", 0.9)),
                 new Stop(1, Color.web("#6B4657", 0.9))
         );
         gc.setFill(gradient);
-        gc.fillRoundRect(x, y, boxSize, boxSize + 40, cornerRadius, cornerRadius);
+        gc.fillRoundRect(x, y, size, size + ITEM_BOX_EXTRA_HEIGHT, 10, 10);
+        gc.setStroke(Color.LIGHTGRAY);
+        gc.strokeRoundRect(x, y, size, size + ITEM_BOX_EXTRA_HEIGHT, 10, 10);
 
-        // Draw border
-        gc.setStroke(Color.rgb(100, 100, 120, 0.7));
-        gc.setLineWidth(1.5);
-        gc.strokeRoundRect(x, y, boxSize, boxSize + 40, cornerRadius, cornerRadius);
-
-        // Draw item image
-        if (image != null) {
-            double imageSize = boxSize * 0.75;
-            double imageX = x + (boxSize - imageSize) / 2;
-            double imageY = y + (boxSize - imageSize) / 2;
-            gc.drawImage(image, imageX, imageY, imageSize, imageSize);
+        if (img != null) {
+            double imgSize = size * 0.75;
+            gc.drawImage(img, x + (size - imgSize) / 2, y + (size - imgSize) / 2, imgSize, imgSize);
         }
-
-        // Draw item text
-        String name = item != null ? getItemName(item) : "None";
-        String stats = item != null ? getItemStats(item) : "";
 
         gc.setFill(Color.WHITE);
         gc.setFont(Font.font("Arial", FontWeight.BOLD, 12));
-        gc.fillText(name, x + 5, y + boxSize + 15);
-
-        gc.setFont(Font.font("Arial", FontWeight.NORMAL, 10));
-        gc.setFill(Color.rgb(200, 200, 200));
-        gc.fillText(stats, x + 5, y + boxSize + 28);
-
+        gc.fillText(getItemName(item), x + 5, y + size + 15);
+        gc.setFont(Font.font("Arial", 10));
+        gc.fillText(getItemStats(item), x + 5, y + size + 28);
         gc.restore();
     }
 
-    // Helper methods to get item name and stats
     private String getItemName(Object item) {
-        if (item instanceof Weapon) return ((Weapon)item).getNameEng();
-        if (item instanceof Armor) return ((Armor)item).getNameEng();
-        if (item instanceof Potion) return ((Potion)item).getNameEng();
+        if (item instanceof Weapon w) return w.getNameEng();
+        if (item instanceof Armor a) return a.getNameEng();
+        if (item instanceof Potion p) return p.getNameEng();
         return "None";
     }
 
     private String getItemStats(Object item) {
-        if (item instanceof Weapon) {
-            Weapon w = (Weapon)item;
-            return "DMG: " + w.getAtkValue();
-        }
-        if (item instanceof Armor) {
-            Armor a = (Armor)item;
-            return "DEF k: " + a.getDefCof();
-        }
-        if (item instanceof Potion) {
-            Potion p = (Potion)item;
-            return "HP: +" + p.getScoreVal();
-        }
+        if (item instanceof Weapon w) return "DMG: " + w.getAtkValue();
+        if (item instanceof Armor a) return "DEF: " + a.getDefCof();
+        if (item instanceof Potion p) return "HP: +" + p.getScoreVal();
         return "";
     }
 
-    /**
-     * Loads an item image from the resources folder.
-     * <p>
-     * If the provided image name is {@code null}, a default "no-item" placeholder image is loaded.
-     * Otherwise, it loads the image from the "tiles/" subdirectory.
-     *
-     * @param imageName the name of the image file (without path and extension), or {@code null}
-     * @return the loaded {@link Image} object
-     * @throws NullPointerException if the resource stream cannot be found
-     */
-    private Image loadItemImage(String imageName) {
-        if (imageName == null) {
-            imageName = "default-no-item.png";
-        } else {
-            imageName = "tiles/" + imageName + ".png";
-        }
-        return new Image(
-                Objects.requireNonNull(
-                        getClass().getResourceAsStream("/com/gnome/gnome/images/" + imageName)
-                )
-        );
+    private Image loadImage(Object item) {
+        if (item instanceof Weapon w) return loadItemImage(w.getImg());
+        if (item instanceof Armor a) return loadItemImage(a.getImg());
+        if (item instanceof Potion p) return loadItemImage(p.getImg1());
+        return null;
     }
 
-
-
-    /**
-     * Returns a cached image; if it’s not already loaded, loads it from the resource.
-     *
-     * @param imagePath the path to the image
-     * @return the cached Image
-     */
-    private Image getCachedImage(String imagePath) {
-        // Use the computeIfAbsent method for caching:
-        // - If the image with this path is already in the imageCache, we return it
-        // - If the image is not available, we download it from resources and add it to the cache
-        return imageCache.computeIfAbsent(imagePath, path ->
-                // Load the image from resources (the file must be in the resources folder)
-                // Objects.requireNonNull throws an exception if the image is not found
-                new Image(Objects.requireNonNull(
-                        TypeOfObjects.class.getResourceAsStream(path)
-                )));
+    private Image loadItemImage(String name) {
+        if (name == null) name = "default-no-item";
+        return getCachedImage("tiles/" + name + ".png");
     }
 
-
-    /**
-     * Updates the camera center to follow the player's position.
-     */
-    public void updateCameraCenter() {
-        // Update the coordinates of the camera centre, setting them equal to the player's position
-        cameraCenterX = player.getX(); // X-coordinate of the player
-        cameraCenterY = player.getY(); // Y-coordinate of the player
-
-        // Call the clampCameraCentre method to make sure that the camera does not extend beyond the map
-        clampCameraCenter();
-    }
-
-    /**
-     * Ensures the camera's center stays within the valid map area
-     * so that the viewport doesn't go out of bounds.
-     */
-    private void clampCameraCenter() {
-        int halfViewport = viewportSize / 2; // Calculate half the size of the viewport (viewportSize / 2)
-
-        int totalCols = mapGrid[0].length; // Number of columns
-        int totalRows = mapGrid.length; // Number of lines
-
-        // Bound cameraCenterX so that the viewport does not extend beyond the map:
-        // - Math.max(half, ...) ensures that the centre is not too close to the left edge (so as not to show negative coordinates)
-        // - Math.min(..., totalCols - viewportSize + half) ensures that the centre is not too close to the right edge
-        cameraCenterX = Math.max(halfViewport, Math.min(cameraCenterX, totalCols - halfViewport));
-        cameraCenterY = Math.max(halfViewport, Math.min(cameraCenterY, totalRows - halfViewport));
+    private Image getCachedImage(String path) {
+        return imageCache.computeIfAbsent(path, key -> {
+            InputStream is = TypeOfObjects.class.getResourceAsStream(key);
+            if (is == null) return null;
+            return new Image(is);
+        });
     }
 
 }

@@ -15,7 +15,6 @@ public class UserGameState {
     private float balance;
     private float health;
     private int score;
-    private int deathCounter;
     private int mapLevel;
     private Integer weaponId; // Nullable foreign key to Weapon
     private Integer potionId; // Nullable foreign key to Potion

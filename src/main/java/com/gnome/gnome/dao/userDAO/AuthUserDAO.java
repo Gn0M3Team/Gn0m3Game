@@ -87,7 +87,7 @@ public class AuthUserDAO extends BaseDAO<AuthUser> {
      * The users are ordered alphabetically by username.
      */
     public List<AuthUser> getUsersByPage(int offset, int limit) {
-        String sql = "SELECT username, password, role FROM \"Users\" ORDER BY username LIMIT ? OFFSET ?";
+        String sql = "SELECT username, password, role FROM \"Users\" ORDER BY score DESC LIMIT ? OFFSET ?";
         return findAll(sql, limit, offset);
     }
 
@@ -97,12 +97,13 @@ public class AuthUserDAO extends BaseDAO<AuthUser> {
      * @param authUser the username of the user whose role is being updated and  the new role to set
      * @throws DataAccessException if the update fails
      */
-    public void updateUserRole(AuthUser authUser) {
+    public boolean updateUserRole(AuthUser authUser) {
         try {
             db.beginTransaction();
             String sql = "UPDATE \"Users\" SET role = ? WHERE username = ?";
             executeUpdate(sql, authUser.getRole().toString(), authUser.getUsername());
             db.commitTransaction();
+            return true;
         } catch (DataAccessException e) {
             db.rollBackTransaction();
             throw e;

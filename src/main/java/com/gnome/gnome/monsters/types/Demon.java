@@ -6,23 +6,19 @@ import com.gnome.gnome.monsters.movements.OmnidirectionalMovement;
 import javafx.scene.Node;
 
 public class Demon extends Monster {
-    public Demon(int startX, int startY) {
-        super(100,
-                600,
-                1000,
-                3,
-                "Demon",
-                "Démon",
+    public Demon(int startX, int startY, com.gnome.gnome.models.Monster dbMonster) {
+        super(dbMonster.getAttack(),
+                dbMonster.getHealth(),
+                dbMonster.getCost(),
+                dbMonster.getRadius(),
+                dbMonster.getName(),
+                dbMonster.getName_sk(),
                 startX,
                 startY,
                 TypeOfObjects.DEMON.getValue(),
-                new OmnidirectionalMovement(), "tile_125.png"
-        );
-    }
-
-    @Override
-    public Node attack(int cameraStartCol, int cameraStartRow, int playerGridX, int playerGridY) {
-        System.out.println("The demon unleashes a fiery blast!");
-        return null;
+                new OmnidirectionalMovement(),
+                TypeOfObjects.DEMON.getImagePath(),
+                "/com/gnome/gnome/effects/demon_damaged.gif",
+                "/com/gnome/gnome/effects/red_monster.gif");
     }
 }

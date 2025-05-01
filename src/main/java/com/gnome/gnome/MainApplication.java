@@ -15,9 +15,11 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.util.Map;
 import java.util.Properties;
+import java.util.ResourceBundle;
 
 public class MainApplication extends Application {
     private boolean skip_db;
+    public static char lang = 'S';
     public void start(Stage stage) throws IOException {
 
         Map<String, Boolean> properties = getProperties();
@@ -71,8 +73,17 @@ public class MainApplication extends Application {
 
     private FXMLLoader getFxmlLoader(boolean skip_logging){
         FXMLLoader fxmlLoader;
-        if (skip_logging)
+        if (skip_logging) {
             fxmlLoader = new FXMLLoader(MainApplication.class.getResource("pages/main-menu.fxml"));
+
+            if (MainApplication.lang == 'S'){
+                fxmlLoader.setResources(ResourceBundle.getBundle("slovak"));
+            }
+            else{
+                fxmlLoader.setResources(ResourceBundle.getBundle("english"));
+            }
+
+        }
         else {
             connect_db();
             fxmlLoader = new FXMLLoader(MainApplication.class.getResource("pages/login-registration.fxml"));
