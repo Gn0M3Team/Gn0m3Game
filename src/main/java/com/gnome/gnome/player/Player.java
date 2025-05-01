@@ -43,7 +43,7 @@ public class Player {
     private static final long MOVE_COOLDOWN_NS = 200_000_000L;
 
     private long lastAttackTime = 0;
-    private static final long ATTACK_COOLDOWN_NS = 500_000_000L;
+    private static final long ATTACK_COOLDOWN_NS = 300_000_000L;
 
     /**
      * Creates a new player at the specified position with the given maximum health.
@@ -130,7 +130,7 @@ public class Player {
         return representation.getBoundsInParent();
     }
 
-    public void updatePositionWithCamera(int cameraStartCol, int cameraStartRow, double tileWidth, double tileHeight) {
+    public void updatePositionWithCamera(int cameraStartCol, int cameraStartRow, double tileWidth, double tileHeight, Runnable onAnimationFinished) {
         double sizeX = tileWidth * 0.6;
         double sizeY = tileHeight * 0.6;
         double offsetX = (tileWidth - sizeX) / 2;
@@ -138,7 +138,7 @@ public class Player {
         double px = (x - cameraStartCol) * tileWidth + offsetX;
         double py = (y - cameraStartRow) * tileHeight + offsetY;
 
-        animateToPosition(px, py);
+        animateToPosition(px, py, onAnimationFinished);
 
         if (representation instanceof Rectangle r) {
             r.setWidth(sizeX);
@@ -146,10 +146,13 @@ public class Player {
         }
     }
 
-    private void animateToPosition(double toX, double toY) {
+    private void animateToPosition(double toX, double toY, Runnable onFinished) {
         TranslateTransition transition = new TranslateTransition(Duration.millis(50), representation);
         transition.setToX(toX);
         transition.setToY(toY);
+        transition.setOnFinished(e -> {
+            if (onFinished != null) onFinished.run();
+        });
         transition.play();
     }
 

@@ -42,7 +42,8 @@ public class Skeleton extends Monster {
                 new RandomMovement(),
                 TypeOfObjects.SKELETON.getImagePath(),
                 "/com/gnome/gnome/effects/demon_damaged.gif",
-                "/com/gnome/gnome/effects/red_monster.gif");
+                "/com/gnome/gnome/effects/red_monster.gif",
+                dbMonster.getScore_val());
     }
 
     public boolean canShootArrow() {

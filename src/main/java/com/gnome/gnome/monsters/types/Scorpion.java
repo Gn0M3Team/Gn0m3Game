@@ -19,6 +19,7 @@ public class Scorpion extends Monster {
                 new StraightMovement()
                 ,TypeOfObjects.SCORPION.getImagePath(),
                 "/com/gnome/gnome/effects/scorpion_damaged.gif",
-                "/com/gnome/gnome/effects/red_monster.gif");
+                "/com/gnome/gnome/effects/red_monster.gif",
+                dbMonster.getScore_val());
     }
 }

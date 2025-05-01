@@ -69,6 +69,8 @@ public abstract class Monster {
      */
     protected int value;
 
+    protected int score;
+
     /**
      * The movement strategy used by the monster.
      */
@@ -114,7 +116,7 @@ public abstract class Monster {
      * @param movementStrategy The strategy that determines how the monster moves.
      * @param imagePath The file path to the monster's image.
      */
-    public Monster(double attack, double health, double cost, double attackRange, String nameEng, String nameSk, int startX, int startY, int value, MovementStrategy movementStrategy, String  imagePath, String hitGifPath, String attackGifPath) {
+    public Monster(double attack, double health, double cost, double attackRange, String nameEng, String nameSk, int startX, int startY, int value, MovementStrategy movementStrategy, String  imagePath, String hitGifPath, String attackGifPath, int score) {
         this.attack = attack; // Set the monster's attack damage
         this.health = health; // Set the monster's initial health
         this.cost = cost; // Set the coin reward for defeating the monster
@@ -128,6 +130,7 @@ public abstract class Monster {
         this.imagePath = imagePath; // Set the path to the monster's image
         this.hitGifPath = hitGifPath;
         this.attackImagePath = attackGifPath;
+        this.score = score;
 
         initRepresentation();
     }

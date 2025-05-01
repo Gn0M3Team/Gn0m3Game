@@ -92,10 +92,10 @@ public class GameController {
     private Popup centerMenuPopup;
     private Pane darkOverlay;
     private PlayerHealthBar healthBar;
-    private Stage currentPopup;
 
 
     private Map selectedMap;
+    private boolean isStoryMode;
 
 
     public static GameController getGameController() {
@@ -114,6 +114,7 @@ public class GameController {
         this.weapon = weapon;
         this.potion = potion;
         this.selectedMap = selectedMap;
+        isStoryMode = selectedMap.getLevel() != 0;
 
 
         GameInitializer.setupMap(fieldMap, dbMonsters, this.monsterList, this.activeChests, armor, weapon);
@@ -228,7 +229,6 @@ public class GameController {
         if (tileType == TypeOfObjects.FINISH_POINT) onHatchStepped();
         else if (tileType == TypeOfObjects.RIVER) onRiverStepped();
 
-        checkCoinPickup();
         renderGame();
     }
 
@@ -291,17 +291,17 @@ public class GameController {
         if (gameLoop != null) gameLoop.stop();
 
         onLevelCompleted();
-        showShopPopup();
+
+        isStop = true;
+        uiManager.showStatisticsPopup(isStoryMode,() -> uiManager.showShopPopup(isStoryMode));
     }
 
     public void onLevelCompleted() {
         updateMapAfterLevelCompletion(selectedMap);
-
         updatePlayerAfterLevelCompletion(player);
-
         updatePlayerStatisticsAfterLevelCompletion(player);
 
-        if (selectedMap.getLevel() == UserState.getInstance().getMapLevel()) {
+        if (isStoryMode && selectedMap.getLevel() == UserState.getInstance().getMapLevel()) {
             updatePlayerLevelAfterStoryLevelCompletion();
         }
     }
@@ -341,67 +341,19 @@ public class GameController {
         UserGameStateDAO userGameStateDAO = new UserGameStateDAO();
         UserGameState userGameState = userGameStateDAO.getUserGameStateByUsername(UserState.getInstance().getUsername());
         if (userGameState != null) {
-            userGameState.setMapLevel(userGameState.getMapLevel() + 1); // Increment the player's level
+            userGameState.setMapLevel(userGameState.getMapLevel() + 1);
             userGameStateDAO.updateUserGameState(userGameState);
         }
     }
 
-    private void showDarkOverlay() {
-        if (darkOverlay == null) {
-            darkOverlay = new Pane();
-            darkOverlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.6);");
-            darkOverlay.prefWidthProperty().bind(centerStack.widthProperty());
-            darkOverlay.prefHeightProperty().bind(centerStack.heightProperty());
-        }
-
-        if (!centerStack.getChildren().contains(darkOverlay)) {
-            centerStack.getChildren().add(darkOverlay);
-        }
-    }
-
-    private void hideDarkOverlay() {
-        centerStack.getChildren().remove(darkOverlay);
-    }
-
-    private void showShopPopup() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/gnome/gnome/pages/shop.fxml"));
-            Parent shopRoot = loader.load();
-
-            Scene shopScene = new Scene(shopRoot);
-            Stage popup = new Stage();
-            popup.initModality(Modality.APPLICATION_MODAL);
-            popup.initOwner(centerMenuButton.getScene().getWindow());
-            popup.setTitle("Shop");
-
-            popup.setScene(shopScene);
-            popup.setResizable(false);
-
-            showDarkOverlay();
-            popup.setOnHidden(e -> {
-                hideDarkOverlay();
-                currentPopup = null;
-            });
-
-            ShopController controller = loader.getController();
-            controller.setGameController(this);
-
-            currentPopup = popup;
-            popup.showAndWait();
-
-        } catch (IOException e) {
-            logger.severe("Failed to load shop popup: " + e.getMessage());
-        }
-    }
-
     public void closeShopAndGoToMainMenu() {
-        if (currentPopup != null) currentPopup.close();
+        if (uiManager.getCurrentPopup() != null) uiManager.getCurrentPopup().close();
         onSceneExit(false);
         new SwitchPage().goMainMenu(rootBorder);
     }
 
     public void closeShopAndStartNewGame() {
-        if (currentPopup != null) currentPopup.close();
+        if (uiManager.getCurrentPopup() != null) uiManager.getCurrentPopup().close();
         onSceneExit(false);
         new SwitchPage().goNewGame(rootBorder);
     }
@@ -491,7 +443,7 @@ public class GameController {
         activeArrows.forEach(a -> a.updateCameraOffset(camera.getStartCol(), camera.getStartRow()));
 
         player.setDynamicTileSize(Math.min(camera.getTileWidth(), camera.getTileHeight()));
-        player.updatePositionWithCamera(camera.getStartCol(), camera.getStartRow(), camera.getTileWidth(), camera.getTileHeight());
+        player.updatePositionWithCamera(camera.getStartCol(), camera.getStartRow(), camera.getTileWidth(), camera.getTileHeight(), this::checkCoinPickup);
 
         if (!gameObjectsPane.getChildren().contains(player.getRepresentation()))
             gameObjectsPane.getChildren().add(player.getRepresentation());
@@ -539,6 +491,7 @@ public class GameController {
                     updateMonsters(delta);
                     updateProjectiles(delta);
                     renderGame();
+                    checkCoinPickup();
                     lastTime = now;
                 }
             }
