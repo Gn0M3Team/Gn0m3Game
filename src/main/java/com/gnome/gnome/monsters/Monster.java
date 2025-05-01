@@ -140,7 +140,10 @@ public abstract class Monster {
      */
     public void updatePositionWithCamera(int cameraStartCol, int cameraStartRow,
                                          double tileWidth, double tileHeight, boolean isTransit) {
-        if (representation == null) return;
+        if (representation == null) {
+            System.out.println("representation is null");
+            return;
+        }
 
         double sizeX = tileWidth * 0.6;
         double sizeY = tileHeight * 0.6;
@@ -151,12 +154,7 @@ public abstract class Monster {
         double px = (x - cameraStartCol) * tileWidth + offsetX;
         double py = (y - cameraStartRow) * tileHeight + offsetY;
 
-        ImageView iv = representation;
-        iv.setFitWidth(sizeX);
-        iv.setFitHeight(sizeY);
-
-        boolean shouldAnimate = isTransit && firstUpdateDone && countUpdates == 5;
-
+        boolean shouldAnimate = isTransit && firstUpdateDone && countUpdates >= 5;
         if (shouldAnimate) {
             TranslateTransition transition = new TranslateTransition(Duration.millis(50), representation);
             transition.setToX(px);
@@ -166,6 +164,9 @@ public abstract class Monster {
             representation.setTranslateX(px);
             representation.setTranslateY(py);
         }
+
+        representation.setFitWidth(sizeX);
+        representation.setFitHeight(sizeY);
 
         firstUpdateDone = true;
         if (countUpdates != 5)
@@ -180,11 +181,14 @@ public abstract class Monster {
      */
     public void move() {
         if (movementStrategy != null) {
+            System.out.println("Monster " + nameEng + " moving from (" + x + ", " + y + ")");
             movementStrategy.move(this);
             if (representation != null) {
                 representation.getProperties().put("gridX", x);
                 representation.getProperties().put("gridY", y);
             }
+        } else {
+            System.out.println("Monster " + nameEng + " has NO movement strategy!");
         }
     }
 
@@ -211,11 +215,8 @@ public abstract class Monster {
      * @param newY new Y coordinate
      */
     public void setPosition(int newX, int newY) {
-        if (newX < 0 || newY < 0) return;
-
         this.x = newX;
         this.y = newY;
-
         if (representation != null) {
             representation.getProperties().put("gridX", newX);
             representation.getProperties().put("gridY", newY);
@@ -349,6 +350,7 @@ public abstract class Monster {
 
     public void updateLogic(Player player, double delta, int [][] fieldMap, int [][] baseMap) {
         if (isHitEffectPlaying || isMeleeAttacking) return;
+
         long now = System.nanoTime();
         if (now - lastMoveTime < MOVE_COOLDOWN) return;
         lastMoveTime = now;
@@ -363,17 +365,19 @@ public abstract class Monster {
         int newX = getX(), newY = getY();
         if (newX < 0 || newY < 0 || newY >= fieldMap.length || newX >= fieldMap[0].length) {
             setPosition(oldX, oldY);
-            return;
+        } else {
+            int tile = fieldMap[newY][newX];
+            if (tile < 0) tile = baseMap[newY][newX];
+
+            TypeOfObjects type = TypeOfObjects.fromValue(tile);
+            boolean chestOnTile = GameController.getGameController().isBlocked(newX, newY, this);
+
+            if (type.isObstacle() || chestOnTile) {
+                setPosition(oldX, oldY);
+            }
         }
 
-        int tile = fieldMap[newY][newX];
-        if (tile < 0) tile = baseMap[newY][newX];
-
-        TypeOfObjects type = TypeOfObjects.fromValue(tile);
-
-        if (!type.isWalkable()) {
-            setPosition(oldX, oldY);
-        }
+        updateVisual(Camera.getInstance());
     }
 
     public void updateVisual(Camera camera) {

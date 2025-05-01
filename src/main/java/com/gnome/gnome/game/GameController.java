@@ -103,8 +103,6 @@ public class GameController {
 
         this.player = Player.getInstance();
         this.camera = Camera.getInstance(fieldMap, 0, 0, player, armor, weapon, potion);
-
-
         camera.updateCameraCenter();
         instance = this;
 
@@ -112,7 +110,7 @@ public class GameController {
         addGameEntitiesToPane();
 
         uiManager = new GameUIManager(this);
-        healthBar = new PlayerHealthBar(250, 100);
+        healthBar = new PlayerHealthBar(250, 50);
         healthBarContainer.getChildren().add(healthBar);
         updatePlayerHealthBar();
 
@@ -123,7 +121,7 @@ public class GameController {
         });
 
         startGameLoop();
-        renderGame(false);
+        renderGame();
     }
 
     private void setupUI() {
@@ -137,15 +135,18 @@ public class GameController {
         viewportCanvas.widthProperty().bind(centerStack.widthProperty());
         viewportCanvas.heightProperty().bind(centerStack.heightProperty());
         viewportCanvas.setFocusTraversable(true);
+        viewportCanvas.requestFocus();
 
         gameObjectsPane = new Pane();
+        gameObjectsPane.setPickOnBounds(false);
         gameObjectsPane.prefWidthProperty().bind(centerStack.widthProperty());
         gameObjectsPane.prefHeightProperty().bind(centerStack.heightProperty());
-        gameObjectsPane.setPickOnBounds(false);
 
         Pane viewportRoot = new Pane(viewportCanvas, gameObjectsPane);
         centerStack.getChildren().setAll(viewportRoot);
         StackPane.setAlignment(viewportRoot, Pos.CENTER);
+
+        camera.drawViewport(viewportCanvas, coinsOnMap);
     }
 
     private void loadMainMenu() {
@@ -175,6 +176,9 @@ public class GameController {
             monsterView.getProperties().put("gridX", monster.getX());
             monsterView.getProperties().put("gridY", monster.getY());
             monster.updateVisual(camera);
+            System.out.println("Adding monster view: " + monster.getNameEng() +
+                    ", visible=" + monster.getRepresentation().isVisible() +
+                    ", parent=" + monster.getRepresentation().getParent());
             if (!gameObjectsPane.getChildren().contains(monsterView)) {
                 gameObjectsPane.getChildren().add(monsterView);
             }
@@ -203,10 +207,11 @@ public class GameController {
         scene.getRoot().requestFocus();
     }
 
-    public boolean isBlocked(int x, int y) {
-        return monsterList.stream().anyMatch(m -> m.getX() == x && m.getY() == y) ||
+    public boolean isBlocked(int x, int y, Monster self) {
+        return monsterList.stream().anyMatch(m -> m != self && m.getX() == x && m.getY() == y) ||
                 activeChests.stream().anyMatch(ch -> ch.getGridX() == x && ch.getGridY() == y);
     }
+
 
     void movePlayer(int oldX, int oldY, int newX, int newY, TypeOfObjects tileType) {
         if (newX < oldX) player.moveLeft();
@@ -218,7 +223,7 @@ public class GameController {
         else if (tileType == TypeOfObjects.RIVER) onRiverStepped();
 
         checkCoinPickup();
-        renderGame(true);
+        renderGame();
         monsterList.forEach(m -> m.cancelMeleeAttackIfPlayerOutOfRange(player));
     }
 
@@ -250,7 +255,7 @@ public class GameController {
                 PauseTransition delay = new PauseTransition(javafx.util.Duration.seconds(1));
                 delay.setOnFinished(event -> {
                     activeChests.remove(chest);
-                    renderGame(true);
+                    renderGame();
                 });
                 delay.play();
 
@@ -343,7 +348,7 @@ public class GameController {
         });
 
         monsterList.removeAll(eliminated);
-        renderGame(true);
+        renderGame();
     }
 
 
@@ -351,15 +356,17 @@ public class GameController {
      * Updates the camera's viewport to render the current state of the game.
      * This includes drawing the map, updating the player's position, repositioning effects, and updating UI elements.
      */
-    private void renderGame(boolean updateCamera) {
+    private void renderGame() {
         GraphicsContext gc = viewportCanvas.getGraphicsContext2D();
-        if (updateCamera) camera.updateCameraCenter();
+        camera.updateCameraCenter();
 
         camera.drawViewport(viewportCanvas, coinsOnMap);
         camera.drawPressEHints(gc, baseMap, player.getX(), player.getY(), activeChests);
         drawAttackRange(gc, 1);
 
-        monsterList.forEach(m -> m.updateVisual(camera));
+        monsterList.forEach(m -> {
+            m.updateVisual(camera);
+        });
         activeChests.forEach(c -> c.updatePositionWithCamera(camera.getStartCol(), camera.getStartRow(), camera.getTileWidth(), camera.getTileHeight()));
         activeArrows.forEach(a -> a.updateCameraOffset(camera.getStartCol(), camera.getStartRow()));
 
@@ -410,7 +417,7 @@ public class GameController {
                     double delta = (now - lastTime) / 1_000_000_000.0;
                     updateMonsters(delta);
                     updateProjectiles(delta);
-                    renderGame(true);
+                    renderGame();
                     lastTime = now;
                 }
             }
@@ -420,6 +427,9 @@ public class GameController {
 
     private void updateMonsters(double delta) {
         for (Monster monster : monsterList) {
+            if (monster.getRepresentation().getParent() == null) {
+                gameObjectsPane.getChildren().add(monster.getRepresentation());
+            }
             monster.updateLogic(player, delta, fieldMap, baseMap);
             if (monster instanceof Skeleton skeleton) {
                 if (skeleton.canShootArrow() && !skeleton.hasActiveArrow() &&

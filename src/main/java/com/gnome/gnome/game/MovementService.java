@@ -43,7 +43,7 @@ public class MovementService {
         }
 
         if (newX == oldX && newY == oldY) return;
-        if (controller.isBlocked(newX, newY)) return;
+        if (controller.isBlocked(newX, newY, null)) return;
 
         int tileVal = fieldMap[newY][newX] < 0 ? baseMap[newY][newX] : fieldMap[newY][newX];
         TypeOfObjects tileType = TypeOfObjects.fromValue(tileVal);
