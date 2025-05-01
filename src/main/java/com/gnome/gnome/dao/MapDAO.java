@@ -153,6 +153,18 @@ public class MapDAO extends BaseDAO<Map> {
 
 
     /**
+     * Retrieves the all not story maps in random sequence.
+     *
+     * @return a list of all Map objects, which has the level = 0, where each map's data is parsed into a 2D int array
+     * @throws DataAccessException if retrieval fails
+     */
+    public List<Map> getMapsOrderedByRandom() {
+        String sql = "SELECT * FROM \"Maps\" WHERE level = 0 ORDER BY RANDOM()";
+        return findAll(sql);
+    }
+
+
+    /**
      * Retrieves all Maps from the database.
      *
      * @return a list of all Map objects, where each map's data is parsed into a 2D int array
@@ -208,10 +220,27 @@ public class MapDAO extends BaseDAO<Map> {
 //        executeUpdate(sql, map.getMapNameEng(), map.getScoreVal(), map.getId());
 //    }
 
+
+    /**
+     * Updates the map string representation in the database for the given map.
+     *
+     * @param map the map object containing updated map data
+     */
     public void updateMap(Map map) {
         String mapString = MapParser.convertMapToString(map.getMapData());
         String sql = "UPDATE \"Maps\" SET map_string = ? WHERE map_id = ?";
         executeUpdate(sql, mapString, map.getId());
+    }
+
+
+    /**
+     * Updates gameplay statistics (times played and completed) for the given map in the database.
+     *
+     * @param map the map object containing updated statistics
+     */
+    public void updateMapStats(Map map) {
+        String sql = "UPDATE \"Maps\" SET times_played = ?, times_completed = ? WHERE map_id = ?";
+        executeUpdate(sql, map.getTimesPlayed(), map.getTimesCompleted(), map.getId());
     }
 
 }
