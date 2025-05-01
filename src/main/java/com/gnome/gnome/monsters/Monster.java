@@ -164,7 +164,7 @@ public abstract class Monster {
         iv.setFitWidth(sizeX);
         iv.setFitHeight(sizeY);
 
-        boolean shouldAnimate = isTransit && firstUpdateDone && countUpdates >= 2;
+        boolean shouldAnimate = isTransit && firstUpdateDone && countUpdates == 5;
 
         if (shouldAnimate) {
             TranslateTransition transition = new TranslateTransition(Duration.millis(50), representation);
@@ -177,7 +177,8 @@ public abstract class Monster {
         }
 
         firstUpdateDone = true;
-        countUpdates++;
+        if (countUpdates != 5)
+            countUpdates++;
 
     }
 

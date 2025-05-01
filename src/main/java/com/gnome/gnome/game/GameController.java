@@ -46,99 +46,40 @@ import java.util.logging.Logger;
 
 public class GameController {
 
-    /** Root layout of the scene. */
-    @FXML
-    private BorderPane rootBorder;
-    /** StackPane container for the camera viewport. */
+    @FXML private BorderPane rootBorder;
     @FXML private StackPane centerStack;
-    /** Button that opens the center menu popup. */
     @FXML private Button centerMenuButton;
-    /**
-     * Container for the player's health bar.
-     */
     @FXML private StackPane healthBarContainer;
-
-    /**
-     * The canvas used for rendering the visible portion of the map.
-     */
     private Canvas viewportCanvas;
-
     private Weapon weapon;
     private Armor armor;
     private Potion potion;
-
-    /**
-     * The initial game map (static terrain).
-     */
     @Getter
     private int[][] baseMap;
-    /**
-     * The active game map including monsters and dynamic elements.
-     */
     private int[][] fieldMap;
-    /**
-     * Camera object for managing viewport rendering.
-     */
     private Camera camera;
-    /**
-     * Popup menu shown when the center menu button is clicked.
-     */
     private Popup centerMenuPopup;
-    /**
-     * List of all active monsters in the game.
-     */
     private final List<Monster> monsterList = new ArrayList<>();
-    /**
-     * List of coins currently present on the map.
-     */
     private final List<Coin> coinsOnMap = new ArrayList<>();
-    /**
-     * List of arrows currently active in the game.
-     */
     private final List<Arrow> activeArrows = new ArrayList<>();
-
     private final List<Chest> activeChests = new ArrayList<>();
-
     private final List<com.gnome.gnome.models.Monster> dbMonsters = new ArrayList<>();
-
     private static final Logger logger = Logger.getLogger(GameController.class.getName());
 
-    /**
-     * Timer for updating monster behavior periodically.
-     */
     private AnimationTimer monsterMovementTimer;
-    /**
-     * Time interval (in nanoseconds) for updating monsters.
-     */
     private final long MONSTER_UPDATE_INTERVAL_NANOS = 1_000_000_000L;
-    /**
-     * Last time monsters were updated.
-     */
     private long lastMonsterUpdateTime = 0;
-
     private boolean is_stop = false;
-
-    // Player instance
-    @Getter
-    private Player player;
+    @Getter private Player player;
     private static final int PLAYER_MAX_HEALTH = 100;
 
-    /**
-     * The player's health bar UI component.
-     */
+
     private PlayerHealthBar healthBar;
-    /**
-     * Pane containing game objects such as coins.
-     */
     private Pane gameObjectsPane;
-    /**
-     * Overlay shown when the game is over.
-     */
     private VBox gameOverOverlay;
-
-    private static GameController instance; //Singleton Instance
-
+    private static GameController instance;
     private Popup tablePopup;
+    private boolean debug_mod_game;
 
     public static GameController getGameController(){
         if (GameController.instance == null)
@@ -148,21 +89,20 @@ public class GameController {
 
     public GameController() {}
 
-    private boolean debug_mod_game;
 
     public void initializeWithLoadedMap(int[][] mapData, List<com.gnome.gnome.models.Monster> monsterList, Armor armor, Weapon weapon, Potion potion) {
-        setupProperties();
-
         this.baseMap = mapData;
-        this.fieldMap = copyMap(baseMap);
+        this.fieldMap = new GameInitializer().copyMap(baseMap);
+        this.debug_mod_game = new GameInitializer().loadProperties("app.debug_mod_game");
         this.dbMonsters.addAll(monsterList);
         this.armor = armor;
         this.weapon = weapon;
         this.potion = potion;
 
-        camera = Camera.getInstance(fieldMap, 0, 0, null, armor, weapon, potion); // Temporary init
-        camera.setPlayer(player);
-        setupMap(monsterList);
+        camera = Camera.getInstance(fieldMap, 0, 0, null, armor, weapon, potion);
+
+        GameInitializer.setupMap(fieldMap, dbMonsters, this.monsterList, this.activeChests, armor, weapon);
+        this.player = Player.getInstance();
 
         camera.setPlayer(player);
         camera.updateCameraCenter();
@@ -170,7 +110,6 @@ public class GameController {
         instance = this; //Fill singleton instance ONLY on initialization. BECAUSE OTHERWISE THERE IS NO DATA THAT IS REQUIRED IN OTHER CLASSES
 
         viewportCanvas = new Canvas();
-
         BorderPane.setAlignment(centerStack, Pos.CENTER);
         BorderPane.setMargin(centerStack, new Insets(0));
 
@@ -275,102 +214,6 @@ public class GameController {
         activeArrows.clear();
         gameObjectsPane.getChildren().clear();
         is_stop = false;
-    }
-
-
-    private void setupMap(List<com.gnome.gnome.models.Monster> importedMonsterList) {
-        for (int row = 0; row < fieldMap.length; row++) {
-            for (int col = 0; col < fieldMap[row].length; col++) {
-                int tile = fieldMap[row][col];
-                TypeOfObjects tileType = TypeOfObjects.fromValue(tile);
-
-                if (tile == TypeOfObjects.START_POINT.getValue()) {
-                    int health = armor == null ? PLAYER_MAX_HEALTH : armor.getHealth();
-                    double damage = weapon == null ? 20.0 : weapon.getAtkValue();
-                    player = Player.getInstance(col, row, health, damage);
-                    fieldMap[row][col] = TypeOfObjects.START_POINT.getValue();
-                }
-
-                if (tileType.isChest()) {
-                    double val = returnBasedChestTypeValue(tileType);
-                    activeChests.add(new Chest(col, row, val,tileType.getImagePath(), "/com/gnome/gnome/effects/animated_chest.gif"));
-                    System.out.println("Creating chest at: " + col + "," + row);
-                    fieldMap[row][col] = TypeOfObjects.FLOOR.getValue();
-                }
-
-                if (tile < 0) {
-                    com.gnome.gnome.models.Monster dbMonster = findMonsterById(importedMonsterList, tile);
-
-                    if (dbMonster == null) {
-                        throw new RuntimeException("Monster with id " + tile + " not found in importedMonsterList");
-                    }
-
-                    Monster m = MonsterFactory.createMonster(tileType, col, row, dbMonster);
-
-                    fieldMap[row][col] = TypeOfObjects.FLOOR.getValue();
-                    monsterList.add(m);
-                }
-            }
-        }
-    }
-
-    private double returnBasedChestTypeValue(TypeOfObjects type) {
-        Random random = new Random();
-        return switch (type) {
-            case CHEST_1 -> 1 + random.nextDouble() * 10;   // Range: 10.0 - 20.0
-            case CHEST_2 -> 2 + random.nextDouble() * 10;   // Range: 20.0 - 30.0
-            case CHEST_3 -> 3 + random.nextDouble() * 10;   // Range: 30.0 - 40.0
-            case CHEST_4 -> 4 + random.nextDouble() * 10;   // Range: 40.0 - 50.0
-            case CHEST_5 -> 5 + random.nextDouble() * 10;   // Range: 50.0 - 60.0
-            case CHEST_6 -> 6 + random.nextDouble() * 10;   // Range: 60.0 - 70.0
-            case CHEST_7 -> 7 + random.nextDouble() * 10;   // Range: 70.0 - 80.0
-            default -> throw new IllegalStateException("Unexpected value: " + type);
-        };
-    }
-
-    private com.gnome.gnome.models.Monster findMonsterById(List<com.gnome.gnome.models.Monster> list, int id) {
-        return list.stream().filter(monster -> monster.getId() == id).findFirst().orElse(null);
-    }
-
-
-    /**
-     * Loads properties from the app.properties file to configure the game.
-     * Specifically, it loads the debug mode setting (app.skip_login).
-     * If the properties file cannot be loaded, an exception is thrown.
-     */
-    private void setupProperties() {
-        Properties properties = new Properties();
-        // Load the app.properties file from the classpath
-        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("app.properties")) {
-            if (inputStream == null) {
-                throw new RuntimeException("Could not find app.properties in classpath");
-            }
-            properties.load(inputStream);
-        } catch (IOException e) {
-            throw new RuntimeException("Could not load properties file", e);
-        }
-
-        // Read the debug mode setting (app.skip_login) and convert it to a boolean
-        debug_mod_game = Boolean.parseBoolean(properties.getProperty("app.skip_login"));
-    }
-
-
-    /**
-     * Creates a deep copy of a 2D map array.
-     * This is used to create the fieldMap, which can be modified without affecting the baseMap.
-     *
-     * @param src The source 2D array to copy.
-     * @return A new 2D array that is a deep copy of the source.
-     */
-    private int[][] copyMap(int[][] src) {
-        int rows = src.length;
-        int[][] dest = new int[rows][];
-        // Copy each row of the source array to the destination array
-        for (int i = 0; i < rows; i++) {
-            dest[i] = new int[src[i].length];
-            System.arraycopy(src[i], 0, dest[i], 0, src[i].length);
-        }
-        return dest;
     }
 
 

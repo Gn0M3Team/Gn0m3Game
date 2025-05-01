@@ -83,6 +83,13 @@ public class Player {
         return instance;
     }
 
+    public static Player getInstance() {
+        if (instance == null) {
+            throw new IllegalStateException("Player has not been initialized");
+        }
+        return instance;
+    }
+
 
     // Movement methods: These methods allow the player to move on the grid by changing their x and y coordinates
     // Each method adjusts the player's position by 1 tile in the specified direction
