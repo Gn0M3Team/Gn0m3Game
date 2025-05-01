@@ -18,7 +18,7 @@ public enum TypeOfObjects {
     FINISH_POINT("tile_297.png", 2),
 
     /** Monsters category */
-    SKELETON("tile_80.png", -1),
+    SKELETON("tile_73.png", -1),
     DEMON("demon.png", -2),
     GOBLIN("goblin.png", -3),
     SCORPION("scorpion.png", -4),

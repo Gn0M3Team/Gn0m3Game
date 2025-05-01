@@ -414,7 +414,7 @@ public class GameController {
         eliminated.forEach(monster -> {
             int x = monster.getX(), y = monster.getY();
             coinsOnMap.add(new Coin(x, y, monster.getCost()));
-            player.addScore(monster.getValue());
+            player.addScore(monster.getScore());
             player.addCountOfKilledMonsters();
             gameObjectsPane.getChildren().remove(monster.getRepresentation());
         });

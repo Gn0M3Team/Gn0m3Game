@@ -46,7 +46,7 @@ public class CategoryGenerator {
             "Start/Finish", List.of("Start_Point", "Finish_Point"),
 
             "Monsters", List.of(
-                    "Demon", "Butterfly", "Goblin", "Scorpion", "Skeleton"
+                    "Demon", "Butterfly", "Goblin", "Scorpion"
             ),
 
             "Props", List.of(

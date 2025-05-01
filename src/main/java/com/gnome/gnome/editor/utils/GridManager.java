@@ -112,7 +112,6 @@ public class GridManager {
             case "Butterfly"    -> TypeOfObjects.BUTTERFLY.getValue();
             case "Goblin"       -> TypeOfObjects.GOBLIN.getValue();
             case "Scorpion"     -> TypeOfObjects.SCORPION.getValue();
-            case "Skeleton"     -> TypeOfObjects.SKELETON.getValue();
 
             // Props
             case "Floor"        -> TypeOfObjects.FLOOR.getValue();

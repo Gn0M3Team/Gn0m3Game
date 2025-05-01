@@ -98,14 +98,12 @@ public class MainController {
 
         continueGameButton.setOnAction(e -> {
             if (mapLoaderService != null) {
-                Map selectedMap = mapDAO.getMapByLevel(1);
+                Map selectedMap = mapDAO.getMapByLevel(UserState.getInstance().getMapLevel());
                 new MapLoaderUIHandler(mapLoaderService, primaryStage).showStartMap(selectedMap);
             }
         });
     }
 
-
-//    TODO: delete in final
     /**
      * Checks if there is a current user. If not, sets a default user (Admin).
      */
