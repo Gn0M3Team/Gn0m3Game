@@ -57,7 +57,7 @@
 
                     <!-- Maps Section -->
                     <VBox alignment="CENTER" spacing="20" styleClass="maps-container">
-                        <Label text="Your Maps" styleClass="maps-title"/>
+                        <Label fx:id="mapOwner" styleClass="maps-title"/>
                                 <ListView fx:id="mapListView" styleClass="map-list"/>
                     </VBox>
 

@@ -12,10 +12,12 @@ import com.gnome.gnome.models.user.UserGameState;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import com.gnome.gnome.userState.UserState;
+import com.gnome.gnome.utils.CustomPopupUtil;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -46,6 +48,7 @@ public class ProfileController {
     @FXML private Label totalChestOpened;
     @FXML private Label winningPercentage;
     @FXML private Label deathCounter;
+    @FXML private Label mapOwner;
     @FXML private ImageView avatarImage;
     @FXML private Button banUserButton;
     @FXML private Button leftButton;
@@ -117,6 +120,8 @@ public class ProfileController {
         // Update UI with user data
         nameLabel.setText("Profile of " + user.getUsername());
         recordLabel.setText("Score: " + (gameState != null ? gameState.getScore() : 0));
+        mapOwner.setText(Objects.equals(userState.getUsername(), user.getUsername()) ? "Your Maps"  : user.getUsername() + " Maps");
+
 
         if (userStatistics != null) {
             totalMapsPlayed.setText("Games Played: " + userStatistics.getTotalMapsPlayed());
@@ -280,6 +285,8 @@ public class ProfileController {
      */
     @FXML
     private void handleBanUser(ActionEvent event) {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
         Popup confirmPopup = new Popup();
         confirmPopup.setAutoHide(true);
 
@@ -306,8 +313,10 @@ public class ProfileController {
             if (deleted) {
                 logger.info("User deleted: " + selectedUserRole);
                 pageSwitch.goMainMenu(profilePage);
+                CustomPopupUtil.showSuccess(stage, "User was deleted successfully!");
             } else {
                 logger.warning("Failed to delete user: " + selectedUserRole);
+                CustomPopupUtil.showError(stage, "Failed to delete user: " + selectedUserRole);
             }
         });
 
@@ -353,8 +362,10 @@ public class ProfileController {
      */
     @FXML
     private void handleConfirmRole(ActionEvent event) {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         if (user == null) {
             logger.warning("Cannot update role: user is null");
+            CustomPopupUtil.showError(stage, "Cannot update role: user is null");
             return;
         }
 
@@ -363,10 +374,12 @@ public class ProfileController {
         boolean updated = userDAO.updateUserRole(user);
         if (updated) {
             logger.info("Role updated to " + selectedRole + " for user " + selectedUsername);
+            CustomPopupUtil.showSuccess(stage, "Role updated to " + selectedRole + " for user " + selectedUsername);
             selectedUserRole = selectedRole;
             updateButtonVisibility();
         } else {
             logger.warning("Failed to update role for user: " + selectedUsername);
+            CustomPopupUtil.showError(stage, "Failed to update role for user: " + selectedUsername);
         }
     }
 }
