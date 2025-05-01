@@ -21,10 +21,4 @@ public class Goblin extends Monster {
                 "/com/gnome/gnome/effects/goblin_damaged.gif",
                 "/com/gnome/gnome/effects/red_monster.gif");
     }
-
-    @Override
-    public Node attack(int cameraStartCol, int cameraStartRow, int playerGridX, int playerGridY) {
-        System.out.println("The goblin attacks with mischievous ferocity!");
-        return null;
-    }
 }

@@ -89,7 +89,7 @@ public enum TypeOfObjects {
     /** Integer value associated with the object type */
     private final int value;
 
-     /* Constructor for object type.
+     /** Constructor for object type.
      *
      * @param imageName the filename of the tile image
      * @param value     the numeric value representing this type in the map grid
@@ -204,11 +204,14 @@ public enum TypeOfObjects {
     public boolean isWalkable() {
         return switch (this) {
             case FLOOR, FINISH_POINT, RIVER, EMPTY, WEB,
-                 CHEST_1, CHEST_2, CHEST_3, CHEST_4, CHEST_5, CHEST_6, CHEST_7,
                  DOOR_1, DOOR_2, DOOR_3, DOOR_4, DOOR_5, DOOR_6, DOOR_7, DOOR_8, DOOR_9, DOOR_10, DOOR_11, DOOR_12, DOOR_13
                     -> true;
             default -> false;
         };
+    }
+
+    public boolean isObstacle() {
+        return !isWalkable();
     }
 
     public boolean isChest() {

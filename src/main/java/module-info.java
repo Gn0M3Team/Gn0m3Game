@@ -16,6 +16,7 @@ module com.gnome.gnome {
     requires software.amazon.awssdk.http.nio.netty;
     requires software.amazon.awssdk.awscore;
     requires jbcrypt;
+    requires software.amazon.awssdk.services.ecrpublic;
 
     opens com.gnome.gnome.game to javafx.fxml;
 
