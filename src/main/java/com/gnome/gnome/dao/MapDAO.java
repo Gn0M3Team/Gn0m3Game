@@ -202,4 +202,16 @@ public class MapDAO extends BaseDAO<Map> {
             throw new DataAccessException("Failed to delete map with map_id: " + id, e);
         }
     }
+
+//    public void updateMap(Map map) {
+//        String sql = "UPDATE \"Maps\" SET map_name_eng = ?, score_val = ? WHERE id = ?";
+//        executeUpdate(sql, map.getMapNameEng(), map.getScoreVal(), map.getId());
+//    }
+
+    public void updateMap(Map map) {
+        String mapString = MapParser.convertMapToString(map.getMapData());
+        String sql = "UPDATE \"Maps\" SET map_string = ? WHERE map_id = ?";
+        executeUpdate(sql, mapString, map.getId());
+    }
+
 }
