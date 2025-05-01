@@ -1,15 +1,11 @@
 package com.gnome.gnome.camera;
-import com.gnome.gnome.continueGame.component.Coin;
-import com.gnome.gnome.dao.ArmorDAO;
-import com.gnome.gnome.dao.MapDAO;
-import com.gnome.gnome.dao.PotionDAO;
-import com.gnome.gnome.dao.WeaponDAO;
+import com.gnome.gnome.game.component.Chest;
+import com.gnome.gnome.game.component.Coin;
 import com.gnome.gnome.editor.utils.TypeOfObjects;
 import com.gnome.gnome.models.Armor;
 import com.gnome.gnome.models.Potion;
 import com.gnome.gnome.models.Weapon;
 import com.gnome.gnome.player.Player;
-import com.gnome.gnome.userState.UserState;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
@@ -25,7 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import static com.gnome.gnome.editor.utils.EditorConstants.TILE_SIZE;
 
 /**
  * The Camera class is responsible for rendering a 15x15 viewport of the map,
@@ -66,7 +61,6 @@ public class Camera {
 
     private double tileWidth, tileHeight;
 
-
     /**
      * Constructor of the Camera class. Used to create a new Camera object.
      *
@@ -92,6 +86,14 @@ public class Camera {
         if (instance == null) {
             instance = new Camera(fieldMap, cameraCenterX, cameraCenterY, player, armor, weapon, potion);
         }
+        return instance;
+    }
+
+    public static Camera getInstance() {
+        if (instance == null) {
+            throw new IllegalStateException("Camera not initialized");
+        }
+
         return instance;
     }
 
@@ -172,6 +174,7 @@ public class Camera {
 
             if (gx >= startCol && gx < startCol + viewportSize &&
                     gy >= startRow && gy < startRow + viewportSize) {
+
                 Image img = coin.getImageView().getImage();
                 double w = coin.getImageView().getFitWidth();
                 double h = coin.getImageView().getFitHeight();
@@ -195,6 +198,7 @@ public class Camera {
         double padding = canvas.getWidth() * 0.015;
         double canvasWidth = canvas.getWidth();
         double canvasHeight = canvas.getHeight();
+
         double cornerRadius = 10.0;
         double shadowOffset = 3.0;
 
@@ -221,9 +225,47 @@ public class Camera {
 
         // Draw coin amount
         int coinCount = coins.size(); // Assuming this represents the player's coin count
-        Image coinImage = coins.isEmpty() ? null : coins.get(0).getImageView().getImage(); // Use the coin image
+        Image coinImage = loadItemImage("tile_522");
         drawCoinAmount(gc, coinImage, coinCount, coinX, coinY, boxSize, cornerRadius, shadowOffset, canvas);
     }
+
+
+    public void drawPressEHints(GraphicsContext gc, int[][] baseMap, int px, int py, List<Chest> activeChests) {
+        int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+        double tw = getTileWidth();
+        double th = getTileHeight();
+
+        gc.setFont(Font.font("Arial", FontWeight.BOLD, 12));
+        gc.setFill(Color.WHITE);
+
+        for (int[] d : directions) {
+            int nx = px + d[0];
+            int ny = py + d[1];
+
+            if (nx >= 0 && nx < baseMap[0].length && ny >= 0 && ny < baseMap.length) {
+                TypeOfObjects tileType = TypeOfObjects.fromValue(baseMap[ny][nx]);
+                boolean isTable = tileType == TypeOfObjects.TABLE;
+                boolean isChest = activeChests.stream().anyMatch(c -> c.getGridX() == nx && c.getGridY() == ny);
+
+                if (isTable || isChest) {
+                    int dx = nx - getStartCol();
+                    int dy = ny - getStartRow();
+
+                    if (dx >= 0 && dx < viewportSize && dy >= 0 && dy < viewportSize) {
+                        double x = dx * tw + tw / 2;
+                        double y = dy * th - th * 0.4;
+
+                        gc.setFill(Color.rgb(0, 0, 0, 0.7));
+                        gc.fillRoundRect(x - 30, y - 5, 60, 20, 5, 5);
+
+                        gc.setFill(Color.WHITE);
+                        gc.fillText("Press E", x - 20, y + 7);
+                    }
+                }
+            }
+        }
+    }
+
 
     // Helper method to draw coin amount (horizontal layout)
     private void drawCoinAmount(GraphicsContext gc, Image coinImage, int coinCount, double x, double y,

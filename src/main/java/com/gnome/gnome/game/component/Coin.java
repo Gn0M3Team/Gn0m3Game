@@ -1,14 +1,12 @@
-package com.gnome.gnome.continueGame.component;
+package com.gnome.gnome.game.component;
 
-import com.gnome.gnome.editor.utils.GenerateGrid;
-import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import lombok.Getter;
 
 import java.util.Objects;
 
-import static com.gnome.gnome.continueGame.component.ObjectsConstants.*;
+import static com.gnome.gnome.game.component.ObjectsConstants.*;
 import static com.gnome.gnome.editor.utils.EditorConstants.TILE_SIZE;
 
 /**
@@ -27,7 +25,7 @@ public class Coin {
     /**
      * The value of the coin (amount added to player's coin count).
      */
-    private final int value;
+    private final double value;
     /**
      * The image used to visually represent the coin in the UI.
      */
@@ -40,7 +38,7 @@ public class Coin {
      * @param gridY the Y coordinate on the map grid
      * @param value the numeric value of the coin
      */
-    public Coin(int gridX, int gridY, int value) {
+    public Coin(int gridX, int gridY, double value) {
         this.gridX = gridX;
         this.gridY = gridY;
         this.value = value;

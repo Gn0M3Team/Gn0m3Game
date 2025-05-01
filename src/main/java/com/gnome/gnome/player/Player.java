@@ -1,5 +1,6 @@
 package com.gnome.gnome.player;
 
+import com.gnome.gnome.game.GameController;
 import com.gnome.gnome.monsters.Monster;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
@@ -35,7 +36,7 @@ public class Player {
     /**
      * The current health of the player.
      */
-    private int currentHealth;
+    private double currentHealth;
     /**
      * Node representing the player visually on screen.
      */
@@ -43,7 +44,7 @@ public class Player {
     /**
      * Total number of coins the player has collected.
      */
-    private int playerCoins = 0;
+    private double playerCoins = 0;
 
     private static Player instance;
 
@@ -91,9 +92,15 @@ public class Player {
      * Reduces player's health by a given damage amount.
      * Health cannot go below 0.
      */
-    public void takeDamage(int damage) {
+    public void takeDamage(double damage) {
         currentHealth -= damage;
         if (currentHealth < 0) currentHealth = 0;
+
+        GameController ctrl = GameController.getGameController();
+        if (ctrl != null) {
+            ctrl.shakeCamera(); // <-- трясіння камери при пошкодженні
+            ctrl.updatePlayerHealthBar(); // оновити здоров'я на панелі
+        }
     }
 
     /**
@@ -132,6 +139,10 @@ public class Player {
             // Check if the monster is within the attack range (e.g., if range=1, the monster must be 1 tile away or closer)
             // This checks for monsters in a square area around the player, not just in a straight line
             if (dx <= range && dy <= range) {
+                if (GameController.getGameController().isLineOfSightClear(this.x, this.y, monster.getX(), monster.getY())) {
+                    continue; // монстр за об'єктом, пропустити
+                }
+
                 hitMonsters.add(monster);
             }
         }
@@ -152,7 +163,7 @@ public class Player {
             // Show a visual hit effect for the monster (animation)
             // The hit effect is displayed on the gameObjectsPane at the monster's position, adjusted for the camera's viewport
             // The lambda expression () -> {...} is a callback that runs when the hit effect finishes
-            monster.showHitEffect(gameObjectsPane, cameraStartCol, cameraStartRow, () -> {
+            monster.showHitEffect(() -> {
                 // Check if this monster was eliminated (killed) during the attack
                 if (eliminated.contains(monster)) {
                     // If the monster was eliminated, call the callback function to handle post-elimination actions
@@ -181,7 +192,7 @@ public class Player {
      *
      * @param coin the number of coins to add
      */
-    public void addCoin(int coin) {
+    public void addCoin(double coin) {
         playerCoins += coin; // Increase the player's coin count by the specified amount
     }
 

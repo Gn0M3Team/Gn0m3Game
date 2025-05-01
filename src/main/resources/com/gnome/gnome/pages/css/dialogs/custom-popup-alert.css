@@ -1,0 +1,42 @@
+@font-face {
+    font-family: 'Press Start 2P';
+    src: url('../../fonts/PressStart2P-Regular.ttf') format('truetype');
+}
+
+/* Base style for the popup container (VBox) */
+.popup-box {
+    -fx-background-radius: 20px;
+    -fx-border-color: #2E1C26;
+    -fx-border-width: 3px;
+    -fx-border-radius: 20px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.6), 15, 0, 0, 3);
+    -fx-padding: 15px;
+    -fx-alignment: center;
+    -fx-min-width: 300px;
+}
+
+/* Success popup background */
+.popup-box.success {
+    -fx-background-color: rgba(40, 167, 69, 0.95); /* #28a745 with opacity */
+}
+
+/* Error popup background */
+.popup-box.error {
+    -fx-background-color: rgba(220, 53, 69, 0.95); /* #dc3545 with opacity */
+}
+
+/* Warning popup background */
+.popup-box.warning {
+    -fx-background-color: rgba(255, 193, 7, 0.95); /* #ffc107 with opacity */
+}
+
+/* Style for the message label */
+.popup-message {
+    -fx-text-fill: #e0e0e0;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-wrap-text: true;
+    -fx-alignment: center;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.8), 6, 0, 2, 2);
+}

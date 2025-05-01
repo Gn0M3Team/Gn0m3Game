@@ -29,7 +29,9 @@ public class MapDAO extends BaseDAO<Map> {
                 rs.getInt("score_val"),
                 rs.getString("map_name_eng"),
                 rs.getString("map_name_sk"),
-                rs.getInt("level")
+                rs.getInt("level"),
+                rs.getInt("times_played"),
+                rs.getInt("times_completed")
         );
     }
 
@@ -105,6 +107,11 @@ public class MapDAO extends BaseDAO<Map> {
      */
     public List<Map> getMapsByUsername(String username) {
         String sql = "SELECT * FROM \"Maps\" WHERE username = ?";
+        return findAll(sql, username);
+    }
+
+    public List<Map> getMapsByUsernameOrdered(String username) {
+        String sql = "SELECT * FROM \"Maps\" WHERE username = ? ORDER BY times_completed DESC, times_played";
         return findAll(sql, username);
     }
 
@@ -195,4 +202,16 @@ public class MapDAO extends BaseDAO<Map> {
             throw new DataAccessException("Failed to delete map with map_id: " + id, e);
         }
     }
+
+//    public void updateMap(Map map) {
+//        String sql = "UPDATE \"Maps\" SET map_name_eng = ?, score_val = ? WHERE id = ?";
+//        executeUpdate(sql, map.getMapNameEng(), map.getScoreVal(), map.getId());
+//    }
+
+    public void updateMap(Map map) {
+        String mapString = MapParser.convertMapToString(map.getMapData());
+        String sql = "UPDATE \"Maps\" SET map_string = ? WHERE map_id = ?";
+        executeUpdate(sql, mapString, map.getId());
+    }
+
 }

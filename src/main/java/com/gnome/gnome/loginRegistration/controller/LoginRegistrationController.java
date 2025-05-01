@@ -1,8 +1,10 @@
 package com.gnome.gnome.loginRegistration.controller;
 
+import com.gnome.gnome.dao.UserStatisticsDAO;
 import com.gnome.gnome.dao.userDAO.AuthUserDAO;
 import com.gnome.gnome.dao.userDAO.UserGameStateDAO;
 import com.gnome.gnome.dao.userDAO.UserSession;
+import com.gnome.gnome.models.UserStatistics;
 import com.gnome.gnome.userState.UserState;
 import com.gnome.gnome.loginRegistration.service.LoginRegistrationService;
 import com.gnome.gnome.loginRegistration.service.LoginResult;
@@ -68,12 +70,14 @@ public class LoginRegistrationController {
 
             AuthUserDAO authUserDAO = new AuthUserDAO();
             UserGameStateDAO userGameStateDAO = new UserGameStateDAO();
+            UserStatisticsDAO userStatisticsDAO = new UserStatisticsDAO();
 
             UserGameState userGameState = userGameStateDAO.getUserGameStateByUsername(username);
             AuthUser authUser = authUserDAO.getAuthUserByUsername(username);
+            UserStatistics userStatistics = userStatisticsDAO.getUserStatisticsByUsername(username);
 
             if (authUser != null && userGameState != null) {
-                UserState.init(authUser, userGameState);
+                UserState.init(authUser, userGameState, userStatistics);
             }
 
             pageSwitch.goMainMenu(loginRegistretion);
