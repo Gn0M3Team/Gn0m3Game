@@ -28,6 +28,8 @@ public class MovementService {
 
     private void handleMovement(KeyEvent event) {
         Player player = controller.getPlayer();
+        if (!player.canMoveNow()) return;
+
         int oldX = player.getX();
         int oldY = player.getY();
         int newX = oldX;
@@ -54,6 +56,7 @@ public class MovementService {
             return;
         }
 
+        player.recordMoveTime();
         controller.movePlayer(oldX, oldY, newX, newY, tileType);
     }
 
@@ -68,13 +71,17 @@ public class MovementService {
 
     private void handleAttack() {
         Player player = controller.getPlayer();
+
+        if (!player.canAttackNow()) return;
+
         List<Monster> monsters = controller.getMonsterList();
 
         List<Monster> eliminated = new ArrayList<>();
         player.attack(monsters, 1, monster -> {
             eliminated.add(monster);
-            // видалення викликається, коли ефект завершено
             controller.removeMonsters(List.of(monster));
         });
+
+        player.recordAttackTime();
     }
 }

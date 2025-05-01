@@ -36,6 +36,12 @@ public class Player {
     @Setter
     private double dynamicTileSize;
 
+    private long lastMoveTime = 0;
+    private static final long MOVE_COOLDOWN_NS = 200_000_000L;
+
+    private long lastAttackTime = 0;
+    private static final long ATTACK_COOLDOWN_NS = 500_000_000L;
+
     /**
      * Creates a new player at the specified position with the given maximum health.
      *
@@ -152,5 +158,23 @@ public class Player {
         }
 
         return eliminated;
+    }
+
+
+    public boolean canMoveNow() {
+        long now = System.nanoTime();
+        return (now - lastMoveTime) >= MOVE_COOLDOWN_NS;
+    }
+
+    public void recordMoveTime() {
+        lastMoveTime = System.nanoTime();
+    }
+
+    public boolean canAttackNow() {
+        return (System.nanoTime() - lastAttackTime) >= ATTACK_COOLDOWN_NS;
+    }
+
+    public void recordAttackTime() {
+        lastAttackTime = System.nanoTime();
     }
 }

@@ -1,6 +1,7 @@
 package com.gnome.gnome;
 
 import com.gnome.gnome.config.EditorLogger;
+import com.gnome.gnome.dao.MonsterDAO;
 import com.gnome.gnome.db.DatabaseWrapper;
 import com.gnome.gnome.loginRegistration.controller.LoginRegistrationController;
 import com.gnome.gnome.music.MusicWizard;
@@ -41,6 +42,9 @@ public class MainApplication extends Application {
             MainController controller = fxmlLoader.getController();
             controller.setPrimaryStage(stage);
         }
+
+        MonsterDAO monsterDAO = new MonsterDAO();
+        monsterDAO.getAllMonsters();
 
 
         Scene scene = new Scene(root);
