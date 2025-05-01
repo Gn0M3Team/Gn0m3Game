@@ -157,7 +157,10 @@ public abstract class Monster {
         double px = (x - cameraStartCol) * tileWidth + offsetX;
         double py = (y - cameraStartRow) * tileHeight + offsetY;
 
-        boolean shouldAnimate = isTransit && firstUpdateDone && countUpdates >= 5;
+        boolean shouldAnimate = isTransit && firstUpdateDone && countUpdates == 5
+                && Camera.getInstance().getCameraCenterX() == x
+                && Camera.getInstance().getCameraCenterY() == y;
+
         if (shouldAnimate) {
             TranslateTransition transition = new TranslateTransition(Duration.millis(50), representation);
             transition.setToX(px);
