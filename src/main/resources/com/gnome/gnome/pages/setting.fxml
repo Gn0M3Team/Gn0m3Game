@@ -1,35 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gnome.gnome.setting.SettingController"
+            fx:id="settingPage"
+            stylesheets="@./css/settings.css"
+            styleClass="settings-root">
 
-<BorderPane xmlns="http://javafx.com/javafx"
-                xmlns:fx="http://javafx.com/fxml"
-                fx:id="settingPage"
-                styleClass="root-pane"
-                stylesheets="@./css/setting.css"
-                fx:controller="com.gnome.gnome.setting.SettingController"
-                prefHeight="400.0" prefWidth="600.0">
-
-    <top>
-        <VBox alignment="CENTER" spacing="20" style="-fx-padding: 20">
-            <Label text="%settings.title"  styleClass="menu-title"/>
-
-            <HBox alignment="CENTER" maxWidth="500" spacing="10">
-                <Button fx:id="backGameButton" styleClass="menu-button" text="%settings.button.backtogame" onAction="#backToGameButtonClick" prefWidth="230"/>
-                <Button fx:id="mainMenuButton" styleClass="menu-button" text="%settings.button.mainmenu" onAction="#mainMenuButtonClick" prefWidth="230"/>
-            </HBox>
-        </VBox>
-    </top>
     <center>
-        <VBox alignment="CENTER" spacing="10">
-            <Label text="%settings.titletext" styleClass="menu-title"/>
-            <Label text="%settings.text1" styleClass="center-button"/>
-            <Label text="%settings.text2" styleClass="center-button"/>
+        <VBox alignment="CENTER" spacing="20" styleClass="main-content">
+            <!-- Settings Header -->
+            <Label text="Settings" styleClass="settings-title"/>
+
+            <!-- Settings Options -->
+            <VBox alignment="CENTER" spacing="15" styleClass="settings-container">
+                <!-- Sound Toggle -->
+                <ToggleButton fx:id="musicToggleButton" text="Music: ON" onAction="#handleMusicToggle" styleClass="toggle-button"/>
+                <ToggleButton fx:id="ambientToggleButton" text="Ambient: ON" onAction="#handleAmbientToggle" styleClass="toggle-button"/>
+
+
+                <!-- Sound Volume -->
+                <HBox alignment="CENTER" spacing="10" styleClass="volume-container">
+                    <Label text="Volume:" styleClass="settings-label"/>
+                    <Slider fx:id="soundVolumeSlider" min="0" max="100" value="50" styleClass="volume-slider"/>
+                </HBox>
+
+                <!-- Track Selection -->
+                <HBox alignment="CENTER" spacing="10" styleClass="track-container">
+                    <Label text="Track:" styleClass="settings-label"/>
+                    <ComboBox fx:id="trackSelector" onAction="#handleTrackSelection" styleClass="track-combo"/>
+                </HBox>
+
+                <!-- Language Selection -->
+                <HBox alignment="CENTER" spacing="10" styleClass="language-container">
+                    <Label text="Language:" styleClass="settings-label"/>
+                    <ComboBox fx:id="languageComboBox" onAction="#handleLanguageChange" styleClass="language-combo"/>
+                </HBox>
+            </VBox>
+
+            <!-- Navigation Buttons -->
+            <HBox alignment="CENTER" spacing="20" styleClass="button-container">
+                <Button fx:id="backGameButton" text="Back to Game" onAction="#backToGameButtonClick" styleClass="action-button"/>
+                <Button fx:id="mainMenuButton" text="Main Menu" onAction="#mainMenuButtonClick" styleClass="action-button"/>
+            </HBox>
         </VBox>
     </center>
 
-
-
+    <padding>
+        <Insets top="25" right="25" bottom="25" left="25"/>
+    </padding>
 </BorderPane>
