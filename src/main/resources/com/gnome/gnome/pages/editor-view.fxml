@@ -109,6 +109,9 @@
                 <Button onAction="#onSaveToDatabase" text="Save to database" />
             </children>
             <children>
+                <Button onAction="#onUpdateMapFromDatabase" text="Update Map" />
+            </children>
+            <children>
                 <Button onAction="#onDeleteMapFromDatabase" text="Delete Map" />
             </children>
         </HBox>
