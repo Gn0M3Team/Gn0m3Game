@@ -1,5 +1,6 @@
 package com.gnome.gnome.switcher.switcherPage.component;
 
+import com.gnome.gnome.MainApplication;
 import com.gnome.gnome.profile.ProfileController;
 import javafx.animation.FadeTransition;
 import javafx.fxml.FXMLLoader;
@@ -7,6 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.ResourceBundle;
 
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -31,6 +33,15 @@ public class SceneSwitch {
                 throw new IOException("FXML file not found: " + fxml);
             }
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
+
+            if (MainApplication.lang == 'S'){
+                loader.setResources(ResourceBundle.getBundle("slovak"));
+            }
+            else{
+                loader.setResources(ResourceBundle.getBundle("english"));
+            }
+
+            
             BorderPane nextBorderPane = loader.load();
 
             Scene scene = curBorderPane.getScene();

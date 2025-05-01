@@ -28,6 +28,9 @@ import java.util.Objects;
 
 public class MainController {
 
+    @FXML private Button newGameButton;
+    @FXML private Label menuLabel;
+    @FXML private Button LeaderBoardButton;
     @FXML private ImageView musicIcon;
     @FXML
     private Button musicButton;

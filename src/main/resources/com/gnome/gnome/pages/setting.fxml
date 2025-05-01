@@ -14,19 +14,19 @@
 
     <top>
         <VBox alignment="CENTER" spacing="20" style="-fx-padding: 20">
-            <Label text="Setting"  styleClass="menu-title"/>
+            <Label text="%settings.title"  styleClass="menu-title"/>
 
             <HBox alignment="CENTER" maxWidth="500" spacing="10">
-                <Button fx:id="backGameButton" styleClass="menu-button" text="back to game" onAction="#backToGameButtonClick" prefWidth="230"/>
-                <Button fx:id="mainMenuButton" styleClass="menu-button" text="mein menu" onAction="#mainMenuButtonClick" prefWidth="230"/>
+                <Button fx:id="backGameButton" styleClass="menu-button" text="%settings.button.backtogame" onAction="#backToGameButtonClick" prefWidth="230"/>
+                <Button fx:id="mainMenuButton" styleClass="menu-button" text="%settings.button.mainmenu" onAction="#mainMenuButtonClick" prefWidth="230"/>
             </HBox>
         </VBox>
     </top>
     <center>
         <VBox alignment="CENTER" spacing="10">
-            <Label text="Here is Setting:" styleClass="menu-title"/>
-            <Label text="1. Setting" styleClass="center-button"/>
-            <Label text="2. Setting" styleClass="center-button"/>
+            <Label text="%settings.titletext" styleClass="menu-title"/>
+            <Label text="%settings.text1" styleClass="center-button"/>
+            <Label text="%settings.text2" styleClass="center-button"/>
         </VBox>
     </center>
 
