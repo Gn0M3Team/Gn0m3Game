@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * The Camera class is responsible for rendering a 15x15 viewport of the map,
@@ -40,6 +41,10 @@ public class Camera {
     private final Armor armor;
     private final Weapon weapon;
     private final Potion potion;
+
+    private Image armorImage;
+    private Image weaponImage;
+    private Image potionImage;
 
     private int cameraCenterX, cameraCenterY, startRow, startCol;
     private double tileWidth, tileHeight, dynamicTileSize;
@@ -144,7 +149,7 @@ public class Camera {
                         ? TypeOfObjects.fromValue(mapGrid[mapRow][mapCol])
                         : TypeOfObjects.MOUNTAIN;
 
-                Image img = getCachedImage(tileType.getImagePath());
+                Image img = getCachedTileImage(tileType.getImagePath());
                 if (img != null) {
                     gc.drawImage(img, x, y, tileWidth, tileHeight);
                 } else {
@@ -183,14 +188,19 @@ public class Camera {
         double totalWidth = 3 * boxSize + 2 * padding;
         double startX = (canvas.getWidth() - totalWidth) / 2;
 
-        drawItemBox(gc, loadImage(weapon), weapon, startX, bottomY, boxSize);
-        drawItemBox(gc, loadImage(potion), potion, startX + boxSize + padding, bottomY, boxSize);
-        drawItemBox(gc, loadImage(armor), armor, startX + 2 * (boxSize + padding), bottomY, boxSize);
+        armorImage = loadItemImage(armor != null ? armor.getImg() : null);
+        weaponImage = loadItemImage(weapon != null ? weapon.getImg() : null);
+        potionImage = loadItemImage(potion != null ? potion.getImg1() : null);
+
+
+        drawItemBox(gc, weaponImage, weapon, startX, bottomY, boxSize);
+        drawItemBox(gc, potionImage, potion, startX + boxSize + padding, bottomY, boxSize);
+        drawItemBox(gc, armorImage, armor, startX + 2 * (boxSize + padding), bottomY, boxSize);
     }
 
     private void drawCoinUI(GraphicsContext gc, Canvas canvas, int coinCount) {
         double boxSize = canvas.getWidth() * 0.06;
-        Image coinImage = getCachedImage("tiles/tile_522.png");
+        Image coinImage = loadItemImage("tiles/tile_522.png");
         double x = 10, y = canvas.getHeight() - boxSize - 10;
 
         gc.save();
@@ -228,6 +238,7 @@ public class Camera {
         gc.strokeRoundRect(x, y, size, size + ITEM_BOX_EXTRA_HEIGHT, 10, 10);
 
         if (img != null) {
+            System.out.println("We drow img");
             double imgSize = size * 0.75;
             gc.drawImage(img, x + (size - imgSize) / 2, y + (size - imgSize) / 2, imgSize, imgSize);
         }
@@ -254,22 +265,34 @@ public class Camera {
         return "";
     }
 
-    private Image loadImage(Object item) {
-        if (item instanceof Weapon w) return loadItemImage(w.getImg());
-        if (item instanceof Armor a) return loadItemImage(a.getImg());
-        if (item instanceof Potion p) return loadItemImage(p.getImg1());
-        return null;
-    }
-
     private Image loadItemImage(String name) {
-        if (name == null) name = "default-no-item";
-        return getCachedImage("tiles/" + name + ".png");
+        System.out.println("Loading image " + name);
+        if (name == null || name.isEmpty()) {
+            return getCachedItemImage("com/gnome/gnome/images/default-no-item.png");
+        }
+        return getCachedItemImage("com/gnome/gnome/images/" + name);
     }
 
-    private Image getCachedImage(String path) {
+    private Image getCachedItemImage(String path) {
+        System.out.println("Loading item: " + path);
         return imageCache.computeIfAbsent(path, key -> {
-            InputStream is = TypeOfObjects.class.getResourceAsStream(key);
-            if (is == null) return null;
+            InputStream is = Camera.class.getResourceAsStream("/" + path);
+            if (is == null) {
+                System.err.println("Item image not found: " + path);
+                return null;
+            }
+            return new Image(is);
+        });
+    }
+
+    // Для тайлів (tile images)
+    private Image getCachedTileImage(String path) {
+        return imageCache.computeIfAbsent(path, key -> {
+            InputStream is = TypeOfObjects.class.getResourceAsStream(path);
+            if (is == null) {
+                System.err.println("Tile image not found: " + path);
+                return null;
+            }
             return new Image(is);
         });
     }
