@@ -89,7 +89,7 @@ public enum TypeOfObjects {
     /** Integer value associated with the object type */
     private final int value;
 
-     /* Constructor for object type.
+     /** Constructor for object type.
      *
      * @param imageName the filename of the tile image
      * @param value     the numeric value representing this type in the map grid

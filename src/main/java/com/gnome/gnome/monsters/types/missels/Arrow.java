@@ -38,11 +38,13 @@ public class Arrow {
     /**
      * Velocity in the X, Y direction (tiles per frame).
      */
-    private final double vx, vy;
+    private double vx;
+    private double vy;
     /**
      * Target X, Y coordinate of the arrow (in tiles).
      */
-    private final double targetX, targetY;
+    private double targetX;
+    private double targetY;
     /**
      * The amount of damage this arrow inflicts on the player.
      */
@@ -59,10 +61,12 @@ public class Arrow {
     /**
      * The skeleton that fired this arrow.
      */
+    @Getter
     @Setter
     private Skeleton skeleton;
     private int cameraStartCol, cameraStartRow;
     private double dynamicTileSize;
+    private boolean hitTarget = false;
 
 
     /**
@@ -91,6 +95,17 @@ public class Arrow {
         this.view = new ImageView(arrowImage);
     }
 
+    public void reset(double startX, double startY, double vx, double vy, double targetX, double targetY) {
+        this.x = startX;
+        this.y = startY;
+        this.vx = vx / 60.0;
+        this.vy = vy / 60.0;
+        this.targetX = targetX;
+        this.targetY = targetY;
+        this.hitTarget = false;
+        this.isAnimating = false;
+    }
+
     public void setDynamicTileSize(double dynamicTileSize) {
         this.dynamicTileSize = dynamicTileSize;
         double viewSize = dynamicTileSize * 0.6;
@@ -108,7 +123,10 @@ public class Arrow {
     public void updateCameraOffset(int cameraStartCol, int cameraStartRow) {
         this.cameraStartCol = cameraStartCol;
         this.cameraStartRow = cameraStartRow;
+        relocateView();
+    }
 
+    private void relocateView() {
         if (dynamicTileSize == 0) return;
 
         double viewSize = dynamicTileSize * 0.6;
@@ -122,6 +140,28 @@ public class Arrow {
     }
 
 
+    public void update(double delta) {
+        x += vx * delta * 60;
+        y += vy * delta * 60;
+        relocateView();
+    }
+
+    public boolean hasHitTarget() {
+        return hitTarget || outOfBounds() || reachedTarget();
+    }
+
+    private boolean outOfBounds() {
+        double pixelX = (x - cameraStartCol) * dynamicTileSize;
+        double pixelY = (y - cameraStartRow) * dynamicTileSize;
+        return pixelX < 0 || pixelX > dynamicTileSize * 15 || pixelY < 0 || pixelY > dynamicTileSize * 15;
+    }
+
+    private boolean reachedTarget() {
+        return (vx > 0 && x >= targetX) || (vx < 0 && x <= targetX) ||
+                (vy > 0 && y >= targetY) || (vy < 0 && y <= targetY);
+    }
+
+
     /**
      * Adds the arrow to the scene and animates its movement until it goes out of bounds,
      * reaches the target, or collides with the player.
@@ -131,25 +171,18 @@ public class Arrow {
      */
     public void shoot(Pane layer, Player player) {
         if (isAnimating) {
-            System.out.println("Arrow " + arrowId + " is already animating, skipping shoot");
             return;
         }
         isAnimating = true;
 
-        System.out.println("Adding arrow " + arrowId + " to gameObjectsPane at (" + x + ", " + y + ")");
 
         // Very important: set initial dynamic size BEFORE adding to layer
         double viewSize = dynamicTileSize * 0.6;
         view.setFitWidth(viewSize);
         view.setFitHeight(viewSize);
 
-        double offset = (dynamicTileSize - viewSize) / 2.0;
-        double pixelX = (x - cameraStartCol) * dynamicTileSize + offset;
-        double pixelY = (y - cameraStartRow) * dynamicTileSize + offset;
-        view.setTranslateX(pixelX);
-        view.setTranslateY(pixelY);
+        relocateView();
 
-        // Add the view to scene
         layer.getChildren().add(view);
 
         new AnimationTimer() {
@@ -157,43 +190,29 @@ public class Arrow {
             public void handle(long now) {
                 x += vx;
                 y += vy;
+                relocateView();
 
-                double pixelX = (x - cameraStartCol) * dynamicTileSize + offset;
-                double pixelY = (y - cameraStartRow) * dynamicTileSize + offset;
-                view.setTranslateX(pixelX);
-                view.setTranslateY(pixelY);
-
-                double paneWidth = layer.getWidth();
-                double paneHeight = layer.getHeight();
-
-                boolean outOfBounds = pixelX < 0 || pixelX > paneWidth || pixelY < 0 || pixelY > paneHeight;
-                boolean reachedTarget = (vx > 0 && x >= targetX) || (vx < 0 && x <= targetX) ||
-                        (vy > 0 && y >= targetY) || (vy < 0 && y <= targetY);
-
-                if (outOfBounds || reachedTarget) {
-
-                    System.out.println("Arrow " + arrowId + " removed: reached bounds or target at (" + x + ", " + y + ")");
-                    layer.getChildren().remove(view);
+                if (outOfBounds() || reachedTarget()) {
+                    hitTarget = true;
+                    removeArrow(layer);
                     stop();
-                    isAnimating = false;
-
-                    if (skeleton != null)
-                        skeleton.clearActiveArrow();
                     return;
                 }
 
                 if (view.getBoundsInParent().intersects(player.getRepresentation().getBoundsInParent())) {
-                    System.out.println("Arrow " + arrowId + " hit player at (" + x + ", " + y + ")");
                     player.takeDamage(DAMAGE);
-                    layer.getChildren().remove(view);
+                    hitTarget = true;
+                    removeArrow(layer);
                     stop();
-                    isAnimating = false;
-
-                    if (skeleton != null)
-                        skeleton.clearActiveArrow();
                 }
             }
         }.start();
+    }
+
+    private void removeArrow(Pane layer) {
+        layer.getChildren().remove(view);
+        isAnimating = false;
+        if (skeleton != null) skeleton.clearActiveArrow();
     }
 
 }

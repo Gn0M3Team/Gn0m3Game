@@ -21,10 +21,4 @@ public class Demon extends Monster {
                 "/com/gnome/gnome/effects/demon_damaged.gif",
                 "/com/gnome/gnome/effects/red_monster.gif");
     }
-
-    @Override
-    public Node attack(int cameraStartCol, int cameraStartRow, int playerGridX, int playerGridY) {
-        System.out.println("The demon unleashes a fiery blast!");
-        return null;
-    }
 }

@@ -19,7 +19,7 @@ public class GameInitializer {
 
     public static final int PLAYER_MAX_HEALTH = 100;
 
-    public int[][] copyMap(int[][] src) {
+    public static int[][] copyMap(int[][] src) {
         int[][] copy = new int[src.length][];
         for (int i = 0; i < src.length; i++) {
             copy[i] = Arrays.copyOf(src[i], src[i].length);
@@ -80,8 +80,8 @@ public class GameInitializer {
         return list.stream().filter(monster -> monster.getId() == id).findFirst().orElse(null);
     }
 
-    public boolean loadProperties(String key) {
-        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("app.properties")) {
+    public static boolean loadProperties(String key) {
+        try (InputStream inputStream = GameInitializer.class.getClassLoader().getResourceAsStream("app.properties")) {
             if (inputStream == null) throw new RuntimeException("Could not find app.properties");
             Properties props = new Properties();
             props.load(inputStream);

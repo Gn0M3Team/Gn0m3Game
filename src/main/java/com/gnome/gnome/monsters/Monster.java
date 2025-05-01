@@ -1,6 +1,8 @@
 package com.gnome.gnome.monsters;
 
 
+import com.gnome.gnome.camera.Camera;
+import com.gnome.gnome.editor.utils.TypeOfObjects;
 import com.gnome.gnome.game.GameController;
 import com.gnome.gnome.monsters.movements.MovementStrategy;
 import com.gnome.gnome.player.Player;
@@ -90,6 +92,9 @@ public abstract class Monster {
     private boolean firstUpdateDone = false;
     private int countUpdates = 0;
 
+    private long lastMoveTime = 0;
+    private static final long MOVE_COOLDOWN = 500_000_000L; // 0.5 seconds
+
     /**
      * Constructor for the Monster class. This method is called when a new Monster object is created.
      * It initializes all the monster's attributes with the provided values.
@@ -123,20 +128,6 @@ public abstract class Monster {
 
         initRepresentation();
     }
-
-
-
-    /**
-     * Executes an attack action based on monster type.
-     * Must be implemented by concrete subclasses.
-     *
-     * @param cameraStartCol the starting column of the camera viewport
-     * @param cameraStartRow the starting row of the camera viewport
-     * @param playerGridX    the player's current X position
-     * @param playerGridY    the player's current Y position
-     * @return attack result (e.g., projectile or null if not attacking)
-     */
-    public abstract Object attack(int cameraStartCol, int cameraStartRow, int playerGridX, int playerGridY);
 
     /**
      * Updates the visual position of the monster based on camera offset.
@@ -220,8 +211,11 @@ public abstract class Monster {
      * @param newY new Y coordinate
      */
     public void setPosition(int newX, int newY) {
+        if (newX < 0 || newY < 0) return;
+
         this.x = newX;
         this.y = newY;
+
         if (representation != null) {
             representation.getProperties().put("gridX", newX);
             representation.getProperties().put("gridY", newY);
@@ -351,5 +345,38 @@ public abstract class Monster {
             Image originalImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)));
             representation.setImage(originalImage);
         }
+    }
+
+    public void updateLogic(Player player, double delta, int [][] fieldMap, int [][] baseMap) {
+        if (isHitEffectPlaying || isMeleeAttacking) return;
+        long now = System.nanoTime();
+        if (now - lastMoveTime < MOVE_COOLDOWN) return;
+        lastMoveTime = now;
+
+        int dx = Math.abs(player.getX() - x);
+        int dy = Math.abs(player.getY() - y);
+        if (dx <= attackRange && dy <= attackRange) return;
+
+        int oldX = x, oldY = y;
+        move();
+
+        int newX = getX(), newY = getY();
+        if (newX < 0 || newY < 0 || newY >= fieldMap.length || newX >= fieldMap[0].length) {
+            setPosition(oldX, oldY);
+            return;
+        }
+
+        int tile = fieldMap[newY][newX];
+        if (tile < 0) tile = baseMap[newY][newX];
+
+        TypeOfObjects type = TypeOfObjects.fromValue(tile);
+
+        if (!type.isWalkable()) {
+            setPosition(oldX, oldY);
+        }
+    }
+
+    public void updateVisual(Camera camera) {
+        updatePositionWithCamera(camera.getStartCol(), camera.getStartRow(), camera.getTileWidth(), camera.getTileHeight(), true);
     }
 }
