@@ -3,7 +3,7 @@ import com.gnome.gnome.dao.ArmorDAO;
 import com.gnome.gnome.dao.PotionDAO;
 import com.gnome.gnome.dao.WeaponDAO;
 import com.gnome.gnome.exceptions.BalanceException;
-import com.gnome.gnome.player.Player;
+import com.gnome.gnome.userState.UserState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,13 +15,11 @@ public class ShopService {
     private final WeaponDAO weaponDAO = new WeaponDAO();
     private final PotionDAO potionDAO = new PotionDAO();
     private final ArmorDAO armorDAO = new ArmorDAO();
-    private final Player player;
+    private final UserState user;
 
     private final List<ShopItem> items = new ArrayList<>();
 
-    public ShopService() {
-        this.player = Player.getInstance(0, 0, 0);
-    }
+    public ShopService() { this.user = UserState.getInstance(); }
 
     /**
      * Retrieves a randomized list of shop items composed of:
@@ -55,12 +53,12 @@ public class ShopService {
      * @throws BalanceException if the player's coin balance is insufficient
      */
     public void buy(ShopItem item) {
-        float playerCoinsRemainder = player.getPlayerCoins() - item.getCost();
-        if (playerCoinsRemainder < 0) {
+        float coinsRemainder = user.getBalance() - item.getCost();
+        if (coinsRemainder < 0) {
             throw new BalanceException("Not enough money");
         }
 
-        player.setPlayerCoins((int) playerCoinsRemainder);
+        user.setBalance(coinsRemainder);
         item.buy();
     }
 }

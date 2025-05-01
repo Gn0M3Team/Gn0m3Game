@@ -46,6 +46,7 @@ public class Player {
     @Setter @Getter
     private int playerCoins = 10000;
 
+    @Getter
     private static Player instance;
 
     @Setter
@@ -86,7 +87,6 @@ public class Player {
         }
         return instance;
     }
-
 
     // Movement methods: These methods allow the player to move on the grid by changing their x and y coordinates
     // Each method adjusts the player's position by 1 tile in the specified direction

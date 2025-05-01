@@ -13,6 +13,7 @@ public class UserState {
 
     private String username;
     private PlayerRole role;
+    @Getter
     private float balance;
     private float health;
     private int score;
@@ -31,6 +32,7 @@ public class UserState {
     public static UserState getInstance() {
         if (instance == null) {
             instance = new UserState();
+            instance.setBalance(10000);
         }
         return instance;
     }
