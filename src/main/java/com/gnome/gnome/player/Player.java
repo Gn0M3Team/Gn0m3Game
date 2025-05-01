@@ -2,11 +2,13 @@ package com.gnome.gnome.player;
 
 import com.gnome.gnome.game.GameController;
 import com.gnome.gnome.monsters.Monster;
+import javafx.animation.TranslateTransition;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.util.Duration;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -33,6 +35,8 @@ public class Player {
      */
     private final int maxHealth;
 
+    private double damage;
+
     /**
      * The current health of the player.
      */
@@ -58,24 +62,23 @@ public class Player {
      * @param startY     the starting Y position
      * @param maxHealth  the maximum health of the player
      */
-    private Player(int startX, int startY, int maxHealth) {
+    private Player(int startX, int startY, int maxHealth, double damage) {
         this.x = startX; // Set the player's initial X-coordinate on the grid
         this.y = startY; // Set the player's initial Y-coordinate on the grid
         this.maxHealth = maxHealth; // Set the player's maximum health.
         this.currentHealth = maxHealth; // Set the player's current health to the maximum health at the start of the game.
+        this.damage = damage;
 
         // Create a yellow square to visually represent the player:
-        // - TILE_SIZE x TILE_SIZE defines the size of the square (50x50 pixels)
-        // - Color.YELLOW sets the fill color of the square to yellow
         Rectangle rect = new Rectangle(TILE_SIZE * 0.6, TILE_SIZE * 0.6, Color.YELLOW);
-        rect.setArcWidth(10); // Rounded corners
+        rect.setArcWidth(10);
         rect.setArcHeight(10);
         this.representation = rect;
     }
 
-    public static Player getInstance(int startX, int startY, int maxHealth) {
+    public static Player getInstance(int startX, int startY, int maxHealth, double damage) {
         if (instance == null) {
-            instance = new Player(startX, startY, maxHealth);
+            instance = new Player(startX, startY, maxHealth, damage);
         }
         return instance;
     }
@@ -110,20 +113,12 @@ public class Player {
      *
      * @param monsters A list of all monsters currently in the game.
      * @param range The attack range (in tiles). For example, if range=1, the player can attack monsters 1 tile away in any direction.
-     * @param damage The amount of damage to deal to each monster that is hit (e.g., 20).
-     * @param gameObjectsPane The JavaFX Pane where visual effects (like hit animations) are displayed.
-     * @param cameraStartCol The starting column of the camera's viewport (used for positioning visual effects).
-     * @param cameraStartRow The starting row of the camera's viewport (used for positioning visual effects).
      * @param onHitEffectFinished A callback function (Consumer) that is called when a monster's hit effect finishes.
      *                            This is used to handle actions after the hit effect (e.g., removing a dead monster).
      * @return A list of monsters that were eliminated (killed) by the attack.
      */
     public List<Monster> attack(List<Monster> monsters,
                                 int range,
-                                int damage,
-                                Pane gameObjectsPane,
-                                int cameraStartCol,
-                                int cameraStartRow,
                                 Consumer<Monster> onHitEffectFinished) {
         // Create a list to store monsters that are within the player's attack range
         List<Monster> hitMonsters = new ArrayList<>();
@@ -153,7 +148,7 @@ public class Player {
         // Iterate through all monsters that were hit to apply damage and visual effects
         for (Monster monster : hitMonsters) {
             // Apply the specified damage to the monster (e.g., reduce its health by 20)
-            monster.takeDamage(damage);
+            monster.takeDamage(this.damage);
 
             // Check if the monster's health has dropped to 0 or below (i.e., the monster is dead)
             if (monster.getHealth() <= 0) {
@@ -220,22 +215,28 @@ public class Player {
      */
     public void updatePositionWithCamera(int cameraStartCol, int cameraStartRow,
                                          double tileWidth, double tileHeight) {
-        double sizeX = tileWidth  * 0.6;
+        double sizeX = tileWidth * 0.6;
         double sizeY = tileHeight * 0.6;
 
-        double offsetX = (tileWidth  - sizeX) / 2;
+        double offsetX = (tileWidth - sizeX) / 2;
         double offsetY = (tileHeight - sizeY) / 2;
 
-        double px = (x - cameraStartCol) * tileWidth  + offsetX;
+        double px = (x - cameraStartCol) * tileWidth + offsetX;
         double py = (y - cameraStartRow) * tileHeight + offsetY;
 
-        representation.setTranslateX(px);
-        representation.setTranslateY(py);
+        animateToPosition(px, py);
 
         if (representation instanceof Rectangle r) {
             r.setWidth(sizeX);
             r.setHeight(sizeY);
         }
+    }
+
+    private void animateToPosition(double toX, double toY) {
+        TranslateTransition transition = new TranslateTransition(Duration.millis(50), representation);
+        transition.setToX(toX);
+        transition.setToY(toY);
+        transition.play();
     }
 
 }

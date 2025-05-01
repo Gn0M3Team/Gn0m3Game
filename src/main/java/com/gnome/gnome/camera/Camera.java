@@ -16,6 +16,7 @@ import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import lombok.Data;
+import software.amazon.awssdk.services.ecrpublic.model.ImageNotFoundException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -376,16 +377,13 @@ public class Camera {
     }
 
     private String getItemStats(Object item) {
-        if (item instanceof Weapon) {
-            Weapon w = (Weapon)item;
+        if (item instanceof Weapon w) {
             return "DMG: " + w.getAtkValue();
         }
-        if (item instanceof Armor) {
-            Armor a = (Armor)item;
+        if (item instanceof Armor a) {
             return "DEF k: " + a.getDefCof();
         }
-        if (item instanceof Potion) {
-            Potion p = (Potion)item;
+        if (item instanceof Potion p) {
             return "HP: +" + p.getScoreVal();
         }
         return "";
@@ -401,7 +399,7 @@ public class Camera {
      * @return the loaded {@link Image} object
      * @throws NullPointerException if the resource stream cannot be found
      */
-    private Image loadItemImage(String imageName) {
+    private Image loadItemImage(String imageName) throws ImageNotFoundException {
         if (imageName == null) {
             imageName = "default-no-item.png";
         } else {
@@ -452,7 +450,7 @@ public class Camera {
      * so that the viewport doesn't go out of bounds.
      */
     private void clampCameraCenter() {
-        int halfViewport = viewportSize / 2; // Calculate half the size of the viewport (viewportSize / 2)
+        int halfViewport = viewportSize / 2; // Calculate half the size of the viewport
 
         int totalCols = mapGrid[0].length; // Number of columns
         int totalRows = mapGrid.length; // Number of lines

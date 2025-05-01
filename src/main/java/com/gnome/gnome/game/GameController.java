@@ -28,7 +28,6 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
@@ -44,8 +43,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.*;
 import java.util.logging.Logger;
-
-import static com.gnome.gnome.editor.utils.TypeOfObjects.*;
 
 public class GameController {
 
@@ -119,7 +116,7 @@ public class GameController {
      */
     private long lastMonsterUpdateTime = 0;
 
-    private boolean is_end = false;
+    private boolean is_stop = false;
 
     // Player instance
     @Getter
@@ -224,7 +221,7 @@ public class GameController {
         startMonsterMovement();
 
         // Initial update of the camera viewport to render the map and player
-        updateCameraViewport();
+        updateCameraViewport(false);
     }
 
     private void addChestsToGameObjectsPane() {
@@ -251,11 +248,7 @@ public class GameController {
             monsterView.getProperties().put("gridX", monster.getX());
             monsterView.getProperties().put("gridY", monster.getY());
 
-            monsterView.setFitWidth(tileSize);
-            monsterView.setFitHeight(tileSize);
-
-            monsterView.setTranslateX((monster.getX() - camera.getStartCol()) * tileSize);
-            monsterView.setTranslateY((monster.getY() - camera.getStartRow()) * tileSize);
+            monster.updatePositionWithCamera(camera.getStartCol(), camera.getStartRow(), tileSize, tileSize, false);
 
             if (!gameObjectsPane.getChildren().contains(monsterView)) {
                 gameObjectsPane.getChildren().add(monsterView);
@@ -281,6 +274,7 @@ public class GameController {
         coinsOnMap.clear();
         activeArrows.clear();
         gameObjectsPane.getChildren().clear();
+        is_stop = false;
     }
 
 
@@ -291,7 +285,9 @@ public class GameController {
                 TypeOfObjects tileType = TypeOfObjects.fromValue(tile);
 
                 if (tile == TypeOfObjects.START_POINT.getValue()) {
-                    player = Player.getInstance(col, row, PLAYER_MAX_HEALTH);
+                    int health = armor == null ? PLAYER_MAX_HEALTH : armor.getHealth();
+                    double damage = weapon == null ? 20.0 : weapon.getAtkValue();
+                    player = Player.getInstance(col, row, health, damage);
                     fieldMap[row][col] = TypeOfObjects.START_POINT.getValue();
                 }
 
@@ -389,7 +385,7 @@ public class GameController {
         scene.setOnKeyPressed(event -> {
             // If the center menu popup is showing, ignore key presses (player cannot move while the menu is open)
             if (centerMenuPopup != null && centerMenuPopup.isShowing()) return;
-            if (is_end) return;
+            if (is_stop) return;
 
             // Get the dimensions of the map to ensure the player stays within bounds
             int maxRow = baseMap.length; // Number of rows in the map
@@ -431,7 +427,7 @@ public class GameController {
                     }
                     // Perform the attack, dealing 20 damage to monsters within 1 tile
                     // The callback removes any monsters that are killed by the attack
-                    player.attack(monsterList, 1, 20, gameObjectsPane, camera.getStartCol(), camera.getStartRow(), monster -> {
+                    player.attack(monsterList, 1, monster -> {
                         removeMonsters(Collections.singletonList(monster));
                     });
                 }
@@ -495,7 +491,7 @@ public class GameController {
 
                     // Update the camera to follow the player and redraw the viewport
                     camera.updateCameraCenter();
-                    updateCameraViewport();
+                    updateCameraViewport(true);
 
                     for (Monster m : monsterList) {
                         m.cancelMeleeAttackIfPlayerOutOfRange(player);
@@ -534,13 +530,12 @@ public class GameController {
 
             if (isAdjacent) {
                 chest.animate();
-                player.addCoin(chest.getValue());
+                player.addCoin(Math.round(chest.getValue()));
 
                 PauseTransition delay = new PauseTransition(javafx.util.Duration.seconds(1));
                 delay.setOnFinished(event -> {
-                    gameObjectsPane.getChildren().remove(chest.getImageView());
                     activeChests.remove(chest);
-                    updateCameraViewport();
+                    updateCameraViewport(true);
                 });
                 delay.play();
 
@@ -680,7 +675,7 @@ public class GameController {
         // Update the fieldMap with the remaining monsters
         camera.setMapGrid(fieldMap);
         // Redraw the viewport to reflect the changes (e.g., monster removed, coin added)
-        updateCameraViewport();
+        updateCameraViewport(true);
     }
 
 
@@ -688,7 +683,7 @@ public class GameController {
      * Updates the camera's viewport to render the current state of the game.
      * This includes drawing the map, updating the player's position, repositioning effects, and updating UI elements.
      */
-    private void updateCameraViewport() {
+    private void updateCameraViewport(boolean isTransit) {
         GraphicsContext gc = viewportCanvas.getGraphicsContext2D();
         camera.updateCameraCenter();
         camera.drawViewport(viewportCanvas, coinsOnMap);
@@ -699,7 +694,7 @@ public class GameController {
 
         for (Monster monster : monsterList) {
             monster.updatePositionWithCamera(camera.getStartCol(), camera.getStartRow(),
-                    camera.getTileWidth(), camera.getTileHeight());
+                    camera.getTileWidth(), camera.getTileHeight(), isTransit);
         }
 
         for (Chest chest : activeChests) {
@@ -769,7 +764,7 @@ public class GameController {
                 }
 
                 // Update the viewport to reflect the current game state
-                updateCameraViewport();
+                updateCameraViewport(true);
 
                 // Check if it's time to update monster behavior (every 1 second)
                 if (now - lastMonsterUpdateTime >= MONSTER_UPDATE_INTERVAL_NANOS) {
@@ -868,6 +863,14 @@ public class GameController {
                 continue;
             }
 
+            boolean isChestAtNewPos = activeChests.stream()
+                    .anyMatch(ch -> ch.getGridX() == newX && ch.getGridY() == newY);
+            if (isChestAtNewPos) {
+                if (debug_mod_game)
+                    System.out.println("Monster cannot move to (" + newX + ", " + newY + ") - chest blocking");
+                return;
+            }
+
             // Check if the new position is occupied by the player
             // If so, revert the monster to its old position (monsters cannot move onto the player's tile)
             if (newX == player.getX() && newY == player.getY()) {
@@ -955,7 +958,9 @@ public class GameController {
         // Create the popup if it doesn't already exist
         if (centerMenuPopup == null) {
             centerMenuPopup = new Popup();
+            monsterMovementTimer.stop();
             centerMenuPopup.setAutoHide(true); // The popup hides when clicked outside of it
+            is_stop = true;
 
             // Create a VBox to hold the popup's content
             VBox menuBox = new VBox(20); // 20 pixels spacing between children
@@ -972,7 +977,11 @@ public class GameController {
             Button goBackButton = new Button("Go Back");
 
             // Define the action for "Option 1" (simply closes the popup)
-            option1.setOnAction(e -> centerMenuPopup.hide());
+            option1.setOnAction(e ->  {
+                centerMenuPopup.hide();
+                monsterMovementTimer.start();
+                is_stop = false;
+            });
 
             // Define the action for "Go Back" (loads the main menu scene)
             goBackButton.setOnAction(e -> {
@@ -1031,9 +1040,9 @@ public class GameController {
      */
     private void showGameOverOverlay() {
         if (gameOverOverlay != null) return;
-        if (is_end) return;
+        if (is_stop) return;
         monsterMovementTimer.stop();
-        is_end = true;
+        is_stop = true;
 
         gameOverOverlay = new VBox(20);
         gameOverOverlay.setAlignment(Pos.CENTER);

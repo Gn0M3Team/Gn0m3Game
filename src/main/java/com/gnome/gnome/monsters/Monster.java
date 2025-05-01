@@ -7,6 +7,7 @@ import com.gnome.gnome.player.Player;
 import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
+import javafx.animation.TranslateTransition;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -86,6 +87,9 @@ public abstract class Monster {
 
     protected Timeline activeAttackAnimation; // для зупинки атаки вручну
 
+    private boolean firstUpdateDone = false;
+    private int countUpdates = 0;
+
     /**
      * Constructor for the Monster class. This method is called when a new Monster object is created.
      * It initializes all the monster's attributes with the provided values.
@@ -144,25 +148,37 @@ public abstract class Monster {
      * @param tileHeight height of one tile
      */
     public void updatePositionWithCamera(int cameraStartCol, int cameraStartRow,
-                                         double tileWidth, double tileHeight) {
+                                         double tileWidth, double tileHeight, boolean isTransit) {
         if (representation == null) return;
 
         double sizeX = tileWidth * 0.6;
         double sizeY = tileHeight * 0.6;
 
-        double offsetX = (tileWidth  - sizeX) / 2;
+        double offsetX = (tileWidth - sizeX) / 2;
         double offsetY = (tileHeight - sizeY) / 2;
 
         double px = (x - cameraStartCol) * tileWidth + offsetX;
         double py = (y - cameraStartRow) * tileHeight + offsetY;
 
-        representation.setTranslateX(px);
-        representation.setTranslateY(py);
+        ImageView iv = representation;
+        iv.setFitWidth(sizeX);
+        iv.setFitHeight(sizeY);
 
-        if (representation instanceof ImageView iv) {
-            iv.setFitWidth(sizeX);
-            iv.setFitHeight(sizeY);
+        boolean shouldAnimate = isTransit && firstUpdateDone && countUpdates >= 2;
+
+        if (shouldAnimate) {
+            TranslateTransition transition = new TranslateTransition(Duration.millis(50), representation);
+            transition.setToX(px);
+            transition.setToY(py);
+            transition.play();
+        } else {
+            representation.setTranslateX(px);
+            representation.setTranslateY(py);
         }
+
+        firstUpdateDone = true;
+        countUpdates++;
+
     }
 
 
@@ -216,7 +232,7 @@ public abstract class Monster {
      *
      * @param damage the amount of damage taken
      */
-    public void takeDamage(int damage) {
+    public void takeDamage(double damage) {
         health -= damage; // Subtract the damage from the monster's current health
         System.out.println("Monster at (" + x + ", " + y + ") took " + damage + " damage, health now: " + health);
     }
