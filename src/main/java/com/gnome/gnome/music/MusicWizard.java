@@ -24,6 +24,7 @@ public class MusicWizard {
 
     protected static float MAXvolume = 0.5f;
     static public boolean stop = false;
+    static public List<String> playlist;
 
     /**
      * Sets sent .wav file as an ambient and start to play it on a loop
@@ -106,18 +107,39 @@ public class MusicWizard {
         ambientControl.shift(-20, -80,50000);
         ambient.stop();
     }
+    /**
+     * Updates the current playlist with a new one (thread-safe).
+     */
+    public static void change_loop(List<String> newPlaylist){
+        synchronized (MusicWizard.class) {
+            playlist.clear();
+            playlist.addAll(newPlaylist);
+        }
+    }
+    /**
+     * Stops music and ambient playback.
+     */
+    public static void Music_stop(){
+        MusicWizard.stop = true;
+        MusicWizard.stop_ambient();
+    }
 
     /**
-     * Starts a playlist of soundtrack clips on repeat, with fading between clips in own Thread
+     * Starts a music loop playing each track from the playlist in sequence with fading transitions.
+     * If 'stop' is triggered, fades out and stops the music safely.
      */
     public static void start_music_loop() {
         musicRunning = true;
         stop = false;
-        List<String> playlist = new ArrayList<>();
 
-        playlist.add("src/main/java/com/gnome/gnome/music/1.wav");
-        playlist.add("src/main/java/com/gnome/gnome/music/2.wav");
-        playlist.add("src/main/java/com/gnome/gnome/music/3.wav");
+
+        // Fallback playlist if none provided
+        if (playlist==null){
+            playlist=new ArrayList<>();
+            playlist.add("src/main/java/com/gnome/gnome/music/1.wav");
+            playlist.add("src/main/java/com/gnome/gnome/music/2.wav");
+            playlist.add("src/main/java/com/gnome/gnome/music/3.wav");
+        }
 
         Thread musicThread = new Thread() {
             /**
@@ -126,7 +148,11 @@ public class MusicWizard {
              */
             public void run() {
                 while(!stop){
-                    for (String track: playlist) {
+                    List<String> currentPlaylist;
+                    synchronized (MusicWizard.class) {
+                        currentPlaylist = new ArrayList<>(playlist);
+                    }
+                    for (String track: currentPlaylist) {
                         try {
                             run_clip_till_finish(track);
                         } catch (InterruptedException e) {
@@ -210,6 +236,10 @@ public class MusicWizard {
      */
     @SneakyThrows
     public static void setup_music(String audioFile){
+        if (music != null && music.isOpen()) {
+            music.stop();
+            music.close();
+        }
         if ( music == null || !music.isRunning()){
             try {
                 music = AudioSystem.getClip();
