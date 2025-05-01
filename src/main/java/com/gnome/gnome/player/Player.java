@@ -32,9 +32,18 @@ public class Player {
     private double currentHealth;
     private final Node representation;
     private double playerCoins = 0;
+    private int score = 0;
+    private int countOfOpenedChest = 0;
+    private int countOfKilledMonsters = 0;
     private static Player instance;
     @Setter
     private double dynamicTileSize;
+
+    private long lastMoveTime = 0;
+    private static final long MOVE_COOLDOWN_NS = 200_000_000L;
+
+    private long lastAttackTime = 0;
+    private static final long ATTACK_COOLDOWN_NS = 300_000_000L;
 
     /**
      * Creates a new player at the specified position with the given maximum health.
@@ -105,11 +114,23 @@ public class Player {
         playerCoins += coin;
     }
 
+    public void addScore(int score) {
+        this.score += score;
+    }
+
+    public void addCountOfOpenedChest() {
+        countOfOpenedChest++;
+    }
+
+    public void addCountOfKilledMonsters() {
+        countOfKilledMonsters++;
+    }
+
     public Bounds getBounds() {
         return representation.getBoundsInParent();
     }
 
-    public void updatePositionWithCamera(int cameraStartCol, int cameraStartRow, double tileWidth, double tileHeight) {
+    public void updatePositionWithCamera(int cameraStartCol, int cameraStartRow, double tileWidth, double tileHeight, Runnable onAnimationFinished) {
         double sizeX = tileWidth * 0.6;
         double sizeY = tileHeight * 0.6;
         double offsetX = (tileWidth - sizeX) / 2;
@@ -117,7 +138,7 @@ public class Player {
         double px = (x - cameraStartCol) * tileWidth + offsetX;
         double py = (y - cameraStartRow) * tileHeight + offsetY;
 
-        animateToPosition(px, py);
+        animateToPosition(px, py, onAnimationFinished);
 
         if (representation instanceof Rectangle r) {
             r.setWidth(sizeX);
@@ -125,10 +146,13 @@ public class Player {
         }
     }
 
-    private void animateToPosition(double toX, double toY) {
+    private void animateToPosition(double toX, double toY, Runnable onFinished) {
         TranslateTransition transition = new TranslateTransition(Duration.millis(50), representation);
         transition.setToX(toX);
         transition.setToY(toY);
+        transition.setOnFinished(e -> {
+            if (onFinished != null) onFinished.run();
+        });
         transition.play();
     }
 
@@ -152,5 +176,23 @@ public class Player {
         }
 
         return eliminated;
+    }
+
+
+    public boolean canMoveNow() {
+        long now = System.nanoTime();
+        return (now - lastMoveTime) >= MOVE_COOLDOWN_NS;
+    }
+
+    public void recordMoveTime() {
+        lastMoveTime = System.nanoTime();
+    }
+
+    public boolean canAttackNow() {
+        return (System.nanoTime() - lastAttackTime) >= ATTACK_COOLDOWN_NS;
+    }
+
+    public void recordAttackTime() {
+        lastAttackTime = System.nanoTime();
     }
 }

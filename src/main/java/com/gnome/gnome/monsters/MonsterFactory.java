@@ -8,7 +8,6 @@ public class MonsterFactory {
     /**
      * Creates a monster of the given type at the specified position.
      */
-    // TODO: Implement two more columns for monster in db, and after that when we create monsters, we use for images data from db.
     public static Monster createMonster(TypeOfObjects type, int startX, int startY, com.gnome.gnome.models.Monster dbMonster) {
         return switch (type) {
             case DEMON -> new Demon(startX, startY, dbMonster);

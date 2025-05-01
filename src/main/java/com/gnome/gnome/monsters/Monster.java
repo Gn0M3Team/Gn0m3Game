@@ -69,6 +69,8 @@ public abstract class Monster {
      */
     protected int value;
 
+    protected int score;
+
     /**
      * The movement strategy used by the monster.
      */
@@ -114,7 +116,7 @@ public abstract class Monster {
      * @param movementStrategy The strategy that determines how the monster moves.
      * @param imagePath The file path to the monster's image.
      */
-    public Monster(double attack, double health, double cost, double attackRange, String nameEng, String nameSk, int startX, int startY, int value, MovementStrategy movementStrategy, String  imagePath, String hitGifPath, String attackGifPath) {
+    public Monster(double attack, double health, double cost, double attackRange, String nameEng, String nameSk, int startX, int startY, int value, MovementStrategy movementStrategy, String  imagePath, String hitGifPath, String attackGifPath, int score) {
         this.attack = attack; // Set the monster's attack damage
         this.health = health; // Set the monster's initial health
         this.cost = cost; // Set the coin reward for defeating the monster
@@ -128,6 +130,7 @@ public abstract class Monster {
         this.imagePath = imagePath; // Set the path to the monster's image
         this.hitGifPath = hitGifPath;
         this.attackImagePath = attackGifPath;
+        this.score = score;
 
         initRepresentation();
     }
@@ -157,7 +160,10 @@ public abstract class Monster {
         double px = (x - cameraStartCol) * tileWidth + offsetX;
         double py = (y - cameraStartRow) * tileHeight + offsetY;
 
-        boolean shouldAnimate = isTransit && firstUpdateDone && countUpdates >= 5;
+        boolean shouldAnimate = isTransit && firstUpdateDone && countUpdates == 5
+                && Camera.getInstance().getCameraCenterX() == x
+                && Camera.getInstance().getCameraCenterY() == y;
+
         if (shouldAnimate) {
             TranslateTransition transition = new TranslateTransition(Duration.millis(50), representation);
             transition.setToX(px);
@@ -293,11 +299,8 @@ public abstract class Monster {
     public void meleeAttack(Player player, Pane gameObjectsPane, long currentTime) {
         if (health <= 0) return;
         if (currentTime - lastMeleeAttackTime < MELEE_ATTACK_COOLDOWN) return;
-        if (gameObjectsPane == null) {
-            System.err.println("Error: gameObjectsPane is null in meleeAttack for Monster at (" + x + ", " + y + ")");
-            isMeleeAttacking = false;
-            return;
-        }
+        if (isMeleeAttacking) return;
+        if (gameObjectsPane == null) return;
 
         if (GameController.getGameController().isLineOfSightClear(x, y, player.getX(), player.getY())) {
             return;
@@ -321,9 +324,11 @@ public abstract class Monster {
                         int newDy = Math.abs(player.getY() - y);
 
                         if (newDx <= attackRange && newDy <= attackRange && health > 0) {
+                            System.out.println("Damage of " + nameEng + "is " + attack);
+                            System.out.println("Health of " + nameEng + "is " + health);
                             player.takeDamage(attack);
+                            lastMeleeAttackTime = System.nanoTime(); // встановлюємо тільки якщо атака вдала
                         }
-                        lastMeleeAttackTime = currentTime;
 
                         System.out.println("Finished attack animation for " + nameEng);
                     })

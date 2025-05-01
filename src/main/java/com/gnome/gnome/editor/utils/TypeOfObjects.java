@@ -65,7 +65,6 @@ public enum TypeOfObjects {
     CHEST_4("tile_354.png", 63),
     CHEST_5("tile_355.png", 64),
     CHEST_6("tile_451.png", 65),
-    CHEST_7("tile_513.png", 66),
 
 
     /** Doors category */
@@ -164,7 +163,6 @@ public enum TypeOfObjects {
             case 63  -> CHEST_4;
             case 64  -> CHEST_5;
             case 65  -> CHEST_6;
-            case 66  -> CHEST_7;
 
             // Doors
             case 80  -> DOOR_1;
@@ -216,7 +214,7 @@ public enum TypeOfObjects {
 
     public boolean isChest() {
         return switch (this) {
-            case CHEST_1, CHEST_2, CHEST_3, CHEST_4, CHEST_5, CHEST_6, CHEST_7 -> true;
+            case CHEST_1, CHEST_2, CHEST_3, CHEST_4, CHEST_5, CHEST_6 -> true;
             default -> false;
         };
     }
@@ -224,7 +222,7 @@ public enum TypeOfObjects {
     public boolean isTransparent() {
         return switch (this) {
             case FLOOR, EMPTY, FINISH_POINT, RIVER, WEB,
-                 CHEST_1, CHEST_2, CHEST_3, CHEST_4, CHEST_5, CHEST_6, CHEST_7,
+                 CHEST_1, CHEST_2, CHEST_3, CHEST_4, CHEST_5, CHEST_6,
                  DOOR_1, DOOR_2, DOOR_3, DOOR_4, DOOR_5, DOOR_6, DOOR_7, DOOR_8, DOOR_9, DOOR_10, DOOR_11, DOOR_12, DOOR_13
                     -> true;
             default -> false;

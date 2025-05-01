@@ -2,16 +2,22 @@ package com.gnome.gnome.game;
 
 import com.gnome.gnome.camera.Camera;
 import com.gnome.gnome.components.PlayerHealthBar;
+import com.gnome.gnome.dao.MapDAO;
+import com.gnome.gnome.dao.UserStatisticsDAO;
+import com.gnome.gnome.dao.userDAO.UserGameStateDAO;
 import com.gnome.gnome.game.component.Chest;
 import com.gnome.gnome.game.component.Coin;
 import com.gnome.gnome.editor.utils.TypeOfObjects;
-import com.gnome.gnome.models.Armor;
-import com.gnome.gnome.models.Potion;
-import com.gnome.gnome.models.Weapon;
+import com.gnome.gnome.models.*;
+import com.gnome.gnome.models.Map;
+import com.gnome.gnome.models.user.UserGameState;
 import com.gnome.gnome.monsters.Monster;
 import com.gnome.gnome.monsters.types.Skeleton;
 import com.gnome.gnome.monsters.types.missels.Arrow;
 import com.gnome.gnome.player.Player;
+import com.gnome.gnome.shop.controllers.ShopController;
+import com.gnome.gnome.switcher.switcherPage.SwitchPage;
+import com.gnome.gnome.userState.UserState;
 import javafx.animation.AnimationTimer;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
@@ -31,6 +37,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.Modality;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import lombok.Getter;
@@ -83,7 +90,13 @@ public class GameController {
     private GameUIManager uiManager;
     private VBox gameOverOverlay;
     private Popup centerMenuPopup;
+    private Pane darkOverlay;
     private PlayerHealthBar healthBar;
+
+
+    private Map selectedMap;
+    private boolean isStoryMode;
+
 
     public static GameController getGameController() {
         return instance == null ? new GameController() : instance;
@@ -92,7 +105,7 @@ public class GameController {
     public GameController() {}
 
 
-    public void initializeWithLoadedMap(int[][] mapData, List<com.gnome.gnome.models.Monster> monsterList, Armor armor, Weapon weapon, Potion potion) {
+    public void initializeWithLoadedMap(Map selectedMap,int[][] mapData, List<com.gnome.gnome.models.Monster> monsterList, Armor armor, Weapon weapon, Potion potion) {
         this.baseMap = mapData;
         this.fieldMap = GameInitializer.copyMap(baseMap);
         this.debugModGame = GameInitializer.loadProperties("app.debug_mod_game");
@@ -100,6 +113,8 @@ public class GameController {
         this.armor = armor;
         this.weapon = weapon;
         this.potion = potion;
+        this.selectedMap = selectedMap;
+        isStoryMode = selectedMap.getLevel() != 0;
 
 
         GameInitializer.setupMap(fieldMap, dbMonsters, this.monsterList, this.activeChests, armor, weapon);
@@ -150,17 +165,6 @@ public class GameController {
         StackPane.setAlignment(viewportRoot, Pos.CENTER);
 
         camera.drawViewport(viewportCanvas, coinsOnMap);
-    }
-
-    private void loadMainMenu() {
-        try {
-            URL fxmlUrl = getClass().getResource("/com/gnome/gnome/pages/main-menu.fxml");
-            Parent mainRoot = FXMLLoader.load(Objects.requireNonNull(fxmlUrl));
-            Stage stage = (Stage) centerMenuButton.getScene().getWindow();
-            stage.getScene().setRoot(mainRoot);
-        } catch (IOException ex) {
-            logger.severe("Failed to load main page: " + ex.getMessage());
-        }
     }
 
     private void addGameEntitiesToPane() {
@@ -225,7 +229,6 @@ public class GameController {
         if (tileType == TypeOfObjects.FINISH_POINT) onHatchStepped();
         else if (tileType == TypeOfObjects.RIVER) onRiverStepped();
 
-        checkCoinPickup();
         renderGame();
     }
 
@@ -252,6 +255,7 @@ public class GameController {
                 chest.setOpened(true);
                 chest.animate();
                 player.addCoin(Math.round(chest.getValue()));
+                player.addCountOfOpenedChest();
                 break;
             }
         }
@@ -277,9 +281,81 @@ public class GameController {
         uiManager.showTablePopup("Crafting Table");
     }
 
-    // TODO: Here we need to implement shop
     private void onHatchStepped() {
+        if (!monsterList.isEmpty()) {
+            if (debugModGame) System.out.println("You must kill all monsters before using the hatch!");
+            return;
+        }
 
+        isGameOver = true;
+        if (gameLoop != null) gameLoop.stop();
+
+        onLevelCompleted();
+
+        isStop = true;
+        uiManager.showStatisticsPopup(isStoryMode,() -> uiManager.showShopPopup(isStoryMode));
+    }
+
+    public void onLevelCompleted() {
+        updateMapAfterLevelCompletion(selectedMap);
+        updatePlayerAfterLevelCompletion(player);
+        updatePlayerStatisticsAfterLevelCompletion(player);
+
+        if (isStoryMode && selectedMap.getLevel() == UserState.getInstance().getMapLevel()) {
+            updatePlayerLevelAfterStoryLevelCompletion();
+        }
+    }
+
+    public void updatePlayerStatisticsAfterLevelCompletion(Player player) {
+        UserStatisticsDAO userStatisticsDAO = new UserStatisticsDAO();
+        UserStatistics userStatistics = userStatisticsDAO.getUserStatisticsByUsername(UserState.getInstance().getUsername());
+        if (userStatistics != null) {
+            userStatistics.setTotalMapsPlayed(userStatistics.getTotalMapsPlayed() + 1);
+            userStatistics.setTotalWins(userStatistics.getTotalWins() + 1);
+            userStatistics.setTotalMonstersKilled(userStatistics.getTotalMonstersKilled() + player.getCountOfKilledMonsters());
+            userStatistics.setTotalChestsOpened(userStatistics.getTotalChestsOpened() + player.getCountOfOpenedChest());
+            userStatisticsDAO.updateUserStatistics(userStatistics);
+        }
+    }
+
+    public void updatePlayerAfterLevelCompletion(Player player) {
+        UserGameStateDAO userGameStateDAO = new UserGameStateDAO();
+        UserGameState userGameState = userGameStateDAO.getUserGameStateByUsername(UserState.getInstance().getUsername());
+        if (userGameState != null) {
+            userGameState.setScore(userGameState.getScore() + player.getScore());
+            userGameState.setBalance((float) (userGameState.getBalance() + player.getPlayerCoins()));
+            userGameStateDAO.updateUserGameState(userGameState);
+        }
+    }
+
+    public void updateMapAfterLevelCompletion(Map map) {
+        MapDAO mapDAO = new MapDAO();
+        map.setTimesPlayed(map.getTimesPlayed() + 1);
+        map.setTimesCompleted(map.getTimesCompleted() + 1);
+        mapDAO.updateMap(map);
+    }
+
+
+
+    public void updatePlayerLevelAfterStoryLevelCompletion() {
+        UserGameStateDAO userGameStateDAO = new UserGameStateDAO();
+        UserGameState userGameState = userGameStateDAO.getUserGameStateByUsername(UserState.getInstance().getUsername());
+        if (userGameState != null) {
+            userGameState.setMapLevel(userGameState.getMapLevel() + 1);
+            userGameStateDAO.updateUserGameState(userGameState);
+        }
+    }
+
+    public void closeShopAndGoToMainMenu() {
+        if (uiManager.getCurrentPopup() != null) uiManager.getCurrentPopup().close();
+        onSceneExit(false);
+        new SwitchPage().goMainMenu(rootBorder);
+    }
+
+    public void closeShopAndStartNewGame() {
+        if (uiManager.getCurrentPopup() != null) uiManager.getCurrentPopup().close();
+        onSceneExit(false);
+        new SwitchPage().goNewGame(rootBorder);
     }
 
     /**
@@ -338,6 +414,8 @@ public class GameController {
         eliminated.forEach(monster -> {
             int x = monster.getX(), y = monster.getY();
             coinsOnMap.add(new Coin(x, y, monster.getCost()));
+            player.addScore(monster.getValue());
+            player.addCountOfKilledMonsters();
             gameObjectsPane.getChildren().remove(monster.getRepresentation());
         });
 
@@ -365,7 +443,7 @@ public class GameController {
         activeArrows.forEach(a -> a.updateCameraOffset(camera.getStartCol(), camera.getStartRow()));
 
         player.setDynamicTileSize(Math.min(camera.getTileWidth(), camera.getTileHeight()));
-        player.updatePositionWithCamera(camera.getStartCol(), camera.getStartRow(), camera.getTileWidth(), camera.getTileHeight());
+        player.updatePositionWithCamera(camera.getStartCol(), camera.getStartRow(), camera.getTileWidth(), camera.getTileHeight(), this::checkCoinPickup);
 
         if (!gameObjectsPane.getChildren().contains(player.getRepresentation()))
             gameObjectsPane.getChildren().add(player.getRepresentation());
@@ -413,6 +491,7 @@ public class GameController {
                     updateMonsters(delta);
                     updateProjectiles(delta);
                     renderGame();
+                    checkCoinPickup();
                     lastTime = now;
                 }
             }
@@ -421,9 +500,10 @@ public class GameController {
     }
 
     private void updateMonsters(double delta) {
-        if (isGameOver) return;
+        if (isGameOver || isStop) return;
 
         List<Monster> toRemove = new ArrayList<>();
+
         for (Monster monster : monsterList) {
             if (monster.getHealth() <= 0) {
                 toRemove.add(monster);
@@ -433,6 +513,7 @@ public class GameController {
                 gameObjectsPane.getChildren().add(monster.getRepresentation());
             }
             monster.updateLogic(player, delta, fieldMap, baseMap);
+
             if (monster instanceof Skeleton skeleton) {
                 if (skeleton.canShootArrow() && !skeleton.hasActiveArrow() &&
                         !isLineOfSightClear(skeleton.getX(), skeleton.getY(), player.getX(), player.getY())) {
@@ -481,7 +562,7 @@ public class GameController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/gnome/gnome/pages/game.fxml"));
             Parent newRoot = loader.load();
             GameController ctrl = loader.getController();
-            ctrl.initializeWithLoadedMap(baseMap, dbMonsters, armor, weapon, potion);
+            ctrl.initializeWithLoadedMap(selectedMap,baseMap, dbMonsters, armor, weapon, potion);
             Stage stage = (Stage) rootBorder.getScene().getWindow();
             stage.getScene().setRoot(newRoot);
         } catch (IOException ex) {
