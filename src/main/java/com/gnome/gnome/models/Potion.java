@@ -1,5 +1,6 @@
 package com.gnome.gnome.models;
 
+import com.gnome.gnome.MainApplication;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -19,4 +20,17 @@ public class Potion {
     private String detailsSk;
     private String img1;
     private String img2;
+
+    public String getDetails() {
+        if (MainApplication.lang == 'E')
+            return detailsEng;
+        else
+            return detailsSk;
+    }
+    public String getName() {
+        if (MainApplication.lang == 'E')
+            return nameEng;
+        else
+            return nameSk;
+    }
 }

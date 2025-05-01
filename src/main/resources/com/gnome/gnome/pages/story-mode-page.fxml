@@ -18,7 +18,7 @@
 
     <top>
         <HBox alignment="CENTER_LEFT" spacing="10" styleClass="top-bar">
-            <Button fx:id="backButton" onAction="#onBackButtonClick" styleClass="top-button" text="Back to Menu">
+            <Button fx:id="backButton" onAction="#onBackButtonClick" styleClass="top-button" text="%newgame.button.back">
             </Button>
 
             <Label styleClass="top-label" text="Story Maps" />

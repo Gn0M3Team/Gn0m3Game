@@ -1,6 +1,7 @@
 package com.gnome.gnome.models;
 
 
+import com.gnome.gnome.MainApplication;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -26,5 +27,14 @@ public class Map {
         this.level = level;
         this.timesPlayed = 0;
         this.timesCompleted = 0;
+    }
+
+    public String getName(){
+        if (MainApplication.lang == 'E') {
+            return mapNameEng;
+        }
+        else{
+            return mapNameSk;
+        }
     }
 }

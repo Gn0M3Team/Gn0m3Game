@@ -30,6 +30,9 @@ import java.util.Objects;
 public class MainController {
 // TODO: If we have time, we need to change logic with creating DAO, because we in two places crete monster dao, map dao, and for me we need to change this.
 
+    @FXML private Button newGameButton;
+    @FXML private Label menuLabel;
+    @FXML private Button LeaderBoardButton;
     @FXML private ImageView musicIcon;
     @FXML
     private Button musicButton;

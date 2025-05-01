@@ -71,7 +71,8 @@ public class StoryModeController {
             textContainer.setPrefWidth(400);
 
             // Map name
-            Label mapName = new Label("Map " + mapLevel + ": " + selectedMap.getMapNameEng());
+            Label mapName = new Label("Map " + mapLevel + ": " + selectedMap.getName());
+            System.out.println(selectedMap.getMapNameSk());
             mapName.getStyleClass().add("map-name");
 
             // Map status
