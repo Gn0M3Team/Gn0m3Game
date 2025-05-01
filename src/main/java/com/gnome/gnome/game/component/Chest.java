@@ -3,6 +3,7 @@ package com.gnome.gnome.game.component;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Objects;
 
@@ -10,6 +11,7 @@ import static com.gnome.gnome.editor.utils.EditorConstants.TILE_SIZE;
 import static com.gnome.gnome.game.component.ObjectsConstants.COIN_IMAGE;
 
 @Getter
+@Setter
 public class Chest {
     /**
      * The X position of the coin on the grid.
@@ -28,6 +30,8 @@ public class Chest {
      */
     private final ImageView imageView;
     private final String gifPath;
+
+    private boolean opened = false;
 
     public Chest(int gridX, int gridY, double value, String imagePath, String gifPath) {
         this.gridX = gridX;

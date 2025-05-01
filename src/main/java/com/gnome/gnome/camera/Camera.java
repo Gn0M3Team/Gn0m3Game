@@ -99,7 +99,7 @@ public class Camera {
             if (nx >= 0 && nx < baseMap[0].length && ny >= 0 && ny < baseMap.length) {
                 TypeOfObjects tileType = TypeOfObjects.fromValue(baseMap[ny][nx]);
                 boolean isTable = tileType == TypeOfObjects.TABLE;
-                boolean isChest = activeChests.stream().anyMatch(c -> c.getGridX() == nx && c.getGridY() == ny);
+                boolean isChest = activeChests.stream().anyMatch(c -> c.getGridX() == nx && c.getGridY() == ny && !c.isOpened());
 
                 if (isTable || isChest) {
                     int dx = nx - getStartCol();

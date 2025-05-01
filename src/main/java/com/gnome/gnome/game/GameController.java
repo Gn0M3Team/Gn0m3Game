@@ -41,6 +41,8 @@ import java.net.URL;
 import java.util.*;
 import java.util.logging.Logger;
 
+import static java.lang.Math.max;
+
 @Getter
 @Setter
 public class GameController {
@@ -239,26 +241,17 @@ public class GameController {
     }
 
     void openNearbyChest() {
-        Iterator<Chest> iter = activeChests.iterator();
-        while (iter.hasNext()) {
-            Chest chest = iter.next();
+        for (Chest chest : activeChests) {
             int cx = chest.getGridX();
             int cy = chest.getGridY();
 
             boolean isAdjacent = (Math.abs(cx - player.getX()) == 1 && cy == player.getY()) ||
                     (Math.abs(cy - player.getY()) == 1 && cx == player.getX());
 
-            if (isAdjacent) {
+            if (isAdjacent && !chest.isOpened()) {
+                chest.setOpened(true);
                 chest.animate();
                 player.addCoin(Math.round(chest.getValue()));
-
-                PauseTransition delay = new PauseTransition(javafx.util.Duration.seconds(1));
-                delay.setOnFinished(event -> {
-                    activeChests.remove(chest);
-                    renderGame();
-                });
-                delay.play();
-
                 break;
             }
         }
@@ -295,7 +288,7 @@ public class GameController {
      */
     private void onRiverStepped() {
         if (debugModGame) System.out.println("Player stepped on river at (" + player.getX() + ", " + player.getY() + ")");
-        double damage = player.getCurrentHealth() * 0.1;
+        double damage = max(player.getCurrentHealth() * 0.1, 1);
         player.takeDamage(damage);
         updatePlayerHealthBar();
     }
@@ -386,7 +379,7 @@ public class GameController {
         int dx = x2 - x1;
         int dy = y2 - y1;
 
-        int steps = Math.max(Math.abs(dx), Math.abs(dy));
+        int steps = max(Math.abs(dx), Math.abs(dy));
         double stepX = dx / (double) steps;
         double stepY = dy / (double) steps;
 
@@ -407,6 +400,7 @@ public class GameController {
      * The game loop updates the viewport, moves monsters, triggers skeleton attacks, and manages active arrows.
      */
     private void startGameLoop() {
+        if (isGameOver) return;
         gameLoop = new AnimationTimer() {
             @Override
             public void handle(long now) {
@@ -428,7 +422,13 @@ public class GameController {
 
     private void updateMonsters(double delta) {
         if (isGameOver) return;
+
+        List<Monster> toRemove = new ArrayList<>();
         for (Monster monster : monsterList) {
+            if (monster.getHealth() <= 0) {
+                toRemove.add(monster);
+                continue;
+            }
             if (monster.getRepresentation().getParent() == null) {
                 gameObjectsPane.getChildren().add(monster.getRepresentation());
             }
@@ -448,6 +448,10 @@ public class GameController {
                 monster.meleeAttack(player, gameObjectsPane, System.nanoTime());
             }
         }
+
+        if (!toRemove.isEmpty()) {
+            removeMonsters(toRemove);
+        }
     }
 
     private void updateProjectiles(double delta) {
@@ -463,6 +467,7 @@ public class GameController {
 
 
     public void shakeCamera() {
+        if (isGameOver) return;
         uiManager.shakeCamera();
     }
 

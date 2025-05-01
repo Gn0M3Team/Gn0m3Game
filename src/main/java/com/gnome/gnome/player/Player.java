@@ -136,11 +136,13 @@ public class Player {
         List<Monster> eliminated = new ArrayList<>();
 
         for (Monster monster : monsters) {
+            if (monster.getHealth() <= 0) continue;
             int dx = Math.abs(monster.getX() - x);
             int dy = Math.abs(monster.getY() - y);
 
             if (dx <= range && dy <= range && !GameController.getGameController().isLineOfSightClear(x, y, monster.getX(), monster.getY())) {
                 monster.takeDamage(damage);
+                System.out.println("Damage: " + damage + " monster: " + monster.getNameEng());
                 if (monster.getHealth() <= 0) eliminated.add(monster);
 
                 monster.showHitEffect(() -> {

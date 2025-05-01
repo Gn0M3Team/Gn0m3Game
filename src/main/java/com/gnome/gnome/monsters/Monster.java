@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.util.Objects;
 
 import static com.gnome.gnome.editor.utils.EditorConstants.TILE_SIZE;
+import static java.lang.Math.max;
 
 /**
  * Abstract base class representing a monster in the game.
@@ -230,6 +231,7 @@ public abstract class Monster {
      * @param damage the amount of damage taken
      */
     public void takeDamage(double damage) {
+        if (health <= 0) return;
         health -= damage; // Subtract the damage from the monster's current health
         System.out.println("Monster at (" + x + ", " + y + ") took " + damage + " damage, health now: " + health);
     }
@@ -355,7 +357,7 @@ public abstract class Monster {
             TypeOfObjects type = TypeOfObjects.fromValue(tile);
             boolean chestOnTile = GameController.getGameController().isBlocked(newX, newY, this);
 
-            if (type == TypeOfObjects.RIVER) takeDamage(health * 0.1);
+            if (type == TypeOfObjects.RIVER) takeDamage(max(health * 0.1, 1));
 
             if (type.isObstacle() || chestOnTile) {
                 setPosition(oldX, oldY);

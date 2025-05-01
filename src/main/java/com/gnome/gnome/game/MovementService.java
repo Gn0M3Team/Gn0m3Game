@@ -71,10 +71,10 @@ public class MovementService {
         List<Monster> monsters = controller.getMonsterList();
 
         List<Monster> eliminated = new ArrayList<>();
-        player.attack(monsters, 1, eliminated::add);
-
-        if (!eliminated.isEmpty()) {
-            controller.removeMonsters(eliminated);
-        }
+        player.attack(monsters, 1, monster -> {
+            eliminated.add(monster);
+            // видалення викликається, коли ефект завершено
+            controller.removeMonsters(List.of(monster));
+        });
     }
 }
