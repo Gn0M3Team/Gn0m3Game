@@ -32,6 +32,13 @@ public class MapLoaderService {
         executor.submit(() -> {
             try {
                 List<Monster> monsters = monsterDAO.getAllMonsters().stream().peek((value) -> value.setId(value.getId() * -1)).toList();
+
+                monsters.forEach(monster -> {
+                    System.out.println("Loading " + monster.getName());
+                    System.out.println(monster.getName());
+                    System.out.println(monster.getAttack());
+                    System.out.println(monster.getHealth());
+                });
               
                 Integer armorId = UserState.getInstance().getArmorId();
                 Armor armor = null;

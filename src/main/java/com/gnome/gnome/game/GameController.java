@@ -12,6 +12,8 @@ import com.gnome.gnome.monsters.Monster;
 import com.gnome.gnome.monsters.types.Skeleton;
 import com.gnome.gnome.monsters.types.missels.Arrow;
 import com.gnome.gnome.player.Player;
+import com.gnome.gnome.shop.controllers.ShopController;
+import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import javafx.animation.AnimationTimer;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
@@ -31,6 +33,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.Modality;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import lombok.Getter;
@@ -83,7 +86,10 @@ public class GameController {
     private GameUIManager uiManager;
     private VBox gameOverOverlay;
     private Popup centerMenuPopup;
+    private Pane darkOverlay;
     private PlayerHealthBar healthBar;
+    private Stage currentPopup;
+
 
     public static GameController getGameController() {
         return instance == null ? new GameController() : instance;
@@ -277,9 +283,76 @@ public class GameController {
         uiManager.showTablePopup("Crafting Table");
     }
 
-    // TODO: Here we need to implement shop
     private void onHatchStepped() {
+        if (!monsterList.isEmpty()) {
+            if (debugModGame) System.out.println("You must kill all monsters before using the hatch!");
+            return;
+        }
 
+        isGameOver = true;
+        if (gameLoop != null) gameLoop.stop();
+
+        showShopPopup();
+    }
+
+    private void showDarkOverlay() {
+        if (darkOverlay == null) {
+            darkOverlay = new Pane();
+            darkOverlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.6);");
+            darkOverlay.prefWidthProperty().bind(centerStack.widthProperty());
+            darkOverlay.prefHeightProperty().bind(centerStack.heightProperty());
+        }
+
+        if (!centerStack.getChildren().contains(darkOverlay)) {
+            centerStack.getChildren().add(darkOverlay);
+        }
+    }
+
+    private void hideDarkOverlay() {
+        centerStack.getChildren().remove(darkOverlay);
+    }
+
+    private void showShopPopup() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/gnome/gnome/pages/shop.fxml"));
+            Parent shopRoot = loader.load();
+
+            Scene shopScene = new Scene(shopRoot);
+            Stage popup = new Stage();
+            popup.initModality(Modality.APPLICATION_MODAL);
+            popup.initOwner(centerMenuButton.getScene().getWindow());
+            popup.setTitle("Shop");
+
+            popup.setScene(shopScene);
+            popup.setResizable(false);
+
+            showDarkOverlay();
+            popup.setOnHidden(e -> {
+                hideDarkOverlay();
+                currentPopup = null;
+            });
+
+            ShopController controller = loader.getController();
+            controller.setGameController(this);
+
+            currentPopup = popup;
+            popup.showAndWait();
+
+        } catch (IOException e) {
+            logger.severe("Failed to load shop popup: " + e.getMessage());
+        }
+    }
+
+    public void closeShopAndGoToMainMenu() {
+        if (currentPopup != null) currentPopup.close();
+        onSceneExit(false);
+        new SwitchPage().goMainMenu(rootBorder);
+    }
+
+    public void closeShopAndStartNewGame() {
+        if (currentPopup != null) currentPopup.close();
+        onSceneExit(false);
+        new SwitchPage().goNewGame(rootBorder);
     }
 
     /**
@@ -424,6 +497,7 @@ public class GameController {
         if (isGameOver) return;
 
         List<Monster> toRemove = new ArrayList<>();
+
         for (Monster monster : monsterList) {
             if (monster.getHealth() <= 0) {
                 toRemove.add(monster);
@@ -433,6 +507,7 @@ public class GameController {
                 gameObjectsPane.getChildren().add(monster.getRepresentation());
             }
             monster.updateLogic(player, delta, fieldMap, baseMap);
+
             if (monster instanceof Skeleton skeleton) {
                 if (skeleton.canShootArrow() && !skeleton.hasActiveArrow() &&
                         !isLineOfSightClear(skeleton.getX(), skeleton.getY(), player.getX(), player.getY())) {

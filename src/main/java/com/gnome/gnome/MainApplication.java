@@ -1,6 +1,7 @@
 package com.gnome.gnome;
 
 import com.gnome.gnome.config.EditorLogger;
+import com.gnome.gnome.dao.MonsterDAO;
 import com.gnome.gnome.db.DatabaseWrapper;
 import com.gnome.gnome.loginRegistration.controller.LoginRegistrationController;
 import com.gnome.gnome.music.MusicWizard;
@@ -33,7 +34,7 @@ public class MainApplication extends Application {
         System.out.println(skip_db);
 
         boolean skipLogging = properties.get("skip_logging");
-        skipLogging = true;
+//        skipLogging = true;
         FXMLLoader fxmlLoader = getFxmlLoader(skipLogging);
         Parent root = fxmlLoader.load();
 
@@ -41,6 +42,9 @@ public class MainApplication extends Application {
             MainController controller = fxmlLoader.getController();
             controller.setPrimaryStage(stage);
         }
+
+        MonsterDAO monsterDAO = new MonsterDAO();
+        monsterDAO.getAllMonsters();
 
 
         Scene scene = new Scene(root);
