@@ -4,8 +4,6 @@ import javafx.scene.Node;
 import javafx.scene.input.DragEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Scale;
 import lombok.Getter;
 import lombok.Setter;
@@ -147,10 +145,10 @@ public class GridManager {
             // Chests
             case "Chest_1"      -> TypeOfObjects.CHEST_1.getValue();
             case "Chest_2"      -> TypeOfObjects.CHEST_2.getValue();
-            case "Chest_3"      -> TypeOfObjects.CHEST_3.getValue();
-            case "Chest_4"      -> TypeOfObjects.CHEST_4.getValue();
-            case "Chest_5"      -> TypeOfObjects.CHEST_5.getValue();
-            case "Chest_6"      -> TypeOfObjects.CHEST_6.getValue();
+            case "Chest_3"      -> TypeOfObjects.CHEST_2.getValue();
+            case "Chest_4"      -> TypeOfObjects.CHEST_3.getValue();
+            case "Chest_5"      -> TypeOfObjects.CHEST_4.getValue();
+            case "Chest_6"      -> TypeOfObjects.CHEST_5.getValue();
 
             // Doors
             case "Door_1"       -> TypeOfObjects.DOOR_1.getValue();
