@@ -88,7 +88,6 @@ public class ShopController {
             if (!(node instanceof VBox cell)) continue;
 
             ShopItem item = items.get(cellIndex);
-            System.out.println(item.getNameEng());
             cellIndex++;
 
             Label priceLabel = (Label)cell.getChildren().get(1);
@@ -97,25 +96,14 @@ public class ShopController {
             StackPane iconContainer = (StackPane) cell.getChildren().get(0);
             iconContainer.getChildren().clear();
 
-            String resourcePath = item.getImagePath();
+            Image itemImage = item.getImage();
+            ImageView iv = new ImageView(itemImage);
+            iv.setFitWidth(iconContainer.getPrefWidth());
+            iv.setFitHeight(iconContainer.getPrefHeight());
+            iv.setPreserveRatio(true);
+            iconContainer.getChildren().add(iv);
 
-            Image image = null;
-            try (InputStream is = getClass().getResourceAsStream(resourcePath)) {
-                if (is != null) {
-                    image = new Image(is);
-                    ImageView iv = new ImageView(image);
-                    iv.setFitWidth(iconContainer.getPrefWidth());
-                    iv.setFitHeight(iconContainer.getPrefHeight());
-                    iv.setPreserveRatio(true);
-                    iconContainer.getChildren().add(iv);
-                }
-            } catch(IOException ex) {
-                logger.severe("Failed to load item's image: " + ex.getMessage());
-                throw new RuntimeException("Unable to load item's image" + ex.getMessage());
-            }
-
-            Image itemImage = image;
-            cell.setOnMouseClicked(e -> showItemModal(item, itemImage));
+            cell.setOnMouseClicked(e -> showItemModal(item));
         }
     }
 
@@ -126,10 +114,9 @@ public class ShopController {
      * a "Cancel" to close the modal window.
      *
      * @param item  the {@link ShopItem} whose details are to be displayed
-     * @param image the {@link Image} to be used as the item's icon in the modal
      * @throws RuntimeException if the FXML resource or controller cannot be loaded
      */
-    private void showItemModal(ShopItem item, Image image) {
+    private void showItemModal(ShopItem item) {
         try {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/gnome/gnome/pages/item-modal.fxml")
@@ -140,6 +127,7 @@ public class ShopController {
             Stage popup = new Stage();
             popup.initOwner(shopPopUpPage.getScene().getWindow());
             popup.initModality(Modality.APPLICATION_MODAL);
+            Image image = item.getImage();
             itemController.setItemData(item, new ImageView(image));
 
             popup.setScene(new Scene(root));

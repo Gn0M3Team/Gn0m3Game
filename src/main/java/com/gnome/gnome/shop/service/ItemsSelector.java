@@ -8,6 +8,7 @@ import com.gnome.gnome.models.Potion;
 import com.gnome.gnome.models.Weapon;
 import com.gnome.gnome.shop.utils.ItemCategory;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,9 +30,8 @@ public class ItemsSelector<T> {
                         a.getId(),
                         a.getCost(),
                         a.getNameEng(),
-                        a.getNameSk(),
                         a.getDetailsEng(),
-                        a.getDetailsSk(),
+                        a.getImg(),
                         ItemCategory.ARMOR,
                         String.format("Def coef.: %.2f", a.getDefCof())
                 ));
@@ -46,9 +46,8 @@ public class ItemsSelector<T> {
                         w.getId(),
                         w.getCost(),
                         w.getNameEng(),
-                        w.getNameSk(),
                         w.getDetailsEng(),
-                        w.getDetailsSk(),
+                        w.getImg(),
                         ItemCategory.WEAPON,
                         String.format("DMG: %.2f", w.getAtkValue())
                 ));
@@ -62,9 +61,8 @@ public class ItemsSelector<T> {
                         p.getId(),
                         p.getCost(),
                         p.getNameEng(),
-                        p.getNameSk(),
                         p.getDetailsEng(),
-                        p.getDetailsSk(),
+                        p.getImg1(),
                         ItemCategory.POTION,
                         String.format("HP: %+d", p.getScoreVal())
                 ));

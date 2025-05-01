@@ -1,6 +1,9 @@
 package com.gnome.gnome.shop.service;
 import com.gnome.gnome.shop.utils.ItemCategory;
 import lombok.Getter;
+import javafx.scene.image.Image;
+
+import java.util.Objects;
 
 /**
  * Represents shop item
@@ -11,45 +14,40 @@ public class ShopItem {
     @Getter
     private float cost;
     @Getter
-    private String nameEng;
+    private String name;
     @Getter
-    private String nameSk;
-    @Getter
-    private String detailsEng;
-    @Getter
-    private String detailsSk;
+    private String details;
     private ItemCategory category;
     @Getter
     private String characteristics;
+    @Getter
+    private String imageName;
 
     public ShopItem(int id,
                     float cost,
-                    String nameEng,
-                    String nameSk,
-                    String detailsEng,
-                    String detailsSk,
+                    String name,
+                    String details,
+                    String imageName,
                     ItemCategory category,
                     String characteristics) {
         this.id          = id;
         this.cost        = cost;
-        this.nameEng     = nameEng;
-        this.nameSk      = nameSk;
-        this.detailsEng  = detailsEng;
-        this.detailsSk   = detailsSk;
+        this.name        = name;
+        this.details     = details;
         this.category    = category;
         this.characteristics = characteristics;
+        this.imageName = imageName != null ? "tiles/" + imageName + ".png" : "default-no-item.png";
     }
 
     public void buy() {
         category.applyBuy(this.id);
     }
 
-    public String getImagePath() {
-        String folderName = category.getFolder();
-        return String.format(
-                "/com/gnome/gnome/images/items/%s/%s.png",
-                folderName,
-                this.id
-        );
+    /**
+     * Get an Image representation of the item
+     * @return {@link Image}
+     */
+    public Image getImage() {
+        return new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/gnome/gnome/images/" + imageName)));
     }
 }

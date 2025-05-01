@@ -42,9 +42,9 @@ public class ItemController {
      */
     public void setItemData(ShopItem data, ImageView image) {
         this.item = data;
-        itemName.setText(item.getNameEng());
+        itemName.setText(item.getName());
         itemValue.setText(item.getCharacteristics());
-        itemDetails.setText("Details: " + item.getDetailsEng());
+        itemDetails.setText("Details: " + item.getDetails());
         itemPrice.setText(String.valueOf(item.getCost()));
         itemImageContainer.getChildren().clear();
         image.setFitWidth(itemImageContainer.getPrefWidth());
@@ -71,7 +71,7 @@ public class ItemController {
     public void onBuy() {
         try {
             shopService.buy(item);
-            logger.severe(String.format("Player successfully bought item (%d, %s)", item.getId(), item.getNameEng()));
+            logger.severe(String.format("Player successfully bought item (%d, %s)", item.getId(), item.getName()));
             // Automatically close the modal after buying success
             onCancel();
         } catch (BalanceException ex) {
