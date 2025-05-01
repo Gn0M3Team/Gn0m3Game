@@ -13,23 +13,35 @@
                 prefHeight="400.0" prefWidth="600.0">
 
     <top>
-        <VBox alignment="CENTER" spacing="20" style="-fx-padding: 20">
-            <Label text="%settings.title"  styleClass="menu-title"/>
+        <VBox alignment="CENTER" spacing="20" style="-fx-padding: 30">
+            <Label fx:id="titleLabel" text="Setting" styleClass="menu-title-large"/>
 
-            <HBox alignment="CENTER" maxWidth="500" spacing="10">
-                <Button fx:id="backGameButton" styleClass="menu-button" text="%settings.button.backtogame" onAction="#backToGameButtonClick" prefWidth="230"/>
-                <Button fx:id="mainMenuButton" styleClass="menu-button" text="%settings.button.mainmenu" onAction="#mainMenuButtonClick" prefWidth="230"/>
+            <HBox alignment="CENTER" spacing="20">
+                <Button fx:id="backGameButton" styleClass="menu-button" text="Back to Game" onAction="#backToGameButtonClick" prefWidth="230"/>
+                <Button fx:id="mainMenuButton" styleClass="menu-button" text="Main Menu" onAction="#mainMenuButtonClick" prefWidth="230"/>
             </HBox>
         </VBox>
     </top>
+
     <center>
-        <VBox alignment="CENTER" spacing="10">
-            <Label text="%settings.titletext" styleClass="menu-title"/>
-            <Label text="%settings.text1" styleClass="center-button"/>
-            <Label text="%settings.text2" styleClass="center-button"/>
+        <VBox alignment="CENTER" spacing="40" style="-fx-padding: 30;">
+
+            <VBox alignment="CENTER" spacing="10">
+                <Label fx:id="languageLabelTitle" text="Language:" styleClass="menu-subtitle"/>
+                <HBox alignment="CENTER" spacing="15">
+                    <Button text="◀" onAction="#onLanguageLeftClick" styleClass="lang-button"/>
+                    <Label fx:id="languageLabel" text="English" styleClass="menu-title"/>
+                    <Button text="▶" onAction="#onLanguageRightClick" styleClass="lang-button"/>
+                </HBox>
+            </VBox>
+
+            <VBox alignment="CENTER" spacing="15">
+                <Label fx:id="selectMusicLabel" text="Select Music Track:" styleClass="menu-subtitle"/>
+                <ChoiceBox fx:id="musicChoiceBox" styleClass="choice-box" prefWidth="300"/>
+                <Button fx:id="applyMusicButton" styleClass="menu-button" text="Apply Music" onAction="#onApplyMusicClick" prefWidth="230" />
+            </VBox>
         </VBox>
     </center>
-
 
 
 </BorderPane>
