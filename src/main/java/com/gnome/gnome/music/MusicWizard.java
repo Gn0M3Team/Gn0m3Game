@@ -275,4 +275,35 @@ public class MusicWizard {
             t.start();  // calls run() below
         }
     }
+
+    public static void setGlobalVolume(double sliderValue) {
+        // 0-100 in 0.0001 - 0.5 (MAXvolume)
+        float volumeFraction = (float) (sliderValue / 100.0 * MAXvolume);
+        if (volumeFraction < 0.0001f) volumeFraction = 0.0001f;
+
+        float dB = (float)(Math.log10(volumeFraction) * 20.0);
+        if (musicControl != null) musicControl.setValue(dB);
+        if (ambientControl != null) ambientControl.setValue(dB);
+
+        currDB = dB;
+    }
+
+
+    public static void playSingleTrack(String filePath) {
+        stop = true;
+        try {
+            if (music != null && music.isRunning()) {
+                music.stop();
+                music.close();
+            }
+            setup_music(filePath);
+            music.loop(Clip.LOOP_CONTINUOUSLY);
+            shiftVolumeTo(1);
+            musicRunning = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }

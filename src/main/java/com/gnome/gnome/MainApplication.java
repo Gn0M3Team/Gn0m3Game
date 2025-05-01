@@ -9,6 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import lombok.Setter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +18,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
+@Setter
 public class MainApplication extends Application {
     private boolean skip_db;
     public static char lang = 'S';
