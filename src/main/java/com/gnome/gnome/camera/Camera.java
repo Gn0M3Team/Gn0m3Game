@@ -238,7 +238,6 @@ public class Camera {
         gc.strokeRoundRect(x, y, size, size + ITEM_BOX_EXTRA_HEIGHT, 10, 10);
 
         if (img != null) {
-            System.out.println("We drow img");
             double imgSize = size * 0.75;
             gc.drawImage(img, x + (size - imgSize) / 2, y + (size - imgSize) / 2, imgSize, imgSize);
         }
@@ -266,7 +265,6 @@ public class Camera {
     }
 
     private Image loadItemImage(String name) {
-        System.out.println("Loading image " + name);
         if (name == null || name.isEmpty()) {
             return getCachedItemImage("com/gnome/gnome/images/default-no-item.png");
         }
@@ -274,7 +272,6 @@ public class Camera {
     }
 
     private Image getCachedItemImage(String path) {
-        System.out.println("Loading item: " + path);
         return imageCache.computeIfAbsent(path, key -> {
             InputStream is = Camera.class.getResourceAsStream("/" + path);
             if (is == null) {

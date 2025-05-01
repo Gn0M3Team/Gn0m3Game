@@ -296,11 +296,8 @@ public abstract class Monster {
     public void meleeAttack(Player player, Pane gameObjectsPane, long currentTime) {
         if (health <= 0) return;
         if (currentTime - lastMeleeAttackTime < MELEE_ATTACK_COOLDOWN) return;
-        if (gameObjectsPane == null) {
-            System.err.println("Error: gameObjectsPane is null in meleeAttack for Monster at (" + x + ", " + y + ")");
-            isMeleeAttacking = false;
-            return;
-        }
+        if (isMeleeAttacking) return;
+        if (gameObjectsPane == null) return;
 
         if (GameController.getGameController().isLineOfSightClear(x, y, player.getX(), player.getY())) {
             return;
@@ -324,9 +321,11 @@ public abstract class Monster {
                         int newDy = Math.abs(player.getY() - y);
 
                         if (newDx <= attackRange && newDy <= attackRange && health > 0) {
+                            System.out.println("Damage of " + nameEng + "is " + attack);
+                            System.out.println("Health of " + nameEng + "is " + health);
                             player.takeDamage(attack);
+                            lastMeleeAttackTime = System.nanoTime(); // встановлюємо тільки якщо атака вдала
                         }
-                        lastMeleeAttackTime = currentTime;
 
                         System.out.println("Finished attack animation for " + nameEng);
                     })
