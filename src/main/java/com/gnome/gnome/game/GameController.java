@@ -2,18 +2,22 @@ package com.gnome.gnome.game;
 
 import com.gnome.gnome.camera.Camera;
 import com.gnome.gnome.components.PlayerHealthBar;
+import com.gnome.gnome.dao.MapDAO;
+import com.gnome.gnome.dao.UserStatisticsDAO;
+import com.gnome.gnome.dao.userDAO.UserGameStateDAO;
 import com.gnome.gnome.game.component.Chest;
 import com.gnome.gnome.game.component.Coin;
 import com.gnome.gnome.editor.utils.TypeOfObjects;
-import com.gnome.gnome.models.Armor;
-import com.gnome.gnome.models.Potion;
-import com.gnome.gnome.models.Weapon;
+import com.gnome.gnome.models.*;
+import com.gnome.gnome.models.Map;
+import com.gnome.gnome.models.user.UserGameState;
 import com.gnome.gnome.monsters.Monster;
 import com.gnome.gnome.monsters.types.Skeleton;
 import com.gnome.gnome.monsters.types.missels.Arrow;
 import com.gnome.gnome.player.Player;
 import com.gnome.gnome.shop.controllers.ShopController;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
+import com.gnome.gnome.userState.UserState;
 import javafx.animation.AnimationTimer;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
@@ -91,6 +95,9 @@ public class GameController {
     private Stage currentPopup;
 
 
+    private Map selectedMap;
+
+
     public static GameController getGameController() {
         return instance == null ? new GameController() : instance;
     }
@@ -98,7 +105,7 @@ public class GameController {
     public GameController() {}
 
 
-    public void initializeWithLoadedMap(int[][] mapData, List<com.gnome.gnome.models.Monster> monsterList, Armor armor, Weapon weapon, Potion potion) {
+    public void initializeWithLoadedMap(Map selectedMap,int[][] mapData, List<com.gnome.gnome.models.Monster> monsterList, Armor armor, Weapon weapon, Potion potion) {
         this.baseMap = mapData;
         this.fieldMap = GameInitializer.copyMap(baseMap);
         this.debugModGame = GameInitializer.loadProperties("app.debug_mod_game");
@@ -106,6 +113,7 @@ public class GameController {
         this.armor = armor;
         this.weapon = weapon;
         this.potion = potion;
+        this.selectedMap = selectedMap;
 
 
         GameInitializer.setupMap(fieldMap, dbMonsters, this.monsterList, this.activeChests, armor, weapon);
@@ -282,7 +290,60 @@ public class GameController {
         isGameOver = true;
         if (gameLoop != null) gameLoop.stop();
 
+        onLevelCompleted();
         showShopPopup();
+    }
+
+    public void onLevelCompleted() {
+        updateMapAfterLevelCompletion(selectedMap);
+
+        updatePlayerAfterLevelCompletion(player);
+
+        updatePlayerStatisticsAfterLevelCompletion(player);
+
+        if (selectedMap.getLevel() == UserState.getInstance().getMapLevel()) {
+            updatePlayerLevelAfterStoryLevelCompletion();
+        }
+    }
+
+    public void updatePlayerStatisticsAfterLevelCompletion(Player player) {
+        UserStatisticsDAO userStatisticsDAO = new UserStatisticsDAO();
+        UserStatistics userStatistics = userStatisticsDAO.getUserStatisticsByUsername(UserState.getInstance().getUsername());
+        if (userStatistics != null) {
+            userStatistics.setTotalMapsPlayed(userStatistics.getTotalMapsPlayed() + 1);
+            userStatistics.setTotalWins(userStatistics.getTotalWins() + 1);
+            userStatistics.setTotalMonstersKilled(userStatistics.getTotalMonstersKilled() + player.getCountOfKilledMonsters());
+            userStatistics.setTotalChestsOpened(userStatistics.getTotalChestsOpened() + player.getCountOfOpenedChest());
+            userStatisticsDAO.updateUserStatistics(userStatistics);
+        }
+    }
+
+    public void updatePlayerAfterLevelCompletion(Player player) {
+        UserGameStateDAO userGameStateDAO = new UserGameStateDAO();
+        UserGameState userGameState = userGameStateDAO.getUserGameStateByUsername(UserState.getInstance().getUsername());
+        if (userGameState != null) {
+            userGameState.setScore(userGameState.getScore() + player.getScore());
+            userGameState.setBalance((float) (userGameState.getBalance() + player.getPlayerCoins()));
+            userGameStateDAO.updateUserGameState(userGameState);
+        }
+    }
+
+    public void updateMapAfterLevelCompletion(Map map) {
+        MapDAO mapDAO = new MapDAO();
+        map.setTimesPlayed(map.getTimesPlayed() + 1);
+        map.setTimesCompleted(map.getTimesCompleted() + 1);
+        mapDAO.updateMap(map);
+    }
+
+
+
+    public void updatePlayerLevelAfterStoryLevelCompletion() {
+        UserGameStateDAO userGameStateDAO = new UserGameStateDAO();
+        UserGameState userGameState = userGameStateDAO.getUserGameStateByUsername(UserState.getInstance().getUsername());
+        if (userGameState != null) {
+            userGameState.setMapLevel(userGameState.getMapLevel() + 1); // Increment the player's level
+            userGameStateDAO.updateUserGameState(userGameState);
+        }
     }
 
     private void showDarkOverlay() {
@@ -548,7 +609,7 @@ public class GameController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/gnome/gnome/pages/game.fxml"));
             Parent newRoot = loader.load();
             GameController ctrl = loader.getController();
-            ctrl.initializeWithLoadedMap(baseMap, dbMonsters, armor, weapon, potion);
+            ctrl.initializeWithLoadedMap(selectedMap,baseMap, dbMonsters, armor, weapon, potion);
             Stage stage = (Stage) rootBorder.getScene().getWindow();
             stage.getScene().setRoot(newRoot);
         } catch (IOException ex) {

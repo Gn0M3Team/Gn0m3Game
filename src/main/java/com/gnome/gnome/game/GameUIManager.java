@@ -1,8 +1,15 @@
 package com.gnome.gnome.game;
 
 import com.gnome.gnome.components.PlayerHealthBar;
+import com.gnome.gnome.dao.MapDAO;
+import com.gnome.gnome.dao.UserStatisticsDAO;
+import com.gnome.gnome.dao.userDAO.UserGameStateDAO;
+import com.gnome.gnome.models.Map;
+import com.gnome.gnome.models.UserStatistics;
+import com.gnome.gnome.models.user.UserGameState;
 import com.gnome.gnome.player.Player;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
+import com.gnome.gnome.userState.UserState;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
@@ -44,6 +51,13 @@ public class GameUIManager {
         controller.setGameOver(true);
 
         Player player = controller.getPlayer();
+
+        Map map = controller.getSelectedMap();
+        updateMapAfterDeath(map);
+
+        updatePlayerAfterDeath(player);
+
+        updatePlayerStatisticsAfterDeath(player);
 
         VBox overlay = new VBox(20);
         overlay.setAlignment(Pos.CENTER);
@@ -139,6 +153,34 @@ public class GameUIManager {
         }
 
         controller.setCenterMenuPopup(popup);
+    }
+
+    public void updatePlayerAfterDeath(Player player) {
+        UserGameStateDAO userGameStateDAO = new UserGameStateDAO();
+        UserGameState userGameState = userGameStateDAO.getUserGameStateByUsername(UserState.getInstance().getUsername());
+        if (userGameState != null) {
+            userGameState.setScore(userGameState.getScore() + player.getScore());
+            userGameState.setBalance((float) (userGameState.getBalance() + player.getPlayerCoins()));
+            userGameStateDAO.updateUserGameState(userGameState);
+        }
+    }
+
+    public void updateMapAfterDeath(Map map) {
+        MapDAO mapDAO = new MapDAO();
+        map.setTimesPlayed(map.getTimesPlayed() + 1);
+        mapDAO.updateMap(map);
+    }
+
+    public void updatePlayerStatisticsAfterDeath(Player player) {
+        UserStatisticsDAO userStatisticsDAO = new UserStatisticsDAO();
+        UserStatistics userStatistics = userStatisticsDAO.getUserStatisticsByUsername(UserState.getInstance().getUsername());
+        if (userStatistics != null) {
+            userStatistics.setTotalMapsPlayed(userStatistics.getTotalMapsPlayed() + 1);
+            userStatistics.setTotalDeaths(userStatistics.getTotalDeaths() + 1);
+            userStatistics.setTotalMonstersKilled(userStatistics.getTotalMonstersKilled() + player.getCountOfKilledMonsters());
+            userStatistics.setTotalChestsOpened(userStatistics.getTotalChestsOpened() + player.getCountOfOpenedChest());
+            userStatisticsDAO.updateUserStatistics(userStatistics);
+        }
     }
 
     public void shakeCamera() {
