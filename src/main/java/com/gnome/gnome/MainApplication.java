@@ -3,6 +3,7 @@ package com.gnome.gnome;
 import com.gnome.gnome.config.EditorLogger;
 import com.gnome.gnome.db.DatabaseWrapper;
 import com.gnome.gnome.loginRegistration.controller.LoginRegistrationController;
+import com.gnome.gnome.music.MusicWizard;
 import com.gnome.gnome.utils.ImageParser;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -20,7 +21,12 @@ import java.util.ResourceBundle;
 public class MainApplication extends Application {
     private boolean skip_db;
     public static char lang = 'S';
+    public static boolean musicEnabled = true;
+    public static boolean ambientEnabled = true;
     public void start(Stage stage) throws IOException {
+
+        MusicWizard.start_music_loop();
+        MusicWizard.start_ambient();
 
         Map<String, Boolean> properties = getProperties();
         skip_db = properties.get("skip_db");

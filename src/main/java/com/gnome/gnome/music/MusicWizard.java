@@ -26,6 +26,11 @@ public class MusicWizard {
     static public boolean stop = false;
     static public List<String> playlist;
 
+    static protected float currDB = 0F;
+    static protected float targetDB = 0F;
+    static protected float fadePerStep = .03F; //TO big change will cause clicks
+    static protected boolean fading = false;
+
     /**
      * Sets sent .wav file as an ambient and start to play it on a loop
      */
@@ -107,22 +112,6 @@ public class MusicWizard {
         ambientControl.shift(-20, -80,50000);
         ambient.stop();
     }
-    /**
-     * Updates the current playlist with a new one (thread-safe).
-     */
-    public static void change_loop(List<String> newPlaylist){
-        synchronized (MusicWizard.class) {
-            playlist.clear();
-            playlist.addAll(newPlaylist);
-        }
-    }
-    /**
-     * Stops music and ambient playback.
-     */
-    public static void Music_stop(){
-        MusicWizard.stop = true;
-        MusicWizard.stop_ambient();
-    }
 
     /**
      * Starts a music loop playing each track from the playlist in sequence with fading transitions.
@@ -176,11 +165,6 @@ public class MusicWizard {
         musicThread.start();
 
     }
-
-    static protected float currDB = 0F;
-    static protected float targetDB = 0F;
-    static protected float fadePerStep = .03F; //TO big change will cause clicks
-    static protected boolean fading = false;
 
     /**
      * Starts a playlist of soundtrack clips on repeat, with fading between clips
@@ -305,4 +289,49 @@ public class MusicWizard {
             t.start();  // calls run() below
         }
     }
+
+    public static void setGlobalVolume(double sliderValue) {
+        float volumeFraction = (float) (sliderValue / 100.0 * MAXvolume);
+        if (volumeFraction < 0.0001f) volumeFraction = 0.0001f;
+
+        float dB = (float)(Math.log10(volumeFraction) * 20.0);
+        if (musicControl != null) musicControl.setValue(dB);
+        if (ambientControl != null) ambientControl.setValue(dB);
+
+        currDB = dB;
+    }
+
+    /**
+     * Plays a single audio track in a continuous loop, replacing any currently playing music.
+     *
+     * @param filePath the full path to the .wav file to be played
+     */
+    public static void playSingleTrack(String filePath) {
+        stop = true;
+        try {
+            if (music != null && music.isRunning()) {
+                music.stop();
+                music.close();
+            }
+            setup_music(filePath);
+            music.loop(Clip.LOOP_CONTINUOUSLY);
+            shiftVolumeTo(1);
+            musicRunning = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Stops the currently playing music and resets the music state.
+     */
+    public static void stop_music() {
+        stop = true;
+        if (music != null && music.isRunning()) {
+            music.stop();
+            music.close();
+        }
+        musicRunning = false;
+    }
+
 }
