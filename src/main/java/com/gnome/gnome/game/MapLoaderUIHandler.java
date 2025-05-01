@@ -27,10 +27,27 @@ public class MapLoaderUIHandler {
     public void showStartMap(Map map) {
         showLoadingPopup();
 
+        long startTime = System.currentTimeMillis();
+
         service.loadMapAsync(
                 (monsters, armor, weapon, potion) -> Platform.runLater(() -> {
-                    hideLoadingPopup();
-                    loadGamePage(map, monsters, armor, weapon, potion);
+                    long elapsed = System.currentTimeMillis() - startTime;
+                    long remaining = 7_000 - elapsed;
+
+                    if (remaining > 0) {
+                        new Thread(() -> {
+                            try {
+                                Thread.sleep(remaining);
+                            } catch (InterruptedException ignored) {}
+                            Platform.runLater(() -> {
+                                hideLoadingPopup();
+                                loadGamePage(map, monsters, armor, weapon, potion);
+                            });
+                        }).start();
+                    } else {
+                        hideLoadingPopup();
+                        loadGamePage(map, monsters, armor, weapon, potion);
+                    }
                 }),
                 ex -> Platform.runLater(() -> {
                     hideLoadingPopup();
@@ -42,16 +59,57 @@ public class MapLoaderUIHandler {
     private void showLoadingPopup() {
         if (loadingPopup == null) {
             Label loadingLabel = new Label("Loading...");
-            loadingLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: white; -fx-background-color: #333; -fx-padding: 20px;");
-            VBox box = new VBox(loadingLabel);
+            loadingLabel.setStyle("""
+                -fx-font-family: 'Press Start 2P';
+                -fx-font-size: 22px;
+                -fx-text-fill: white;
+                -fx-effect: dropshadow(gaussian, black, 2, 0.5, 1, 1);
+        """);
+
+            Label tipLabel = new Label(getRandomTip());
+            tipLabel.setWrapText(true);
+            tipLabel.setMaxWidth(500);
+            tipLabel.setStyle("""
+                -fx-font-family: 'Press Start 2P';
+                -fx-font-size: 12px;
+                -fx-text-fill: lightgray;
+                -fx-padding: 15px 0 0 0;
+        """);
+
+            VBox box = new VBox(loadingLabel, tipLabel);
+            box.setPrefSize(600, 300);
+            box.setStyle("""
+                -fx-background-color: rgba(0, 0, 0, 0.8);
+                -fx-border-color: white;
+                -fx-border-width: 2px;
+                -fx-background-radius: 15px;
+                -fx-border-radius: 15px;
+                -fx-padding: 30px;
+            """);
+            box.setSpacing(30);
             box.setAlignment(Pos.CENTER);
+
             loadingPopup = new Popup();
             loadingPopup.getContent().add(box);
         }
 
         loadingPopup.show(primaryStage);
-        loadingPopup.setX(primaryStage.getX() + primaryStage.getWidth() / 2 - 100);
-        loadingPopup.setY(primaryStage.getY() + primaryStage.getHeight() / 2 - 50);
+        loadingPopup.setX(primaryStage.getX() + primaryStage.getWidth() / 2 - 300);
+        loadingPopup.setY(primaryStage.getY() + primaryStage.getHeight() / 2 - 150);
+    }
+
+
+
+    private String getRandomTip() {
+        String[] tips = {
+                "Tip: Press 'E' to open nearby chests.",
+                "Tip: Use potions to quickly recover health.",
+                "Tip: Some monsters have patterns — study their movement.",
+                "Tip: Find better armor to survive longer.",
+                "Tip: Coins can be used to buy upgrades after a level."
+        };
+        int index = (int) (Math.random() * tips.length);
+        return tips[index];
     }
 
     private void hideLoadingPopup() {
