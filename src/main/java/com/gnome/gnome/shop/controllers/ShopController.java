@@ -1,5 +1,6 @@
 package com.gnome.gnome.shop.controllers;
 
+import com.gnome.gnome.game.GameController;
 import com.gnome.gnome.shop.service.ShopItem;
 import com.gnome.gnome.shop.service.ShopService;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
@@ -16,6 +17,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.IOException;
 import java.util.List;
@@ -28,10 +31,15 @@ import java.util.logging.Logger;
  * to handle page transitions.
  */
 public class ShopController {
+    @Setter
+    @Getter
+    private GameController gameController;
     private static final Logger logger = Logger.getLogger(ShopController.class.getName());
 
     @FXML
     private Button ReturnGameButton;
+    @FXML
+    private Button exitButton;
     @FXML
     private BorderPane shopPopUpPage;
     @FXML
@@ -61,7 +69,7 @@ public class ShopController {
      */
     @FXML
     public void onNewGame(ActionEvent e) {
-        pageSwitch.goNewGame(shopPopUpPage);
+        gameController.closeShopAndStartNewGame();
     }
 
     /**
@@ -71,8 +79,14 @@ public class ShopController {
      */
     @FXML
     public void onExit(ActionEvent e) {
-        pageSwitch.goMainMenu(shopPopUpPage);
+        gameController.closeShopAndGoToMainMenu();
     }
+
+    private void closePopup() {
+        Stage stage = (Stage) exitButton.getScene().getWindow();
+        stage.close();
+    }
+
 
     /**
      * Loads random items for shop

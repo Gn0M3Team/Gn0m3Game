@@ -103,7 +103,13 @@ public class MonsterDAO extends BaseDAO<Monster> {
      */
     public List<Monster> getAllMonsters() {
         String sql = "SELECT * FROM \"Monsters\"";
-        return findAll(sql);
+        List<Monster> monsters = findAll(sql);
+        monsters.forEach(monster -> {
+            System.out.println(monster.getName());
+            System.out.println(monster.getAttack());
+            System.out.println(monster.getHealth());
+        });
+        return monsters;
     }
 
 }

@@ -12,8 +12,8 @@ public class Monster {
     private String name_sk;
     private String details;
     private String details_sk;
-    private double health;
     private double attack;
+    private double health;
     private double radius;
     private int score_val;
     private double cost;
