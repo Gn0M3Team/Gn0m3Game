@@ -76,7 +76,7 @@ public class LoginRegistrationController {
             AuthUser authUser = authUserDAO.getAuthUserByUsername(username);
             UserStatistics userStatistics = userStatisticsDAO.getUserStatisticsByUsername(username);
 
-            if (authUser != null && userGameState != null) {
+            if (authUser != null && userGameState != null && userStatistics != null) {
                 UserState.init(authUser, userGameState, userStatistics);
             }
 

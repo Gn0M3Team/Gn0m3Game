@@ -7,6 +7,7 @@ import com.gnome.gnome.models.Monster;
 import com.gnome.gnome.models.Weapon;
 import com.gnome.gnome.monsters.MonsterFactory;
 import com.gnome.gnome.player.Player;
+import software.amazon.awssdk.services.s3.model.CSVOutput;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,6 +42,7 @@ public class GameInitializer {
                 if (tile == TypeOfObjects.START_POINT.getValue()) {
                     int health = armor == null ? PLAYER_MAX_HEALTH : armor.getHealth();
                     double damage = weapon == null ? 20.0 : weapon.getAtkValue();
+                    System.out.println("Damage: " + damage);
                     Player.getInstance(col, row, health, damage);
                     fieldMap[row][col] = TypeOfObjects.START_POINT.getValue();
                 }

@@ -37,10 +37,11 @@ public class GameUIManager {
     }
 
     public void showGameOverOverlay() {
-        if (controller.getGameOverOverlay() != null || !controller.isGameOver()) return;
+        if (controller.getGameOverOverlay() != null || controller.isGameOver()) return;
 
         controller.getGameLoop().stop();
         controller.setStop(true);
+        controller.setGameOver(true);
 
         VBox overlay = new VBox(20);
         overlay.setAlignment(Pos.CENTER);
@@ -89,8 +90,12 @@ public class GameUIManager {
         goBackButton.setOnAction(e -> {
             try {
                 controller.onSceneExit(false);
-                URL fxmlUrl = getClass().getResource("/com/gnome/gnome/pages/main-menu.fxml");
-                Parent mainRoot = FXMLLoader.load(Objects.requireNonNull(fxmlUrl));
+                URL fxmlUrl = GameUIManager.class.getResource("/com/gnome/gnome/pages/main-menu.fxml");
+                if (fxmlUrl == null) {
+                    logger.severe("main-menu.fxml not found!");
+                    return;
+                }
+                Parent mainRoot = FXMLLoader.load(fxmlUrl);
                 Stage stage = (Stage) controller.getCenterMenuButton().getScene().getWindow();
                 stage.getScene().setRoot(mainRoot);
             } catch (IOException ex) {
@@ -114,6 +119,8 @@ public class GameUIManager {
     }
 
     public void shakeCamera() {
+        if (controller.isGameOver()) return;
+
         double originalX = controller.getCenterStack().getTranslateX();
         double originalY = controller.getCenterStack().getTranslateY();
         Random random = new Random();
@@ -129,6 +136,14 @@ public class GameUIManager {
             @Override
             public void run() {
                 Platform.runLater(() -> {
+
+                    if (controller.isGameOver()) {
+                        controller.getCenterStack().setTranslateX(0);
+                        controller.getCenterStack().setTranslateY(0);
+                        timer.cancel();
+                        return;
+                    }
+
                     if (count < shakeTimes) {
                         double offsetX = (random.nextDouble() - 0.5) * 10;
                         double offsetY = (random.nextDouble() - 0.5) * 10;
