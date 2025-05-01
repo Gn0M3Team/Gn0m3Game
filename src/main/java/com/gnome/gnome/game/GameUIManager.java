@@ -101,7 +101,7 @@ public class GameUIManager {
     }
 
     public void showCenterMenuPopup() {
-        if (controller.getCenterMenuPopup() != null) return;
+        if (controller.getCenterMenuPopup() != null && controller.getCenterMenuPopup().isShowing()) return;
 
         Popup popup = new Popup();
         controller.getGameLoop().stop();
@@ -128,6 +128,14 @@ public class GameUIManager {
             controller.getGameLoop().start();
             controller.setStop(false);
             controller.getCenterStack().getChildren().remove(darkOverlay);
+
+            Scene scene = controller.getCenterMenuButton().getScene();
+            if (scene != null) {
+                scene.setOnKeyPressed(controller.getMovementService()::handleKeyPress);
+                scene.getRoot().requestFocus();
+            }
+
+            controller.setCenterMenuPopup(null);
         });
 
         Button settingsButton = new Button("Settings");
