@@ -177,4 +177,6 @@ Caused by: org.postgresql.util.PSQLException: ERROR: column "id" does not exist
 	at org.postgresql.jdbc.PgPreparedStatement.executeWithFlags(PgPreparedStatement.java:190)
 	at org.postgresql.jdbc.PgPreparedStatement.executeUpdate(PgPreparedStatement.java:152)
 	at com.gnome.gnome/com.gnome.gnome.db.DatabaseWrapper.executeUpdate(DatabaseWrapper.java:75)
-	... 59 more
+	... 59 more[33mThu May 01 16:03:57 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - User not found: Admin     
+[0m[33mThu May 01 16:04:05 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - User not found: Admin     
+[0m
