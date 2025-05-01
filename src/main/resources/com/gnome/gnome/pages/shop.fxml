@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="shopPopUpPage" prefHeight="802.0" prefWidth="821.0" styleClass="root-pane" stylesheets="@./css/shop-pop-up.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gnome.gnome.shop.controllers.ShopController">
+<BorderPane fx:id="shopPopUpPage" prefHeight="802.0" prefWidth="821.0" styleClass="root-pane" stylesheets="@css/shop.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gnome.gnome.shop.controllers.ShopController">
 
     <center>
         <StackPane alignment="CENTER" prefHeight="692.0" prefWidth="953.0">

@@ -30,6 +30,8 @@ public class ItemController {
     private StackPane itemImageContainer;
     @FXML
     private Button cancelButton;
+    @FXML
+    private Label buyErrorMsg;
 
     private final ShopService shopService = new ShopService();
     private ShopItem item;
@@ -51,6 +53,7 @@ public class ItemController {
         image.setFitHeight(itemImageContainer.getPrefHeight());
         image.setPreserveRatio(true);
         itemImageContainer.getChildren().add(image);
+        buyErrorMsg.setText("");
     }
 
     /**
@@ -77,6 +80,10 @@ public class ItemController {
         } catch (BalanceException ex) {
             logger.severe("Failed to buy item: " + ex.getMessage());
             System.out.println("Not enough money");
+            buyErrorMsg.setText(
+                    "Can’t afford that yet…\n" +
+                            "maybe try pickpocketing a rat?"
+            );
         }
     }
 }
