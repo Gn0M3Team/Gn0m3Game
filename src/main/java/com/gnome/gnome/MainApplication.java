@@ -33,7 +33,7 @@ public class MainApplication extends Application {
         System.out.println(skip_db);
 
         boolean skipLogging = properties.get("skip_logging");
-
+        skipLogging = true;
         FXMLLoader fxmlLoader = getFxmlLoader(skipLogging);
         Parent root = fxmlLoader.load();
 

@@ -205,6 +205,9 @@ public class MainController {
         }
     }
 
+    @FXML
+    public void switchToShop() { pageSwitch.goShop(mainBorderPane); }
+
     /**
      * Closes the application.
      */

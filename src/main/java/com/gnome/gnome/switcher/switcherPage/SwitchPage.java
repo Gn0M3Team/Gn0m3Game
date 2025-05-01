@@ -48,8 +48,8 @@ public class SwitchPage implements PageSwitcherInterface {
     }
 
     @Override
-    public void goShopPopUp(BorderPane anchorPane)  {
-        new SceneSwitch(anchorPane, "/com/gnome/gnome/pages/shop-pop-up.fxml");
+    public void goShop(BorderPane anchorPane)  {
+        new SceneSwitch(anchorPane, "/com/gnome/gnome/pages/shop.fxml");
     }
 
     @Override

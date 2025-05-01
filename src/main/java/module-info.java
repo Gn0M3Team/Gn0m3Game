@@ -51,10 +51,11 @@ module com.gnome.gnome {
     opens com.gnome.gnome.setting to javafx.fxml;
     exports com.gnome.gnome.setting;
 
-    opens com.gnome.gnome.shopPopUp to javafx.fxml;
-    exports com.gnome.gnome.shopPopUp;
-
     opens com.gnome.gnome.storyMaps to javafx.fxml;
     exports com.gnome.gnome.storyMaps;
 
+    exports com.gnome.gnome.shop.service;
+    opens com.gnome.gnome.shop.service to javafx.fxml;
+    exports com.gnome.gnome.shop.controllers;
+    opens com.gnome.gnome.shop.controllers to javafx.fxml;
 }

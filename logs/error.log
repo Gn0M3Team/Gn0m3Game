@@ -178,20 +178,3 @@ Caused by: org.postgresql.util.PSQLException: ERROR: column "id" does not exist
 	at org.postgresql.jdbc.PgPreparedStatement.executeUpdate(PgPreparedStatement.java:152)
 	at com.gnome.gnome/com.gnome.gnome.db.DatabaseWrapper.executeUpdate(DatabaseWrapper.java:75)
 	... 59 more
-[0m[33mThu May 01 14:46:55 CEST 2025 WARNING [javafx.css.CssParser] - CSS Error parsing file:/C:/STU/VAVA/gnome/target/classes/com/gnome/gnome/pages/css/setting.css: Expected LBRACE at [123,0]
-[0m[31mThu May 01 15:06:16 CEST 2025 SEVERE [com.gnome.gnome.game.GameController] - Failed to load main page: No resources specified.
-/C:/STU/VAVA/gnome/target/classes/com/gnome/gnome/pages/main-menu.fxml:22
-
-[0m[31mThu May 01 15:06:19 CEST 2025 SEVERE [com.gnome.gnome.game.GameController] - Failed to load main page: No resources specified.
-/C:/STU/VAVA/gnome/target/classes/com/gnome/gnome/pages/main-menu.fxml:22
-
-[0m[31mThu May 01 15:17:33 CEST 2025 SEVERE [com.gnome.gnome.game.GameController] - Failed to load main page: No resources specified.
-/C:/STU/VAVA/gnome/target/classes/com/gnome/gnome/pages/main-menu.fxml:22
-
-[0m[31mThu May 01 15:17:50 CEST 2025 SEVERE [com.gnome.gnome.game.GameController] - Failed to load main page: No resources specified.
-/C:/STU/VAVA/gnome/target/classes/com/gnome/gnome/pages/main-menu.fxml:22
-
-[0m[31mThu May 01 15:29:01 CEST 2025 SEVERE [com.gnome.gnome.game.GameController] - Failed to load main page: No resources specified.
-/C:/STU/VAVA/gnome/target/classes/com/gnome/gnome/pages/main-menu.fxml:22
-
-[0m

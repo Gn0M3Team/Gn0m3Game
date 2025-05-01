@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane prefHeight="530.0" prefWidth="850.0" styleClass="dialog-overlay" stylesheets="@./css/item-modal.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gnome.gnome.shop.controllers.ItemController">
+
+    <VBox alignment="TOP_CENTER" prefHeight="535.0" spacing="20" styleClass="purchase-dialog">
+        <HBox alignment="CENTER" prefHeight="360.0" prefWidth="800.0" spacing="40.0" styleClass="dialog-content">
+            <VBox alignment="CENTER" prefWidth="260.0" spacing="25.0" styleClass="item-preview">
+                <StackPane fx:id="itemImageContainer" prefHeight="200.0" prefWidth="200.0" />
+                <Label fx:id="itemPrice" prefWidth="200.0" styleClass="item-price" />
+            </VBox>
+            <VBox alignment="TOP_LEFT" prefWidth="480.0" spacing="20.0" styleClass="detail-box">
+                <Label fx:id="itemName" styleClass="item-name" />
+                <Label fx:id="itemValue" styleClass="item-value" />
+                <Label fx:id="itemDetails" styleClass="item-details" wrapText="true" />
+            </VBox>
+        </HBox>
+        <HBox alignment="CENTER_RIGHT" prefHeight="112.0" prefWidth="810.0" spacing="20" styleClass="dialog-buttons">
+         <BorderPane prefHeight="88.0" prefWidth="810.0">
+            <left>
+               <VBox alignment="BOTTOM_LEFT" prefHeight="65.0" prefWidth="204.0" spacing="10.0" BorderPane.alignment="CENTER">
+                  <children>
+                     <Label prefHeight="42.0" prefWidth="8.0" />
+                        <Button fx:id="cancelButton" onAction="#onCancel" prefHeight="38.0" prefWidth="156.0" styleClass="button-cancel" text="Cancel" />
+                  </children>
+               </VBox>
+            </left>
+            <right>
+               <VBox alignment="BOTTOM_RIGHT" prefHeight="101.0" prefWidth="344.0" spacing="7.0" BorderPane.alignment="CENTER_RIGHT">
+                  <children>
+                     <Label fx:id="buyErrorMsg" maxWidth="450.0" prefHeight="70.0" prefWidth="295.0" styleClass="buy-error-msg" />
+                      <Button fx:id="buyButton" onAction="#onBuy" styleClass="button-buy" text="Buy" />
+                  </children>
+               </VBox>
+            </right>
+         </BorderPane>
+        </HBox>
+    </VBox>
+</StackPane>

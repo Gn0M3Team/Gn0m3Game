@@ -15,6 +15,7 @@ public class UserState {
 
     private String username;
     private PlayerRole role;
+    @Getter
     private float balance;
     private float health;
     private int score;
