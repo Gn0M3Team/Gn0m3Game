@@ -59,29 +59,33 @@
                 </HBox>
 
                 <!-- Container HBox to center the ScrollPane horizontally -->
-                <HBox alignment="CENTER">
+                <StackPane alignment="CENTER">
                     <children>
-                        <!-- Inline buttons row wrapped in a ScrollPane (initially hidden) -->
-                        <ScrollPane fx:id="inlineScrollPane"
-                                    visible="false" managed="false"
-                                    hbarPolicy="AS_NEEDED" vbarPolicy="NEVER"
-                                    fitToHeight="true"
-                                    style="
-                                    -fx-background-color: transparent;
-                                    -fx-border-color: black;
-                                    -fx-border-width: 2;
-                                    -fx-border-radius: 15;
-                                    -fx-background-radius: 15;
-                                    -fx-padding: 5;">
-                            <content>
-                                <HBox fx:id="inlineButtonsBox"
-                                      alignment="CENTER"
-                                      spacing="10"
-                                      />
-                            </content>
-                        </ScrollPane>
+                        <HBox alignment="CENTER">
+                            <children>
+                                <ScrollPane fx:id="inlineScrollPane"
+                                            visible="false" managed="false"
+                                            hbarPolicy="AS_NEEDED" vbarPolicy="NEVER"
+                                            fitToHeight="true"
+                                            style="
+                            -fx-background-color: transparent;
+                            -fx-border-color: black;
+                            -fx-border-width: 2;
+                            -fx-border-radius: 15;
+                            -fx-background-radius: 15;
+                            -fx-padding: 5;">
+                                    <content>
+                                        <HBox fx:id="inlineButtonsBox"
+                                              alignment="CENTER"
+                                              spacing="10"
+                                        />
+                                    </content>
+                                </ScrollPane>
+                            </children>
+                        </HBox>
                     </children>
-                </HBox>
+                </StackPane>
+
             </children>
         </VBox>
     </top>

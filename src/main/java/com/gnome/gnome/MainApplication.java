@@ -10,6 +10,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCombination;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -47,6 +48,8 @@ public class MainApplication extends Application {
 
         Scene scene = new Scene(root);
         stage.setFullScreen(true);
+//        stage.setFullScreenExitHint("");
+//        stage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
         stage.setTitle("Dark Rifter");
         stage.setScene(scene);
         stage.show();

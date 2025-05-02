@@ -179,4 +179,17 @@ Caused by: org.postgresql.util.PSQLException: ERROR: column "id" does not exist
 	at com.gnome.gnome/com.gnome.gnome.db.DatabaseWrapper.executeUpdate(DatabaseWrapper.java:75)
 	... 59 more[33mThu May 01 16:03:57 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - User not found: Admin     
 [0m[33mThu May 01 16:04:05 CEST 2025 WARNING [com.gnome.gnome.profile.ProfileController] - User not found: Admin     
+[0m[33mThu May 01 22:34:45 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
+[0m[33mThu May 01 23:34:06 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
+[0m[33mFri May 02 00:36:32 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
+[0m[33mFri May 02 00:37:01 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
+[0m[31mFri May 02 00:37:03 CEST 2025 SEVERE [com.gnome.gnome.shop.controllers.ItemController] - Player successfully bought item (1, Heal potion)
+[0m[33mFri May 02 00:37:35 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
+[0m[31mFri May 02 00:37:37 CEST 2025 SEVERE [com.gnome.gnome.shop.controllers.ItemController] - Player successfully bought item (4, Scorpion shell armour)
+[0m[33mFri May 02 00:37:40 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
+[0m[31mFri May 02 00:37:42 CEST 2025 SEVERE [com.gnome.gnome.shop.controllers.ItemController] - Player successfully bought item (10, Full moon bow)
+[0m[33mFri May 02 00:40:48 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
+[0m[33mFri May 02 00:40:53 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
+[0m[31mFri May 02 00:40:55 CEST 2025 SEVERE [com.gnome.gnome.shop.controllers.ItemController] - Player successfully bought item (4, Dagger)
+[0m[33mFri May 02 01:03:13 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
 [0m

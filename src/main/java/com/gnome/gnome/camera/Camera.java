@@ -200,7 +200,7 @@ public class Camera {
 
     private void drawCoinUI(GraphicsContext gc, Canvas canvas, int coinCount) {
         double boxSize = canvas.getWidth() * 0.06;
-        Image coinImage = loadItemImage("tiles/tile_522.png");
+        Image coinImage = loadItemImage("tile_522");
         double x = 10, y = canvas.getHeight() - boxSize - 10;
 
         gc.save();
@@ -268,7 +268,7 @@ public class Camera {
         if (name == null || name.isEmpty()) {
             return getCachedItemImage("com/gnome/gnome/images/default-no-item.png");
         }
-        return getCachedItemImage("com/gnome/gnome/images/" + name);
+        return getCachedItemImage("com/gnome/gnome/images/tiles/" + name + ".png");
     }
 
     private Image getCachedItemImage(String path) {

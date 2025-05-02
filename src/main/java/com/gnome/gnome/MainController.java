@@ -33,9 +33,9 @@ public class MainController {
     @FXML private Button newGameButton;
     @FXML private Label menuLabel;
     @FXML private Button LeaderBoardButton;
-    @FXML private ImageView musicIcon;
+    @FXML private ImageView coinIcon;
     @FXML
-    private Button musicButton;
+    private Label coinLabel;
     @FXML
     private BorderPane mainBorderPane;
     @FXML
@@ -63,10 +63,10 @@ public class MainController {
     public void initialize() {
         pageSwitch = new SwitchPage();
 
-        musicIcon.setImage(
+        coinIcon.setImage(
                 new Image(
                         Objects.requireNonNull(
-                                getClass().getResourceAsStream("/com/gnome/gnome/images/musicicon.png")
+                                getClass().getResourceAsStream("/com/gnome/gnome/images/tiles/tile_522.png")
                         )
                 )
         );
@@ -74,7 +74,12 @@ public class MainController {
         User_test_for_creation();
 //        checkUserRole();
 
-        musicButton.setGraphic(musicIcon);
+        coinLabel.setText(String.valueOf(userState.getBalance()));
+
+        User_test_for_creation();
+//        checkUserRole();
+
+//        musicButton.setGraphic(musicIcon);
 
         Platform.runLater(() -> {
             primaryStage = (Stage) continueGameButton.getScene().getWindow();
@@ -95,7 +100,7 @@ public class MainController {
 
         this.mapLoaderService = new MapLoaderService(monsterDAO, armorDAO, weaponDAO, potionDAO);
 
-
+// TODO
         continueGameButton.setOnAction(e -> {
             if (mapLoaderService != null) {
                 Map selectedMap = mapDAO.getMapByLevel(1);
@@ -186,23 +191,6 @@ public class MainController {
         fadeIn.setFromValue(0.0);
         fadeIn.setToValue(1.0);
         fadeIn.play();
-    }
-
-    /**
-     * Starts and ends music by fading
-     */
-    @FXML
-    public void onMusicIconClick(ActionEvent event) {
-        //System.out.println("Music");
-        if (!MusicWizard.musicRunning){
-            MusicWizard.start_music_loop();
-            MusicWizard.start_ambient();
-        }
-
-        else{
-            MusicWizard.stop = true;
-            MusicWizard.stop_ambient();
-        }
     }
 
     @FXML

@@ -97,7 +97,7 @@ public class UserState {
     }
 
     public void setMapLevel(int mapLevel) {
-        this.mapLevel = mapLevel;
+        this.mapLevel = Math.max(mapLevel, this.mapLevel);
         updateUserGameState();
     }
 
@@ -115,6 +115,30 @@ public class UserState {
         this.armorId = armorId;
         updateUserGameState();
     }
+
+    public void setUpdateStats(int totalMonstersKilled, boolean isWin, int totalChestsOpened) {
+        this.totalMapsPlayed = this.totalMapsPlayed + 1;
+        this.totalMonstersKilled = this.totalMonstersKilled + totalMonstersKilled;
+        if (isWin) {
+            this.totalWins = this.totalWins + 1;
+        } else {
+            this.totalDeaths = totalDeaths + 1;
+        }
+
+        this.totalChestsOpened = this.totalChestsOpened + totalChestsOpened;
+
+        updateUserStatistics();
+    }
+
+    public void setUpdatePlayerState(int score, double coins) {
+        this.score = this.score + score;
+        this.balance = (float) (this.balance + coins);
+
+        updateUserGameState();
+    }
+
+
+
 
     private void updateUserGameState() {
         UserGameState userGameState = new UserGameState(
