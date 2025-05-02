@@ -178,6 +178,7 @@ public class Camera {
         }
     }
 
+
     public Image getCachedItemImage(String path) {
         return imageCache.computeIfAbsent(path, key -> {
             InputStream is = Camera.class.getResourceAsStream("/" + path);

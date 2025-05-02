@@ -20,19 +20,19 @@ public class PlayerHealthBar extends StackPane {
      */
     public PlayerHealthBar(double width, double height) {
         setPrefSize(width, height);
+        getStyleClass().add("player-health-bar"); // Apply the player-health-bar style class
 
         background = new Rectangle(width, height);
-        background.setFill(Color.DARKGRAY);
-        background.setStroke(Color.BLACK);
+        background.getStyleClass().add("background"); // Apply CSS class
 
         foreground = new Rectangle(width, height);
-        foreground.setFill(Color.RED);
-        foreground.setStroke(Color.BLACK);
+        foreground.getStyleClass().add("foreground"); // Apply CSS class
 
         healthFraction = new SimpleDoubleProperty(1.0);
         foreground.widthProperty().bind(background.widthProperty().multiply(healthFraction));
 
         getChildren().addAll(background, foreground);
+        getStylesheets().add(getClass().getResource("/com/gnome/gnome/pages/css/continueGame.css").toExternalForm());
     }
 
     /**

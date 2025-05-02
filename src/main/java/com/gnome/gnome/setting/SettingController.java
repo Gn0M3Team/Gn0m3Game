@@ -20,7 +20,7 @@ public class SettingController {
     @FXML private Slider soundVolumeSlider;
     @FXML private ComboBox<String> languageComboBox;
     @FXML private ComboBox<String> trackSelector;
-    @FXML private Button backGameButton;
+//    @FXML private Button backGameButton;
     @FXML private Button mainMenuButton;
     @FXML private BorderPane settingPage;
 
@@ -120,10 +120,10 @@ public class SettingController {
         }
     }
 
-    @FXML
-    public void backToGameButtonClick(ActionEvent e) {
-        pageSwitch.goNewGame(settingPage);
-    }
+//    @FXML
+//    public void backToGameButtonClick(ActionEvent e) {
+//        pageSwitch.goNewGame(settingPage);
+//    }
 
     @FXML
     public void mainMenuButtonClick(ActionEvent e) {

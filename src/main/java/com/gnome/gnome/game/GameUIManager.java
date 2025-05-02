@@ -11,6 +11,7 @@ import com.gnome.gnome.player.Player;
 import com.gnome.gnome.shop.controllers.ShopController;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import com.gnome.gnome.userState.UserState;
+import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
@@ -25,10 +26,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import lombok.Getter;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -37,6 +38,7 @@ public class GameUIManager {
     private final Logger logger = Logger.getLogger(GameUIManager.class.getName());
     @Getter
     private Stage currentPopup;
+    private Popup infoPopup; // Track the info popup specifically
 
     public GameUIManager(GameController controller) {
         this.controller = controller;
@@ -64,12 +66,12 @@ public class GameUIManager {
 
         VBox overlay = new VBox(20);
         overlay.setAlignment(Pos.CENTER);
-        overlay.setStyle("-fx-background-color: rgba(0,0,0,0.7);");
+        overlay.getStyleClass().add("game-over-overlay");
         overlay.prefWidthProperty().bind(controller.getCenterStack().widthProperty());
         overlay.prefHeightProperty().bind(controller.getCenterStack().heightProperty());
 
         Label gameOverLabel = new Label("GAME OVER");
-        gameOverLabel.setStyle("-fx-font-size: 48px; -fx-text-fill: red;");
+        gameOverLabel.getStyleClass().add("game-over-label");
 
         Label coinsLabel = new Label("Coins collected: " + (int) player.getPlayerCoins());
         Label scoreLabel = new Label("Score: " + player.getScore());
@@ -77,13 +79,15 @@ public class GameUIManager {
         Label killedLabel = new Label("Monsters killed: " + player.getCountOfKilledMonsters());
 
         for (Label statLabel : List.of(coinsLabel, scoreLabel, chestsLabel, killedLabel)) {
-            statLabel.setStyle("-fx-text-fill: white; -fx-font-size: 20px;");
+            statLabel.getStyleClass().add("stat-label");
         }
 
         Button restartButton = new Button("Restart");
+        restartButton.getStyleClass().add("game-button");
         restartButton.setOnAction(e -> controller.restartGame());
 
         Button exitButton = new Button("Exit");
+        exitButton.getStyleClass().add("game-button");
         exitButton.setOnAction(e -> Platform.exit());
 
         overlay.getChildren().addAll(
@@ -116,13 +120,14 @@ public class GameUIManager {
 
         VBox menuBox = new VBox(20);
         menuBox.setAlignment(Pos.CENTER);
-        menuBox.setStyle("-fx-background-color: #C0C0C0; -fx-padding: 20; -fx-background-radius: 20;");
+        menuBox.getStylesheets().add(getClass().getResource("/com/gnome/gnome/pages/css/game-ui.css").toExternalForm());
         menuBox.getStyleClass().add("menu-popup");
 
         Label title = new Label("MENU");
         title.getStyleClass().add("menu-title");
 
         Button resumeButton = new Button("Resume");
+        resumeButton.getStyleClass().add("menu-button");
         resumeButton.setOnAction(e -> {
             popup.hide();
             controller.getGameLoop().start();
@@ -139,6 +144,7 @@ public class GameUIManager {
         });
 
         Button settingsButton = new Button("Settings");
+        settingsButton.getStyleClass().add("menu-button");
         settingsButton.setOnAction(e -> {
             new SwitchPage().goSetting(controller.getRootBorder());
             popup.hide();
@@ -146,6 +152,7 @@ public class GameUIManager {
         });
 
         Button goBackButton = new Button("Go Back");
+        goBackButton.getStyleClass().add("menu-button");
         goBackButton.setOnAction(e -> {
             controller.onSceneExit(false);
             new SwitchPage().goMainMenu(controller.getRootBorder());
@@ -213,7 +220,6 @@ public class GameUIManager {
             @Override
             public void run() {
                 Platform.runLater(() -> {
-
                     if (controller.isGameOver()) {
                         controller.getCenterStack().setTranslateX(0);
                         controller.getCenterStack().setTranslateY(0);
@@ -237,7 +243,6 @@ public class GameUIManager {
         };
         timer.scheduleAtFixedRate(task, 0, intervalMs);
     }
-
 
     public void showShopPopup(boolean isStoryMode) {
         try {
@@ -293,12 +298,14 @@ public class GameUIManager {
 
         VBox popupContent = new VBox(10);
         popupContent.setAlignment(Pos.CENTER);
-        popupContent.setStyle("-fx-background-color: white; -fx-padding: 15; -fx-border-color: black; -fx-border-width: 2;");
+        popupContent.getStylesheets().add(getClass().getResource("/com/gnome/gnome/pages/css/game-ui.css").toExternalForm());
+        popupContent.getStyleClass().add("table-popup");
 
         Label title = new Label(titleText);
-        title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+        title.getStyleClass().add("table-title");
 
         Button closeButton = new Button("Close");
+        closeButton.getStyleClass().add("table-button");
         closeButton.setOnAction(e -> popup.hide());
 
         popupContent.getChildren().addAll(title, closeButton);
@@ -320,21 +327,23 @@ public class GameUIManager {
 
         VBox popupContent = new VBox(10);
         popupContent.setAlignment(Pos.CENTER);
-        popupContent.setStyle("-fx-background-color: #ffffff; -fx-padding: 20; -fx-border-color: black; -fx-border-width: 2;");
+        popupContent.getStylesheets().add(getClass().getResource("/com/gnome/gnome/pages/css/game-ui.css").toExternalForm());
+        popupContent.getStyleClass().add("stats-popup");
 
         Label title = new Label("Level Statistics");
-        title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
+        title.getStyleClass().add("stats-title");
 
         Label coinsLabel = new Label("Coins collected: " + (int) player.getPlayerCoins());
+        coinsLabel.getStyleClass().add("stats-label");
         Label scoreLabel = new Label("Score: " + player.getScore());
+        scoreLabel.getStyleClass().add("stats-label");
         Label chestsLabel = new Label("Opened chests: " + player.getCountOfOpenedChest());
+        chestsLabel.getStyleClass().add("stats-label");
         Label killedLabel = new Label("Monsters killed: " + player.getCountOfKilledMonsters());
-
-        for (Label statLabel : List.of(coinsLabel, scoreLabel, chestsLabel, killedLabel)) {
-            statLabel.setStyle("-fx-font-size: 16px;");
-        }
+        killedLabel.getStyleClass().add("stats-label");
 
         Button continueButton = new Button("Continue");
+        continueButton.getStyleClass().add("stats-button");
         continueButton.setOnAction(e -> {
             controller.getCenterStack().getChildren().remove(popupContent);
             controller.getCenterStack().getChildren().removeIf(node -> node.getStyle() != null && node.getStyle().contains("rgba(0, 0, 0, 0.6)"));
@@ -348,5 +357,53 @@ public class GameUIManager {
         StackPane.setAlignment(popupContent, Pos.CENTER);
     }
 
+    public void showInfo(Stage stage, String message) {
+        // Check if an info popup is already visible
+        if (infoPopup != null && infoPopup.isShowing()) {
+            logger.info("Info popup is already visible. Skipping new popup with message: " + message);
+            return;
+        }
 
+        // Create a new popup
+        infoPopup = new Popup();
+        infoPopup.setAutoHide(true);
+
+        // Create the popup content
+        Label label = new Label(message);
+        label.getStyleClass().add("info-message");
+
+        VBox box = new VBox(label);
+        box.getStylesheets().add(getClass().getResource("/com/gnome/gnome/pages/css/game-ui.css").toExternalForm());
+        box.getStyleClass().add("info-box");
+        box.setAlignment(Pos.CENTER);
+
+        infoPopup.getContent().add(box);
+
+        // Show the popup
+        Scene scene = stage.getScene();
+        if (scene != null) {
+            infoPopup.show(stage);
+
+            // Calculate position after layout
+            box.applyCss();
+            box.layout();
+
+            double centerX = stage.getX() + (scene.getWidth() - box.getWidth()) / 2;
+            double centerY = stage.getY() + (scene.getHeight() - box.getHeight()) / 2;
+
+            infoPopup.setX(centerX);
+            infoPopup.setY(centerY);
+
+            // Add fade animation
+            FadeTransition fade = new FadeTransition(Duration.seconds(2), box);
+            fade.setFromValue(1.0);
+            fade.setToValue(0.0);
+            fade.setDelay(Duration.seconds(1.5));
+            fade.setOnFinished(e -> {
+                infoPopup.hide();
+                infoPopup = null; // Clear the reference when the popup hides
+            });
+            fade.play();
+        }
+    }
 }

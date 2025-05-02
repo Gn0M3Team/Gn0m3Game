@@ -11,6 +11,8 @@ import javafx.util.Duration;
 
 public class CustomPopupUtil {
 
+    private static Popup currentPopup = null; // Track the currently active popup
+
     public static void showSuccess(Stage stage, String message) {
         showPopup(stage, message, "success");
     }
@@ -21,6 +23,14 @@ public class CustomPopupUtil {
 
     public static void showWarning(Stage stage, String message) {
         showPopup(stage, message, "warning");
+    }
+
+    public static void showInfo(Stage stage, String message) {
+        // Check if a popup is currently showing
+        if (currentPopup != null && currentPopup.isShowing()) {
+            return; // Don't show a new popup if one is already active
+        }
+        showPopup(stage, message, "info");
     }
 
     private static void showPopup(Stage stage, String message, String type) {
@@ -39,6 +49,7 @@ public class CustomPopupUtil {
 
         Scene scene = stage.getScene();
         if (scene != null) {
+            currentPopup = popup; // Set the current popup
             popup.show(stage);
 
             // Отложенный вызов layout для получения ширины
@@ -55,7 +66,10 @@ public class CustomPopupUtil {
             fade.setFromValue(1.0);
             fade.setToValue(0.0);
             fade.setDelay(Duration.seconds(1.5));
-            fade.setOnFinished(e -> popup.hide());
+            fade.setOnFinished(e -> {
+                popup.hide();
+                currentPopup = null; // Clear the reference when the popup disappears
+            });
             fade.play();
         }
     }

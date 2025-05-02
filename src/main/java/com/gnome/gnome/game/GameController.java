@@ -20,6 +20,7 @@ import com.gnome.gnome.player.Player;
 import com.gnome.gnome.shop.controllers.ShopController;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import com.gnome.gnome.userState.UserState;
+import com.gnome.gnome.utils.CustomPopupUtil;
 import javafx.animation.AnimationTimer;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
@@ -282,6 +283,7 @@ public class GameController {
                 player.addCoin(Math.round(chest.getValue()));
                 coinUIRenderer.update();
                 player.addCountOfOpenedChest();
+                player.addScore(50);
                 break;
             }
         }
@@ -333,24 +335,17 @@ public class GameController {
     }
 
     public void updatePlayerStatisticsAfterLevelCompletion(Player player) {
-        UserStatisticsDAO userStatisticsDAO = new UserStatisticsDAO();
-        UserStatistics userStatistics = userStatisticsDAO.getUserStatisticsByUsername(UserState.getInstance().getUsername());
-        if (userStatistics != null) {
-            userStatistics.setTotalMapsPlayed(userStatistics.getTotalMapsPlayed() + 1);
-            userStatistics.setTotalWins(userStatistics.getTotalWins() + 1);
-            userStatistics.setTotalMonstersKilled(userStatistics.getTotalMonstersKilled() + player.getCountOfKilledMonsters());
-            userStatistics.setTotalChestsOpened(userStatistics.getTotalChestsOpened() + player.getCountOfOpenedChest());
-            userStatisticsDAO.updateUserStatistics(userStatistics);
+        UserState userState = UserState.getInstance();
+        if (userState != null) {
+            userState.setUpdateStats(player.getCountOfKilledMonsters(), true, player.getCountOfOpenedChest());
         }
     }
 
     public void updatePlayerAfterLevelCompletion(Player player) {
-        UserGameStateDAO userGameStateDAO = new UserGameStateDAO();
-        UserGameState userGameState = userGameStateDAO.getUserGameStateByUsername(UserState.getInstance().getUsername());
-        if (userGameState != null) {
-            userGameState.setScore(userGameState.getScore() + player.getScore());
-            userGameState.setBalance((float) (userGameState.getBalance() + player.getPlayerCoins()));
-            userGameStateDAO.updateUserGameState(userGameState);
+        UserState userState = UserState.getInstance();
+        if (userState != null) {
+            userState.setUpdatePlayerState(player.getScore(), player.getPlayerCoins());
+
         }
     }
 
@@ -364,11 +359,10 @@ public class GameController {
 
 
     public void updatePlayerLevelAfterStoryLevelCompletion() {
-        UserGameStateDAO userGameStateDAO = new UserGameStateDAO();
-        UserGameState userGameState = userGameStateDAO.getUserGameStateByUsername(UserState.getInstance().getUsername());
-        if (userGameState != null) {
-            userGameState.setMapLevel(userGameState.getMapLevel() + 1);
-            userGameStateDAO.updateUserGameState(userGameState);
+        UserState userState = UserState.getInstance();
+
+        if (userState != null) {
+            userState.setMapLevel(selectedMap.getLevel());
         }
     }
 
@@ -461,7 +455,13 @@ public class GameController {
         camera.updateCameraCenter();
 
         camera.drawViewport(viewportCanvas, coinsOnMap);
-        camera.drawPressEHints(gc, baseMap, player.getX(), player.getY(), activeChests);
+//        camera.drawPressEHints(gc, baseMap, player.getX(), player.getY(), activeChests);
+
+        if (rootBorder.getScene() != null && rootBorder.getScene().getWindow() != null) {
+            Stage stage = (Stage) rootBorder.getScene().getWindow();
+            if (this.isNearTable(player.getX(), player.getY())) CustomPopupUtil.showInfo(stage, "To read table enter E");
+            if (this.isNearChest(player.getX(), player.getY())) CustomPopupUtil.showInfo(stage, "To loot the chest enter E");
+        }
         drawAttackRange(gc, 1);
 
         monsterList.forEach(m -> {

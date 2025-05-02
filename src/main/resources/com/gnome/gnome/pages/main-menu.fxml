@@ -25,11 +25,8 @@
 
             <Pane HBox.hgrow="ALWAYS" />
 
-            <Button fx:id="musicButton" onAction="#onMusicIconClick"  styleClass="top-button" >
-                <graphic>
-                    <ImageView fx:id="musicIcon" fitWidth="24" fitHeight="24" preserveRatio="true" styleClass="top-button"/>
-                </graphic>
-            </Button>
+            <Label fx:id="coinLabel" styleClass="top-label" />
+            <ImageView fx:id="coinIcon" fitWidth="24" fitHeight="24" preserveRatio="true" styleClass="top-button"/>
 
         </HBox>
     </top>
