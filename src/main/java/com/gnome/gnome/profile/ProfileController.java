@@ -4,6 +4,7 @@ import com.gnome.gnome.dao.UserStatisticsDAO;
 import com.gnome.gnome.dao.userDAO.AuthUserDAO;
 import com.gnome.gnome.dao.MapDAO;
 import com.gnome.gnome.dao.userDAO.UserGameStateDAO;
+import com.gnome.gnome.game.GameController;
 import com.gnome.gnome.models.Map;
 import com.gnome.gnome.models.UserStatistics;
 import com.gnome.gnome.models.user.AuthUser;
@@ -57,6 +58,7 @@ public class ProfileController {
     @FXML private ListView<String> mapListView;
     @FXML private BorderPane profilePage;
     @FXML private ScrollPane mainScrollPane;
+    @FXML private Button goToGameButton;
 
     // Dependencies
     private PageSwitcherInterface pageSwitch;
@@ -84,6 +86,12 @@ public class ProfileController {
             mainScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         } else {
             logger.warning("mainScrollPane is null during initialization");
+        }
+
+        if (goToGameButton != null) {
+            boolean isGameRunning = GameController.getGameController() != null;
+            goToGameButton.setVisible(isGameRunning);
+            goToGameButton.setManaged(isGameRunning);
         }
     }
 
@@ -280,6 +288,19 @@ public class ProfileController {
         }
     }
 
+    @FXML
+    public void handleGame(ActionEvent actionEvent) {
+        GameController controller = GameController.getGameController();
+        if (controller != null) {
+            Stage stage = (Stage) profilePage.getScene().getWindow();
+            Scene currentScene = stage.getScene();
+
+            if (controller.getRootBorder() != null) {
+                currentScene.setRoot(controller.getRootBorder());
+            }
+        }
+    }
+
     /**
      * Handles the "Ban User" button, showing a confirmation popup.
      */
@@ -382,4 +403,5 @@ public class ProfileController {
             CustomPopupUtil.showError(stage, "Failed to update role for user: " + selectedUsername);
         }
     }
+
 }
