@@ -7,7 +7,6 @@ import com.gnome.gnome.models.Monster;
 import com.gnome.gnome.models.Weapon;
 import com.gnome.gnome.monsters.MonsterFactory;
 import com.gnome.gnome.player.Player;
-import software.amazon.awssdk.services.s3.model.CSVOutput;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,14 +42,14 @@ public class GameInitializer {
                     int health = armor == null ? PLAYER_MAX_HEALTH : armor.getHealth();
                     double damage = weapon == null ? 20.0 : weapon.getAtkValue();
                     System.out.println("Damage: " + damage);
-                    Player.getInstance(col, row, health, damage);
+                    Player.getInstance(col, row, health, damage, "/com/gnome/gnome/images/tiles/tile_172.png");
                     fieldMap[row][col] = TypeOfObjects.START_POINT.getValue();
                 }
 
                 if (tileType != null && tileType.isChest()) {
                     double val = returnBasedChestTypeValue(tileType);
-                    activeChests.add(new Chest(col, row, val, tileType.getImagePath(), "/com/gnome/gnome/effects/animated_chest.gif"));
-                    fieldMap[row][col] = TypeOfObjects.FLOOR.getValue();
+                    activeChests.add(new Chest(col, row, val, tileType.getImagePath(), "/com/gnome/gnome/effects/" + getGifChestPath(tileType)));
+                    fieldMap[row][col] = TypeOfObjects.EMPTY.getValue();
                 }
 
                 if (tile < 0) {
@@ -64,6 +63,17 @@ public class GameInitializer {
         }
     }
 
+    public static String getGifChestPath(TypeOfObjects tileType) {
+        return switch (tileType) {
+            case CHEST_1 -> "animated_chest_302.gif";
+            case CHEST_2 -> "animated_doors_348.gif";
+            case CHEST_3 -> "animated_drawer_354.gif";
+            case CHEST_4 -> "door_opening_355.gif";
+            case CHEST_5 -> "preserved_background_451.gif";
+            default -> null;
+        };
+    }
+
     private static double returnBasedChestTypeValue(TypeOfObjects type) {
         Random random = new Random();
         return switch (type) {
@@ -72,7 +82,6 @@ public class GameInitializer {
             case CHEST_3 -> 3 + random.nextDouble() * 10;
             case CHEST_4 -> 4 + random.nextDouble() * 10;
             case CHEST_5 -> 5 + random.nextDouble() * 10;
-            case CHEST_6 -> 6 + random.nextDouble() * 10;
             default -> throw new IllegalStateException("Unexpected chest type: " + type);
         };
     }

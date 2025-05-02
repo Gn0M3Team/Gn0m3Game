@@ -1,7 +1,5 @@
 package com.gnome.gnome.editor.utils;
 
-import javafx.scene.paint.Color;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 
@@ -20,11 +18,11 @@ public enum TypeOfObjects {
     FINISH_POINT("tile_297.png", 2),
 
     /** Monsters category */
-    SKELETON("tile_80.png", -1),
-    DEMON("tile_125.png", -2),
-    GOBLIN("tile_127.png", -3),
-    SCORPION("tile_269.png", -4),
-    BUTTERFLY("tile_276.png", -5),
+    SKELETON("tile_73.png", -1),
+    DEMON("demon.png", -2),
+    GOBLIN("goblin.png", -3),
+    SCORPION("scorpion.png", -4),
+    BUTTERFLY("butterfly.png", -5),
 
 
     /** Props category */
@@ -60,11 +58,10 @@ public enum TypeOfObjects {
 
     /** Chest category */
     CHEST_1("tile_302.png", 60),
-    CHEST_3("tile_348.png", 61),
-    CHEST_2("tile_701.png", 62),
-    CHEST_4("tile_354.png", 63),
-    CHEST_5("tile_355.png", 64),
-    CHEST_6("tile_451.png", 65),
+    CHEST_2("tile_348.png", 61),
+    CHEST_3("tile_354.png", 62),
+    CHEST_4("tile_355.png", 63),
+    CHEST_5("tile_451.png", 64),
 
 
     /** Doors category */
@@ -105,6 +102,10 @@ public enum TypeOfObjects {
      */
     public String getImagePath() {
         return "/com/gnome/gnome/images/tiles/" + imageName;
+    }
+
+    public String getImagePathForMonsters() {
+        return "/com/gnome/gnome/images/monsters/default/" + imageName;
     }
 
     /**
@@ -158,11 +159,10 @@ public enum TypeOfObjects {
 
             // Chests
             case 60  -> CHEST_1;
-            case 61  -> CHEST_3;
-            case 62  -> CHEST_2;
+            case 61  -> CHEST_2;
+            case 62  -> CHEST_3;
             case 63  -> CHEST_4;
             case 64  -> CHEST_5;
-            case 65  -> CHEST_6;
 
             // Doors
             case 80  -> DOOR_1;
@@ -214,7 +214,7 @@ public enum TypeOfObjects {
 
     public boolean isChest() {
         return switch (this) {
-            case CHEST_1, CHEST_2, CHEST_3, CHEST_4, CHEST_5, CHEST_6 -> true;
+            case CHEST_1, CHEST_2, CHEST_3, CHEST_4, CHEST_5 -> true;
             default -> false;
         };
     }
@@ -222,7 +222,7 @@ public enum TypeOfObjects {
     public boolean isTransparent() {
         return switch (this) {
             case FLOOR, EMPTY, FINISH_POINT, RIVER, WEB,
-                 CHEST_1, CHEST_2, CHEST_3, CHEST_4, CHEST_5, CHEST_6,
+                 CHEST_1, CHEST_2, CHEST_3, CHEST_4, CHEST_5,
                  DOOR_1, DOOR_2, DOOR_3, DOOR_4, DOOR_5, DOOR_6, DOOR_7, DOOR_8, DOOR_9, DOOR_10, DOOR_11, DOOR_12, DOOR_13
                     -> true;
             default -> false;

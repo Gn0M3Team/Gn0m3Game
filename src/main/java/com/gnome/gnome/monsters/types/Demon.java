@@ -3,7 +3,6 @@ package com.gnome.gnome.monsters.types;
 import com.gnome.gnome.editor.utils.TypeOfObjects;
 import com.gnome.gnome.monsters.Monster;
 import com.gnome.gnome.monsters.movements.OmnidirectionalMovement;
-import javafx.scene.Node;
 
 public class Demon extends Monster {
     public Demon(int startX, int startY, com.gnome.gnome.models.Monster dbMonster) {
@@ -17,9 +16,9 @@ public class Demon extends Monster {
                 startY,
                 TypeOfObjects.DEMON.getValue(),
                 new OmnidirectionalMovement(),
-                TypeOfObjects.DEMON.getImagePath(),
-                "/com/gnome/gnome/effects/demon_damaged.gif",
-                "/com/gnome/gnome/effects/red_monster.gif",
+                TypeOfObjects.DEMON.getImagePathForMonsters(),
+                "/com/gnome/gnome/images/monsters/hitGif/demon_damaged.gif",
+                "/com/gnome/gnome/images/monsters/attackGif/animated_demon.gif",
                 dbMonster.getScore_val());
     }
 }
