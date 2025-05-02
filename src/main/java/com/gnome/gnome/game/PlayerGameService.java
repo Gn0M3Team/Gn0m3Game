@@ -3,16 +3,17 @@ package com.gnome.gnome.game;
 import com.gnome.gnome.editor.utils.TypeOfObjects;
 import com.gnome.gnome.monsters.Monster;
 import com.gnome.gnome.player.Player;
+import com.gnome.gnome.userState.UserState;
 import javafx.scene.input.KeyEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MovementService {
+public class PlayerGameService {
 
     private final GameController controller;
 
-    public MovementService(GameController controller) {
+    public PlayerGameService(GameController controller) {
         this.controller = controller;
     }
 
@@ -21,8 +22,25 @@ public class MovementService {
         switch (event.getCode()) {
             case LEFT, A, RIGHT, D, UP, W, DOWN, S -> handleMovement(event);
             case E -> handleInteraction();
+            case R -> handleUsePotion();
             case SPACE -> handleAttack();
             default -> {}
+        }
+    }
+
+    private void handleUsePotion() {
+        Player player = controller.getPlayer();
+        if (controller.getPotion() != null && player.getCurrentHealth() < player.getMaxHealth()) {
+            double healAmount = 20;
+            player.heal(healAmount);
+
+            controller.setPotion(null);
+
+            controller.getItemUIRenderer().render(controller.getArmor(), controller.getWeapon(), null);
+
+            controller.updatePlayerHealthBar();
+
+            UserState.getInstance().setPotionId(null);
         }
     }
 
