@@ -105,7 +105,7 @@ public class GameUIManager {
     }
 
     public void showCenterMenuPopup() {
-        if (controller.getCenterMenuPopup() != null) return;
+        if (controller.getCenterMenuPopup() != null && controller.getCenterMenuPopup().isShowing()) return;
 
         Popup popup = new Popup();
         controller.getGameLoop().stop();
@@ -133,6 +133,14 @@ public class GameUIManager {
             controller.getGameLoop().start();
             controller.setStop(false);
             controller.getCenterStack().getChildren().remove(darkOverlay);
+
+            Scene scene = controller.getCenterMenuButton().getScene();
+            if (scene != null) {
+                scene.setOnKeyPressed(controller.getMovementService()::handleKeyPress);
+                scene.getRoot().requestFocus();
+            }
+
+            controller.setCenterMenuPopup(null);
         });
 
         Button settingsButton = new Button("Settings");
@@ -240,29 +248,38 @@ public class GameUIManager {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/gnome/gnome/pages/shop.fxml"));
             Parent shopRoot = loader.load();
-            Scene shopScene = new Scene(shopRoot);
-            Stage popup = new Stage();
-            popup.initModality(Modality.APPLICATION_MODAL);
-            popup.initOwner(controller.getCenterMenuButton().getScene().getWindow());
-            popup.setTitle("Shop");
-            popup.setScene(shopScene);
-            popup.setResizable(false);
-
-            showDarkOverlay();
-            popup.setOnHidden(e -> {
-                hideDarkOverlay();
-                if (isStoryMode) controller.closeShopAndStartNewGame();
-                else controller.restartGame();
-            });
 
             ShopController shopController = loader.getController();
             shopController.setGameController(controller);
 
-            popup.showAndWait();
+            showDarkOverlay();
+
+            controller.getCenterStack().getChildren().add(shopRoot);
+            StackPane.setAlignment(shopRoot, Pos.CENTER);
+
+            shopController.setOnExit(() -> {
+                controller.getCenterStack().getChildren().remove(shopRoot);
+                hideDarkOverlay();
+                controller.onSceneExit(false);
+                new SwitchPage().goMainMenu(controller.getRootBorder());
+            });
+
+            shopController.setOnContinue(() -> {
+                controller.getCenterStack().getChildren().remove(shopRoot);
+                hideDarkOverlay();
+
+                if (isStoryMode) {
+                    controller.closeShopAndStartNewGame();
+                }
+                // else do nothing — just close the popup
+            });
+
         } catch (IOException e) {
             logger.severe("Failed to load shop popup: " + e.getMessage());
         }
     }
+
+
 
     private void showDarkOverlay() {
         Pane overlay = new Pane();

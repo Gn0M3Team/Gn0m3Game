@@ -3,7 +3,6 @@ package com.gnome.gnome.monsters.types;
 import com.gnome.gnome.editor.utils.TypeOfObjects;
 import com.gnome.gnome.monsters.Monster;
 import com.gnome.gnome.monsters.movements.OmnidirectionalMovement;
-import javafx.scene.Node;
 
 public class Goblin extends Monster {
     public Goblin(int startX, int startY, com.gnome.gnome.models.Monster dbMonster) {
@@ -17,9 +16,9 @@ public class Goblin extends Monster {
                 startY,
                 TypeOfObjects.GOBLIN.getValue(),
                 new OmnidirectionalMovement(),
-                TypeOfObjects.GOBLIN.getImagePath(),
-                "/com/gnome/gnome/effects/goblin_damaged.gif",
-                "/com/gnome/gnome/effects/red_monster.gif",
+                TypeOfObjects.GOBLIN.getImagePathForMonsters(),
+                "/com/gnome/gnome/images/monsters/hitGif/goblin_damaged.gif",
+                "/com/gnome/gnome/images/monsters/attackGif/animated_goblin.gif",
                 dbMonster.getScore_val());
     }
 }

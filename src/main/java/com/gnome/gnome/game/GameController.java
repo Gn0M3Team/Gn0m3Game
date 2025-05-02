@@ -8,6 +8,8 @@ import com.gnome.gnome.dao.userDAO.UserGameStateDAO;
 import com.gnome.gnome.game.component.Chest;
 import com.gnome.gnome.game.component.Coin;
 import com.gnome.gnome.editor.utils.TypeOfObjects;
+import com.gnome.gnome.game.component.CoinUIRenderer;
+import com.gnome.gnome.game.component.ItemUIRenderer;
 import com.gnome.gnome.models.*;
 import com.gnome.gnome.models.Map;
 import com.gnome.gnome.models.user.UserGameState;
@@ -97,6 +99,11 @@ public class GameController {
 
     private Map selectedMap;
     private boolean isStoryMode;
+    private ItemUIRenderer itemUIRenderer;
+    private CoinUIRenderer coinUIRenderer;
+    private Pane uiOverlayPane;
+    private VBox bottomUIBox;
+
 
 
     public static GameController getGameController() {
@@ -128,6 +135,9 @@ public class GameController {
         setupUI();
         addGameEntitiesToPane();
 
+        this.itemUIRenderer = new ItemUIRenderer(bottomUIBox, camera);
+        this.coinUIRenderer = new CoinUIRenderer(bottomUIBox, player, camera);
+        itemUIRenderer.render(armor, weapon, potion);
         uiManager = new GameUIManager(this);
         healthBar = new PlayerHealthBar(250, 50);
         healthBarContainer.getChildren().add(healthBar);
@@ -161,12 +171,27 @@ public class GameController {
         gameObjectsPane.prefWidthProperty().bind(centerStack.widthProperty());
         gameObjectsPane.prefHeightProperty().bind(centerStack.heightProperty());
 
-        Pane viewportRoot = new Pane(viewportCanvas, gameObjectsPane);
+        uiOverlayPane = new Pane();
+        uiOverlayPane.setPickOnBounds(false);
+        uiOverlayPane.prefWidthProperty().bind(centerStack.widthProperty());
+        uiOverlayPane.prefHeightProperty().bind(centerStack.heightProperty());
+
+        VBox bottomUIBox = new VBox();
+        bottomUIBox.setAlignment(Pos.BOTTOM_CENTER);
+        bottomUIBox.setPrefHeight(150);
+        bottomUIBox.setMouseTransparent(true);
+        bottomUIBox.prefWidthProperty().bind(centerStack.widthProperty());
+        bottomUIBox.prefHeightProperty().bind(centerStack.heightProperty());
+        uiOverlayPane.getChildren().add(bottomUIBox);
+        this.bottomUIBox = bottomUIBox;
+
+        Pane viewportRoot = new Pane(viewportCanvas, gameObjectsPane, uiOverlayPane);
         centerStack.getChildren().setAll(viewportRoot);
         StackPane.setAlignment(viewportRoot, Pos.CENTER);
 
         camera.drawViewport(viewportCanvas, coinsOnMap);
     }
+
 
     private void addGameEntitiesToPane() {
         camera.updateCameraCenter();
@@ -256,6 +281,7 @@ public class GameController {
                 chest.setOpened(true);
                 chest.animate();
                 player.addCoin(Math.round(chest.getValue()));
+                coinUIRenderer.update();
                 player.addCountOfOpenedChest();
                 player.addScore(50);
                 break;
@@ -380,6 +406,7 @@ public class GameController {
         });
 
         coinsOnMap.removeAll(collected);
+        coinUIRenderer.update();
     }
 
     private void drawAttackRange(GraphicsContext gc, int range) {
@@ -410,6 +437,7 @@ public class GameController {
             coinsOnMap.add(new Coin(x, y, monster.getCost()));
             player.addScore(monster.getScore());
             player.addCountOfKilledMonsters();
+            coinUIRenderer.update();
             gameObjectsPane.getChildren().remove(monster.getRepresentation());
         });
 
@@ -449,7 +477,7 @@ public class GameController {
             gameObjectsPane.getChildren().add(player.getRepresentation());
 
         updatePlayerHealthBar();
-
+        coinUIRenderer.update();
     }
 
 

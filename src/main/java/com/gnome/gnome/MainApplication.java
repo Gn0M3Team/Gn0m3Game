@@ -105,13 +105,16 @@ public class MainApplication extends Application {
 
     private void connect_db() {
         if (!skip_db) {
-            Connection conn = DatabaseWrapper.getInstance().getConnection();
-
-            if (conn != null) {
-                System.out.println("✅ Database connection successful!");
-
-            } else {
-                System.out.println("❌ Failed to connect to database.");
+            try {
+                Connection conn = DatabaseWrapper.getInstance().getConnection();
+                if (conn != null) {
+                    System.out.println("✅ Database connection successful!");
+                } else {
+                    System.out.println("❌ Failed to connect to database.");
+                }
+            } catch (Exception e) {
+                System.err.println("❌ Database error: " + e.getMessage());
+                e.printStackTrace();
             }
         }
     }

@@ -5,6 +5,8 @@ import com.gnome.gnome.monsters.Monster;
 import javafx.animation.TranslateTransition;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -15,6 +17,7 @@ import lombok.Setter;
 import static com.gnome.gnome.editor.utils.EditorConstants.TILE_SIZE;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -30,7 +33,7 @@ public class Player {
     private final int maxHealth;
     private double damage;
     private double currentHealth;
-    private final Node representation;
+    private final ImageView representation;
     private double playerCoins = 0;
     private int score = 0;
     private int countOfOpenedChest = 0;
@@ -52,23 +55,21 @@ public class Player {
      * @param startY     the starting Y position
      * @param maxHealth  the maximum health of the player
      */
-    private Player(int startX, int startY, int maxHealth, double damage) {
+    private Player(int startX, int startY, int maxHealth, double damage, String imagePath) {
         this.x = startX; // Set the player's initial X-coordinate on the grid
         this.y = startY; // Set the player's initial Y-coordinate on the grid
         this.maxHealth = maxHealth; // Set the player's maximum health.
         this.currentHealth = maxHealth; // Set the player's current health to the maximum health at the start of the game.
         this.damage = damage;
 
-        // Create a yellow square to visually represent the player:
-        Rectangle rect = new Rectangle(TILE_SIZE * 0.6, TILE_SIZE * 0.6, Color.YELLOW);
-        rect.setArcWidth(10);
-        rect.setArcHeight(10);
-        this.representation = rect;
+        this.representation = new ImageView(new Image(Objects.requireNonNull(Player.class.getResourceAsStream(imagePath))));
+        this.representation.setFitWidth(TILE_SIZE * 0.6);
+        this.representation.setFitHeight(TILE_SIZE * 0.6);
     }
 
-    public static Player getInstance(int startX, int startY, int maxHealth, double damage) {
+    public static Player getInstance(int startX, int startY, int maxHealth, double damage, String imagePath) {
         if (instance == null) {
-            instance = new Player(startX, startY, maxHealth, damage);
+            instance = new Player(startX, startY, maxHealth, damage, imagePath);
         }
         return instance;
     }
@@ -139,11 +140,8 @@ public class Player {
         double py = (y - cameraStartRow) * tileHeight + offsetY;
 
         animateToPosition(px, py, onAnimationFinished);
-
-        if (representation instanceof Rectangle r) {
-            r.setWidth(sizeX);
-            r.setHeight(sizeY);
-        }
+        representation.setFitWidth(sizeX);
+        representation.setFitHeight(sizeY);
     }
 
     private void animateToPosition(double toX, double toY, Runnable onFinished) {
