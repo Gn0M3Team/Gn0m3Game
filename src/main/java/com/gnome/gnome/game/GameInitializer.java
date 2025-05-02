@@ -41,8 +41,7 @@ public class GameInitializer {
                 if (tile == TypeOfObjects.START_POINT.getValue()) {
                     int health = armor == null ? PLAYER_MAX_HEALTH : armor.getHealth();
                     double damage = weapon == null ? 20.0 : weapon.getAtkValue();
-                    System.out.println("Damage: " + damage);
-                    Player.getInstance(col, row, health, damage, "/com/gnome/gnome/images/tiles/tile_172.png");
+                    Player.getInstance(col, row, health, damage, "/com/gnome/gnome/images/player.png");
                     fieldMap[row][col] = TypeOfObjects.START_POINT.getValue();
                 }
 

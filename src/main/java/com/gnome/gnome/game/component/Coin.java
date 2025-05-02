@@ -46,7 +46,7 @@ public class Coin {
         this.imageView = new ImageView(
                 new Image(
                         Objects.requireNonNull(
-                            Coin.class.getResourceAsStream("/com/gnome/gnome/images/tiles/" + COIN_IMAGE)
+                            Coin.class.getResourceAsStream("/com/gnome/gnome/images/" + COIN_IMAGE)
                         )
                 )
         );

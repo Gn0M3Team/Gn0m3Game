@@ -105,22 +105,20 @@ public class GameUIManager {
     }
 
     public void showCenterMenuPopup() {
-        if (controller.getCenterMenuPopup() != null && controller.getCenterMenuPopup().isShowing()) return;
+        if (controller.getCenterStack().getChildren().stream().anyMatch(n -> n.getStyleClass().contains("menu-popup")))
+            return;
 
-        Popup popup = new Popup();
         controller.getGameLoop().stop();
         controller.setStop(true);
-        popup.setAutoHide(true);
 
         Pane darkOverlay = new Pane();
         darkOverlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.6);");
         darkOverlay.prefWidthProperty().bind(controller.getCenterStack().widthProperty());
         darkOverlay.prefHeightProperty().bind(controller.getCenterStack().heightProperty());
-        controller.getCenterStack().getChildren().add(darkOverlay);
 
         VBox menuBox = new VBox(20);
         menuBox.setAlignment(Pos.CENTER);
-        menuBox.getStylesheets().add(getClass().getResource("/com/gnome/gnome/pages/css/game-ui.css").toExternalForm());
+        menuBox.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/com/gnome/gnome/pages/css/game-menu.css")).toExternalForm());
         menuBox.getStyleClass().add("menu-popup");
 
         Label title = new Label("MENU");
@@ -129,10 +127,9 @@ public class GameUIManager {
         Button resumeButton = new Button("Resume");
         resumeButton.getStyleClass().add("menu-button");
         resumeButton.setOnAction(e -> {
-            popup.hide();
+            controller.getCenterStack().getChildren().removeAll(menuBox, darkOverlay);
             controller.getGameLoop().start();
             controller.setStop(false);
-            controller.getCenterStack().getChildren().remove(darkOverlay);
 
             Scene scene = controller.getCenterMenuButton().getScene();
             if (scene != null) {
@@ -146,33 +143,25 @@ public class GameUIManager {
         Button settingsButton = new Button("Settings");
         settingsButton.getStyleClass().add("menu-button");
         settingsButton.setOnAction(e -> {
+            controller.getCenterStack().getChildren().removeAll(menuBox, darkOverlay);
+            controller.onSceneExit(false);
             new SwitchPage().goSetting(controller.getRootBorder());
-            popup.hide();
-            controller.getCenterStack().getChildren().remove(darkOverlay);
         });
 
         Button goBackButton = new Button("Go Back");
         goBackButton.getStyleClass().add("menu-button");
         goBackButton.setOnAction(e -> {
+            controller.getCenterStack().getChildren().removeAll(menuBox, darkOverlay);
             controller.onSceneExit(false);
             new SwitchPage().goMainMenu(controller.getRootBorder());
-            popup.hide();
-            controller.getCenterStack().getChildren().remove(darkOverlay);
         });
 
         menuBox.getChildren().addAll(title, resumeButton, settingsButton, goBackButton);
-        popup.getContent().add(menuBox);
 
-        Scene scene = controller.getCenterMenuButton().getScene();
-        if (scene != null) {
-            Bounds bounds = scene.getRoot().localToScreen(scene.getRoot().getBoundsInLocal());
-            popup.show(scene.getWindow(),
-                    bounds.getMinX() + bounds.getWidth() / 2 - 100,
-                    bounds.getMinY() + bounds.getHeight() / 2 - 75);
-        }
-
-        controller.setCenterMenuPopup(popup);
+        controller.getCenterStack().getChildren().addAll(darkOverlay, menuBox);
+        StackPane.setAlignment(menuBox, Pos.CENTER);
     }
+
 
     public void updatePlayerAfterDeath(Player player) {
         UserGameStateDAO userGameStateDAO = new UserGameStateDAO();

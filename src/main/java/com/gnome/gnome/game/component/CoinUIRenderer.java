@@ -13,6 +13,8 @@ import javafx.scene.text.FontWeight;
 
 import java.io.InputStream;
 
+import static com.gnome.gnome.game.component.ObjectsConstants.COIN_IMAGE;
+
 public class CoinUIRenderer {
 
     private final VBox uiPane;
@@ -21,7 +23,7 @@ public class CoinUIRenderer {
     private HBox coinBox;
     private Label coinCountLabel;
 
-    private static final String COIN_IMAGE_PATH = "/com/gnome/gnome/images/tiles/tile_522.png";
+    private static final String COIN_IMAGE_PATH = "/com/gnome/gnome/images/";
 
     public CoinUIRenderer(VBox uiPane, Player player, Camera camera) {
         this.uiPane = uiPane;
@@ -34,9 +36,9 @@ public class CoinUIRenderer {
             uiPane.getChildren().remove(coinBox);
         }
 
-        Image coinImage = loadImage(COIN_IMAGE_PATH);
+        Image coinImage = loadImage(COIN_IMAGE_PATH + COIN_IMAGE);
         if (coinImage == null) {
-            System.err.println("Coin image not found: " + COIN_IMAGE_PATH);
+            System.err.println("Coin image not found: " + COIN_IMAGE_PATH + COIN_IMAGE);
             return;
         }
 
