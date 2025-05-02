@@ -27,6 +27,8 @@ import javafx.util.Duration;
 
 import java.util.Objects;
 
+import static com.gnome.gnome.game.component.ObjectsConstants.COIN_IMAGE;
+
 public class MainController {
 // TODO: If we have time, we need to change logic with creating DAO, because we in two places crete monster dao, map dao, and for me we need to change this.
 
@@ -66,7 +68,7 @@ public class MainController {
         coinIcon.setImage(
                 new Image(
                         Objects.requireNonNull(
-                                getClass().getResourceAsStream("/com/gnome/gnome/images/tiles/tile_522.png")
+                                getClass().getResourceAsStream("/com/gnome/gnome/images/" + COIN_IMAGE)
                         )
                 )
         );

@@ -89,42 +89,6 @@ public class Camera {
         cameraCenterY = Math.max(half, Math.min(cameraCenterY, maxY));
     }
 
-    public void drawPressEHints(GraphicsContext gc, int [][] baseMap, int px, int py, List<Chest> activeChests) {
-        int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-        double tw = getTileWidth();
-        double th = getTileHeight();
-
-        gc.setFont(Font.font("Arial", FontWeight.BOLD, 12));
-        gc.setFill(Color.WHITE);
-
-        for (int[] d : directions) {
-            int nx = px + d[0];
-            int ny = py + d[1];
-
-            if (nx >= 0 && nx < baseMap[0].length && ny >= 0 && ny < baseMap.length) {
-                TypeOfObjects tileType = TypeOfObjects.fromValue(baseMap[ny][nx]);
-                boolean isTable = tileType == TypeOfObjects.TABLE;
-                boolean isChest = activeChests.stream().anyMatch(c -> c.getGridX() == nx && c.getGridY() == ny && !c.isOpened());
-
-                if (isTable || isChest) {
-                    int dx = nx - getStartCol();
-                    int dy = ny - getStartRow();
-
-                    if (dx >= 0 && dx < VIEWPORT_SIZE && dy >= 0 && dy < VIEWPORT_SIZE) {
-                        double x = dx * tw + tw / 2;
-                        double y = dy * th - th * 0.4;
-
-                        gc.setFill(Color.rgb(0, 0, 0, 0.7));
-                        gc.fillRoundRect(x - 30, y + 14, 60, 20, 5, 5);
-
-                        gc.setFill(Color.WHITE);
-                        gc.fillText("Press E", x - 20, y + 22);
-                    }
-                }
-            }
-        }
-    }
-
     public void drawViewport(Canvas canvas, List<Coin> coins) {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         this.tileWidth = canvas.getWidth() / VIEWPORT_SIZE;

@@ -82,8 +82,9 @@ public class ItemUIRenderer {
 
     private Image loadImageOrDefault(String imagePath) {
         InputStream stream;
+        System.out.println(imagePath);
         if (imagePath != null && !imagePath.isEmpty()) {
-            stream = getClass().getResourceAsStream("/com/gnome/gnome/images/" + imagePath);
+            stream = getClass().getResourceAsStream("/com/gnome/gnome/images/tiles/" + imagePath + ".png");
             if (stream != null) {
                 return new Image(stream);
             }

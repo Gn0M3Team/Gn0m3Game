@@ -706,7 +706,7 @@ public class EditorPageController {
                 Map map = new Map(
                         userState.getUsername(),
                         mapGrid,
-                        0,
+                        100,
                         fileName,
                         fileName,
                         level
