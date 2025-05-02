@@ -1,15 +1,19 @@
 package com.gnome.gnome.game;
 
 import com.gnome.gnome.models.*;
+import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.Separator;
 import javafx.scene.layout.VBox;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.util.List;
 
@@ -58,46 +62,49 @@ public class MapLoaderUIHandler {
 
     private void showLoadingPopup() {
         if (loadingPopup == null) {
+            // Loading Title
             Label loadingLabel = new Label("Loading...");
-            loadingLabel.setStyle("""
-                -fx-font-family: 'Press Start 2P';
-                -fx-font-size: 22px;
-                -fx-text-fill: white;
-                -fx-effect: dropshadow(gaussian, black, 2, 0.5, 1, 1);
-        """);
+            loadingLabel.getStyleClass().add("loading-label");
 
+            // Loading Indicator
+            ProgressIndicator loadingIndicator = new ProgressIndicator(-1); // Indeterminate progress
+            loadingIndicator.getStyleClass().add("loading-indicator");
+
+            // Separator
+            Separator separator = new Separator();
+            separator.getStyleClass().add("loading-separator");
+
+            // Tip Label
             Label tipLabel = new Label(getRandomTip());
             tipLabel.setWrapText(true);
-            tipLabel.setMaxWidth(500);
-            tipLabel.setStyle("""
-                -fx-font-family: 'Press Start 2P';
-                -fx-font-size: 12px;
-                -fx-text-fill: lightgray;
-                -fx-padding: 15px 0 0 0;
-        """);
+            tipLabel.setMaxWidth(450);
+            tipLabel.getStyleClass().add("tip-label");
 
-            VBox box = new VBox(loadingLabel, tipLabel);
-            box.setPrefSize(600, 300);
-            box.setStyle("""
-                -fx-background-color: rgba(0, 0, 0, 0.8);
-                -fx-border-color: white;
-                -fx-border-width: 2px;
-                -fx-background-radius: 15px;
-                -fx-border-radius: 15px;
-                -fx-padding: 30px;
-            """);
-            box.setSpacing(30);
+            // Tip Container (to give the tip its own background and padding)
+            VBox tipContainer = new VBox(tipLabel);
+            tipContainer.getStyleClass().add("tip-container");
+
+            // Main Container
+            VBox box = new VBox(15, loadingLabel, loadingIndicator, separator, tipContainer);
+            box.setPrefSize(600, 350);
+            box.getStyleClass().add("loading-box");
+            box.getStylesheets().add(getClass().getResource("/com/gnome/gnome/pages/css/dialogs/map-loader.css").toExternalForm());
             box.setAlignment(Pos.CENTER);
 
             loadingPopup = new Popup();
             loadingPopup.getContent().add(box);
+
+            // Add fade-in animation for a gentle effect
+            FadeTransition fadeIn = new FadeTransition(Duration.millis(500), box);
+            fadeIn.setFromValue(0.0);
+            fadeIn.setToValue(1.0);
+            fadeIn.play();
         }
 
         loadingPopup.show(primaryStage);
         loadingPopup.setX(primaryStage.getX() + primaryStage.getWidth() / 2 - 300);
-        loadingPopup.setY(primaryStage.getY() + primaryStage.getHeight() / 2 - 150);
+        loadingPopup.setY(primaryStage.getY() + primaryStage.getHeight() / 2 - 175);
     }
-
 
 
     private String getRandomTip() {

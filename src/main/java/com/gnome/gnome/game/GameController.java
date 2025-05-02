@@ -311,7 +311,11 @@ public class GameController {
 
     private void onHatchStepped() {
         if (!monsterList.isEmpty()) {
-            if (debugModGame) System.out.println("You must kill all monsters before using the hatch!");
+            if (rootBorder.getScene() != null && rootBorder.getScene().getWindow() != null) {
+                Stage stage = (Stage) rootBorder.getScene().getWindow();
+                if (debugModGame) System.out.println("You must kill all monsters before using the hatch!");
+                CustomPopupUtil.showWarning(stage, "You must kill all monsters before using the hatch!");
+            }
             return;
         }
 
