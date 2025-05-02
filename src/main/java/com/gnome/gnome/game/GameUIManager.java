@@ -23,7 +23,6 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -133,7 +132,7 @@ public class GameUIManager {
 
             Scene scene = controller.getCenterMenuButton().getScene();
             if (scene != null) {
-                scene.setOnKeyPressed(controller.getMovementService()::handleKeyPress);
+                scene.setOnKeyPressed(controller.getPlayerGameService()::handleKeyPress);
                 scene.getRoot().requestFocus();
             }
 
