@@ -1,0 +1,52 @@
+/* Loading Popup Styles */
+.loading-box {
+    -fx-background-color: linear-gradient(to bottom, rgba(46, 28, 38, 0.95), rgba(78, 52, 78, 0.95)); /* Slightly darker gradient */
+    -fx-background-radius: 20px;
+    -fx-border-color: linear-gradient(to right, #F4C8D4, #C8A2C8); /* Gradient border */
+    -fx-border-width: 3px;
+    -fx-border-radius: 20px;
+    -fx-padding: 30px;
+    -fx-spacing: 15px;
+    -fx-alignment: center;
+    -fx-effect: dropshadow(gaussian, rgba(244, 200, 212, 0.6), 15, 0, 0, 5); /* Enhanced pink shadow */
+}
+
+.loading-label {
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 28px; /* Larger for emphasis */
+    -fx-text-fill: linear-gradient(to right, #F4C8D4, #C8A2C8); /* Pink to purple gradient */
+    -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 0.4), 6, 0, 0, 2); /* Brighter glow */
+}
+
+.loading-indicator {
+    -fx-progress-color: linear-gradient(to right, #F4C8D4, #C8A2C8); /* Gradient for the spinning indicator */
+    -fx-pref-width: 50px;
+    -fx-pref-height: 50px;
+    -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 0.3), 5, 0, 0, 1); /* Subtle glow */
+}
+
+.loading-separator {
+    -fx-pref-width: 300px;
+    -fx-background-color: #4A3A4A; /* Dark purple line */
+    -fx-background-insets: 0;
+    -fx-padding: 10px 0;
+    -fx-opacity: 0.5; /* Slightly transparent */
+}
+
+.tip-container {
+    -fx-background-color: rgba(30, 18, 28, 0.7); /* Darker inner background */
+    -fx-background-radius: 10px;
+    -fx-padding: 15px;
+    -fx-max-width: 500px;
+    -fx-alignment: center;
+}
+
+.tip-label {
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 14px; /* Slightly larger for readability */
+    -fx-text-fill: #E0E0E0; /* Light gray for readability */
+    -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 0.2), 3, 0, 0, 1); /* Gentle glow */
+    -fx-wrap-text: true;
+    -fx-max-width: 450px;
+    -fx-text-alignment: center;
+}

@@ -192,4 +192,27 @@ Caused by: org.postgresql.util.PSQLException: ERROR: column "id" does not exist
 [0m[33mFri May 02 00:40:53 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
 [0m[31mFri May 02 00:40:55 CEST 2025 SEVERE [com.gnome.gnome.shop.controllers.ItemController] - Player successfully bought item (4, Dagger)
 [0m[33mFri May 02 01:03:13 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
+[0m[33mFri May 02 02:48:23 CEST 2025 WARNING [javafx.scene.CssStyleHelper] - Failed to set css [-fx-progress-color] on [ObjectProperty [bean: javafx.scene.control.skin.ProgressIndicatorSkin@67782385, name: progressColorProperty, value: null]] due to 'Only Color objects are supported'
+
+[0m[33mFri May 02 02:48:36 CEST 2025 WARNING [javafx.scene.CssStyleHelper] - Failed to set css [-fx-progress-color] on [ObjectProperty [bean: javafx.scene.control.skin.ProgressIndicatorSkin@3153b528, name: progressColorProperty, value: null]] due to 'Only Color objects are supported'
+
+[0m[33mFri May 02 02:49:18 CEST 2025 WARNING [javafx.scene.CssStyleHelper] - Failed to set css [-fx-progress-color] on [ObjectProperty [bean: javafx.scene.control.skin.ProgressIndicatorSkin@9090467, name: progressColorProperty, value: null]] due to 'Only Color objects are supported'
+
+[0m[33mFri May 02 02:49:43 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
+[0m[33mFri May 02 02:49:50 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
+[0m[31mFri May 02 02:49:52 CEST 2025 SEVERE [com.gnome.gnome.shop.controllers.ItemController] - Player successfully bought item (3, Goblin armour)
+[0m[33mFri May 02 02:49:53 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
+[0m[31mFri May 02 02:49:54 CEST 2025 SEVERE [com.gnome.gnome.shop.controllers.ItemController] - Player successfully bought item (8, Axe of God)
+[0m[33mFri May 02 02:49:59 CEST 2025 WARNING [javafx.scene.CssStyleHelper] - Failed to set css [-fx-progress-color] on [ObjectProperty [bean: javafx.scene.control.skin.ProgressIndicatorSkin@78cbf312, name: progressColorProperty, value: null]] due to 'Only Color objects are supported'
+
+[0m[33mFri May 02 02:51:59 CEST 2025 WARNING [javafx.scene.CssStyleHelper] - Failed to set css [-fx-progress-color] on [ObjectProperty [bean: javafx.scene.control.skin.ProgressIndicatorSkin@4425d8db, name: progressColorProperty, value: null]] due to 'Only Color objects are supported'
+
+[0m[33mFri May 02 02:57:08 CEST 2025 WARNING [javafx.scene.CssStyleHelper] - Failed to set css [-fx-progress-color] on [ObjectProperty [bean: javafx.scene.control.skin.ProgressIndicatorSkin@7393934d, name: progressColorProperty, value: null]] due to 'Only Color objects are supported'
+
+[0m[33mFri May 02 03:03:23 CEST 2025 WARNING [javafx.scene.CssStyleHelper] - Failed to set css [-fx-progress-color] on [ObjectProperty [bean: javafx.scene.control.skin.ProgressIndicatorSkin@325971bf, name: progressColorProperty, value: null]] due to 'Only Color objects are supported'
+
+[0m[33mFri May 02 03:05:17 CEST 2025 WARNING [javafx.scene.CssStyleHelper] - Failed to set css [-fx-progress-color] on [ObjectProperty [bean: javafx.scene.control.skin.ProgressIndicatorSkin@6aaf08aa, name: progressColorProperty, value: null]] due to 'Only Color objects are supported'
+
+[0m[33mFri May 02 03:07:12 CEST 2025 WARNING [javafx.scene.CssStyleHelper] - Failed to set css [-fx-progress-color] on [ObjectProperty [bean: javafx.scene.control.skin.ProgressIndicatorSkin@70676e72, name: progressColorProperty, value: null]] due to 'Only Color objects are supported'
+
 [0m
