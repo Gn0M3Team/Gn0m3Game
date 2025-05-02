@@ -1,0 +1,24 @@
+.menu-popup {
+    -fx-background-color: rgba(20, 20, 20, 0.85);
+    -fx-padding: 20px;
+    -fx-background-radius: 20px;
+    -fx-border-color: #555555;
+    -fx-border-width: 2px;
+}
+
+.menu-title {
+    -fx-font-size: 28px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.menu-button {
+    -fx-font-size: 18px;
+    -fx-padding: 8 20;
+    -fx-background-color: linear-gradient(to bottom, #3a3a3a, #1e1e1e);
+    -fx-text-fill: white;
+    -fx-background-radius: 10;
+    -fx-border-color: #888;
+    -fx-border-width: 1px;
+    -fx-effect: dropshadow(gaussian, black, 3, 0.5, 0, 1);
+}

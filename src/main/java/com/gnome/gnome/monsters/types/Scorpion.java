@@ -3,7 +3,6 @@ package com.gnome.gnome.monsters.types;
 import com.gnome.gnome.editor.utils.TypeOfObjects;
 import com.gnome.gnome.monsters.Monster;
 import com.gnome.gnome.monsters.movements.StraightMovement;
-import javafx.scene.Node;
 
 public class Scorpion extends Monster {
     public Scorpion(int startX, int startY, com.gnome.gnome.models.Monster dbMonster) {
@@ -17,9 +16,9 @@ public class Scorpion extends Monster {
                 startY,
                 TypeOfObjects.SCORPION.getValue(),
                 new StraightMovement()
-                ,TypeOfObjects.SCORPION.getImagePath(),
-                "/com/gnome/gnome/effects/scorpion_damaged.gif",
-                "/com/gnome/gnome/effects/red_monster.gif",
+                ,TypeOfObjects.SCORPION.getImagePathForMonsters(),
+                "/com/gnome/gnome/images/monsters/hitGif/scorpion_damaged.gif",
+                "/com/gnome/gnome/images/monsters/attackGif/animated_scorpion.gif",
                 dbMonster.getScore_val());
     }
 }

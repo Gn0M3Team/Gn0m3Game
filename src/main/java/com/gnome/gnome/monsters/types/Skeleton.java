@@ -40,8 +40,8 @@ public class Skeleton extends Monster {
                 startY,
                 TypeOfObjects.SKELETON.getValue(),
                 new RandomMovement(),
-                TypeOfObjects.SKELETON.getImagePath(),
-                "/com/gnome/gnome/effects/demon_damaged.gif",
+                TypeOfObjects.SKELETON.getImagePathForMonsters(),
+                "/com/gnome/gnome/images/monsters/hitGif/demon_damaged.gif",
                 "/com/gnome/gnome/effects/red_monster.gif",
                 dbMonster.getScore_val());
     }

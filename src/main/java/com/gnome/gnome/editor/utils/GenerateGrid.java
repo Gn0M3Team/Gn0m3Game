@@ -164,6 +164,7 @@ public class GenerateGrid {
      */
     public static void updateTileImage(StackPane tilePane, TypeOfObjects type) {
         tilePane.getChildren().clear();
+        System.out.println("IMAGE: " + type.getImagePath());
         ImageView icon = new ImageView(
                 new Image(Objects.requireNonNull(
                         GenerateGrid.class.getResourceAsStream(type.getImagePath())

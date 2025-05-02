@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'Press Start 2P';
-    src: url('../../fonts/PressStart2P-Regular.ttf') format('truetype');
+    src: url('../fonts/PressStart2P-Regular.ttf') format('truetype');
 }
 
 /* Base style for the popup container (VBox) */
@@ -28,6 +28,11 @@
 /* Warning popup background */
 .popup-box.warning {
     -fx-background-color: rgba(255, 193, 7, 0.95); /* #ffc107 with opacity */
+}
+
+/* Info popup background (grey) */
+.popup-box.info {
+    -fx-background-color: rgba(108, 117, 125, 0.95); /* #6c757d with opacity */
 }
 
 /* Style for the message label */

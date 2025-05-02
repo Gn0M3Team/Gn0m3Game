@@ -706,7 +706,7 @@ public class EditorPageController {
                 Map map = new Map(
                         userState.getUsername(),
                         mapGrid,
-                        0,
+                        100,
                         fileName,
                         fileName,
                         level
@@ -737,6 +737,16 @@ public class EditorPageController {
         });
     }
 
+    /**
+     * Handles the action of updating an existing map in the database.
+     * <p>
+     * This method retrieves all maps owned by the current user (or all maps if the user is an admin),
+     * validates the current editor map, and allows the user to select a map to update via a dialog.
+     * If a map is selected and valid, its data is updated in the database and a success message is shown.
+     * </p>
+     *
+     * @param event the action event triggered by clicking the "Update Map" button
+     */
     @FXML
     protected void onUpdateMapFromDatabase(ActionEvent event) {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();

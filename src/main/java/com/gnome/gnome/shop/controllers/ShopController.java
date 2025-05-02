@@ -36,6 +36,12 @@ public class ShopController {
     private GameController gameController;
     private static final Logger logger = Logger.getLogger(ShopController.class.getName());
 
+    @Getter @Setter
+    private Runnable onExit;
+
+    @Getter @Setter
+    private Runnable onContinue;
+
     @FXML
     private Button ReturnGameButton;
     @FXML
@@ -69,17 +75,12 @@ public class ShopController {
      */
     @FXML
     public void onNewGame(ActionEvent e) {
-        gameController.closeShopAndStartNewGame();
+        if (onContinue != null) onContinue.run();
     }
 
-    /**
-     * Handles the action of exiting the application.
-     *
-     * @param e the action event triggered by the exit button
-     */
     @FXML
     public void onExit(ActionEvent e) {
-        gameController.closeShopAndGoToMainMenu();
+        if (onExit != null) onExit.run();
     }
 
     private void closePopup() {

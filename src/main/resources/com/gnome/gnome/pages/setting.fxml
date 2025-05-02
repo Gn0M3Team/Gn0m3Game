@@ -49,13 +49,13 @@
 
             <!-- Navigation Buttons -->
             <HBox alignment="CENTER" spacing="20" styleClass="button-container">
-                <Button fx:id="backGameButton" text="%settings.backtogame" onAction="#backToGameButtonClick" styleClass="action-button"/>
-                <Button fx:id="mainMenuButton" text="%settings.button.mainmenu" onAction="#mainMenuButtonClick" styleClass="action-button"/>
-            </HBox>
-        </VBox>
-    </center>
+                <!--                <Button fx:id="backGameButton" text="%settings.backtogame" onAction="#backToGameButtonClick" styleClass="action-button"/>-->
+                                <Button fx:id="mainMenuButton" text="%settings.button.mainmenu" onAction="#mainMenuButtonClick" styleClass="action-button"/>
+                            </HBox>
+                        </VBox>
+                    </center>
 
-    <padding>
-        <Insets top="25" right="25" bottom="25" left="25"/>
-    </padding>
-</BorderPane>
+                    <padding>
+                        <Insets top="25" right="25" bottom="25" left="25"/>
+                    </padding>
+                </BorderPane>

@@ -8,6 +8,8 @@ import com.gnome.gnome.dao.userDAO.UserGameStateDAO;
 import com.gnome.gnome.game.component.Chest;
 import com.gnome.gnome.game.component.Coin;
 import com.gnome.gnome.editor.utils.TypeOfObjects;
+import com.gnome.gnome.game.component.CoinUIRenderer;
+import com.gnome.gnome.game.component.ItemUIRenderer;
 import com.gnome.gnome.models.*;
 import com.gnome.gnome.models.Map;
 import com.gnome.gnome.models.user.UserGameState;
@@ -18,6 +20,7 @@ import com.gnome.gnome.player.Player;
 import com.gnome.gnome.shop.controllers.ShopController;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import com.gnome.gnome.userState.UserState;
+import com.gnome.gnome.utils.CustomPopupUtil;
 import javafx.animation.AnimationTimer;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
@@ -96,6 +99,11 @@ public class GameController {
 
     private Map selectedMap;
     private boolean isStoryMode;
+    private ItemUIRenderer itemUIRenderer;
+    private CoinUIRenderer coinUIRenderer;
+    private Pane uiOverlayPane;
+    private VBox bottomUIBox;
+
 
 
     public static GameController getGameController() {
@@ -127,6 +135,9 @@ public class GameController {
         setupUI();
         addGameEntitiesToPane();
 
+        this.itemUIRenderer = new ItemUIRenderer(bottomUIBox, camera);
+        this.coinUIRenderer = new CoinUIRenderer(bottomUIBox, player, camera);
+        itemUIRenderer.render(armor, weapon, potion);
         uiManager = new GameUIManager(this);
         healthBar = new PlayerHealthBar(250, 50);
         healthBarContainer.getChildren().add(healthBar);
@@ -160,12 +171,27 @@ public class GameController {
         gameObjectsPane.prefWidthProperty().bind(centerStack.widthProperty());
         gameObjectsPane.prefHeightProperty().bind(centerStack.heightProperty());
 
-        Pane viewportRoot = new Pane(viewportCanvas, gameObjectsPane);
+        uiOverlayPane = new Pane();
+        uiOverlayPane.setPickOnBounds(false);
+        uiOverlayPane.prefWidthProperty().bind(centerStack.widthProperty());
+        uiOverlayPane.prefHeightProperty().bind(centerStack.heightProperty());
+
+        VBox bottomUIBox = new VBox();
+        bottomUIBox.setAlignment(Pos.BOTTOM_CENTER);
+        bottomUIBox.setPrefHeight(150);
+        bottomUIBox.setMouseTransparent(true);
+        bottomUIBox.prefWidthProperty().bind(centerStack.widthProperty());
+        bottomUIBox.prefHeightProperty().bind(centerStack.heightProperty());
+        uiOverlayPane.getChildren().add(bottomUIBox);
+        this.bottomUIBox = bottomUIBox;
+
+        Pane viewportRoot = new Pane(viewportCanvas, gameObjectsPane, uiOverlayPane);
         centerStack.getChildren().setAll(viewportRoot);
         StackPane.setAlignment(viewportRoot, Pos.CENTER);
 
         camera.drawViewport(viewportCanvas, coinsOnMap);
     }
+
 
     private void addGameEntitiesToPane() {
         camera.updateCameraCenter();
@@ -255,7 +281,9 @@ public class GameController {
                 chest.setOpened(true);
                 chest.animate();
                 player.addCoin(Math.round(chest.getValue()));
+                coinUIRenderer.update();
                 player.addCountOfOpenedChest();
+                player.addScore(50);
                 break;
             }
         }
@@ -283,7 +311,11 @@ public class GameController {
 
     private void onHatchStepped() {
         if (!monsterList.isEmpty()) {
-            if (debugModGame) System.out.println("You must kill all monsters before using the hatch!");
+            if (rootBorder.getScene() != null && rootBorder.getScene().getWindow() != null) {
+                Stage stage = (Stage) rootBorder.getScene().getWindow();
+                if (debugModGame) System.out.println("You must kill all monsters before using the hatch!");
+                CustomPopupUtil.showWarning(stage, "You must kill all monsters before using the hatch!");
+            }
             return;
         }
 
@@ -307,24 +339,17 @@ public class GameController {
     }
 
     public void updatePlayerStatisticsAfterLevelCompletion(Player player) {
-        UserStatisticsDAO userStatisticsDAO = new UserStatisticsDAO();
-        UserStatistics userStatistics = userStatisticsDAO.getUserStatisticsByUsername(UserState.getInstance().getUsername());
-        if (userStatistics != null) {
-            userStatistics.setTotalMapsPlayed(userStatistics.getTotalMapsPlayed() + 1);
-            userStatistics.setTotalWins(userStatistics.getTotalWins() + 1);
-            userStatistics.setTotalMonstersKilled(userStatistics.getTotalMonstersKilled() + player.getCountOfKilledMonsters());
-            userStatistics.setTotalChestsOpened(userStatistics.getTotalChestsOpened() + player.getCountOfOpenedChest());
-            userStatisticsDAO.updateUserStatistics(userStatistics);
+        UserState userState = UserState.getInstance();
+        if (userState != null) {
+            userState.setUpdateStats(player.getCountOfKilledMonsters(), true, player.getCountOfOpenedChest());
         }
     }
 
     public void updatePlayerAfterLevelCompletion(Player player) {
-        UserGameStateDAO userGameStateDAO = new UserGameStateDAO();
-        UserGameState userGameState = userGameStateDAO.getUserGameStateByUsername(UserState.getInstance().getUsername());
-        if (userGameState != null) {
-            userGameState.setScore(userGameState.getScore() + player.getScore());
-            userGameState.setBalance((float) (userGameState.getBalance() + player.getPlayerCoins()));
-            userGameStateDAO.updateUserGameState(userGameState);
+        UserState userState = UserState.getInstance();
+        if (userState != null) {
+            userState.setUpdatePlayerState(player.getScore(), player.getPlayerCoins());
+
         }
     }
 
@@ -338,11 +363,10 @@ public class GameController {
 
 
     public void updatePlayerLevelAfterStoryLevelCompletion() {
-        UserGameStateDAO userGameStateDAO = new UserGameStateDAO();
-        UserGameState userGameState = userGameStateDAO.getUserGameStateByUsername(UserState.getInstance().getUsername());
-        if (userGameState != null) {
-            userGameState.setMapLevel(userGameState.getMapLevel() + 1);
-            userGameStateDAO.updateUserGameState(userGameState);
+        UserState userState = UserState.getInstance();
+
+        if (userState != null) {
+            userState.setMapLevel(selectedMap.getLevel());
         }
     }
 
@@ -386,6 +410,7 @@ public class GameController {
         });
 
         coinsOnMap.removeAll(collected);
+        coinUIRenderer.update();
     }
 
     private void drawAttackRange(GraphicsContext gc, int range) {
@@ -414,8 +439,9 @@ public class GameController {
         eliminated.forEach(monster -> {
             int x = monster.getX(), y = monster.getY();
             coinsOnMap.add(new Coin(x, y, monster.getCost()));
-            player.addScore(monster.getValue());
+            player.addScore(monster.getScore());
             player.addCountOfKilledMonsters();
+            coinUIRenderer.update();
             gameObjectsPane.getChildren().remove(monster.getRepresentation());
         });
 
@@ -433,7 +459,13 @@ public class GameController {
         camera.updateCameraCenter();
 
         camera.drawViewport(viewportCanvas, coinsOnMap);
-        camera.drawPressEHints(gc, baseMap, player.getX(), player.getY(), activeChests);
+//        camera.drawPressEHints(gc, baseMap, player.getX(), player.getY(), activeChests);
+
+        if (rootBorder.getScene() != null && rootBorder.getScene().getWindow() != null) {
+            Stage stage = (Stage) rootBorder.getScene().getWindow();
+            if (this.isNearTable(player.getX(), player.getY())) CustomPopupUtil.showInfo(stage, "To read table enter E");
+            if (this.isNearChest(player.getX(), player.getY())) CustomPopupUtil.showInfo(stage, "To loot the chest enter E");
+        }
         drawAttackRange(gc, 1);
 
         monsterList.forEach(m -> {
@@ -449,7 +481,7 @@ public class GameController {
             gameObjectsPane.getChildren().add(player.getRepresentation());
 
         updatePlayerHealthBar();
-
+        coinUIRenderer.update();
     }
 
 
