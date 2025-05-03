@@ -26,7 +26,7 @@ public class SettingController {
     @FXML private BorderPane settingPage;
 
     private PageSwitcherInterface pageSwitch;
-    private double soundVolume = 50.0;
+    private double soundVolume = (MusicWizard.getMAXvolume())*200;
     private char selectedLanguage;
 
     private ResourceBundle bundle;
@@ -52,9 +52,9 @@ public class SettingController {
         soundVolumeSlider.valueProperty().addListener((obs, oldVal, newVal) -> handleSoundVolumeChange());
 
         // Tracks
-        trackSelector.getItems().addAll("1.wav", "2.wav", "3.wav");
-        trackSelector.setOnAction(this::handleTrackSelection);
-        trackSelector.setValue("1.wav");
+//        trackSelector.getItems().addAll("1.wav", "2.wav", "3.wav");
+//        trackSelector.setOnAction(this::handleTrackSelection);
+//        trackSelector.setValue("1.wav");
 
         // Ambient
         ambientToggleButton.setSelected(MainApplication.ambientEnabled);
@@ -80,6 +80,7 @@ public class SettingController {
 
         if (MainApplication.musicEnabled) {
             if (!MusicWizard.musicRunning) {
+                System.out.println("Run Music");
                 MusicWizard.start_music_loop();
             }
         } else {
@@ -109,15 +110,15 @@ public class SettingController {
         MusicWizard.setGlobalVolume(soundVolume);
     }
 
-    @FXML
-    public void handleTrackSelection(ActionEvent e) {
-        String selectedTrack = trackSelector.getValue();
-        if (selectedTrack != null && !selectedTrack.isEmpty()) {
-            String fullPath = "src/main/java/com/gnome/gnome/music/" + selectedTrack;
-            logger.info("Selected track: " + fullPath);
-            MusicWizard.playSingleTrack(fullPath);
-        }
-    }
+//    @FXML
+//    public void handleTrackSelection(ActionEvent e) {
+//        String selectedTrack = trackSelector.getValue();
+//        if (selectedTrack != null && !selectedTrack.isEmpty()) {
+//            String fullPath = "src/main/java/com/gnome/gnome/music/" + selectedTrack;
+//            logger.info("Selected track: " + fullPath);
+//            MusicWizard.playSingleTrack(fullPath);
+//        }
+//    }
 
     @FXML
     public void handleLanguageChange(ActionEvent e) {

@@ -124,6 +124,8 @@ public class MainApplication extends Application {
     public void stop() {
        if (!skip_db)
            DatabaseWrapper.getInstance().close();
+
+       MusicWizard.stop_music();
     }
 
 

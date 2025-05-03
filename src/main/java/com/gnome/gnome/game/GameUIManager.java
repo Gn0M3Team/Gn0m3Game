@@ -1,5 +1,6 @@
 package com.gnome.gnome.game;
 
+import com.gnome.gnome.MainApplication;
 import com.gnome.gnome.components.PlayerHealthBar;
 import com.gnome.gnome.dao.MapDAO;
 import com.gnome.gnome.dao.UserStatisticsDAO;
@@ -39,8 +40,16 @@ public class GameUIManager {
     @Getter
     private Stage currentPopup;
     private Popup infoPopup; // Track the info popup specifically
+    private ResourceBundle bundle;
 
     public GameUIManager(GameController controller) {
+        if (MainApplication.lang == 'S'){
+            this.bundle = ResourceBundle.getBundle("slovak");
+        }
+        else {
+            this.bundle = ResourceBundle.getBundle("english");
+        }
+
         this.controller = controller;
     }
 
@@ -70,23 +79,23 @@ public class GameUIManager {
         overlay.prefWidthProperty().bind(controller.getCenterStack().widthProperty());
         overlay.prefHeightProperty().bind(controller.getCenterStack().heightProperty());
 
-        Label gameOverLabel = new Label("GAME OVER");
+        Label gameOverLabel = new Label(bundle.getString("game.over"));
         gameOverLabel.getStyleClass().add("game-over-label");
 
-        Label coinsLabel = new Label("Coins collected: " + (int) player.getPlayerCoins());
-        Label scoreLabel = new Label("Score: " + player.getScore());
-        Label chestsLabel = new Label("Opened chests: " + player.getCountOfOpenedChest());
-        Label killedLabel = new Label("Monsters killed: " + player.getCountOfKilledMonsters());
+        Label coinsLabel = new Label(String.format(bundle.getString("stats.coins"), (int) player.getPlayerCoins()));
+        Label scoreLabel = new Label( String.format(bundle.getString("stats.score"), player.getScore()));
+        Label chestsLabel = new Label(String.format(bundle.getString("stats.chests"), player.getCountOfOpenedChest()));
+        Label killedLabel = new Label(String.format(bundle.getString("stats.monsters"), player.getCountOfKilledMonsters()));
 
         for (Label statLabel : List.of(coinsLabel, scoreLabel, chestsLabel, killedLabel)) {
             statLabel.getStyleClass().add("stat-label");
         }
 
-        Button restartButton = new Button("Restart");
+        Button restartButton = new Button(bundle.getString("button.restart"));
         restartButton.getStyleClass().add("game-button");
         restartButton.setOnAction(e -> controller.restartGame());
 
-        Button exitButton = new Button("Exit");
+        Button exitButton = new Button(bundle.getString("exit.button"));
         exitButton.getStyleClass().add("game-button");
         exitButton.setOnAction(e -> Platform.exit());
 
@@ -124,7 +133,7 @@ public class GameUIManager {
         Label title = new Label("MENU");
         title.getStyleClass().add("menu-title");
 
-        Button resumeButton = new Button("Resume");
+        Button resumeButton = new Button(bundle.getString("menu.button.resume"));
         resumeButton.getStyleClass().add("menu-button");
         resumeButton.setOnAction(e -> {
             controller.getCenterStack().getChildren().removeAll(menuBox, darkOverlay);
@@ -140,7 +149,7 @@ public class GameUIManager {
             controller.setCenterMenuPopup(null);
         });
 
-        Button settingsButton = new Button("Settings");
+        Button settingsButton = new Button(bundle.getString("button.settings"));
         settingsButton.getStyleClass().add("menu-button");
         settingsButton.setOnAction(e -> {
             controller.getCenterStack().getChildren().removeAll(menuBox, darkOverlay);
@@ -148,7 +157,7 @@ public class GameUIManager {
             new SwitchPage().goSetting(controller.getRootBorder());
         });
 
-        Button goBackButton = new Button("Go Back");
+        Button goBackButton = new Button(bundle.getString("newgame.button.back"));
         goBackButton.getStyleClass().add("menu-button");
         goBackButton.setOnAction(e -> {
             controller.getCenterStack().getChildren().removeAll(menuBox, darkOverlay);
@@ -236,6 +245,13 @@ public class GameUIManager {
     public void showShopPopup(boolean isStoryMode) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/gnome/gnome/pages/shop.fxml"));
+            if (MainApplication.lang == 'S'){
+                loader.setResources(ResourceBundle.getBundle("slovak"));
+            }
+            else{
+                loader.setResources(ResourceBundle.getBundle("english"));
+            }
+
             Parent shopRoot = loader.load();
 
             ShopController shopController = loader.getController();
@@ -293,7 +309,7 @@ public class GameUIManager {
         Label title = new Label(titleText);
         title.getStyleClass().add("table-title");
 
-        Button closeButton = new Button("Close");
+        Button closeButton = new Button(bundle.getString("button.close"));
         closeButton.getStyleClass().add("table-button");
         closeButton.setOnAction(e -> popup.hide());
 
@@ -319,19 +335,19 @@ public class GameUIManager {
         popupContent.getStylesheets().add(getClass().getResource("/com/gnome/gnome/pages/css/game-ui.css").toExternalForm());
         popupContent.getStyleClass().add("stats-popup");
 
-        Label title = new Label("Level Statistics");
+        Label title = new Label(bundle.getString("label.level.statistics"));
         title.getStyleClass().add("stats-title");
 
-        Label coinsLabel = new Label("Coins collected: " + (int) player.getPlayerCoins());
+        Label coinsLabel = new Label(String.format(bundle.getString("stats.coins"), (int) player.getPlayerCoins()));
         coinsLabel.getStyleClass().add("stats-label");
-        Label scoreLabel = new Label("Score: " + player.getScore());
+        Label scoreLabel = new Label( String.format(bundle.getString("stats.score"), player.getScore()));
         scoreLabel.getStyleClass().add("stats-label");
-        Label chestsLabel = new Label("Opened chests: " + player.getCountOfOpenedChest());
+        Label chestsLabel = new Label(String.format(bundle.getString("stats.chests"), player.getCountOfOpenedChest()));
         chestsLabel.getStyleClass().add("stats-label");
-        Label killedLabel = new Label("Monsters killed: " + player.getCountOfKilledMonsters());
+        Label killedLabel = new Label(String.format(bundle.getString("stats.monsters"), player.getCountOfKilledMonsters()));
         killedLabel.getStyleClass().add("stats-label");
 
-        Button continueButton = new Button("Continue");
+        Button continueButton = new Button(bundle.getString("button.continue"));
         continueButton.getStyleClass().add("stats-button");
         continueButton.setOnAction(e -> {
             controller.getCenterStack().getChildren().remove(popupContent);

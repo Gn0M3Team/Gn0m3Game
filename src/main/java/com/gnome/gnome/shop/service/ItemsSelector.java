@@ -29,7 +29,7 @@ public class ItemsSelector<T> {
                         a.getId(),
                         a.getCost(),
                         a.getNameEng(),
-                        a.getDetailsEng(),
+                        a.getDetails(),
                         a.getImg(),
                         ItemCategory.ARMOR,
                         String.format("Def coef.: %.2f", a.getDefCof())
@@ -45,7 +45,7 @@ public class ItemsSelector<T> {
                         w.getId(),
                         w.getCost(),
                         w.getNameEng(),
-                        w.getDetailsEng(),
+                        w.getDetails(),
                         w.getImg(),
                         ItemCategory.WEAPON,
                         String.format("DMG: %.2f", w.getAtkValue())
@@ -60,7 +60,7 @@ public class ItemsSelector<T> {
                         p.getId(),
                         p.getCost(),
                         p.getNameEng(),
-                        p.getDetailsEng(),
+                        p.getDetails(),
                         p.getImg1(),
                         ItemCategory.POTION,
                         String.format("HP: %+d", p.getScoreVal())

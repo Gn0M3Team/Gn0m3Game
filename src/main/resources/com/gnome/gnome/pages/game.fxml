@@ -22,7 +22,7 @@
         >
     <top>
         <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 10;">
-            <Button fx:id="centerMenuButton" text="Show Menu" styleClass="menu-button"/>
+            <Button fx:id="centerMenuButton" text="%button.show.menu" styleClass="menu-button"/>
             <Pane HBox.hgrow="ALWAYS" />
             <StackPane fx:id="healthBarContainer" alignment="CENTER_RIGHT" />
         </HBox>

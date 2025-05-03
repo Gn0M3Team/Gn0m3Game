@@ -1,5 +1,6 @@
 package com.gnome.gnome.editor.controller;
 
+import com.gnome.gnome.MainApplication;
 import com.gnome.gnome.dao.MapDAO;
 import com.gnome.gnome.editor.javafxobj.TemplateMapDialog;
 import com.gnome.gnome.editor.utils.*;
@@ -106,6 +107,7 @@ public class EditorPageController {
 
     private final UserState userState = UserState.getInstance();
 
+    private ResourceBundle bundle;
     /**
      * Default constructor, initializes the level grid.
      */
@@ -122,6 +124,13 @@ public class EditorPageController {
      */
     @FXML
     public void initialize() {
+        if (MainApplication.lang == 'S'){
+            this.bundle = ResourceBundle.getBundle("slovak");
+        }
+        else {
+            this.bundle = ResourceBundle.getBundle("english");
+        }
+
         pageSwitch=new SwitchPage();
 
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
@@ -561,9 +570,9 @@ public class EditorPageController {
         File selectedFile = fileChooser.showOpenDialog(stage);
 
         if (selectedFile != null && loadMapFromFile(selectedFile)) {
-            CustomPopupUtil.showSuccess(stage, "Map was loaded successfully!");;
+            CustomPopupUtil.showSuccess(stage, bundle.getString("map.load.success"));;
         } else {
-            CustomPopupUtil.showError(stage, "Error map loading...");
+            CustomPopupUtil.showError(stage, bundle.getString("map.load.error"));
         }
     }
 
@@ -604,7 +613,7 @@ public class EditorPageController {
 
             if (userMaps.isEmpty()) {
                 logger.info("No maps available for user: " + currentUsername);
-                CustomPopupUtil.showWarning(stage, "You have no maps saved on server");
+                CustomPopupUtil.showWarning(stage, bundle.getString("error.no.maps.server"));
             }
 
             List<String> mapNames = userMaps.stream()
@@ -628,13 +637,13 @@ public class EditorPageController {
                     logger.info("Map loaded successfully: " + selectedItem);
                 } else {
                     logger.log(Level.SEVERE,"Selected map not found in user maps.");
-                    CustomPopupUtil.showWarning(stage, "Selected map not found in user maps.");
+                    CustomPopupUtil.showWarning(stage, bundle.getString("error.map.not.found.user"));
                 }
             });
 
         } catch (DataAccessException e) {
             logger.log(Level.SEVERE, "Error loading maps from database", e);
-            CustomPopupUtil.showError(stage, "Error loading maps from database");
+            CustomPopupUtil.showError(stage, bundle.getString("map.load.error"));
         }
     }
 
@@ -659,7 +668,7 @@ public class EditorPageController {
 
         result.ifPresent(fileName -> {
             DirectoryChooser directoryChooser = new DirectoryChooser();
-            directoryChooser.setTitle("Select Folder to Save File");
+            directoryChooser.setTitle(bundle.getString("dialog.save.folder.title"));
             File selectedDirectory = directoryChooser.showDialog(primaryStage);
 
             if (selectedDirectory != null) {
@@ -672,10 +681,10 @@ public class EditorPageController {
                             .collect(Collectors.toList());
                     Files.write(fileToSave.toPath(), lines);
                     logger.info("Map successfully was saved to local device.");
-                    CustomPopupUtil.showSuccess(primaryStage, "Map was saved to local device successfully.");
+                    CustomPopupUtil.showSuccess(primaryStage, bundle.getString("map.save.local.success"));
                 } catch (IOException e) {
                     logger.log(Level.SEVERE, "Error saving map to local device", e);
-                    CustomPopupUtil.showError(primaryStage, "Error saving map to local device");
+                    CustomPopupUtil.showError(primaryStage, bundle.getString("map.save.local.error"));
                 }
             }
         });
@@ -722,17 +731,17 @@ public class EditorPageController {
                     }
                     mapDAO.insertMap(map, true);
                     logger.info("Story map saved to database: " + fileName);
-                    CustomPopupUtil.showSuccess(primaryStage, "Story map was saved to database!");
+                    CustomPopupUtil.showSuccess(primaryStage, bundle.getString("map.save.database.story.success"));
 
                 } else {
                     mapDAO.insertMap(map, false);
                     logger.info("Map saved to database: " + fileName);
-                    CustomPopupUtil.showSuccess(primaryStage, "New map was saved to database!");
+                    CustomPopupUtil.showSuccess(primaryStage, bundle.getString("map.save.database.regular.success"));
 
                 }
             } catch (DataAccessException e) {
                 logger.log(Level.SEVERE, "Failed to save map to database", e);
-                CustomPopupUtil.showError(primaryStage, "Failed to save map to database");
+                CustomPopupUtil.showError(primaryStage, bundle.getString("map.save.database.error"));
             }
         });
     }
@@ -764,7 +773,7 @@ public class EditorPageController {
 
             if (userMaps.isEmpty()) {
                 logger.info("No maps available for update for user: " + currentUsername);
-                CustomPopupUtil.showWarning(stage, "No maps available for update for user");
+                CustomPopupUtil.showWarning(stage, bundle.getString("warning.no.maps.update"));
                 return;
             }
 
@@ -799,18 +808,18 @@ public class EditorPageController {
 
                     mapDAO.updateMap(selectedMap);
                     logger.info("Map updated successfully: " + selectedMap.getMapNameEng());
-                    CustomPopupUtil.showSuccess(stage, "Map was updated successfully!");
+                    CustomPopupUtil.showSuccess(stage, bundle.getString("map.update.success"));
 
                 } else {
                     logger.log(Level.SEVERE, "Selected map not found in user maps.");
-                    CustomPopupUtil.showWarning(stage, "Selected map not found in user maps.");
+                    CustomPopupUtil.showWarning(stage, bundle.getString("error.map.not.found.user"));
                 }
 
             });
 
         } catch (DataAccessException e) {
             logger.log(Level.SEVERE, "Error updating map in database", e);
-            CustomPopupUtil.showError(stage, "Error updating map in database.");
+            CustomPopupUtil.showError(stage, bundle.getString("map.update.error"));
         }
     }
 
@@ -824,7 +833,7 @@ public class EditorPageController {
     private void onClearButtonClick(ActionEvent event) {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         createAndSetEmptyGrid();
-        CustomPopupUtil.showSuccess(stage, "Map was cleared successfully.");
+        CustomPopupUtil.showSuccess(stage, bundle.getString("map.clear.success"));
     }
 
 
@@ -938,16 +947,16 @@ public class EditorPageController {
                 if (selectedMap != null) {
                     mapDAO.deleteMapById(selectedMap.getId());
                     logger.info("Map deleted successfully: " + selectedItem);
-                    CustomPopupUtil.showSuccess(stage, "Map deleted successfully.");
+                    CustomPopupUtil.showSuccess(stage, bundle.getString("map.delete.success"));
                 } else {
                     logger.log(Level.SEVERE, "Selected map not found in user maps.");
-                    CustomPopupUtil.showWarning(stage, "Selected map not found in user maps.");
+                    CustomPopupUtil.showWarning(stage, bundle.getString("error.map.not.found.user"));
                 }
             });
 
         } catch (DataAccessException e) {
             logger.log(Level.SEVERE, "Error deleting map from database", e);
-            CustomPopupUtil.showError(stage, "Error deleting map from database");
+            CustomPopupUtil.showError(stage, bundle.getString("map.delete.error"));
         }
     }
 }

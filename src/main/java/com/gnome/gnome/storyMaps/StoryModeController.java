@@ -1,5 +1,6 @@
 package com.gnome.gnome.storyMaps;
 
+import com.gnome.gnome.MainApplication;
 import com.gnome.gnome.dao.*;
 import com.gnome.gnome.game.MapLoaderService;
 import com.gnome.gnome.game.MapLoaderUIHandler;
@@ -20,9 +21,11 @@ import javafx.stage.Stage;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.ResourceBundle;
 
 public class StoryModeController {
 
+    private ResourceBundle bundle;
     @FXML
     private BorderPane storyMapsBorderPane;
 
@@ -35,6 +38,13 @@ public class StoryModeController {
 
     @FXML
     public void initialize() {
+        if (MainApplication.lang == 'S'){
+            this.bundle = ResourceBundle.getBundle("slovak");
+        }
+        else {
+            this.bundle = ResourceBundle.getBundle("english");
+        }
+
         pageSwitch = new SwitchPage();
         MapDAO mapDAO = new MapDAO();
         List<Map> allLevelMaps = mapDAO.getAllLevelMaps();
@@ -80,20 +90,20 @@ public class StoryModeController {
             mapStatus.getStyleClass().add("map-status");
 
             // Button to start map
-            Button mapButton = new Button("Play Map");
+            Button mapButton = new Button(bundle.getString("button.play.map"));
             mapButton.getStyleClass().add("menu-button");
 
             if (currentLevel > mapLevel) {
                 mapEntry.getStyleClass().add("map-entry-completed");
-                mapStatus.setText("Completed");
+                mapStatus.setText(bundle.getString("map.status.completed"));
                 mapButton.setDisable(false);
             } else if (currentLevel == mapLevel) {
                 mapEntry.getStyleClass().add("map-entry-current");
-                mapStatus.setText("Current Map");
+                mapStatus.setText(bundle.getString("map.status.current"));
                 mapButton.setDisable(false);
             } else {
                 mapEntry.getStyleClass().add("map-entry-locked");
-                mapStatus.setText("Locked");
+                mapStatus.setText(bundle.getString("map.status.locked"));
                 mapButton.setDisable(true);
             }
 
