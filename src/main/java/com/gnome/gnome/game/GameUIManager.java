@@ -291,11 +291,11 @@ public class GameUIManager {
                 controller.getCenterStack().getChildren().remove(shopRoot);
                 hideDarkOverlay();
 
-//                controller.closeShopAndStartNewGame();
+                controller.closeShopAndStartNewGame();
 
-                if (isStoryMode) {
-                    controller.closeShopAndStartNewGame();
-                }
+//                if (isStoryMode) {
+//                    controller.closeShopAndStartNewGame();
+//                }
 //                else  {
 //                    controller.closeShopAndStartNewGame();
 //                }

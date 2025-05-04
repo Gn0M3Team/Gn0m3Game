@@ -215,4 +215,8 @@ Caused by: org.postgresql.util.PSQLException: ERROR: column "id" does not exist
 
 [0m[33mFri May 02 03:07:12 CEST 2025 WARNING [javafx.scene.CssStyleHelper] - Failed to set css [-fx-progress-color] on [ObjectProperty [bean: javafx.scene.control.skin.ProgressIndicatorSkin@70676e72, name: progressColorProperty, value: null]] due to 'Only Color objects are supported'
 
+[0m[33mSun May 04 23:22:16 CEST 2025 WARNING [javafx.scene.CssStyleHelper] - Failed to set css [-fx-progress-color] on [ObjectProperty [bean: javafx.scene.control.skin.ProgressIndicatorSkin@5cca2967, name: progressColorProperty, value: null]] due to 'Only Color objects are supported'
+
+[0m[33mSun May 04 23:28:31 CEST 2025 WARNING [javafx.scene.CssStyleHelper] - Failed to set css [-fx-progress-color] on [ObjectProperty [bean: javafx.scene.control.skin.ProgressIndicatorSkin@410cf5f, name: progressColorProperty, value: null]] due to 'Only Color objects are supported'
+
 [0m
