@@ -111,6 +111,10 @@ public class Player {
         }
     }
 
+    public void heal(double amount) {
+        currentHealth = Math.min(maxHealth, currentHealth + amount);
+    }
+
     public void addCoin(double coin) {
         playerCoins += coin;
     }

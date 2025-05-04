@@ -4,8 +4,6 @@ import com.gnome.gnome.MainApplication;
 import com.gnome.gnome.camera.Camera;
 import com.gnome.gnome.components.PlayerHealthBar;
 import com.gnome.gnome.dao.MapDAO;
-import com.gnome.gnome.dao.UserStatisticsDAO;
-import com.gnome.gnome.dao.userDAO.UserGameStateDAO;
 import com.gnome.gnome.game.component.Chest;
 import com.gnome.gnome.game.component.Coin;
 import com.gnome.gnome.editor.utils.TypeOfObjects;
@@ -13,42 +11,34 @@ import com.gnome.gnome.game.component.CoinUIRenderer;
 import com.gnome.gnome.game.component.ItemUIRenderer;
 import com.gnome.gnome.models.*;
 import com.gnome.gnome.models.Map;
-import com.gnome.gnome.models.user.UserGameState;
 import com.gnome.gnome.monsters.Monster;
 import com.gnome.gnome.monsters.types.Skeleton;
 import com.gnome.gnome.monsters.types.missels.Arrow;
 import com.gnome.gnome.player.Player;
-import com.gnome.gnome.shop.controllers.ShopController;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import com.gnome.gnome.userState.UserState;
 import com.gnome.gnome.utils.CustomPopupUtil;
 import javafx.animation.AnimationTimer;
-import javafx.animation.PauseTransition;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.stage.Modality;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -90,7 +80,7 @@ public class GameController {
     private static GameController instance;
     private boolean debugModGame;
 
-    private final MovementService movementService = new MovementService(this);
+    private final PlayerGameService playerGameService = new PlayerGameService(this);
     private GameUIManager uiManager;
     private VBox gameOverOverlay;
     private Popup centerMenuPopup;
@@ -244,7 +234,7 @@ public class GameController {
     }
 
     private void registerKeyHandlers(Scene scene) {
-        scene.setOnKeyPressed(movementService::handleKeyPress);
+        scene.setOnKeyPressed(playerGameService::handleKeyPress);
         scene.getRoot().requestFocus();
     }
 
