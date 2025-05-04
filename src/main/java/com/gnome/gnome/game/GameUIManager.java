@@ -259,6 +259,9 @@ public class GameUIManager {
                 if (isStoryMode) {
                     controller.closeShopAndStartNewGame();
                 }
+                else  {
+                    controller.closeShopAndStartNewGame();
+                }
                 // else do nothing — just close the popup
             });
 
