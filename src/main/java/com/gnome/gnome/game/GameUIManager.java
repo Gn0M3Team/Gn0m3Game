@@ -32,6 +32,7 @@ import lombok.Getter;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class GameUIManager {
@@ -74,9 +75,14 @@ public class GameUIManager {
 
         Player player = controller.getPlayer();
 
-        updateMapAfterDeath(controller.getSelectedMap());
-        updatePlayerAfterDeath(player);
-        updatePlayerStatisticsAfterDeath(player);
+        runAsync(() -> {
+            updateMapAfterDeath(controller.getSelectedMap());
+            updatePlayerAfterDeath(player);
+            updatePlayerStatisticsAfterDeath(player);
+        }, () -> {
+            logger.info("Game data saved successfully");
+        });
+
 
         VBox overlay = new VBox(20);
         overlay.setAlignment(Pos.CENTER);
@@ -118,6 +124,19 @@ public class GameUIManager {
 
         controller.getCenterStack().getChildren().add(overlay);
         controller.setGameOverOverlay(overlay);
+    }
+
+    public void runAsync(Runnable backgroundTask, Runnable uiAfterTask) {
+        new Thread(() -> {
+            try {
+                backgroundTask.run();
+                if (uiAfterTask != null) {
+                    Platform.runLater(uiAfterTask);
+                }
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, e.getMessage(), e);
+            }
+        }).start();
     }
 
     public void showCenterMenuPopup() {
