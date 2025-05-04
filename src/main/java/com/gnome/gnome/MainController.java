@@ -201,7 +201,6 @@ public class MainController {
      */
     @FXML
     public void onExitButtonClick(ActionEvent event) {
-        MusicWizard.stop = true;
         pageSwitch.goLogin(mainBorderPane);
     }
 }

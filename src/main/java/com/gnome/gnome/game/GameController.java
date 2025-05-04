@@ -1,5 +1,6 @@
 package com.gnome.gnome.game;
 
+import com.gnome.gnome.MainApplication;
 import com.gnome.gnome.camera.Camera;
 import com.gnome.gnome.components.PlayerHealthBar;
 import com.gnome.gnome.dao.MapDAO;
@@ -94,6 +95,7 @@ public class GameController {
     private Pane uiOverlayPane;
     private VBox bottomUIBox;
 
+    private ResourceBundle bundle;
 
 
     public static GameController getGameController() {
@@ -114,6 +116,12 @@ public class GameController {
         this.selectedMap = selectedMap;
         isStoryMode = selectedMap.getLevel() != 0;
 
+        if (MainApplication.lang == 'S'){
+            this.bundle = ResourceBundle.getBundle("slovak");
+        }
+        else {
+            this.bundle = ResourceBundle.getBundle("english");
+        }
 
         GameInitializer.setupMap(fieldMap, dbMonsters, this.monsterList, this.activeChests, armor, weapon);
 
@@ -296,7 +304,7 @@ public class GameController {
     }
 
     void showTablePopup() {
-        uiManager.showTablePopup("Crafting Table");
+        uiManager.showTablePopup(bundle.getString("crafting.table"));
     }
 
     private void onHatchStepped() {
@@ -304,7 +312,7 @@ public class GameController {
             if (rootBorder.getScene() != null && rootBorder.getScene().getWindow() != null) {
                 Stage stage = (Stage) rootBorder.getScene().getWindow();
                 if (debugModGame) System.out.println("You must kill all monsters before using the hatch!");
-                CustomPopupUtil.showWarning(stage, "You must kill all monsters before using the hatch!");
+                CustomPopupUtil.showWarning(stage, bundle.getString("warning.monsters.before.hatch"));
             }
             return;
         }
@@ -453,8 +461,8 @@ public class GameController {
 
         if (rootBorder.getScene() != null && rootBorder.getScene().getWindow() != null) {
             Stage stage = (Stage) rootBorder.getScene().getWindow();
-            if (this.isNearTable(player.getX(), player.getY())) CustomPopupUtil.showInfo(stage, "To read table enter E");
-            if (this.isNearChest(player.getX(), player.getY())) CustomPopupUtil.showInfo(stage, "To loot the chest enter E");
+            if (this.isNearTable(player.getX(), player.getY())) CustomPopupUtil.showInfo(stage, bundle.getString("interaction.table"));
+            if (this.isNearChest(player.getX(), player.getY())) CustomPopupUtil.showInfo(stage, bundle.getString("interaction.chest"));
         }
         drawAttackRange(gc, 1);
 

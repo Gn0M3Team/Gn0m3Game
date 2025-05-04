@@ -52,7 +52,7 @@
                         </GridPane>
 
                         <!-- Ban Button -->
-                        <Button fx:id="banUserButton" text="Delete User" onAction="#handleBanUser" styleClass="profile-ban-button"/>
+                        <Button fx:id="banUserButton" text="%popup.button.delete" onAction="#handleBanUser" styleClass="profile-ban-button"/>
                     </VBox>
 
                     <!-- Maps Section -->
@@ -63,7 +63,7 @@
 
                     <!-- Bottom Section -->
                     <HBox alignment="CENTER" spacing="20" styleClass="bottom-container">
-                        <Button text="Back" onAction="#handleBack" styleClass="action-button"/>
+                        <Button text="%editor.button.goback" onAction="#handleBack" styleClass="action-button"/>
                         <Button fx:id="goToGameButton" text="Go To Game" onAction="#handleGame" styleClass="action-button"/>
                     </HBox>
                 </VBox>

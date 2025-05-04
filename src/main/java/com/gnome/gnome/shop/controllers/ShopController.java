@@ -1,5 +1,6 @@
 package com.gnome.gnome.shop.controllers;
 
+import com.gnome.gnome.MainApplication;
 import com.gnome.gnome.game.GameController;
 import com.gnome.gnome.shop.service.ShopItem;
 import com.gnome.gnome.shop.service.ShopService;
@@ -22,6 +23,7 @@ import lombok.Setter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 /**
@@ -135,6 +137,13 @@ public class ShopController {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/gnome/gnome/pages/item-modal.fxml")
             );
+            if (MainApplication.lang == 'S'){
+                loader.setResources(ResourceBundle.getBundle("slovak"));
+            }
+            else{
+                loader.setResources(ResourceBundle.getBundle("english"));
+            }
+
             Parent root = loader.load();
             ItemController itemController = loader.getController();
 
