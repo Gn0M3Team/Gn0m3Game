@@ -84,13 +84,7 @@ public class ProfileController {
         // Initialize page switcher
         pageSwitch = new SwitchPage();
 
-        if (MainApplication.lang == 'S'){
-            this.bundle = ResourceBundle.getBundle("slovak");
-        }
-        else {
-            this.bundle = ResourceBundle.getBundle("english");
-        }
-
+        this.bundle = MainApplication.getLangBundle();
 
         // Configure main ScrollPane
         if (mainScrollPane != null) {

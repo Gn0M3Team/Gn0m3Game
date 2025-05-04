@@ -31,12 +31,7 @@ public class MapLoaderUIHandler {
         this.service = service;
         this.primaryStage = stage;
 
-        if (MainApplication.lang == 'S'){
-            this.bundle = ResourceBundle.getBundle("slovak");
-        }
-        else {
-            this.bundle = ResourceBundle.getBundle("english");
-        }
+        this.bundle = MainApplication.getLangBundle();
     }
 
     public void showStartMap(Map map) {
@@ -142,12 +137,8 @@ public class MapLoaderUIHandler {
     private void loadGamePage(Map selectedMap, List<Monster> monsters, Armor armor, Weapon weapon, Potion potion) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/gnome/gnome/pages/game.fxml"));
-            if (MainApplication.lang == 'S'){
-                loader.setResources(ResourceBundle.getBundle("slovak"));
-            }
-            else{
-                loader.setResources(ResourceBundle.getBundle("english"));
-            }
+
+            loader.setResources(MainApplication.getLangBundle());
 
             Parent root = loader.load();
             GameController controller = loader.getController();

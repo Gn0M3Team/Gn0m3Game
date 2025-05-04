@@ -20,13 +20,13 @@ public class Monster {
     private String img;
 
     public String getDetails() {
-        if (MainApplication.lang == 'E')
+        if (MainApplication.getLang() == 'E')
             return details;
         else
             return details_sk;
     }
     public String getName() {
-        if (MainApplication.lang == 'E')
+        if (MainApplication.getLang() == 'E')
             return name;
         else
             return name_sk;

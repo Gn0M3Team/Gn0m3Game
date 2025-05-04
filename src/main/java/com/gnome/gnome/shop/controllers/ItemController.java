@@ -47,12 +47,7 @@ public class ItemController {
      * @param image ImgaeView for the item's image
      */
     public void setItemData(ShopItem data, ImageView image) {
-        if (MainApplication.lang == 'S'){
-            this.bundle = ResourceBundle.getBundle("slovak");
-        }
-        else {
-            this.bundle = ResourceBundle.getBundle("english");
-        }
+        this.bundle = MainApplication.getLangBundle();
 
         this.item = data;
         itemName.setText(item.getName());
@@ -87,12 +82,7 @@ public class ItemController {
      * If player does not have enough money, shows error message
      */
     public void onBuy() {
-        if (MainApplication.lang == 'S'){
-            this.bundle = ResourceBundle.getBundle("slovak");
-        }
-        else {
-            this.bundle = ResourceBundle.getBundle("english");
-        }
+        this.bundle = MainApplication.getLangBundle();
 
         try {
             shopService.buy(item);

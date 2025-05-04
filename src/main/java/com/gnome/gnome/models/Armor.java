@@ -22,14 +22,14 @@ public class Armor {
     private String img;
 
     public String getName(){
-        if(MainApplication.lang == 'E'){
+        if(MainApplication.getLang() == 'E'){
             return nameEng;
         }
         else
             return nameSk;
     }
     public String getDetails(){
-        if(MainApplication.lang == 'E'){
+        if(MainApplication.getLang() == 'E'){
             return detailsEng;
         }
         else

@@ -34,14 +34,8 @@ public class SceneSwitch {
             }
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
 
-            if (MainApplication.lang == 'S'){
-                loader.setResources(ResourceBundle.getBundle("slovak"));
-            }
-            else{
-                loader.setResources(ResourceBundle.getBundle("english"));
-            }
+            loader.setResources(MainApplication.getLangBundle());
 
-            
             BorderPane nextBorderPane = loader.load();
 
             Scene scene = curBorderPane.getScene();

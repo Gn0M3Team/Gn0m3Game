@@ -1,5 +1,6 @@
 package com.gnome.gnome.editor.utils;
 
+import com.gnome.gnome.MainApplication;
 import com.gnome.gnome.annotations.config.Value;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -38,6 +39,8 @@ public class CategoryGenerator {
     // Flag to determine whether to use test data (strings) or real S3 images.
     @Value("app.is_test")
     private boolean test;
+
+    ResourceBundle bundle = MainApplication.getLangBundle();
 
     // Local categories for test = true
     private final Map<String, List<String>> localCategoryMap = Map.of(

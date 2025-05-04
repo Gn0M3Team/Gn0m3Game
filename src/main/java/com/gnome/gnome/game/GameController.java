@@ -18,6 +18,7 @@ import com.gnome.gnome.player.Player;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import com.gnome.gnome.userState.UserState;
 import com.gnome.gnome.utils.CustomPopupUtil;
+import com.sun.tools.javac.Main;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -118,12 +119,7 @@ public class GameController {
         this.selectedMap = selectedMap;
         isStoryMode = selectedMap.getLevel() != 0;
 
-        if (MainApplication.lang == 'S'){
-            this.bundle = ResourceBundle.getBundle("slovak");
-        }
-        else {
-            this.bundle = ResourceBundle.getBundle("english");
-        }
+        this.bundle = MainApplication.getLangBundle();
 
         GameInitializer.setupMap(fieldMap, dbMonsters, this.monsterList, this.activeChests, armor, weapon);
 
@@ -659,6 +655,14 @@ public class GameController {
         try {
             onSceneExit(true);
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/gnome/gnome/pages/game.fxml"));
+
+            if (MainApplication.getLang() == 'S'){
+                loader.setResources(ResourceBundle.getBundle("slovak"));
+            }
+            else{
+                loader.setResources(ResourceBundle.getBundle("english"));
+            }
+
             Parent newRoot = loader.load();
             GameController ctrl = loader.getController();
             ctrl.initializeWithLoadedMap(selectedMap,baseMap, dbMonsters, armor, weapon, potion);

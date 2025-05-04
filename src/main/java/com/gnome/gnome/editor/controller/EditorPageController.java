@@ -124,12 +124,7 @@ public class EditorPageController {
      */
     @FXML
     public void initialize() {
-        if (MainApplication.lang == 'S'){
-            this.bundle = ResourceBundle.getBundle("slovak");
-        }
-        else {
-            this.bundle = ResourceBundle.getBundle("english");
-        }
+        this.bundle = MainApplication.getLangBundle();
 
         pageSwitch=new SwitchPage();
 
