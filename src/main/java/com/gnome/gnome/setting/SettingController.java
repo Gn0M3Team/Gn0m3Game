@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 
+import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 public class SettingController {
@@ -25,14 +26,22 @@ public class SettingController {
     @FXML private BorderPane settingPage;
 
     private PageSwitcherInterface pageSwitch;
-    private double soundVolume = 50.0;
+    private double soundVolume = (MusicWizard.getMAXvolume())*200;
     private char selectedLanguage;
 
+    private ResourceBundle bundle;
 
     @FXML
     public void initialize() {
         pageSwitch = new SwitchPage();
         selectedLanguage = MainApplication.lang;
+
+        if (MainApplication.lang == 'S'){
+            this.bundle = ResourceBundle.getBundle("slovak");
+        }
+        else {
+            this.bundle = ResourceBundle.getBundle("english");
+        }
 
         // Language
         languageComboBox.getItems().addAll("English (eng)", "Slovak (sk)");
@@ -43,20 +52,20 @@ public class SettingController {
         soundVolumeSlider.valueProperty().addListener((obs, oldVal, newVal) -> handleSoundVolumeChange());
 
         // Tracks
-        trackSelector.getItems().addAll("1.wav", "2.wav", "3.wav");
-        trackSelector.setOnAction(this::handleTrackSelection);
-        trackSelector.setValue("1.wav");
+//        trackSelector.getItems().addAll("1.wav", "2.wav", "3.wav");
+//        trackSelector.setOnAction(this::handleTrackSelection);
+//        trackSelector.setValue("1.wav");
 
         // Ambient
         ambientToggleButton.setSelected(MainApplication.ambientEnabled);
-        ambientToggleButton.setText(MainApplication.ambientEnabled ? "Ambient: ON" : "Ambient: OFF");
+        ambientToggleButton.setText(MainApplication.ambientEnabled ? bundle.getString("settings.ambient.on") : bundle.getString("settings.ambient.off"));
         if (MainApplication.ambientEnabled && !MusicWizard.ambientRunning) {
             MusicWizard.start_ambient();
         }
 
         // Music
         musicToggleButton.setSelected(MainApplication.musicEnabled);
-        musicToggleButton.setText(MainApplication.musicEnabled ? "Music: ON" : "Music: OFF");
+        musicToggleButton.setText(MainApplication.musicEnabled ? bundle.getString("settings.music.on")  : bundle.getString("settings.music.off"));
         if (MainApplication.musicEnabled && !MusicWizard.musicRunning) {
             MusicWizard.start_music_loop();
         }
@@ -67,10 +76,11 @@ public class SettingController {
     @FXML
     public void handleMusicToggle(ActionEvent e) {
         MainApplication.musicEnabled = musicToggleButton.isSelected();
-        musicToggleButton.setText(MainApplication.musicEnabled ? "Music: ON" : "Music: OFF");
+        musicToggleButton.setText(MainApplication.musicEnabled ? bundle.getString("settings.music.on") : bundle.getString("settings.music.off") );
 
         if (MainApplication.musicEnabled) {
             if (!MusicWizard.musicRunning) {
+                System.out.println("Run Music");
                 MusicWizard.start_music_loop();
             }
         } else {
@@ -82,7 +92,7 @@ public class SettingController {
     @FXML
     public void handleAmbientToggle(ActionEvent e) {
         MainApplication.ambientEnabled = ambientToggleButton.isSelected();
-        ambientToggleButton.setText(MainApplication.ambientEnabled ? "Ambient: ON" : "Ambient: OFF");
+        ambientToggleButton.setText(MainApplication.ambientEnabled ? bundle.getString("settings.ambient.on") : bundle.getString("settings.ambient.off"));
 
         if (MainApplication.ambientEnabled) {
             if (!MusicWizard.ambientRunning) {
@@ -100,15 +110,15 @@ public class SettingController {
         MusicWizard.setGlobalVolume(soundVolume);
     }
 
-    @FXML
-    public void handleTrackSelection(ActionEvent e) {
-        String selectedTrack = trackSelector.getValue();
-        if (selectedTrack != null && !selectedTrack.isEmpty()) {
-            String fullPath = "src/main/java/com/gnome/gnome/music/" + selectedTrack;
-            logger.info("Selected track: " + fullPath);
-            MusicWizard.playSingleTrack(fullPath);
-        }
-    }
+//    @FXML
+//    public void handleTrackSelection(ActionEvent e) {
+//        String selectedTrack = trackSelector.getValue();
+//        if (selectedTrack != null && !selectedTrack.isEmpty()) {
+//            String fullPath = "src/main/java/com/gnome/gnome/music/" + selectedTrack;
+//            logger.info("Selected track: " + fullPath);
+//            MusicWizard.playSingleTrack(fullPath);
+//        }
+//    }
 
     @FXML
     public void handleLanguageChange(ActionEvent e) {

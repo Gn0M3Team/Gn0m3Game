@@ -29,7 +29,7 @@ import java.util.Objects;
  */
 @Data
 public class Camera {
-    private static final int VIEWPORT_SIZE = 20;
+    public static final int VIEWPORT_SIZE = 15;
     private static final double ITEM_BOX_EXTRA_HEIGHT = 40;
     private static final double COIN_BOX_WIDTH_MULTIPLIER = 2.5;
 
@@ -142,16 +142,9 @@ public class Camera {
         }
     }
 
-
-    public Image getCachedItemImage(String path) {
-        return imageCache.computeIfAbsent(path, key -> {
-            InputStream is = Camera.class.getResourceAsStream("/" + path);
-            if (is == null) {
-                System.err.println("Item image not found: " + path);
-                return null;
-            }
-            return new Image(is);
-        });
+    public boolean isInView(int x, int y) {
+        return x >= startCol && x < startCol + VIEWPORT_SIZE &&
+                y >= startRow && y < startRow + VIEWPORT_SIZE;
     }
 
     // Для тайлів (tile images)

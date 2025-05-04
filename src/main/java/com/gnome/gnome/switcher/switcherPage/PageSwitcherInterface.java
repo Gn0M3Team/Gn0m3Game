@@ -70,4 +70,9 @@ public interface PageSwitcherInterface {
     void goShop(BorderPane anchorPane);
 
     void goStoryMaps(BorderPane anchorPane);
+
+    /**
+     * Navigate to the login page, if internet lost
+     */
+    void goToBeginning();
 }

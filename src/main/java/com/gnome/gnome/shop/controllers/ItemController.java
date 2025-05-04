@@ -1,5 +1,6 @@
 package com.gnome.gnome.shop.controllers;
 
+import com.gnome.gnome.MainApplication;
 import com.gnome.gnome.exceptions.BalanceException;
 import com.gnome.gnome.shop.service.ShopItem;
 import com.gnome.gnome.shop.service.ShopService;
@@ -10,6 +11,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
+import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 /**
@@ -33,6 +35,8 @@ public class ItemController {
     @FXML
     private Label buyErrorMsg;
 
+    private ResourceBundle bundle;
+
     private final ShopService shopService = new ShopService();
     private ShopItem item;
 
@@ -43,10 +47,20 @@ public class ItemController {
      * @param image ImgaeView for the item's image
      */
     public void setItemData(ShopItem data, ImageView image) {
+        if (MainApplication.lang == 'S'){
+            this.bundle = ResourceBundle.getBundle("slovak");
+        }
+        else {
+            this.bundle = ResourceBundle.getBundle("english");
+        }
+
         this.item = data;
         itemName.setText(item.getName());
         itemValue.setText(item.getCharacteristics());
-        itemDetails.setText("Details: " + item.getDetails());
+        itemDetails.setText(String.format(
+                bundle.getString("item.details"),
+                item.getDetails()
+        ));
         itemPrice.setText(String.valueOf(item.getCost()));
         itemImageContainer.getChildren().clear();
         image.setFitWidth(itemImageContainer.getPrefWidth());
@@ -54,6 +68,7 @@ public class ItemController {
         image.setPreserveRatio(true);
         itemImageContainer.getChildren().add(image);
         buyErrorMsg.setText("");
+
     }
 
     /**
@@ -72,17 +87,24 @@ public class ItemController {
      * If player does not have enough money, shows error message
      */
     public void onBuy() {
+        if (MainApplication.lang == 'S'){
+            this.bundle = ResourceBundle.getBundle("slovak");
+        }
+        else {
+            this.bundle = ResourceBundle.getBundle("english");
+        }
+
         try {
             shopService.buy(item);
-            logger.severe(String.format("Player successfully bought item (%d, %s)", item.getId(), item.getName()));
+            logger.info(String.format("Player successfully bought item (%d, %s)", item.getId(), item.getName()));
             // Automatically close the modal after buying success
             onCancel();
         } catch (BalanceException ex) {
             logger.severe("Failed to buy item: " + ex.getMessage());
             System.out.println("Not enough money");
             buyErrorMsg.setText(
-                    "Can’t afford that yet…\n" +
-                            "maybe try pickpocketing a rat?"
+                    bundle.getString("error.purchase.insufficient.funds") + "\n" +
+                            bundle.getString("error.purchase.suggestion")
             );
         }
     }

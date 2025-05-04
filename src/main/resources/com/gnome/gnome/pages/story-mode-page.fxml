@@ -21,7 +21,7 @@
             <Button fx:id="backButton" onAction="#onBackButtonClick" styleClass="top-button" text="%newgame.button.back">
             </Button>
 
-            <Label styleClass="top-label" text="Story Maps" />
+            <Label styleClass="top-label" text="%menu.story.maps" />
 
             <Pane HBox.hgrow="ALWAYS" />
 

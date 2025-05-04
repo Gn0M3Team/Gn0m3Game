@@ -1,5 +1,6 @@
 package com.gnome.gnome.components;
 
+import com.gnome.gnome.MainApplication;
 import com.gnome.gnome.MainController;
 import com.gnome.gnome.dao.userDAO.AuthUserDAO;
 import com.gnome.gnome.dao.userDAO.UserGameStateDAO;
@@ -19,6 +20,7 @@ import javafx.scene.layout.VBox;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -49,6 +51,7 @@ public class LeaderBoardView extends VBox {
     private final UserGameStateDAO userGameStateDAO = new UserGameStateDAO();
     private Map<String, UserGameState> userGameStatesByUsername = new HashMap<>();
 
+    private ResourceBundle bundle;
 
     /**
      * Constructs a LeaderBoardView with a parent controller and a close action.
@@ -68,6 +71,13 @@ public class LeaderBoardView extends VBox {
         );
         this.currentUser = UserSession.getInstance().getCurrentUser();
 
+        if (MainApplication.lang == 'S'){
+            this.bundle = ResourceBundle.getBundle("slovak");
+        }
+        else {
+            this.bundle = ResourceBundle.getBundle("english");
+        }
+
         logger.info("Initializing LeaderBoardView...");
 
         initComponents();
@@ -80,15 +90,15 @@ public class LeaderBoardView extends VBox {
      * Initializes UI components.
      */
     private void initComponents() {
-        titleLabel = new Label("RESULT");
+        titleLabel = new Label(bundle.getString("result.title"));
         titleLabel.getStyleClass().add("title-label");
 
         searchField = new TextField();
-        searchField.setPromptText("Search...");
+        searchField.setPromptText(bundle.getString("search.placeholder"));
         searchField.getStyleClass().add("search-field");
 
-        allRadioButton = new RadioButton("all");
-        onlyMyRadioButton = new RadioButton("only my");
+        allRadioButton = new RadioButton(bundle.getString("filter.all"));
+        onlyMyRadioButton = new RadioButton(bundle.getString("filter.onlymy"));
         toggleGroup = new ToggleGroup();
         allRadioButton.setToggleGroup(toggleGroup);
         onlyMyRadioButton.setToggleGroup(toggleGroup);

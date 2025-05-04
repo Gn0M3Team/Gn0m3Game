@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.Rectangle?>
-<?import javafx.geometry.Insets?>
-
-<!--        fx:controller="com.gnome.gnome.continueGame.ContinueGameController"-->
-<!--        fx:controller="com.gnome.gnome.game.GameController"-->
-
 
 <BorderPane
         fx:id="rootBorder"
@@ -22,15 +15,27 @@
         >
     <top>
         <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 10;">
-            <Button fx:id="centerMenuButton" text="Show Menu" styleClass="menu-button"/>
+            <Button fx:id="centerMenuButton" text="%button.show.menu" styleClass="menu-button"/>
             <Pane HBox.hgrow="ALWAYS" />
             <StackPane fx:id="healthBarContainer" alignment="CENTER_RIGHT" />
         </HBox>
     </top>
-
     <center>
         <StackPane fx:id="centerStack" maxHeight="-1" maxWidth="-1" BorderPane.alignment="CENTER">
 
         </StackPane>
     </center>
+    <left>
+        <HBox maxWidth="100"/>
+    </left>
+<!--    <right>-->
+<!--        <VBox fx:id="rightUIBox"-->
+<!--              alignment="CENTER"-->
+<!--              spacing="20"-->
+<!--              maxWidth="160"-->
+<!--              prefWidth="160"-->
+<!--              prefHeight="Infinity"-->
+<!--              BorderPane.alignment="CENTER"-->
+<!--              VBox.vgrow="ALWAYS"/>-->
+<!--    </right>-->
 </BorderPane>

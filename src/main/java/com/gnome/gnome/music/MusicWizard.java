@@ -1,5 +1,7 @@
 package com.gnome.gnome.music;
 
+import com.gnome.gnome.MainApplication;
+import lombok.Getter;
 import lombok.SneakyThrows;
 
 import javax.sound.sampled.*;
@@ -22,14 +24,19 @@ public class MusicWizard {
 
     public static boolean ambientRunning = false;
 
+    @Getter
     protected static float MAXvolume = 0.5f;
+
     static public boolean stop = false;
+    static public boolean stopImmediate = false;
     static public List<String> playlist;
 
+    static protected float ambientDB = -20;
     static protected float currDB = 0F;
     static protected float targetDB = 0F;
     static protected float fadePerStep = .03F; //TO big change will cause clicks
     static protected boolean fading = false;
+
 
     /**
      * Sets sent .wav file as an ambient and start to play it on a loop
@@ -45,7 +52,7 @@ public class MusicWizard {
 
         ambient.loop(Clip.LOOP_CONTINUOUSLY);
 
-        ambientControl.setValue(-20);
+        ambientControl.setValue(ambientDB);
 
         ambientRunning = true;
     }
@@ -81,7 +88,7 @@ public class MusicWizard {
 
         ambient.loop(Clip.LOOP_CONTINUOUSLY);
 
-        ambientControl.setValue(-20);
+        ambientControl.setValue(ambientDB);
 
         ambientRunning = true;
     }
@@ -109,7 +116,7 @@ public class MusicWizard {
         if (!ambient.isRunning()) {
             return;
         }
-        ambientControl.shift(-20, -80,50000);
+        ambientControl.shift(1, 0,50000);
         ambient.stop();
     }
 
@@ -120,7 +127,8 @@ public class MusicWizard {
     public static void start_music_loop() {
         musicRunning = true;
         stop = false;
-
+        stopImmediate = false;
+        currDB = 0;
 
         // Fallback playlist if none provided
         if (playlist==null){
@@ -130,39 +138,7 @@ public class MusicWizard {
             playlist.add("src/main/java/com/gnome/gnome/music/3.wav");
         }
 
-        Thread musicThread = new Thread() {
-            /**
-             * Run by thread to gradually lower the volume
-             * WE need fadePerStep=.1 to minimize clicks. Too fast change and it will awfully click
-             */
-            public void run() {
-                while(!stop){
-                    List<String> currentPlaylist;
-                    synchronized (MusicWizard.class) {
-                        currentPlaylist = new ArrayList<>(playlist);
-                    }
-                    for (String track: currentPlaylist) {
-                        try {
-                            run_clip_till_finish(track);
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-                        if(stop){
-                            musicRunning = false;
-                            stop = false;
-
-                            currDB = 0;
-
-                            musicControl.setValue(0);
-                            return;
-                        }
-                    }
-
-                }
-            }
-        };  // start a thread to fade volume
-
-        musicThread.start();
+        runPlaylistInThread();
 
     }
 
@@ -174,10 +150,19 @@ public class MusicWizard {
 
         music.loop(Clip.LOOP_CONTINUOUSLY);
 
-        shiftVolumeTo(1);
+        shiftVolumeTo(MAXvolume);
+
         do {
-            Thread.sleep(1000);
+            Thread.sleep(500);
         } while (fading);
+
+        if (stopImmediate){
+            musicControl.shift(1, 0,5000);
+            Thread.sleep(200);
+            music.stop();
+            music.close();
+            return;
+        }
 
         if (stop){
             shiftVolumeTo(0.0);
@@ -189,29 +174,29 @@ public class MusicWizard {
             return;
         }
 
-        for(int i = 0; i <17000; i+=1000){ //2.9 minutes  170000 3 minutes
-            Thread.sleep(1000);
-            if (stop){
-                shiftVolumeTo(0.0);
-                do {
-                    Thread.sleep(1000);
-                } while (fading);
+        for(int i = 0; i <170000; i+=1000){ //2.9 minutes  170000 3 minutes
+            Thread.sleep(500);
+
+            if (stopImmediate){
+                musicControl.shift(1, 0,5000);
+                Thread.sleep(500);
                 music.stop();
                 music.close();
                 return;
             }
+
+            if (stop){
+                break;
+            }
         }
-//        System.out.println("BACK");
         shiftVolumeTo(0.0);
-        Thread.sleep(1005);
+        Thread.sleep(305);
 
         while (fading) {
-            Thread.sleep(1000);
+            Thread.sleep(500);
         }
         music.stop();
         music.close();
-
-        musicControl.setValue(-80);
     }
 
 
@@ -238,7 +223,7 @@ public class MusicWizard {
 
         musicControl = (FloatControl) music.getControl(FloatControl.Type.MASTER_GAIN);
 
-        musicControl.setValue(-80);
+        musicControl.setValue(currDB);
     }
 
     /**
@@ -254,9 +239,13 @@ public class MusicWizard {
         if(value >= MAXvolume){
             value = MAXvolume;
         }
+        targetDB = (float)(Math.log(value)/Math.log(10.0)*30.0);
 
+        if (targetDB < -80) targetDB = -80;
+
+        System.out.println(MAXvolume + " " + currDB + " " + targetDB + " " + value);
         //Change value of from 1 to 0, to dB. Reverse of actual formula they use in documentation
-        targetDB = (float)(Math.log(value)/Math.log(10.0)*20.0);
+
 
         if (!fading) {
             Thread t = new Thread() {
@@ -264,7 +253,7 @@ public class MusicWizard {
                  * Run by thread to gradually lower the volume
                  * WE need fadePerStep=.1 to minimize clicks. Too fast change and it will awfully click
                  */
-                public void run() {
+                public synchronized void run() {
                     fading = true;   // prevent running twice on same sound
                     if (currDB > targetDB + fadePerStep*2) {
                         while (currDB > targetDB + fadePerStep*6) {
@@ -291,47 +280,61 @@ public class MusicWizard {
     }
 
     public static void setGlobalVolume(double sliderValue) {
-        float volumeFraction = (float) (sliderValue / 100.0 * MAXvolume);
-        if (volumeFraction < 0.0001f) volumeFraction = 0.0001f;
+        float volumeFraction = (float) (sliderValue / 200.0 );
+        if (volumeFraction < 0.001f) volumeFraction = 0.001f;
 
-        float dB = (float)(Math.log10(volumeFraction) * 20.0);
-        if (musicControl != null) musicControl.setValue(dB);
-        if (ambientControl != null) ambientControl.setValue(dB);
+        float dB = (float)(Math.log(volumeFraction)/Math.log(10.0)*30.0);
 
-        currDB = dB;
-    }
+        if (dB < -80) dB = -80;
 
-    /**
-     * Plays a single audio track in a continuous loop, replacing any currently playing music.
-     *
-     * @param filePath the full path to the .wav file to be played
-     */
-    public static void playSingleTrack(String filePath) {
-        stop = true;
-        try {
-            if (music != null && music.isRunning()) {
-                music.stop();
-                music.close();
-            }
-            setup_music(filePath);
-            music.loop(Clip.LOOP_CONTINUOUSLY);
-            shiftVolumeTo(1);
-            musicRunning = true;
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (musicControl != null && !fading) {
+            musicControl.setValue(dB );
+            currDB = (dB);
         }
+
+        MAXvolume = volumeFraction;
     }
 
+    private static void runPlaylistInThread() {
+        Thread singleTrackThread = new Thread() {
+            /**
+             * Run by thread to gradually lower the volume
+             * WE need fadePerStep=.1 to minimize clicks. Too fast change and it will awfully click
+             */
+            public void run() {
+                while(!stop ) {
+                    List<String> currentPlaylist;
+                    synchronized (MusicWizard.class) {
+                        currentPlaylist = new ArrayList<>(playlist);
+                    }
+                    for (String track: currentPlaylist) {
+                        try {
+                            run_clip_till_finish(track);
+
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                        if(stop){
+                            musicRunning = false;
+                            stop = false;
+                            stopImmediate = false;
+                            return;
+                        }
+                    }
+                }
+            }
+        };
+
+        singleTrackThread.start();
+    }
     /**
      * Stops the currently playing music and resets the music state.
      */
-    public static void stop_music() {
+    public static void stop_music_slowly() {
         stop = true;
-        if (music != null && music.isRunning()) {
-            music.stop();
-            music.close();
-        }
-        musicRunning = false;
     }
-
+    public static void stop_music(){
+        stop = true;
+        stopImmediate = true;
+    }
 }

@@ -5,7 +5,10 @@ import com.gnome.gnome.dao.MonsterDAO;
 import com.gnome.gnome.db.DatabaseWrapper;
 import com.gnome.gnome.loginRegistration.controller.LoginRegistrationController;
 import com.gnome.gnome.music.MusicWizard;
+import com.gnome.gnome.switcher.switcherPage.SwitchPage;
+import com.gnome.gnome.switcher.switcherPage.component.SceneSwitch;
 import com.gnome.gnome.utils.ImageParser;
+import com.gnome.gnome.utils.InternetMonitor;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -25,10 +28,12 @@ public class MainApplication extends Application {
     public static char lang = 'S';
     public static boolean musicEnabled = true;
     public static boolean ambientEnabled = true;
+    private InternetMonitor internetMonitor;
+
     public void start(Stage stage) throws IOException {
 
         MusicWizard.start_music_loop();
-        MusicWizard.start_ambient();
+//        MusicWizard.start_ambient();
 
         Map<String, Boolean> properties = getProperties();
         skip_db = properties.get("skip_db");
@@ -45,6 +50,9 @@ public class MainApplication extends Application {
             MainController controller = fxmlLoader.getController();
             controller.setPrimaryStage(stage);
         }
+
+        internetMonitor = new InternetMonitor(new SwitchPage(), 5000);
+        internetMonitor.start();
 
         Scene scene = new Scene(root);
         stage.setFullScreen(true);
@@ -122,8 +130,13 @@ public class MainApplication extends Application {
 
     @Override
     public void stop() {
+       if (internetMonitor != null)
+           internetMonitor.stop();
+
        if (!skip_db)
            DatabaseWrapper.getInstance().close();
+
+       MusicWizard.stop_music();
     }
 
 

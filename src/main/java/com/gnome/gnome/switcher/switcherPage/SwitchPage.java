@@ -1,7 +1,12 @@
 package com.gnome.gnome.switcher.switcherPage;
 
 import com.gnome.gnome.switcher.switcherPage.component.SceneSwitch;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 
 
 /**
@@ -57,6 +62,24 @@ public class SwitchPage implements PageSwitcherInterface {
         new SceneSwitch(anchorPane, "/com/gnome/gnome/pages/story-mode-page.fxml");
     }
 
+    @Override
+    public void goToBeginning() {
+        Stage stage = (Stage) Window.getWindows().stream()
+                .filter(Window::isShowing)
+                .findFirst()
+                .orElse(null);
+
+        if (stage != null) {
+            FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/com/gnome/gnome/pages/login-registration.fxml"));
+            try {
+                Parent root = loader.load();
+                Scene scene = new javafx.scene.Scene(root);
+                stage.setScene(scene);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
 
 }

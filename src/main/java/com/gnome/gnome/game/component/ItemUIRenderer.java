@@ -20,65 +20,86 @@ import java.util.Objects;
 public class ItemUIRenderer {
 
     private final VBox uiPane;
-    private final Camera camera;
+    private VBox weaponBox;
+    private VBox armorBox;
+    private VBox potionBox;
 
     private static final String DEFAULT_IMAGE_PATH = "/com/gnome/gnome/images/default-no-item.png";
 
-    public ItemUIRenderer(VBox uiPane, Camera camera) {
+    public ItemUIRenderer(VBox uiPane) {
         this.uiPane = uiPane;
-        this.camera = camera;
     }
 
     public void render(Armor armor, Weapon weapon, Potion potion) {
         uiPane.getChildren().clear();
 
-        HBox itemRow = new HBox();
-        itemRow.setAlignment(Pos.CENTER);
-        itemRow.setSpacing(50); // більше простору між елементами
-
-        itemRow.getChildren().addAll(
-                createItemBox(
-                        weapon != null ? weapon.getImg() : null,
-                        weapon != null ? weapon.getNameEng() : "None",
-                        weapon != null ? "DMG: " + weapon.getAtkValue() : ""
-                ),
-                createItemBox(
-                        potion != null ? potion.getImg1() : null,
-                        potion != null ? potion.getNameEng() : "None",
-                        potion != null ? "HP: +" + potion.getScoreVal() : ""
-                ),
-                createItemBox(
-                        armor != null ? armor.getImg() : null,
-                        armor != null ? armor.getNameEng() : "None",
-                        armor != null ? "DEF: " + armor.getDefCof() : ""
-                )
+        weaponBox = createItemBox(
+                weapon != null ? weapon.getImg() : null,
+                weapon != null ? weapon.getNameEng() : "None",
+                weapon != null ? "DMG: " + weapon.getAtkValue() : ""
+        );
+        potionBox = createItemBox(
+                potion != null ? (potion.getImg1() != null ? potion.getImg1() : potion.getImg2()) : null,
+                potion != null ? potion.getNameEng() : "None",
+                potion != null ? "HP: +" + potion.getScoreVal() : ""
+        );
+        armorBox = createItemBox(
+                armor != null ? armor.getImg() : null,
+                armor != null ? armor.getNameEng() : "None",
+                armor != null ? "DEF: " + armor.getDefCof() : ""
         );
 
-        uiPane.getChildren().add(itemRow);
+        uiPane.getChildren().addAll(weaponBox, potionBox, armorBox);
     }
 
     private VBox createItemBox(String imagePath, String name, String stat) {
         VBox box = new VBox();
         box.setAlignment(Pos.TOP_CENTER);
-        box.setSpacing(8);
+        box.setSpacing(10);
 
-        double size = 80;
+        double size = 100;
 
         ImageView icon = new ImageView(loadImageOrDefault(imagePath));
         icon.setFitWidth(size);
         icon.setFitHeight(size);
 
         Label nameLabel = new Label(name);
-        nameLabel.setFont(Font.font("Arial", FontWeight.BOLD, 14));
+        nameLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
         nameLabel.setTextFill(Color.WHITE);
+        nameLabel.setWrapText(true);
+        nameLabel.setMaxWidth(140);
 
         Label statLabel = new Label(stat);
-        statLabel.setFont(Font.font("Arial", 12));
+        statLabel.setFont(Font.font("Arial", 14));
         statLabel.setTextFill(Color.LIGHTGRAY);
 
         box.getChildren().addAll(icon, nameLabel, statLabel);
+
+        box.setStyle(
+                "-fx-background-color: rgba(0,0,0,0.4);" +
+                        "-fx-border-color: white;" +
+                        "-fx-border-width: 2;" +
+                        "-fx-border-radius: 8;" +
+                        "-fx-background-radius: 8;" +
+                        "-fx-padding: 12;"
+        );
+
+        box.setMaxWidth(160);
         return box;
     }
+
+    public void updatePotion(Potion potion) {
+        int index = uiPane.getChildren().indexOf(potionBox);
+        if (index >= 0) {
+            potionBox = createItemBox(
+                    potion != null ? (potion.getImg1() != null ? potion.getImg1() : potion.getImg2()) : null,
+                    potion != null ? potion.getNameEng() : "None",
+                    potion != null ? "HP: +" + potion.getScoreVal() : ""
+            );
+            uiPane.getChildren().set(index, potionBox);
+        }
+    }
+
 
     private Image loadImageOrDefault(String imagePath) {
         InputStream stream;

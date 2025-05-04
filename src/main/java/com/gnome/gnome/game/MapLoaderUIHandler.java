@@ -1,5 +1,6 @@
 package com.gnome.gnome.game;
 
+import com.gnome.gnome.MainApplication;
 import com.gnome.gnome.models.*;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
@@ -16,6 +17,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.util.List;
+import java.util.ResourceBundle;
 
 public class MapLoaderUIHandler {
 
@@ -23,9 +25,18 @@ public class MapLoaderUIHandler {
     private final Stage primaryStage;
     private Popup loadingPopup;
 
+    private ResourceBundle bundle;
+
     public MapLoaderUIHandler(MapLoaderService service, Stage stage) {
         this.service = service;
         this.primaryStage = stage;
+
+        if (MainApplication.lang == 'S'){
+            this.bundle = ResourceBundle.getBundle("slovak");
+        }
+        else {
+            this.bundle = ResourceBundle.getBundle("english");
+        }
     }
 
     public void showStartMap(Map map) {
@@ -63,7 +74,7 @@ public class MapLoaderUIHandler {
     private void showLoadingPopup() {
         if (loadingPopup == null) {
             // Loading Title
-            Label loadingLabel = new Label("Loading...");
+            Label loadingLabel = new Label(bundle.getString("label.loading"));
             loadingLabel.getStyleClass().add("loading-label");
 
             // Loading Indicator
@@ -109,11 +120,14 @@ public class MapLoaderUIHandler {
 
     private String getRandomTip() {
         String[] tips = {
-                "Tip: Press 'E' to open nearby chests.",
-                "Tip: Use potions to quickly recover health.",
-                "Tip: Some monsters have patterns — study their movement.",
-                "Tip: Find better armor to survive longer.",
-                "Tip: Coins can be used to buy upgrades after a level."
+                bundle.getString("tips.1"),
+                bundle.getString("tips.2"),
+                bundle.getString("tips.3"),
+                bundle.getString("tips.4"),
+                bundle.getString("tips.5"),
+                bundle.getString("tips.6"),
+                bundle.getString("tips.7")
+
         };
         int index = (int) (Math.random() * tips.length);
         return tips[index];
@@ -128,20 +142,27 @@ public class MapLoaderUIHandler {
     private void loadGamePage(Map selectedMap, List<Monster> monsters, Armor armor, Weapon weapon, Potion potion) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/gnome/gnome/pages/game.fxml"));
+            if (MainApplication.lang == 'S'){
+                loader.setResources(ResourceBundle.getBundle("slovak"));
+            }
+            else{
+                loader.setResources(ResourceBundle.getBundle("english"));
+            }
+
             Parent root = loader.load();
             GameController controller = loader.getController();
             controller.initializeWithLoadedMap(selectedMap,selectedMap.getMapData(), monsters, armor, weapon, potion);
             primaryStage.getScene().setRoot(root);
         } catch (Exception e) {
-            showError("Failed to load game view: " + e.getMessage());
+            showError(bundle.getString("error.load.game.view") + " " + e.getMessage());
         }
     }
 
 
     private void showError(String msg) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText("Loading Error");
+        alert.setTitle(bundle.getString("error.title"));
+        alert.setHeaderText(bundle.getString("error.loading.header"));
         alert.setContentText(msg);
         alert.showAndWait();
     }

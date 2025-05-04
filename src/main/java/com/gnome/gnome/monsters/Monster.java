@@ -4,6 +4,7 @@ package com.gnome.gnome.monsters;
 import com.gnome.gnome.camera.Camera;
 import com.gnome.gnome.editor.utils.TypeOfObjects;
 import com.gnome.gnome.game.GameController;
+import com.gnome.gnome.monsters.movements.FollowingMovement;
 import com.gnome.gnome.monsters.movements.MovementStrategy;
 import com.gnome.gnome.player.Player;
 import javafx.animation.KeyFrame;
@@ -310,6 +311,9 @@ public abstract class Monster {
         int dy = Math.abs(player.getY() - y);
         if (dx <= attackRange && dy <= attackRange) {
             isMeleeAttacking = true;
+
+            if (!(movementStrategy instanceof FollowingMovement))
+                movementStrategy = new FollowingMovement();
 
             Image attackImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream(attackImagePath)));
             representation.setImage(attackImage);
