@@ -359,6 +359,7 @@ public class GameController {
         return false;
     }
 
+
     void showTablePopup() {
         uiManager.showTablePopup(bundle.getString("crafting.table"));
     }

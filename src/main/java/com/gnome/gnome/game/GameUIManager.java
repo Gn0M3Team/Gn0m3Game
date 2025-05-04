@@ -140,7 +140,7 @@ public class GameUIManager {
     }
 
     public void showCenterMenuPopup() {
-        if (controller.getCenterStack().getChildren().stream().anyMatch(n -> n.getStyleClass().contains("menu-popup")))
+        if (controller.getCenterStack().getChildren().stream().anyMatch(n -> n.getStyleClass().contains("menu-popup")) || controller.isGameOver())
             return;
 
         controller.getGameLoop().stop();
