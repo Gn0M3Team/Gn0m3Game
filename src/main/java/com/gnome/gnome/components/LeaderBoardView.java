@@ -71,12 +71,7 @@ public class LeaderBoardView extends VBox {
         );
         this.currentUser = UserSession.getInstance().getCurrentUser();
 
-        if (MainApplication.lang == 'S'){
-            this.bundle = ResourceBundle.getBundle("slovak");
-        }
-        else {
-            this.bundle = ResourceBundle.getBundle("english");
-        }
+        this.bundle = MainApplication.getLangBundle();
 
         logger.info("Initializing LeaderBoardView...");
 

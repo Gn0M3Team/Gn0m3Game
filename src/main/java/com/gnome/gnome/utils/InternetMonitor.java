@@ -27,12 +27,7 @@ public class InternetMonitor {
                 .connectTimeout(Duration.ofSeconds(2))
                 .build();
 
-        if (MainApplication.lang == 'S'){
-            this.bundle = ResourceBundle.getBundle("slovak");
-        }
-        else {
-            this.bundle = ResourceBundle.getBundle("english");
-        }
+        this.bundle = MainApplication.getLangBundle();
 
     }
 

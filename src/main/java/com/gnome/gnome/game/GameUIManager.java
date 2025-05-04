@@ -48,12 +48,7 @@ public class GameUIManager {
 
 
     public GameUIManager(GameController controller) {
-        if (MainApplication.lang == 'S'){
-            this.bundle = ResourceBundle.getBundle("slovak");
-        }
-        else {
-            this.bundle = ResourceBundle.getBundle("english");
-        }
+        this.bundle = MainApplication.getLangBundle();
 
         this.controller = controller;
         pageSwitch = new SwitchPage();
@@ -109,6 +104,7 @@ public class GameUIManager {
         Button exitButton = new Button(bundle.getString("exit.button"));
         exitButton.getStyleClass().add("game-button");
         exitButton.setOnAction(e -> {
+            controller.onSceneExit(false);
             pageSwitch.goMainMenu(controller.getRootBorder());
         });
 
@@ -271,12 +267,8 @@ public class GameUIManager {
     public void showShopPopup(boolean isStoryMode) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/gnome/gnome/pages/shop.fxml"));
-            if (MainApplication.lang == 'S'){
-                loader.setResources(ResourceBundle.getBundle("slovak"));
-            }
-            else{
-                loader.setResources(ResourceBundle.getBundle("english"));
-            }
+
+            loader.setResources(MainApplication.getLangBundle());
 
             Parent shopRoot = loader.load();
 
@@ -299,11 +291,11 @@ public class GameUIManager {
                 controller.getCenterStack().getChildren().remove(shopRoot);
                 hideDarkOverlay();
 
-                controller.closeShopAndStartNewGame();
+//                controller.closeShopAndStartNewGame();
 
-//                if (isStoryMode) {
-//                    controller.closeShopAndStartNewGame();
-//                }
+                if (isStoryMode) {
+                    controller.closeShopAndStartNewGame();
+                }
 //                else  {
 //                    controller.closeShopAndStartNewGame();
 //                }

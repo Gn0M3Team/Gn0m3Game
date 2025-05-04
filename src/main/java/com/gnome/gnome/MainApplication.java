@@ -15,6 +15,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCombination;
 import javafx.stage.Stage;
+import lombok.Getter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,10 +26,16 @@ import java.util.ResourceBundle;
 
 public class MainApplication extends Application {
     private boolean skip_db;
-    public static char lang = 'S';
+
     public static boolean musicEnabled = true;
     public static boolean ambientEnabled = true;
     private InternetMonitor internetMonitor;
+
+    @Getter
+    private static char lang = 'S';
+
+    @Getter
+    private static ResourceBundle langBundle = ResourceBundle.getBundle("slovak");
 
     public void start(Stage stage) throws IOException {
 
@@ -74,6 +81,15 @@ public class MainApplication extends Application {
         }
     }
 
+    public static void flipLanguage(){
+        if (lang == 'S'){
+            langBundle = ResourceBundle.getBundle("english");
+            lang = 'E';
+            return;
+        }
+        langBundle = ResourceBundle.getBundle("slovak");
+        lang = 'S';
+    }
 
     private Map<String, Boolean> getProperties() {
         Properties properties = new Properties();

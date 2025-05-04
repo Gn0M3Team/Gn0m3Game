@@ -34,14 +34,9 @@ public class SettingController {
     @FXML
     public void initialize() {
         pageSwitch = new SwitchPage();
-        selectedLanguage = MainApplication.lang;
+        selectedLanguage = MainApplication.getLang();
 
-        if (MainApplication.lang == 'S'){
-            this.bundle = ResourceBundle.getBundle("slovak");
-        }
-        else {
-            this.bundle = ResourceBundle.getBundle("english");
-        }
+        this.bundle = MainApplication.getLangBundle();
 
         // Language
         languageComboBox.getItems().addAll("English (eng)", "Slovak (sk)");
@@ -125,7 +120,8 @@ public class SettingController {
         String selected = languageComboBox.getValue();
         if (selected != null) {
             selectedLanguage = selected.equals("English (eng)") ? 'E' : 'S';
-            MainApplication.lang = selectedLanguage;
+            MainApplication.flipLanguage();
+
             logger.info("Language set to: " + selectedLanguage);
         }
     }

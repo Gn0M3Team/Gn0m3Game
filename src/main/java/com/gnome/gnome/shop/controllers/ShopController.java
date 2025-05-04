@@ -137,12 +137,7 @@ public class ShopController {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/gnome/gnome/pages/item-modal.fxml")
             );
-            if (MainApplication.lang == 'S'){
-                loader.setResources(ResourceBundle.getBundle("slovak"));
-            }
-            else{
-                loader.setResources(ResourceBundle.getBundle("english"));
-            }
+            loader.setResources(MainApplication.getLangBundle());
 
             Parent root = loader.load();
             ItemController itemController = loader.getController();

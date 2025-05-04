@@ -30,7 +30,7 @@ public class Map {
     }
 
     public String getName(){
-        if (MainApplication.lang == 'E') {
+        if (MainApplication.getLang() == 'E') {
             return mapNameEng;
         }
         else{

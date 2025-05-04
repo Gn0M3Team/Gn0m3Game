@@ -9,6 +9,7 @@ module com.gnome.gnome {
     requires java.logging;
     requires jbcrypt;
     requires java.net.http;
+    requires jdk.compiler;
 
     opens com.gnome.gnome.game to javafx.fxml;
 

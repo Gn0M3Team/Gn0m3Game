@@ -21,13 +21,13 @@ public class Weapon {
     private String img;
 
     public String getDetails() {
-        if (MainApplication.lang == 'E')
+        if (MainApplication.getLang() == 'E')
             return detailsEng;
         else
             return detailsSk;
     }
     public String getName() {
-        if (MainApplication.lang == 'E')
+        if (MainApplication.getLang() == 'E')
             return nameEng;
         else
             return nameSk;
