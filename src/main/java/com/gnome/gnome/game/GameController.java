@@ -99,6 +99,8 @@ public class GameController {
 
     private ResourceBundle bundle;
 
+    private boolean isInfoForChestShown = false;
+    private boolean isInfoForTableShown = false;
 
     public static GameController getGameController() {
         return instance == null ? new GameController() : instance;
@@ -508,8 +510,14 @@ public class GameController {
 
         if (rootBorder.getScene() != null && rootBorder.getScene().getWindow() != null) {
             Stage stage = (Stage) rootBorder.getScene().getWindow();
-            if (this.isNearTable(player.getX(), player.getY())) CustomPopupUtil.showInfo(stage, bundle.getString("interaction.table"));
-            if (this.isNearChest(player.getX(), player.getY())) CustomPopupUtil.showInfo(stage, bundle.getString("interaction.chest"));
+            if (this.isNearTable(player.getX(), player.getY()) && !isInfoForTableShown) {
+                isInfoForTableShown = true;
+                CustomPopupUtil.showInfo(stage, bundle.getString("interaction.table"));
+            }
+            if (this.isNearChest(player.getX(), player.getY()) && !isInfoForChestShown) {
+                isInfoForChestShown = true;
+                CustomPopupUtil.showInfo(stage, bundle.getString("interaction.chest"));
+            }
         }
         drawAttackRange(gc, 1);
 
