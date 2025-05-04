@@ -434,7 +434,7 @@ public class GameController {
      */
     private void onRiverStepped() {
         if (debugModGame) System.out.println("Player stepped on river at (" + player.getX() + ", " + player.getY() + ")");
-        double damage = max(player.getCurrentHealth() * 0.1, 1);
+        double damage = player.getMaxHealth() * 0.1;
         player.takeDamage(damage);
         updatePlayerHealthBar();
     }

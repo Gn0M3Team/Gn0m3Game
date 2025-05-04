@@ -1,5 +1,6 @@
 package com.gnome.gnome.utils;
 
+import com.gnome.gnome.MainApplication;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -9,6 +10,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.ResourceBundle;
 
 public class InternetMonitor {
     private final PageSwitcherInterface pageSwitcher;
@@ -16,6 +18,7 @@ public class InternetMonitor {
     private volatile boolean running = true;
 
     private final HttpClient httpClient;
+    private ResourceBundle bundle;
 
     public InternetMonitor(PageSwitcherInterface pageSwitcher, long checkIntervalMs) {
         this.pageSwitcher = pageSwitcher;
@@ -23,6 +26,14 @@ public class InternetMonitor {
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(2))
                 .build();
+
+        if (MainApplication.lang == 'S'){
+            this.bundle = ResourceBundle.getBundle("slovak");
+        }
+        else {
+            this.bundle = ResourceBundle.getBundle("english");
+        }
+
     }
 
     public void start() {
@@ -33,9 +44,9 @@ public class InternetMonitor {
                     running = false;
                     Platform.runLater(() -> {
                         Alert alert = new Alert(Alert.AlertType.ERROR);
-                        alert.setTitle("Connection Lost");
+                        alert.setTitle(bundle.getString("internet.lost.alert.title"));
                         alert.setHeaderText(null);
-                        alert.setContentText("Internet connection lost. You will be redirected to login.");
+                        alert.setContentText(bundle.getString("internet.lost.alert.text"));
                         alert.setOnHidden(e -> pageSwitcher.goToBeginning());
                         alert.show();
                     });
