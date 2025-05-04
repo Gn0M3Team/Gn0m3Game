@@ -19,6 +19,9 @@ import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import com.gnome.gnome.userState.UserState;
 import com.gnome.gnome.utils.CustomPopupUtil;
 import javafx.animation.AnimationTimer;
+import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.DoubleBinding;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -28,10 +31,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
 
+import static java.lang.Double.min;
 import static java.lang.Math.max;
 
 @Getter
@@ -52,6 +53,7 @@ public class GameController {
     @FXML private StackPane centerStack;
     @FXML private Button centerMenuButton;
     @FXML private StackPane healthBarContainer;
+//    @FXML private VBox rightUIBox;
 
     private Canvas viewportCanvas;
     private Weapon weapon;
@@ -132,10 +134,8 @@ public class GameController {
 
         setupUI();
         addGameEntitiesToPane();
+        updateCenterStackSize();
 
-        this.itemUIRenderer = new ItemUIRenderer(bottomUIBox, camera);
-        this.coinUIRenderer = new CoinUIRenderer(bottomUIBox, player, camera);
-        itemUIRenderer.render(armor, weapon, potion);
         uiManager = new GameUIManager(this);
         healthBar = new PlayerHealthBar(250, 50);
         healthBarContainer.getChildren().add(healthBar);
@@ -153,42 +153,96 @@ public class GameController {
 
     private void setupUI() {
         viewportCanvas = new Canvas();
+
         BorderPane.setAlignment(centerStack, Pos.CENTER);
-        centerStack.prefWidthProperty().bind(rootBorder.widthProperty());
-        centerStack.prefHeightProperty().bind(rootBorder.heightProperty());
-        centerStack.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         rootBorder.setCenter(centerStack);
 
-        viewportCanvas.widthProperty().bind(centerStack.widthProperty());
-        viewportCanvas.heightProperty().bind(centerStack.heightProperty());
-        viewportCanvas.setFocusTraversable(true);
-        viewportCanvas.requestFocus();
+        rootBorder.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.widthProperty().addListener((o, oldW, newW) -> updateCenterStackSize());
+                newScene.heightProperty().addListener((o, oldH, newH) -> updateCenterStackSize());
+                updateCenterStackSize();
+            }
+        });
 
         gameObjectsPane = new Pane();
-        gameObjectsPane.setPickOnBounds(false);
-        gameObjectsPane.prefWidthProperty().bind(centerStack.widthProperty());
-        gameObjectsPane.prefHeightProperty().bind(centerStack.heightProperty());
-
         uiOverlayPane = new Pane();
-        uiOverlayPane.setPickOnBounds(false);
-        uiOverlayPane.prefWidthProperty().bind(centerStack.widthProperty());
-        uiOverlayPane.prefHeightProperty().bind(centerStack.heightProperty());
-
         VBox bottomUIBox = new VBox();
+
+        gameObjectsPane.setPickOnBounds(false);
+        uiOverlayPane.setPickOnBounds(false);
+
         bottomUIBox.setAlignment(Pos.BOTTOM_CENTER);
         bottomUIBox.setPrefHeight(150);
         bottomUIBox.setMouseTransparent(true);
-        bottomUIBox.prefWidthProperty().bind(centerStack.widthProperty());
-        bottomUIBox.prefHeightProperty().bind(centerStack.heightProperty());
-        uiOverlayPane.getChildren().add(bottomUIBox);
         this.bottomUIBox = bottomUIBox;
 
-        Pane viewportRoot = new Pane(viewportCanvas, gameObjectsPane, uiOverlayPane);
-        centerStack.getChildren().setAll(viewportRoot);
-        StackPane.setAlignment(viewportRoot, Pos.CENTER);
+        uiOverlayPane.getChildren().add(bottomUIBox);
+
+        VBox itemBoxContent = new VBox(20);
+        itemBoxContent.setAlignment(Pos.CENTER);
+        itemBoxContent.setPickOnBounds(false);
+        itemBoxContent.setMouseTransparent(true);
+
+        itemUIRenderer = new ItemUIRenderer(itemBoxContent);
+        itemUIRenderer.render(armor, weapon, potion);
+
+        coinUIRenderer = new CoinUIRenderer(itemBoxContent, player);
+        coinUIRenderer.render();
+
+        StackPane itemBox = new StackPane(itemBoxContent);
+        itemBox.setAlignment(Pos.CENTER);
+        itemBox.setPrefWidth(200);
+        itemBox.setStyle("-fx-padding: 0 20 0 0;");
+
+        StackPane viewportRoot = new StackPane(viewportCanvas, gameObjectsPane, uiOverlayPane);
+        viewportRoot.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        HBox.setHgrow(viewportRoot, Priority.ALWAYS);
+
+        HBox gameAndUIBox = new HBox(viewportRoot, itemBox);
+        centerStack.getChildren().setAll(gameAndUIBox);
 
         camera.drawViewport(viewportCanvas, coinsOnMap);
+        updateCenterStackSize();
     }
+
+    private void updateCenterStackSize() {
+        if (rootBorder.getScene() == null) return;
+
+        double fullWidth = rootBorder.getScene().getWidth();
+        double availableHeight = rootBorder.getScene().getHeight() - 100;
+
+        double itemBoxWidth = 160;
+        double availableWidth = fullWidth - itemBoxWidth - 100;
+
+        double size = Math.min(availableWidth, availableHeight);
+
+        centerStack.setPrefWidth(size + itemBoxWidth);
+        centerStack.setPrefHeight(size);
+
+        viewportCanvas.setWidth(size);
+        viewportCanvas.setHeight(size);
+
+        if (gameObjectsPane != null) {
+            gameObjectsPane.setPrefSize(size, size);
+            gameObjectsPane.setMinSize(size, size);
+            gameObjectsPane.setMaxSize(size, size);
+        }
+
+        if (uiOverlayPane != null) {
+            uiOverlayPane.setPrefSize(size, size);
+            uiOverlayPane.setMinSize(size, size);
+            uiOverlayPane.setMaxSize(size, size);
+        }
+
+        if (bottomUIBox != null) {
+            bottomUIBox.setPrefSize(size, 150);
+        }
+
+        renderGame();
+    }
+
+
 
 
     private void addGameEntitiesToPane() {
@@ -260,7 +314,7 @@ public class GameController {
         for (Chest chest : activeChests) {
             int cx = chest.getGridX();
             int cy = chest.getGridY();
-            if ((Math.abs(cx - x) == 1 && cy == y) || (Math.abs(cy - y) == 1 && cx == x)) {
+            if (((Math.abs(cx - x) == 1 && cy == y) || (Math.abs(cy - y) == 1 && cx == x)) && !chest.isOpened()) {
                 return true;
             }
         }
@@ -368,12 +422,6 @@ public class GameController {
         }
     }
 
-    public void closeShopAndGoToMainMenu() {
-        if (uiManager.getCurrentPopup() != null) uiManager.getCurrentPopup().close();
-        onSceneExit(false);
-        new SwitchPage().goMainMenu(rootBorder);
-    }
-
     public void closeShopAndStartNewGame() {
         if (uiManager.getCurrentPopup() != null) uiManager.getCurrentPopup().close();
         onSceneExit(false);
@@ -457,7 +505,6 @@ public class GameController {
         camera.updateCameraCenter();
 
         camera.drawViewport(viewportCanvas, coinsOnMap);
-//        camera.drawPressEHints(gc, baseMap, player.getX(), player.getY(), activeChests);
 
         if (rootBorder.getScene() != null && rootBorder.getScene().getWindow() != null) {
             Stage stage = (Stage) rootBorder.getScene().getWindow();
@@ -466,10 +513,33 @@ public class GameController {
         }
         drawAttackRange(gc, 1);
 
-        monsterList.forEach(m -> {
-            m.updateVisual(camera);
+        monsterList.forEach(monster -> {
+            monster.updateVisual(camera);
+            ImageView view = monster.getRepresentation();
+
+            int gridX = monster.getX();
+            int gridY = monster.getY();
+
+            if (camera.isInView(gridX, gridY)) {
+                if (!gameObjectsPane.getChildren().contains(view)) {
+                    gameObjectsPane.getChildren().add(view);
+                }
+            } else {
+                gameObjectsPane.getChildren().remove(view);
+            }
         });
-        activeChests.forEach(c -> c.updatePositionWithCamera(camera.getStartCol(), camera.getStartRow(), camera.getTileWidth(), camera.getTileHeight()));
+        activeChests.forEach(c -> {
+            int x = c.getGridX(), y = c.getGridY();
+            c.updatePositionWithCamera(camera.getStartCol(), camera.getStartRow(), camera.getTileWidth(), camera.getTileHeight());
+
+            if (camera.isInView(x, y)) {
+                if (!gameObjectsPane.getChildren().contains(c.getImageView())) {
+                    gameObjectsPane.getChildren().add(c.getImageView());
+                }
+            } else {
+                gameObjectsPane.getChildren().remove(c.getImageView());
+            }
+        });
         activeArrows.forEach(a -> a.updateCameraOffset(camera.getStartCol(), camera.getStartRow()));
 
         player.setDynamicTileSize(Math.min(camera.getTileWidth(), camera.getTileHeight()));
@@ -521,7 +591,6 @@ public class GameController {
                     updateMonsters(delta);
                     updateProjectiles(delta);
                     renderGame();
-                    checkCoinPickup();
                     lastTime = now;
                 }
             }

@@ -1,13 +1,11 @@
 package com.gnome.gnome.editor.utils;
 
 import com.gnome.gnome.annotations.config.Value;
-import com.gnome.gnome.s3.S3Actions;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import lombok.Getter;
 import lombok.Setter;
-import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
-import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
+
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -74,10 +72,6 @@ public class CategoryGenerator {
             )
     );
 
-
-    // Reference to your S3 utility class
-    private final S3Actions s3Actions = new S3Actions();
-
     // Name of the S3 bucket (adjust as needed)
     private static final String BUCKET_NAME = "my-example-bucket";
 
@@ -125,89 +119,4 @@ public class CategoryGenerator {
 
         return CompletableFuture.completedFuture(new ArrayList<>(botTypes));
     }
-
-    /**
-     * Loads images for a given category from S3.
-     * <p>
-     * The method:
-     * <ol>
-     *   <li>Constructs a prefix from the category (e.g. "Monsters/").</li>
-     *   <li>Sends a ListObjectsV2Request to list objects under that prefix.</li>
-     *   <li>For each object found, downloads the file to a temporary location and creates an ImageView.</li>
-     *   <li>Combines all the asynchronous operations and returns a list of ImageView objects.</li>
-     * </ol>
-     *
-     * @param category The category name.
-     * @return a CompletableFuture that completes with a List of ImageView objects.
-     */
-    private CompletableFuture<List<Object>> loadImagesFromS3(String category) {
-        // Construct the prefix for S3 objects (e.g., "Monsters/").
-        String prefix = category + "/";
-
-        // Create a request to list objects in the S3 bucket under the given prefix.
-        ListObjectsV2Request request = ListObjectsV2Request.builder()
-                .bucket(BUCKET_NAME)
-                .prefix(prefix)
-                .build();
-
-        // Asynchronously list objects from S3.
-        return S3Actions.getS3AsyncClient().listObjectsV2(request)
-                .thenCompose((ListObjectsV2Response response) -> {
-                    // If no objects are found, log and return an empty list.
-                    if (response.contents().isEmpty()) {
-                        logger.info("No objects found in S3 for prefix: " + prefix);
-                        return CompletableFuture.completedFuture(Collections.emptyList());
-                    }
-
-                    // Create a list to hold futures for each ImageView creation.
-                    List<CompletableFuture<ImageView>> futureImageViews = new ArrayList<>();
-
-                    // For each S3 object, download and create an ImageView.
-                    response.contents().forEach(s3Object -> {
-                        String key = s3Object.key();
-
-                        // Check if the image is already cached.
-                        if (imageCache.containsKey(key)) {
-                            // Use the cached ImageView.
-                            futureImageViews.add(CompletableFuture.completedFuture(imageCache.get(key)));
-                        } else {
-                            // Proceed with download, creation, and then cache the ImageView.
-                            String localFileName = "temp/" + key.replace("/", "_");
-                            CompletableFuture<Void> downloadFuture = s3Actions.getObjectBytesAsync(BUCKET_NAME, key, localFileName);
-                            CompletableFuture<ImageView> imageViewFuture = downloadFuture.thenApply((Void v) -> {
-                                try (FileInputStream fis = new FileInputStream(new File(localFileName))) {
-                                    Image image = new Image(fis);
-                                    ImageView imageView = new ImageView(image);
-                                    imageView.setFitWidth(64);
-                                    imageView.setPreserveRatio(true);
-                                    // Cache the image for future use.
-                                    imageCache.put(key, imageView);
-                                    return imageView;
-                                } catch (Exception e) {
-                                    logger.warning("Failed to create ImageView for " + key + ": " + e.getMessage());
-                                    return null;
-                                }
-                            });
-                            futureImageViews.add(imageViewFuture);
-                        }
-                    });
-
-                    // Combine all ImageView futures into one.
-                    CompletableFuture<Void> allDone = CompletableFuture.allOf(
-                            futureImageViews.toArray(new CompletableFuture[0])
-                    );
-
-                    // Once all downloads and ImageView creations are complete, collect the results.
-                    return allDone.thenApply(ignored -> {
-                        List<Object> imageViews = new ArrayList<>();
-                        for (CompletableFuture<ImageView> f : futureImageViews) {
-                            ImageView iv = f.join();
-                            if (iv != null)
-                                imageViews.add(iv);
-                        }
-                        return imageViews;
-                    });
-                });
-    }
-
 }

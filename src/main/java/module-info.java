@@ -7,16 +7,8 @@ module com.gnome.gnome {
     requires java.sql;
     requires java.desktop;
     requires java.logging;
-    requires org.aspectj.runtime;
-    requires software.amazon.awssdk.services.s3;
-    requires software.amazon.awssdk.core;
-    requires software.amazon.awssdk.http;
-    requires software.amazon.awssdk.regions;
-    requires software.amazon.awssdk.services.omics;
-    requires software.amazon.awssdk.http.nio.netty;
-    requires software.amazon.awssdk.awscore;
     requires jbcrypt;
-    requires software.amazon.awssdk.services.ecrpublic;
+    requires java.net.http;
 
     opens com.gnome.gnome.game to javafx.fxml;
 
