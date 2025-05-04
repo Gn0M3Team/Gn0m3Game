@@ -1,6 +1,7 @@
 package com.gnome.gnome.game;
 
 import com.gnome.gnome.editor.utils.TypeOfObjects;
+import com.gnome.gnome.models.Potion;
 import com.gnome.gnome.monsters.Monster;
 import com.gnome.gnome.player.Player;
 import com.gnome.gnome.userState.UserState;
@@ -34,9 +35,11 @@ public class PlayerGameService {
             double healAmount = 20;
             player.heal(healAmount);
 
-            controller.setPotion(null);
+            Potion used = controller.getPotion();
+            Potion dummy = new Potion(0, 0, 0, "", "","","",used.getImg2(), null);
 
-            controller.getItemUIRenderer().render(controller.getArmor(), controller.getWeapon(), null);
+            controller.setPotion(null);
+            controller.getItemUIRenderer().updatePotion(dummy);
 
             controller.updatePlayerHealthBar();
 

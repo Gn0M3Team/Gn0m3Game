@@ -25,9 +25,6 @@ public class NewGameController {
 
     MapLoaderService mapLoaderService;
 
-
-
-
     @FXML
     public void initialize() {
         pageSwitch = new SwitchPage();

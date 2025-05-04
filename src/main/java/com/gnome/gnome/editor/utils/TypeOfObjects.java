@@ -201,7 +201,7 @@ public enum TypeOfObjects {
 
     public boolean isWalkable() {
         return switch (this) {
-            case FLOOR, FINISH_POINT, RIVER, EMPTY, WEB,
+            case FLOOR, FINISH_POINT, RIVER, EMPTY, WEB,ROCK,
                  DOOR_1, DOOR_2, DOOR_3, DOOR_4, DOOR_5, DOOR_6, DOOR_7, DOOR_8, DOOR_9, DOOR_10, DOOR_11, DOOR_12, DOOR_13
                     -> true;
             default -> false;

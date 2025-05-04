@@ -48,7 +48,7 @@ public class GameInitializer {
                 if (tileType != null && tileType.isChest()) {
                     double val = returnBasedChestTypeValue(tileType);
                     activeChests.add(new Chest(col, row, val, tileType.getImagePath(), "/com/gnome/gnome/effects/" + getGifChestPath(tileType)));
-                    fieldMap[row][col] = TypeOfObjects.EMPTY.getValue();
+                    fieldMap[row][col] = TypeOfObjects.FLOOR.getValue();
                 }
 
                 if (tile < 0) {

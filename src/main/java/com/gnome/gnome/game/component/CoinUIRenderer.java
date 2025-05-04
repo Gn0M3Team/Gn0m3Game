@@ -19,16 +19,14 @@ public class CoinUIRenderer {
 
     private final VBox uiPane;
     private final Player player;
-    private final Camera camera;
-    private HBox coinBox;
+    private VBox coinBox;
     private Label coinCountLabel;
 
     private static final String COIN_IMAGE_PATH = "/com/gnome/gnome/images/";
 
-    public CoinUIRenderer(VBox uiPane, Player player, Camera camera) {
+    public CoinUIRenderer(VBox uiPane, Player player) {
         this.uiPane = uiPane;
         this.player = player;
-        this.camera = camera;
     }
 
     public void render() {
@@ -42,46 +40,32 @@ public class CoinUIRenderer {
             return;
         }
 
-        double boxSize = 80; // більший розмір
-        double iconSize = 60;
-
-        coinBox = new HBox();
-        coinBox.setAlignment(Pos.CENTER_LEFT);
-        coinBox.setSpacing(10);
-        coinBox.setMouseTransparent(true);
-
-        // Внутрішній VBox з іконкою та текстом
-        VBox innerBox = new VBox();
-        innerBox.setAlignment(Pos.CENTER);
-        innerBox.setSpacing(4);
+        double size = 100;
 
         ImageView coinIcon = new ImageView(coinImage);
-        coinIcon.setFitWidth(iconSize);
-        coinIcon.setFitHeight(iconSize);
+        coinIcon.setFitWidth(size);
+        coinIcon.setFitHeight(size);
 
         coinCountLabel = new Label("x" + player.getPlayerCoins());
-        coinCountLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
+        coinCountLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
         coinCountLabel.setTextFill(Color.WHITE);
 
-        innerBox.getChildren().addAll(coinIcon, coinCountLabel);
+        VBox box = new VBox();
+        box.setAlignment(Pos.CENTER);
+        box.setSpacing(10);
+        box.getChildren().addAll(coinIcon, coinCountLabel);
+        box.setStyle(
+                "-fx-background-color: rgba(0,0,0,0.4);" +
+                        "-fx-border-color: white;" +
+                        "-fx-border-width: 2;" +
+                        "-fx-border-radius: 8;" +
+                        "-fx-background-radius: 8;" +
+                        "-fx-padding: 12;"
+        );
+        box.setMaxWidth(160);
 
-        StackPane iconContainer = new StackPane(innerBox);
-        iconContainer.setPrefSize(boxSize, boxSize);
-        iconContainer.setStyle("-fx-border-color: white; -fx-border-width: 2; -fx-background-color: rgba(0,0,0,0.5); -fx-background-radius: 6;");
-        coinBox.getChildren().add(iconContainer);
-
-        // Додаємо до UI
-        if (uiPane.getChildren().isEmpty()) {
-            HBox row = new HBox();
-            row.setAlignment(Pos.CENTER);
-            row.setSpacing(30);
-            row.getChildren().add(coinBox);
-            uiPane.getChildren().add(row);
-        } else if (uiPane.getChildren().getFirst() instanceof HBox row) {
-            row.getChildren().addFirst(coinBox);
-        } else {
-            uiPane.getChildren().add(coinBox);
-        }
+        coinBox = box;
+        uiPane.getChildren().add(coinBox);
     }
 
     public void update() {

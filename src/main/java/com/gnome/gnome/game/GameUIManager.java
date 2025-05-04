@@ -10,6 +10,7 @@ import com.gnome.gnome.models.UserStatistics;
 import com.gnome.gnome.models.user.UserGameState;
 import com.gnome.gnome.player.Player;
 import com.gnome.gnome.shop.controllers.ShopController;
+import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import com.gnome.gnome.userState.UserState;
 import javafx.animation.FadeTransition;
@@ -31,15 +32,20 @@ import lombok.Getter;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class GameUIManager {
     private final GameController controller;
     private final Logger logger = Logger.getLogger(GameUIManager.class.getName());
+
+    private PageSwitcherInterface pageSwitch;
+
     @Getter
     private Stage currentPopup;
     private Popup infoPopup; // Track the info popup specifically
     private ResourceBundle bundle;
+
 
     public GameUIManager(GameController controller) {
         if (MainApplication.lang == 'S'){
@@ -50,6 +56,7 @@ public class GameUIManager {
         }
 
         this.controller = controller;
+        pageSwitch = new SwitchPage();
     }
 
     public void updateHealthBar(PlayerHealthBar healthBar) {
@@ -68,9 +75,14 @@ public class GameUIManager {
 
         Player player = controller.getPlayer();
 
-        updateMapAfterDeath(controller.getSelectedMap());
-        updatePlayerAfterDeath(player);
-        updatePlayerStatisticsAfterDeath(player);
+        runAsync(() -> {
+            updateMapAfterDeath(controller.getSelectedMap());
+            updatePlayerAfterDeath(player);
+            updatePlayerStatisticsAfterDeath(player);
+        }, () -> {
+            logger.info("Game data saved successfully");
+        });
+
 
         VBox overlay = new VBox(20);
         overlay.setAlignment(Pos.CENTER);
@@ -96,7 +108,9 @@ public class GameUIManager {
 
         Button exitButton = new Button(bundle.getString("exit.button"));
         exitButton.getStyleClass().add("game-button");
-        exitButton.setOnAction(e -> Platform.exit());
+        exitButton.setOnAction(e -> {
+            pageSwitch.goMainMenu(controller.getRootBorder());
+        });
 
         overlay.getChildren().addAll(
                 gameOverLabel,
@@ -110,6 +124,19 @@ public class GameUIManager {
 
         controller.getCenterStack().getChildren().add(overlay);
         controller.setGameOverOverlay(overlay);
+    }
+
+    public void runAsync(Runnable backgroundTask, Runnable uiAfterTask) {
+        new Thread(() -> {
+            try {
+                backgroundTask.run();
+                if (uiAfterTask != null) {
+                    Platform.runLater(uiAfterTask);
+                }
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, e.getMessage(), e);
+            }
+        }).start();
     }
 
     public void showCenterMenuPopup() {
@@ -153,7 +180,7 @@ public class GameUIManager {
         settingsButton.setOnAction(e -> {
             controller.getCenterStack().getChildren().removeAll(menuBox, darkOverlay);
             controller.onSceneExit(false);
-            new SwitchPage().goSetting(controller.getRootBorder());
+            pageSwitch.goSetting(controller.getRootBorder());
         });
 
         Button goBackButton = new Button(bundle.getString("newgame.button.back"));
@@ -161,7 +188,7 @@ public class GameUIManager {
         goBackButton.setOnAction(e -> {
             controller.getCenterStack().getChildren().removeAll(menuBox, darkOverlay);
             controller.onSceneExit(false);
-            new SwitchPage().goMainMenu(controller.getRootBorder());
+            pageSwitch.goMainMenu(controller.getRootBorder());
         });
 
         menuBox.getChildren().addAll(title, resumeButton, settingsButton, goBackButton);
@@ -265,7 +292,7 @@ public class GameUIManager {
                 controller.getCenterStack().getChildren().remove(shopRoot);
                 hideDarkOverlay();
                 controller.onSceneExit(false);
-                new SwitchPage().goMainMenu(controller.getRootBorder());
+                pageSwitch.goMainMenu(controller.getRootBorder());
             });
 
             shopController.setOnContinue(() -> {
@@ -275,7 +302,6 @@ public class GameUIManager {
                 if (isStoryMode) {
                     controller.closeShopAndStartNewGame();
                 }
-                // else do nothing — just close the popup
             });
 
         } catch (IOException e) {
