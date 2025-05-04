@@ -2,6 +2,7 @@ package com.gnome.gnome.game.component;
 
 import com.gnome.gnome.camera.Camera;
 import com.gnome.gnome.player.Player;
+import com.gnome.gnome.userState.UserState;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -19,6 +20,7 @@ public class CoinUIRenderer {
 
     private final VBox uiPane;
     private final Player player;
+    private final UserState userState;
     private VBox coinBox;
     private Label coinCountLabel;
 
@@ -27,6 +29,13 @@ public class CoinUIRenderer {
     public CoinUIRenderer(VBox uiPane, Player player) {
         this.uiPane = uiPane;
         this.player = player;
+        this.userState = null;
+    }
+
+    public CoinUIRenderer(VBox uiPane, UserState userState) {
+        this.uiPane = uiPane;
+        this.userState = userState;
+        this.player = null;
     }
 
     public void render() {
@@ -46,7 +55,7 @@ public class CoinUIRenderer {
         coinIcon.setFitWidth(size);
         coinIcon.setFitHeight(size);
 
-        coinCountLabel = new Label("x" + player.getPlayerCoins());
+        coinCountLabel = new Label("x" + getCoins());
         coinCountLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
         coinCountLabel.setTextFill(Color.WHITE);
 
@@ -70,10 +79,21 @@ public class CoinUIRenderer {
 
     public void update() {
         if (coinCountLabel != null) {
-            coinCountLabel.setText("x" + player.getPlayerCoins());
+            coinCountLabel.setText("x" + getCoins());
         } else {
             render();
         }
+    }
+
+    public double getCoins() {
+        if (player != null) {
+            return player.getPlayerCoins();
+        }
+        if (userState != null) {
+            return userState.getBalance();
+        }
+
+        throw new RuntimeException("Unable to render coins. Neither Player not UserState do not exist");
     }
 
     private Image loadImage(String path) {

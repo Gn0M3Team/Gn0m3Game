@@ -1,14 +1,16 @@
 package com.gnome.gnome.game.component;
 
-import com.gnome.gnome.camera.Camera;
+import com.gnome.gnome.dao.ArmorDAO;
+import com.gnome.gnome.dao.PotionDAO;
+import com.gnome.gnome.dao.WeaponDAO;
 import com.gnome.gnome.models.Armor;
 import com.gnome.gnome.models.Potion;
 import com.gnome.gnome.models.Weapon;
+import com.gnome.gnome.userState.UserState;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -30,22 +32,45 @@ public class ItemUIRenderer {
         this.uiPane = uiPane;
     }
 
-    public void render(Armor armor, Weapon weapon, Potion potion) {
+    public void render() {
+        UserState userState = UserState.getInstance();
+        WeaponDAO weaponDAO = new WeaponDAO();
+        ArmorDAO armorDAO = new ArmorDAO();
+        PotionDAO potionDAO = new PotionDAO();
+
         uiPane.getChildren().clear();
+
+        Weapon weapon = null;
+        Integer weaponId = userState.getWeaponId();
+        if (weaponId != null) {
+            weapon = weaponDAO.getWeaponById(weaponId);
+        }
+
+        Armor armor = null;
+        Integer armorId = userState.getArmorId();
+        if (armorId != null) {
+            armor = armorDAO.getArmorById(armorId);
+        }
+
+        Potion potion = null;
+        Integer potionId = userState.getPotionId();
+        if (potionId != null) {
+            potion = potionDAO.getPotionById(potionId);
+        }
 
         weaponBox = createItemBox(
                 weapon != null ? weapon.getImg() : null,
-                weapon != null ? weapon.getNameEng() : "None",
+                weapon != null ? weapon.getName() : "None",
                 weapon != null ? "DMG: " + weapon.getAtkValue() : ""
         );
         potionBox = createItemBox(
                 potion != null ? (potion.getImg1() != null ? potion.getImg1() : potion.getImg2()) : null,
-                potion != null ? potion.getNameEng() : "None",
+                potion != null ? potion.getName() : "None",
                 potion != null ? "HP: +" + potion.getScoreVal() : ""
         );
         armorBox = createItemBox(
                 armor != null ? armor.getImg() : null,
-                armor != null ? armor.getNameEng() : "None",
+                armor != null ? armor.getName() : "None",
                 armor != null ? "DEF: " + armor.getDefCof() : ""
         );
 
@@ -55,26 +80,27 @@ public class ItemUIRenderer {
     private VBox createItemBox(String imagePath, String name, String stat) {
         VBox box = new VBox();
         box.setAlignment(Pos.TOP_CENTER);
-        box.setSpacing(10);
+        box.setSpacing(5);
 
-        double size = 100;
+        double size = 70;
 
         ImageView icon = new ImageView(loadImageOrDefault(imagePath));
         icon.setFitWidth(size);
         icon.setFitHeight(size);
+        icon.setPreserveRatio(true);
 
         Label nameLabel = new Label(name);
         nameLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
         nameLabel.setTextFill(Color.WHITE);
         nameLabel.setWrapText(true);
-        nameLabel.setMaxWidth(140);
+        nameLabel.setMaxWidth(100);
 
         Label statLabel = new Label(stat);
-        statLabel.setFont(Font.font("Arial", 14));
+        statLabel.setFont(Font.font("Arial", 12));
         statLabel.setTextFill(Color.LIGHTGRAY);
 
         box.getChildren().addAll(icon, nameLabel, statLabel);
-
+        box.setMaxWidth(120);
         box.setStyle(
                 "-fx-background-color: rgba(0,0,0,0.4);" +
                         "-fx-border-color: white;" +
@@ -84,7 +110,6 @@ public class ItemUIRenderer {
                         "-fx-padding: 12;"
         );
 
-        box.setMaxWidth(160);
         return box;
     }
 
