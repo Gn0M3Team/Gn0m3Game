@@ -81,7 +81,7 @@ public class InternetMonitor {
         try {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("http://www.google.com"))
-                    .timeout(Duration.ofSeconds(2))
+                    .timeout(Duration.ofSeconds(4))
                     .GET()
                     .build();
 
