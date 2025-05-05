@@ -371,7 +371,7 @@ public class GameUIManager {
         scoreLabel.getStyleClass().add("stats-label");
         Label chestsLabel = new Label(String.format(bundle.getString("stats.chests"), player.getCountOfOpenedChest()));
         chestsLabel.getStyleClass().add("stats-label");
-        Label killedLabel = new Label(String.format(bundle.getString("stats.monsters"), player.getCountOfKilledMonsters()));
+        Label killedLabel = new Label(String.format(bundle.getString("profile.stats.monsterskilled"), player.getCountOfKilledMonsters()));
         killedLabel.getStyleClass().add("stats-label");
 
         Button continueButton = new Button(bundle.getString("button.continue"));
