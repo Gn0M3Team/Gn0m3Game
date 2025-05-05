@@ -2,6 +2,7 @@ package com.gnome.gnome.utils;
 
 import com.gnome.gnome.MainApplication;
 import com.gnome.gnome.db.DatabaseWrapper;
+import com.gnome.gnome.game.GameController;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -42,6 +43,9 @@ public class InternetMonitor {
                     if (running) {
                         Platform.runLater(() -> {
                             DatabaseWrapper.getInstance().close();
+                            if (GameController.getGameController() != null) {
+                                GameController.getGameController().onSceneExit(false);
+                            }
                             Alert alert = new Alert(Alert.AlertType.ERROR);
                             alert.setTitle(bundle.getString("internet.lost.alert.title"));
                             alert.setHeaderText(null);
