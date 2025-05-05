@@ -1,26 +1,19 @@
-package com.gnome.gnome.camera;
-import com.gnome.gnome.game.component.Chest;
+package com.gnome.gnome.game.camera;
 import com.gnome.gnome.game.component.Coin;
 import com.gnome.gnome.editor.utils.TypeOfObjects;
 import com.gnome.gnome.models.Armor;
 import com.gnome.gnome.models.Potion;
 import com.gnome.gnome.models.Weapon;
-import com.gnome.gnome.player.Player;
+import com.gnome.gnome.game.player.Player;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.Stop;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import lombok.Data;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * The Camera class is responsible for rendering a 15x15 viewport of the map,

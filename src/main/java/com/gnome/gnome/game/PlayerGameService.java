@@ -2,8 +2,8 @@ package com.gnome.gnome.game;
 
 import com.gnome.gnome.editor.utils.TypeOfObjects;
 import com.gnome.gnome.models.Potion;
-import com.gnome.gnome.monsters.Monster;
-import com.gnome.gnome.player.Player;
+import com.gnome.gnome.game.monsters.GameMonster;
+import com.gnome.gnome.game.player.Player;
 import com.gnome.gnome.userState.UserState;
 import javafx.scene.input.KeyEvent;
 
@@ -95,10 +95,10 @@ public class PlayerGameService {
 
         if (!player.canAttackNow()) return;
 
-        List<Monster> monsters = controller.getMonsterList();
+        List<GameMonster> gameMonsters = controller.getGameMonsterList();
 
-        List<Monster> eliminated = new ArrayList<>();
-        player.attack(monsters, 1, monster -> {
+        List<GameMonster> eliminated = new ArrayList<>();
+        player.attack(gameMonsters, 1, monster -> {
             eliminated.add(monster);
             controller.removeMonsters(List.of(monster));
         });

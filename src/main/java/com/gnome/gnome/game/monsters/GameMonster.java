@@ -1,12 +1,12 @@
-package com.gnome.gnome.monsters;
+package com.gnome.gnome.game.monsters;
 
 
-import com.gnome.gnome.camera.Camera;
+import com.gnome.gnome.game.camera.Camera;
 import com.gnome.gnome.editor.utils.TypeOfObjects;
 import com.gnome.gnome.game.GameController;
-import com.gnome.gnome.monsters.movements.FollowingMovement;
-import com.gnome.gnome.monsters.movements.MovementStrategy;
-import com.gnome.gnome.player.Player;
+import com.gnome.gnome.game.monsters.movements.FollowingMovement;
+import com.gnome.gnome.game.monsters.movements.MovementStrategy;
+import com.gnome.gnome.game.player.Player;
 import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
@@ -34,7 +34,7 @@ import static java.lang.Math.max;
  */
 @Data
 @AllArgsConstructor
-public abstract class Monster {
+public abstract class GameMonster {
     /**
      * The amount of damage the monster can deal.
      */
@@ -117,7 +117,7 @@ public abstract class Monster {
      * @param movementStrategy The strategy that determines how the monster moves.
      * @param imagePath The file path to the monster's image.
      */
-    public Monster(double attack, double health, double cost, double attackRange, String nameEng, String nameSk, int startX, int startY, int value, MovementStrategy movementStrategy, String  imagePath, String hitGifPath, String attackGifPath, int score) {
+    public GameMonster(double attack, double health, double cost, double attackRange, String nameEng, String nameSk, int startX, int startY, int value, MovementStrategy movementStrategy, String  imagePath, String hitGifPath, String attackGifPath, int score) {
         this.attack = attack; // Set the monster's attack damage
         this.health = health; // Set the monster's initial health
         this.cost = cost; // Set the coin reward for defeating the monster

@@ -1,7 +1,7 @@
 package com.gnome.gnome.game;
 
 import com.gnome.gnome.MainApplication;
-import com.gnome.gnome.camera.Camera;
+import com.gnome.gnome.game.camera.Camera;
 import com.gnome.gnome.components.PlayerHealthBar;
 import com.gnome.gnome.dao.MapDAO;
 import com.gnome.gnome.game.component.Chest;
@@ -9,16 +9,13 @@ import com.gnome.gnome.game.component.Coin;
 import com.gnome.gnome.editor.utils.TypeOfObjects;
 import com.gnome.gnome.game.component.CoinUIRenderer;
 import com.gnome.gnome.game.component.ItemUIRenderer;
+import com.gnome.gnome.game.monsters.GameMonster;
 import com.gnome.gnome.models.*;
 import com.gnome.gnome.models.Map;
-import com.gnome.gnome.monsters.Monster;
-import com.gnome.gnome.monsters.types.Skeleton;
-import com.gnome.gnome.monsters.types.missels.Arrow;
-import com.gnome.gnome.player.Player;
+import com.gnome.gnome.game.player.Player;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import com.gnome.gnome.userState.UserState;
 import com.gnome.gnome.utils.CustomPopupUtil;
-import com.sun.tools.javac.Main;
 import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -60,9 +57,8 @@ public class GameController {
     private int[][] fieldMap;
 
     private Camera camera;
-    private final List<Monster> monsterList = new ArrayList<>();
+    private final List<GameMonster> gameMonsterList = new ArrayList<>();
     private final List<Coin> coinsOnMap = new ArrayList<>();
-    private final List<Arrow> activeArrows = new ArrayList<>();
     private final List<Chest> activeChests = new ArrayList<>();
     private final List<com.gnome.gnome.models.Monster> dbMonsters = new ArrayList<>();
 
@@ -106,7 +102,7 @@ public class GameController {
     public GameController() {}
 
 
-    public void initializeWithLoadedMap(Map selectedMap,int[][] mapData, List<com.gnome.gnome.models.Monster> monsterList, Armor armor, Weapon weapon, Potion potion) {
+    public void initializeWithLoadedMap(Map selectedMap,int[][] mapData, List<Monster> monsterList, Armor armor, Weapon weapon, Potion potion) {
         this.baseMap = mapData;
         this.fieldMap = GameInitializer.copyMap(baseMap);
         this.debugModGame = GameInitializer.loadProperties("app.debug_mod_game");
@@ -119,7 +115,7 @@ public class GameController {
 
         this.bundle = MainApplication.getLangBundle();
 
-        GameInitializer.setupMap(fieldMap, dbMonsters, this.monsterList, this.activeChests, armor, weapon);
+        GameInitializer.setupMap(fieldMap, dbMonsters, this.gameMonsterList, this.activeChests, armor, weapon);
 
         this.player = Player.getInstance();
         this.camera = Camera.getInstance(fieldMap, 0, 0, player, armor, weapon, potion);
@@ -250,14 +246,14 @@ public class GameController {
             }
         }
 
-        for (Monster monster : monsterList) {
-            ImageView monsterView = monster.getRepresentation();
-            monsterView.getProperties().put("gridX", monster.getX());
-            monsterView.getProperties().put("gridY", monster.getY());
-            monster.updateVisual(camera);
-            System.out.println("Adding monster view: " + monster.getNameEng() +
-                    ", visible=" + monster.getRepresentation().isVisible() +
-                    ", parent=" + monster.getRepresentation().getParent());
+        for (GameMonster gameMonster : gameMonsterList) {
+            ImageView monsterView = gameMonster.getRepresentation();
+            monsterView.getProperties().put("gridX", gameMonster.getX());
+            monsterView.getProperties().put("gridY", gameMonster.getY());
+            gameMonster.updateVisual(camera);
+            System.out.println("Adding monster view: " + gameMonster.getNameEng() +
+                    ", visible=" + gameMonster.getRepresentation().isVisible() +
+                    ", parent=" + gameMonster.getRepresentation().getParent());
             if (!gameObjectsPane.getChildren().contains(monsterView)) {
                 gameObjectsPane.getChildren().add(monsterView);
             }
@@ -274,9 +270,8 @@ public class GameController {
             GameController.instance = null;
 
         viewportCanvas = null;
-        monsterList.clear();
+        gameMonsterList.clear();
         coinsOnMap.clear();
-        activeArrows.clear();
         gameObjectsPane.getChildren().clear();
         isStop = false;
     }
@@ -286,8 +281,8 @@ public class GameController {
         scene.getRoot().requestFocus();
     }
 
-    public boolean isBlocked(int x, int y, Monster self) {
-        return monsterList.stream().anyMatch(m -> m != self && m.getX() == x && m.getY() == y) ||
+    public boolean isBlocked(int x, int y, GameMonster self) {
+        return gameMonsterList.stream().anyMatch(m -> m != self && m.getX() == x && m.getY() == y) ||
                 activeChests.stream().anyMatch(ch -> ch.getGridX() == x && ch.getGridY() == y);
     }
 
@@ -357,7 +352,7 @@ public class GameController {
     }
 
     private void onHatchStepped() {
-        if (!monsterList.isEmpty()) {
+        if (!gameMonsterList.isEmpty()) {
             if (rootBorder.getScene() != null && rootBorder.getScene().getWindow() != null) {
                 Stage stage = (Stage) rootBorder.getScene().getWindow();
                 if (debugModGame) System.out.println("You must kill all monsters before using the hatch!");
@@ -476,7 +471,7 @@ public class GameController {
      *
      * @param eliminated A list of monsters to remove (e.g., monsters killed by the player's attack).
      */
-    void removeMonsters(List<Monster> eliminated) {
+    void removeMonsters(List<GameMonster> eliminated) {
         eliminated.forEach(monster -> {
             int x = monster.getX(), y = monster.getY();
             coinsOnMap.add(new Coin(x, y, monster.getCost()));
@@ -486,7 +481,7 @@ public class GameController {
             gameObjectsPane.getChildren().remove(monster.getRepresentation());
         });
 
-        monsterList.removeAll(eliminated);
+        gameMonsterList.removeAll(eliminated);
         renderGame();
     }
 
@@ -514,7 +509,7 @@ public class GameController {
         }
         drawAttackRange(gc, 1);
 
-        monsterList.forEach(monster -> {
+        gameMonsterList.forEach(monster -> {
             monster.updateVisual(camera);
             ImageView view = monster.getRepresentation();
 
@@ -541,8 +536,6 @@ public class GameController {
                 gameObjectsPane.getChildren().remove(c.getImageView());
             }
         });
-        activeArrows.forEach(a -> a.updateCameraOffset(camera.getStartCol(), camera.getStartRow()));
-
         player.setDynamicTileSize(Math.min(camera.getTileWidth(), camera.getTileHeight()));
         player.updatePositionWithCamera(camera.getStartCol(), camera.getStartRow(), camera.getTileWidth(), camera.getTileHeight(), this::checkCoinPickup);
 
@@ -590,7 +583,6 @@ public class GameController {
                 if (now - lastTime >= UPDATE_INTERVAL) {
                     double delta = (now - lastTime) / 1_000_000_000.0;
                     updateMonsters(delta);
-                    updateProjectiles(delta);
                     renderGame();
                     lastTime = now;
                 }
@@ -602,50 +594,24 @@ public class GameController {
     private void updateMonsters(double delta) {
         if (isGameOver || isStop) return;
 
-        List<Monster> toRemove = new ArrayList<>();
+        List<GameMonster> toRemove = new ArrayList<>();
 
-        for (Monster monster : monsterList) {
-            if (monster.getHealth() <= 0) {
-                toRemove.add(monster);
+        for (GameMonster gameMonster : gameMonsterList) {
+            if (gameMonster.getHealth() <= 0) {
+                toRemove.add(gameMonster);
                 continue;
             }
-            if (monster.getRepresentation().getParent() == null) {
-                gameObjectsPane.getChildren().add(monster.getRepresentation());
+            if (gameMonster.getRepresentation().getParent() == null) {
+                gameObjectsPane.getChildren().add(gameMonster.getRepresentation());
             }
-            monster.updateLogic(player, delta, fieldMap, baseMap);
-
-            if (monster instanceof Skeleton skeleton) {
-                if (skeleton.canShootArrow() && !skeleton.hasActiveArrow() &&
-                        !isLineOfSightClear(skeleton.getX(), skeleton.getY(), player.getX(), player.getY())) {
-                    Arrow arrow = skeleton.shootArrowTowards(player);
-                    if (arrow != null) {
-                        arrow.setDynamicTileSize(camera.getDynamicTileSize());
-                        arrow.updateCameraOffset(camera.getStartCol(), camera.getStartRow());
-                        activeArrows.add(arrow);
-                        arrow.shoot(gameObjectsPane, player);
-                    }
-                }
-            } else {
-                monster.meleeAttack(player, gameObjectsPane, System.nanoTime());
-            }
+            gameMonster.updateLogic(player, delta, fieldMap, baseMap);
+            gameMonster.meleeAttack(player, gameObjectsPane, System.nanoTime());
         }
 
         if (!toRemove.isEmpty()) {
             removeMonsters(toRemove);
         }
     }
-
-    private void updateProjectiles(double delta) {
-        activeArrows.removeIf(arrow -> {
-            arrow.update(delta);
-            if (arrow.hasHitTarget()) {
-                gameObjectsPane.getChildren().remove(arrow.getView());
-                return true;
-            }
-            return false;
-        });
-    }
-
 
     public void shakeCamera() {
         if (isGameOver) return;

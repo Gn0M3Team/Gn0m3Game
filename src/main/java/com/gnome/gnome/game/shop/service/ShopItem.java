@@ -1,5 +1,5 @@
-package com.gnome.gnome.shop.service;
-import com.gnome.gnome.shop.utils.ItemCategory;
+package com.gnome.gnome.game.shop.service;
+import com.gnome.gnome.game.shop.utils.ItemCategory;
 import lombok.Getter;
 import javafx.scene.image.Image;
 

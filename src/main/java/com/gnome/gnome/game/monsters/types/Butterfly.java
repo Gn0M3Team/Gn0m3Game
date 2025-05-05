@@ -1,10 +1,10 @@
-package com.gnome.gnome.monsters.types;
+package com.gnome.gnome.game.monsters.types;
 
 import com.gnome.gnome.editor.utils.TypeOfObjects;
-import com.gnome.gnome.monsters.Monster;
-import com.gnome.gnome.monsters.movements.RandomMovement;
+import com.gnome.gnome.game.monsters.GameMonster;
+import com.gnome.gnome.game.monsters.movements.RandomMovement;
 
-public class Butterfly extends Monster {
+public class Butterfly extends GameMonster {
     public Butterfly(int startX, int startY, com.gnome.gnome.models.Monster dbMonster) {
         super(dbMonster.getAttack(),
                 dbMonster.getHealth(),

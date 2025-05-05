@@ -1,7 +1,6 @@
 package com.gnome.gnome.game.component;
 
-import com.gnome.gnome.camera.Camera;
-import com.gnome.gnome.player.Player;
+import com.gnome.gnome.game.player.Player;
 import com.gnome.gnome.userState.UserState;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;

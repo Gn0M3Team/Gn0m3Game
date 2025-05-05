@@ -2,11 +2,12 @@ package com.gnome.gnome.game;
 
 import com.gnome.gnome.editor.utils.TypeOfObjects;
 import com.gnome.gnome.game.component.Chest;
+import com.gnome.gnome.game.monsters.GameMonster;
 import com.gnome.gnome.models.Armor;
 import com.gnome.gnome.models.Monster;
 import com.gnome.gnome.models.Weapon;
-import com.gnome.gnome.monsters.MonsterFactory;
-import com.gnome.gnome.player.Player;
+import com.gnome.gnome.game.monsters.MonsterFactory;
+import com.gnome.gnome.game.player.Player;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,7 +30,7 @@ public class GameInitializer {
 
     public static void setupMap(int[][] fieldMap,
                                 List<Monster> importedMonsterList,
-                                List<com.gnome.gnome.monsters.Monster> monsterList,
+                                List<GameMonster> gameMonsterList,
                                 List<Chest> activeChests,
                                 Armor armor,
                                 Weapon weapon) {
@@ -54,9 +55,9 @@ public class GameInitializer {
                 if (tile < 0) {
                     com.gnome.gnome.models.Monster dbMonster = findMonsterById(importedMonsterList, tile);
                     if (dbMonster == null) throw new RuntimeException("Monster not found: " + tile);
-                    com.gnome.gnome.monsters.Monster m = MonsterFactory.createMonster(tileType, col, row, dbMonster);
+                    GameMonster m = MonsterFactory.createMonster(tileType, col, row, dbMonster);
                     fieldMap[row][col] = TypeOfObjects.FLOOR.getValue();
-                    monsterList.add(m);
+                    gameMonsterList.add(m);
                 }
             }
         }

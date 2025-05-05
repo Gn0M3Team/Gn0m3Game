@@ -1,9 +1,9 @@
-package com.gnome.gnome.shop.controllers;
+package com.gnome.gnome.game.shop.controllers;
 
 import com.gnome.gnome.MainApplication;
 import com.gnome.gnome.exceptions.BalanceException;
-import com.gnome.gnome.shop.service.ShopItem;
-import com.gnome.gnome.shop.service.ShopService;
+import com.gnome.gnome.game.shop.service.ShopItem;
+import com.gnome.gnome.game.shop.service.ShopService;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;

@@ -1,4 +1,4 @@
-package com.gnome.gnome.shop.service;
+package com.gnome.gnome.game.shop.service;
 
 import com.gnome.gnome.dao.ArmorDAO;
 import com.gnome.gnome.dao.PotionDAO;
@@ -6,7 +6,7 @@ import com.gnome.gnome.dao.WeaponDAO;
 import com.gnome.gnome.models.Armor;
 import com.gnome.gnome.models.Potion;
 import com.gnome.gnome.models.Weapon;
-import com.gnome.gnome.shop.utils.ItemCategory;
+import com.gnome.gnome.game.shop.utils.ItemCategory;
 
 import java.util.ArrayList;
 import java.util.Collections;
