@@ -2,13 +2,17 @@ package com.gnome.gnome.shop.controllers;
 
 import com.gnome.gnome.MainApplication;
 import com.gnome.gnome.game.GameController;
+import com.gnome.gnome.game.component.CoinUIRenderer;
+import com.gnome.gnome.game.component.ItemUIRenderer;
 import com.gnome.gnome.shop.service.ShopItem;
 import com.gnome.gnome.shop.service.ShopService;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
+import com.gnome.gnome.userState.UserState;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -49,7 +53,7 @@ public class ShopController {
     @FXML
     private Button exitButton;
     @FXML
-    private BorderPane shopPopUpPage;
+    private BorderPane shopContainer;
     @FXML
     private GridPane itemsContainer;
     @FXML
@@ -85,12 +89,6 @@ public class ShopController {
         if (onExit != null) onExit.run();
     }
 
-    private void closePopup() {
-        Stage stage = (Stage) exitButton.getScene().getWindow();
-        stage.close();
-    }
-
-
     /**
      * Loads random items for shop
      * Render items into the UI
@@ -99,6 +97,8 @@ public class ShopController {
     public void loadItems() {
         int cellIndex = 0;
         List<ShopItem> items = shopService.get_shop_items();
+
+        renderHUD();
 
         for (var node : itemsContainer.getChildren()) {
             if (!(node instanceof VBox cell)) continue;
@@ -124,6 +124,30 @@ public class ShopController {
     }
 
     /**
+     * Render the HUD including inventory and coins of the player
+     */
+    protected void renderHUD() {
+        UserState userState = UserState.getInstance();
+        VBox itemBoxContent = new VBox(20);
+        itemBoxContent.setAlignment(Pos.CENTER);
+        itemBoxContent.setPickOnBounds(false);
+        itemBoxContent.setMouseTransparent(true);
+
+        ItemUIRenderer itemUIRenderer = new ItemUIRenderer(itemBoxContent);
+        itemUIRenderer.render();
+
+        CoinUIRenderer coinUIRenderer = new CoinUIRenderer(itemBoxContent, userState);
+        coinUIRenderer.render();
+
+        StackPane itemBox = new StackPane(itemBoxContent);
+        itemBox.setAlignment(Pos.CENTER);
+        itemBox.setPrefWidth(200);
+        itemBox.setStyle("-fx-padding: 0 20 0 0;");
+
+        shopContainer.setRight(itemBox);
+    }
+
+    /**
      * Displays a modal dialog for the selected item.
      * The dialog shows the item's name and description,
      * a “Buy” button for purchasing the item.
@@ -143,13 +167,14 @@ public class ShopController {
             ItemController itemController = loader.getController();
 
             Stage popup = new Stage();
-            popup.initOwner(shopPopUpPage.getScene().getWindow());
+            popup.initOwner(shopContainer.getScene().getWindow());
             popup.initModality(Modality.APPLICATION_MODAL);
             Image image = item.getImage();
             itemController.setItemData(item, new ImageView(image));
 
             popup.setScene(new Scene(root));
             popup.showAndWait();
+            renderHUD();
         } catch (IOException e) {
             logger.severe("Failed to load item's data popup: " + e.getMessage());
             throw new RuntimeException("Failed to load item's data popup: " + e.getMessage());

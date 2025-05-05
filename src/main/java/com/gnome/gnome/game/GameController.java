@@ -20,9 +20,6 @@ import com.gnome.gnome.userState.UserState;
 import com.gnome.gnome.utils.CustomPopupUtil;
 import com.sun.tools.javac.Main;
 import javafx.animation.AnimationTimer;
-import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.DoubleBinding;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -43,7 +40,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
 
-import static java.lang.Double.min;
 import static java.lang.Math.max;
 
 @Getter
@@ -181,7 +177,7 @@ public class GameController {
         itemBoxContent.setMouseTransparent(true);
 
         itemUIRenderer = new ItemUIRenderer(itemBoxContent);
-        itemUIRenderer.render(armor, weapon, potion);
+        itemUIRenderer.render();
 
         coinUIRenderer = new CoinUIRenderer(itemBoxContent, player);
         coinUIRenderer.render();
