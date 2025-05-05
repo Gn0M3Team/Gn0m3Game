@@ -187,7 +187,7 @@ public class GameUIManager {
             pageSwitch.goMainMenu(controller.getRootBorder());
         });
 
-        menuBox.getChildren().addAll(title, resumeButton, settingsButton, goBackButton);
+        menuBox.getChildren().addAll(title, resumeButton, goBackButton);
 
         controller.getCenterStack().getChildren().addAll(darkOverlay, menuBox);
         StackPane.setAlignment(menuBox, Pos.CENTER);

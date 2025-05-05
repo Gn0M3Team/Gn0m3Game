@@ -12,12 +12,16 @@ import com.gnome.gnome.models.user.AuthUser;
 import com.gnome.gnome.models.user.UserGameState;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
+import com.gnome.gnome.utils.CustomPopupUtil;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
+import java.sql.SQLException;
 
 /**
  * Controller class for the Login and Registration view.
@@ -113,28 +117,18 @@ public class LoginRegistrationController {
             return;
         }
 
-
-        LoginResult result = LoginRegistrationService.loginUser(username, password);
-
-        if (result.getUser() != null) {
-            UserSession.getInstance().setCurrentUser(result.getUser());
-
-            AuthUserDAO authUserDAO = new AuthUserDAO();
-            UserGameStateDAO userGameStateDAO = new UserGameStateDAO();
-            UserStatisticsDAO userStatisticsDAO = new UserStatisticsDAO();
-
-            UserGameState userGameState = userGameStateDAO.getUserGameStateByUsername(username);
-            AuthUser authUser = authUserDAO.getAuthUserByUsername(username);
-            UserStatistics userStatistics = userStatisticsDAO.getUserStatisticsByUsername(username);
-
-            if (authUser != null && userGameState != null && userStatistics != null) {
-                UserState.init(authUser, userGameState, userStatistics);
+        try {
+            LoginResult result = LoginRegistrationService.loginUser(username, password);
+            if (result.getUser() != null) {
+                userUploaded(result, username);
+            } else {
+                loginMessage.setText(result.getMessage());
             }
-
-            pageSwitch.goMainMenu(loginRegistretion);
-        } else {
-            loginMessage.setText(result.getMessage());
+        } catch (Exception e) {
+            Stage stage = (Stage) loginUsername.getScene().getWindow();
+            CustomPopupUtil.showError(stage, "Check your internet connection");
         }
+
     }
     /**
      * Handles the user registration process triggered by the registration button.
@@ -148,8 +142,8 @@ public class LoginRegistrationController {
      */
     @FXML
     public void handleRegister(ActionEvent event){
-        String username= registerUsername.getText();
-        String password=registerPassword.getText();
+        String username = registerUsername.getText();
+        String password = registerPassword.getText();
         String confirmPassword = registerConfirmPassword.getText();
 
         if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
@@ -166,15 +160,18 @@ public class LoginRegistrationController {
             registerMessage.setText("Username must be less than 32 characters.");
             return;
         }
-        LoginResult result = LoginRegistrationService.registerUser(username, password);
 
-        if (result.getUser() != null) {
-            registerMessage.setText("Registration successful. You can now log in.");
+        try {
+            LoginResult result = LoginRegistrationService.registerUser(username, password);
 
-            loginUsername.setText(username);
-            loginPassword.setText("");
-        } else {
-            registerMessage.setText(result.getMessage());
+            if (result.getUser() != null) {
+                userUploaded(result, username);
+            } else {
+                registerMessage.setText(result.getMessage());
+            }
+        } catch (Exception e) {
+            Stage stage = (Stage) loginUsername.getScene().getWindow();
+            CustomPopupUtil.showError(stage, "Check your internet connection");
         }
     }
 
@@ -186,6 +183,24 @@ public class LoginRegistrationController {
     @FXML
     public void onExitButtonClick(ActionEvent event) {
         Platform.exit();
+    }
+
+    public void userUploaded(LoginResult result, String username) {
+        UserSession.getInstance().setCurrentUser(result.getUser());
+
+        AuthUserDAO authUserDAO = new AuthUserDAO();
+        UserGameStateDAO userGameStateDAO = new UserGameStateDAO();
+        UserStatisticsDAO userStatisticsDAO = new UserStatisticsDAO();
+
+        UserGameState userGameState = userGameStateDAO.getUserGameStateByUsername(username);
+        AuthUser authUser = authUserDAO.getAuthUserByUsername(username);
+        UserStatistics userStatistics = userStatisticsDAO.getUserStatisticsByUsername(username);
+
+        if (authUser != null && userGameState != null && userStatistics != null) {
+            UserState.init(authUser, userGameState, userStatistics);
+        }
+
+        pageSwitch.goMainMenu(loginRegistretion);
     }
 
 }

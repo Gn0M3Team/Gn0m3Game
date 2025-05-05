@@ -97,23 +97,27 @@ public class LoginRegistrationService {
      *         or an error message if registration fails (e.g., username already exists)
      */
     public static LoginResult registerUser(String username, String password){
+        try{
+            AuthUser existing =authUserDAO.getAuthUserByUsername(username);
+            if (existing != null) {
+                return new LoginResult(null, "User already exists.");
+            }
+            if (!isPasswordValid(password)){
+                return new LoginResult(null, "Password should contains at least one uppercase letter, one digit, one " +
+                        "special character, and is at least 6 characters long.");
+            }
 
-        AuthUser existing =authUserDAO.getAuthUserByUsername(username);
-        if (existing != null) {
-            return new LoginResult(null, "User already exists.");
+            AuthUser newUser = new AuthUser(username, PasswordUtils.hashPassword(password),PlayerRole.USER);
+            authUserDAO.insertAuthUser(newUser);
+
+            UserStatistics newUserStatistics = new UserStatistics(username);
+            userStatisticsDAO.insertUserStatistics(newUserStatistics);
+
+
+            return new LoginResult(newUser, "successfully registered ");
+        } catch (Exception e){
+            System.out.println("DB error");
         }
-        if (!isPasswordValid(password)){
-            return new LoginResult(null, "Password should contains at least one uppercase letter, one digit, one " +
-                    "special character, and is at least 6 characters long.");
-        }
-
-        AuthUser newUser = new AuthUser(username, PasswordUtils.hashPassword(password),PlayerRole.USER);
-        authUserDAO.insertAuthUser(newUser);
-
-        UserStatistics newUserStatistics = new UserStatistics(username);
-        userStatisticsDAO.insertUserStatistics(newUserStatistics);
-
-
-        return new LoginResult(newUser, "successfully registered ");
+        return null;
     }
 }
