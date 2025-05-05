@@ -98,15 +98,15 @@ public class InventoryController {
         // Update Weapon UI
         if (weapon != null && userState.getWeaponId() != 0) {
             weaponImage.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/gnome/gnome/images/tiles/" + weapon.getImg() + ".png"))));
-            weaponName.setText(MainApplication.getLang() == 'E' ? weapon.getNameEng() : weapon.getNameSk());
-            weaponDescription.setText(MainApplication.getLang() == 'E' ? weapon.getDetailsEng() : weapon.getDetailsSk());
-            weaponCost.setText("Cost: " + weapon.getCost());
-            weaponBoost.setText("Attack: +" + weapon.getAtkValue());
+            weaponName.setText(weapon.getName());
+            weaponDescription.setText(weapon.getDetails() );
+            weaponCost.setText(bundle.getString("label.cost") + weapon.getCost());
+            weaponBoost.setText(bundle.getString("label.attack") + weapon.getAtkValue());
             sellWeaponButton.setDisable(false);
         } else {
             weaponImage.setImage(null); // Clear image
-            weaponName.setText(MainApplication.getLang() == 'E' ? "No Weapon Equipped" : "Žiadna zbraň nevybavená");
-            weaponDescription.setText(MainApplication.getLang() == 'E' ? "Purchase a weapon in the shop to equip it." : "Kúpte si zbraň v obchode, aby ste ju mohli vybaviť.");
+            weaponName.setText(bundle.getString("equipment.weapon.none"));
+            weaponDescription.setText(bundle.getString("equipment.weapon.purchase.hint"));
             weaponCost.setText("");
             weaponBoost.setText("");
             sellWeaponButton.setDisable(true);
@@ -117,13 +117,13 @@ public class InventoryController {
             armorImage.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/gnome/gnome/images/tiles/" + armor.getImg() + ".png"))));
             armorName.setText(MainApplication.getLang() == 'E' ? armor.getNameEng() : armor.getNameSk());
             armorDescription.setText(MainApplication.getLang() == 'E' ? armor.getDetailsEng() : armor.getDetailsSk());
-            armorCost.setText("Cost: " + armor.getCost());
-            armorBoost.setText("Defense: +" + armor.getDefCof() + " | Health: +" + armor.getHealth());
+            armorCost.setText(bundle.getString("label.cost") + armor.getCost());
+            armorBoost.setText(bundle.getString("label.defense") + armor.getDefCof() + " | " + bundle.getString("label.health")+ armor.getHealth());
             sellArmorButton.setDisable(false);
         } else {
             armorImage.setImage(null); // Clear image
-            armorName.setText(MainApplication.getLang() == 'E' ? "No Armor Equipped" : "Žiadne brnenie nevybavené");
-            armorDescription.setText(MainApplication.getLang() == 'E' ? "Purchase armor in the shop to equip it." : "Kúpte si brnenie v obchode, aby ste ho mohli vybaviť.");
+            armorName.setText(bundle.getString("equipment.armor.none"));
+            armorDescription.setText(bundle.getString("equipment.armor.purchase.hint"));
             armorCost.setText("");
             armorBoost.setText("");
             sellArmorButton.setDisable(true);
@@ -132,15 +132,15 @@ public class InventoryController {
         // Update Potion UI
         if (potion != null && userState.getPotionId() != 0) {
             potionImage.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/gnome/gnome/images/tiles/" + potion.getImg1() + ".png"))));
-            potionName.setText(MainApplication.getLang() == 'E' ? potion.getNameEng() : potion.getNameSk());
-            potionDescription.setText(MainApplication.getLang() == 'E' ? potion.getDetailsEng() : potion.getDetailsSk());
-            potionCost.setText("Cost: " + potion.getCost());
-            potionBoost.setText("Heal Boost: +" + potion.getScoreVal());
+            potionName.setText(potion.getName() );
+            potionDescription.setText(potion.getDetails());
+            potionCost.setText(bundle.getString("label.cost") + potion.getCost());
+            potionBoost.setText(bundle.getString("label.heal") + potion.getScoreVal());
             sellPotionButton.setDisable(false);
         } else {
             potionImage.setImage(null); // Clear image
-            potionName.setText(MainApplication.getLang() == 'E' ? "No Potion Available" : "Žiadny elixír k dispozícii");
-            potionDescription.setText(MainApplication.getLang() == 'E' ? "Complete levels to unlock potions." : "Dokončite úrovne, aby ste odomkli elixíry.");
+            potionName.setText(bundle.getString("equipment.potion.none"));
+            potionDescription.setText(bundle.getString("equipment.potion.unlock.hint"));
             potionCost.setText("");
             potionBoost.setText("");
             sellPotionButton.setDisable(true);
