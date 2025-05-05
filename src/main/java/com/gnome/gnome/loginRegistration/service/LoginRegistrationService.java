@@ -3,9 +3,11 @@ package com.gnome.gnome.loginRegistration.service;
 import com.gnome.gnome.dao.UserStatisticsDAO;
 import com.gnome.gnome.dao.userDAO.AuthUserDAO;
 import com.gnome.gnome.dao.userDAO.PasswordUtils;
+import com.gnome.gnome.dao.userDAO.UserGameStateDAO;
 import com.gnome.gnome.models.UserStatistics;
 import com.gnome.gnome.models.user.AuthUser;
 import com.gnome.gnome.models.user.PlayerRole;
+import com.gnome.gnome.models.user.UserGameState;
 
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -59,47 +61,55 @@ public class LoginRegistrationService {
 
 
     /**
-     * Attempting to log in the user. If the user does not exist, it is registered.
+     * Attempts to log in an existing user by verifying the provided credentials.
      *
-     * @param username username
-     * @param password password
-     * @return AuthUser object if login or registration is successful, or null if failed
+     * @param username the username entered by the user
+     * @param password the plain-text password entered by the user
+     * @return a {@link LoginResult} object containing the authenticated {@link AuthUser} if successful,
+     *         or an error message if login fails (e.g., user not found or incorrect password)
      */
-    public static LoginResult loginOrRegisterUser(String username, String password) {
+    public static LoginResult loginUser(String username, String password) {
         try {
-
-            if (!isPasswordValid(password)){
-                return new LoginResult(null, "Password must be at least 12 characters, with 1 uppercase letter, 1 number, and 1 special character.");
-            }
-
             AuthUser user = authUserDAO.getAuthUserByUsername(username);
 
-            if (user != null) {
-                if (PasswordUtils.checkPassword(password, user.getPassword())){
-                    System.out.println("User found: " + user);
-                    return new LoginResult(user,null);
-                }else {
-                    return new LoginResult(null, "Incorrect password.");
-                }
-            } else {
-                AuthUser newUser = new AuthUser(username, PasswordUtils.hashPassword(password), PlayerRole.USER);
-                authUserDAO.insertAuthUser(newUser);
-
-                UserStatistics newUserStatistics = new UserStatistics(username);
-                userStatisticsDAO.insertUserStatistics(newUserStatistics);
-
-                System.out.println("User not found. User creation: " + username);
-
-                user = authUserDAO.getAuthUserByUsername(username);
-                if (user != null) {
-                    return new LoginResult(user, null);
-                } else {
-                    return new LoginResult(null, "Failed to create user.");
-                }
+            if (user == null) {
+                return new LoginResult(null, "User does not exist.");
             }
+
+            if (!PasswordUtils.checkPassword(password, user.getPassword())) {
+                return new LoginResult(null, "Incorrect password.");
+            }
+
+            return new LoginResult(user, null);
         } catch (Exception e) {
-            System.err.println("Error: " + e.getMessage());
-            return null;
+            System.err.println("Login error: " + e.getMessage());
+            return new LoginResult(null, "An error occurred during login.");
         }
+    }
+
+    /**
+     * Registers a new user with the provided credentials if the username is not already taken.
+     * The password is securely hashed before storage.
+     *
+     * @param username the desired username for the new user
+     * @param password the plain-text password for the new user
+     * @return a {@link LoginResult} object containing the created {@link AuthUser} if successful,
+     *         or an error message if registration fails (e.g., username already exists)
+     */
+    public static LoginResult registerUser(String username, String password){
+
+        AuthUser existing =authUserDAO.getAuthUserByUsername(username);
+        if (existing != null) {
+            return new LoginResult(null, "User already exists.");
+        }
+
+        AuthUser newUser = new AuthUser(username, PasswordUtils.hashPassword(password),PlayerRole.USER);
+        authUserDAO.insertAuthUser(newUser);
+
+        UserStatistics newUserStatistics = new UserStatistics(username);
+        userStatisticsDAO.insertUserStatistics(newUserStatistics);
+
+
+        return new LoginResult(newUser, "successfully registered ");
     }
 }

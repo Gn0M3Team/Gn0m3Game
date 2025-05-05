@@ -17,6 +17,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 
 /**
  * Controller class for the Login and Registration view.
@@ -30,6 +31,16 @@ public class LoginRegistrationController {
     @FXML private PasswordField loginPassword;
     @FXML private Label loginMessage;
 
+    @FXML private TextField registerUsername;
+    @FXML private PasswordField registerPassword;
+    @FXML private PasswordField registerConfirmPassword;
+    @FXML private Label registerMessage;
+
+    @FXML private RadioButton loginRadio;
+    @FXML private RadioButton registerRadio;
+    @FXML private VBox loginPane;
+    @FXML private VBox registerPane;
+
     @FXML
     public BorderPane loginRegistretion;
     private PageSwitcherInterface pageSwitch;
@@ -41,6 +52,46 @@ public class LoginRegistrationController {
     @FXML
     private void initialize() {
         pageSwitch = new SwitchPage();
+        showLoginPane();
+    }
+
+    /**
+     * Switches the UI to display the login pane.
+     * Triggered when the "Login" radio button is selected.
+     */
+    @FXML
+    private void switchToLogin() {
+        showLoginPane();
+    }
+
+    /**
+     * Switches the UI to display the registration pane.
+     * Triggered when the "Register" radio button is selected.
+     */
+    @FXML
+    private void switchToRegister() {
+        showRegisterPane();
+    }
+    /**
+     * Makes the login pane visible and hides the registration pane.
+     * Also ensures only the visible pane is managed by the layout.
+     */
+    private void showLoginPane() {
+        loginPane.setVisible(true);
+        loginPane.setManaged(true);
+        registerPane.setVisible(false);
+        registerPane.setManaged(false);
+    }
+
+    /**
+     * Makes the registration pane visible and hides the login pane.
+     * Also ensures only the visible pane is managed by the layout.
+     */
+    private void showRegisterPane() {
+        registerPane.setVisible(true);
+        registerPane.setManaged(true);
+        loginPane.setVisible(false);
+        loginPane.setManaged(false);
     }
 
     /**
@@ -63,7 +114,7 @@ public class LoginRegistrationController {
         }
 
 
-        LoginResult result = LoginRegistrationService.loginOrRegisterUser(username, password);
+        LoginResult result = LoginRegistrationService.loginUser(username, password);
 
         if (result.getUser() != null) {
             UserSession.getInstance().setCurrentUser(result.getUser());
@@ -83,6 +134,47 @@ public class LoginRegistrationController {
             pageSwitch.goMainMenu(loginRegistretion);
         } else {
             loginMessage.setText(result.getMessage());
+        }
+    }
+    /**
+     * Handles the user registration process triggered by the registration button.
+     *
+     * Validates the input fields (username, password, and confirm password),
+     * checks for empty fields, password confirmation match, and username length.
+     * If validation passes, it attempts to register the user via the {@link LoginRegistrationService}.
+     * On successful registration, it pre-fills the login fields for convenience.
+     *
+     * @param event the action event triggered by the register button
+     */
+    @FXML
+    public void handleRegister(ActionEvent event){
+        String username= registerUsername.getText();
+        String password=registerPassword.getText();
+        String confirmPassword = registerConfirmPassword.getText();
+
+        if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+            registerMessage.setText("Please fill in all fields.");
+            return;
+        }
+
+        if (!password.equals(confirmPassword)) {
+            registerMessage.setText("Passwords do not match.");
+            return;
+        }
+
+        if (username.length() > 32) {
+            registerMessage.setText("Username must be less than 32 characters.");
+            return;
+        }
+        LoginResult result = LoginRegistrationService.registerUser(username, password);
+
+        if (result.getUser() != null) {
+            registerMessage.setText("Registration successful. You can now log in.");
+
+            loginUsername.setText(username);
+            loginPassword.setText("");
+        } else {
+            registerMessage.setText(result.getMessage());
         }
     }
 
