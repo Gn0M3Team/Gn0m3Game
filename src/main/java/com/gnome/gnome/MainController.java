@@ -13,6 +13,7 @@ import com.gnome.gnome.dao.userDAO.UserSession;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import com.gnome.gnome.components.LeaderBoardView;
+import com.gnome.gnome.utils.CongratsPopUp;
 import com.gnome.gnome.utils.CustomPopupUtil;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
@@ -120,7 +121,7 @@ public class MainController {
                 if (selectedMap != null)
                     new MapLoaderUIHandler(mapLoaderService, primaryStage).showStartMap(selectedMap);
                 else
-                    CustomPopupUtil.showInfo(primaryStage, bundle.getString("continue.game.alert"));
+                    CongratsPopUp.showSuccess(primaryStage, bundle.getString("continue.game.alert"));
             }
         });
     }

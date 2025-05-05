@@ -4,7 +4,13 @@ import com.gnome.gnome.MainApplication;
 import com.gnome.gnome.db.DatabaseWrapper;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import javafx.application.Platform;
-import javafx.scene.control.Alert;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
+import javafx.stage.Popup;
+import javafx.stage.Stage;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -31,7 +37,6 @@ public class InternetMonitor {
                 .build();
 
         this.bundle = MainApplication.getLangBundle();
-
     }
 
     public void start() {
@@ -39,6 +44,51 @@ public class InternetMonitor {
             while (!isEnd) {
                 boolean connected = hasInternetConnection();
                 if (!connected) {
+                    running = false;
+                    Platform.runLater(() -> {
+                        // Get the current stage
+                        Stage primaryStage = MainApplication.getPrimaryStage();
+                        if (primaryStage == null) return;
+
+                        // Redirect to the main menu
+                        pageSwitcher.goToBeginning();
+
+                        // Create the popup
+                        Popup popup = new Popup();
+                        popup.setAutoHide(true);
+
+                        VBox popupContent = new VBox(20);
+                        popupContent.getStylesheets().add(getClass().getResource("/com/gnome/gnome/pages/css/dialogs/internet-error-popup.css").toExternalForm());
+                        popupContent.getStyleClass().add("error-popup");
+                        popupContent.setAlignment(Pos.CENTER);
+                        popupContent.setMaxWidth(400);
+
+                        Label title = new Label(bundle.getString("internet.lost.alert.title"));
+                        title.getStyleClass().add("popup-title");
+
+                        Label messageLabel = new Label(bundle.getString("internet.lost.alert.text"));
+                        messageLabel.getStyleClass().add("popup-message");
+
+                        Button okButton = new Button("OK");
+                        okButton.getStyleClass().add("popup-button");
+                        okButton.setOnAction(e -> popup.hide());
+
+                        popupContent.getChildren().addAll(title, messageLabel, okButton);
+                        popup.getContent().add(popupContent);
+
+                        // Center the popup in the stage
+                        Scene scene = primaryStage.getScene();
+                        if (scene != null) {
+                            javafx.geometry.Bounds bounds = scene.getRoot().localToScreen(scene.getRoot().getBoundsInLocal());
+                            double centerX = bounds.getMinX() + bounds.getWidth() / 2;
+                            double centerY = bounds.getMinY() + bounds.getHeight() / 2;
+                            double popupWidth = popupContent.getWidth() > 0 ? popupContent.getWidth() : 400;
+                            double popupHeight = popupContent.getHeight() > 0 ? popupContent.getHeight() : 200;
+                            popup.setX(centerX - popupWidth / 2);
+                            popup.setY(centerY - popupHeight / 2);
+                            popup.show(primaryStage);
+                        }
+                    });
                     if (running) {
                         Platform.runLater(() -> {
                             DatabaseWrapper.getInstance().close();

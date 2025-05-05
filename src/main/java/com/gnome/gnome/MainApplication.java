@@ -30,6 +30,8 @@ public class MainApplication extends Application {
     public static boolean musicEnabled = true;
     public static boolean ambientEnabled = true;
     private InternetMonitor internetMonitor;
+    @Getter
+    private static Stage primaryStage;
 
     @Getter
     private static char lang = 'S';
@@ -39,10 +41,12 @@ public class MainApplication extends Application {
 
     public void start(Stage stage) throws IOException {
 
+        primaryStage = stage;
+
+
         internetMonitor = new InternetMonitor(new SwitchPage(), 5000);
 
         MusicWizard.start_music_loop();
-//        MusicWizard.start_ambient();
 
         Map<String, Boolean> properties = getProperties();
         skip_db = properties.get("skip_db");
@@ -50,7 +54,6 @@ public class MainApplication extends Application {
 
         boolean skipLogging = properties.get("skip_logging");
 
-//        skipLogging = true;
 
         FXMLLoader fxmlLoader = getFxmlLoader(skipLogging);
         Parent root = fxmlLoader.load();
@@ -71,21 +74,10 @@ public class MainApplication extends Application {
 
 //        double fixedWidth = 1200;
 //        double fixedHeight = 900;
-
+//
 //        stage.setMinWidth(fixedWidth);
 //        stage.setMinHeight(fixedHeight);
         stage.show();
-    }
-
-
-    public static void startImageParser() {
-        try {
-            ImageParser.splitImage("com/gnome/gnome/images/colored_pagit cked.png");
-            System.out.println("✅ Image parsed successfully!");
-        } catch (IOException e) {
-            System.out.println("❌ Failed to parse image: " + e.getMessage());
-            e.printStackTrace();
-        }
     }
 
     public static void flipLanguage(){
