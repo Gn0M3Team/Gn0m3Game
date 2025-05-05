@@ -306,7 +306,7 @@ public class ProfileController {
 
             mapListView.getItems().add(String.format(
                     bundle.getString("profile.maps.entry"),
-                    map.getMapNameEng(),
+                    map.getName(),
                     successPercent,
                     map.getScoreVal(),
                     map.getTimesPlayed(),
