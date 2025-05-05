@@ -1,9 +1,11 @@
 package com.gnome.gnome.loginRegistration.controller;
 
+import com.gnome.gnome.MainApplication;
 import com.gnome.gnome.dao.UserStatisticsDAO;
 import com.gnome.gnome.dao.userDAO.AuthUserDAO;
 import com.gnome.gnome.dao.userDAO.UserGameStateDAO;
 import com.gnome.gnome.dao.userDAO.UserSession;
+import com.gnome.gnome.db.DatabaseWrapper;
 import com.gnome.gnome.models.UserStatistics;
 import com.gnome.gnome.userState.UserState;
 import com.gnome.gnome.loginRegistration.service.LoginRegistrationService;
@@ -22,6 +24,9 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.sql.SQLException;
+
+import java.sql.SQLException;
+import java.util.ResourceBundle;
 
 /**
  * Controller class for the Login and Registration view.
@@ -48,6 +53,18 @@ public class LoginRegistrationController {
     @FXML
     public BorderPane loginRegistretion;
     private PageSwitcherInterface pageSwitch;
+
+    private ResourceBundle bundle;
+
+    public LoginRegistrationController() {
+        if (MainApplication.getLang() == 'S'){
+            this.bundle = ResourceBundle.getBundle("slovak");
+        }
+        else {
+            this.bundle = ResourceBundle.getBundle("english");
+        }
+    }
+
     /**
      * Initializes the controller.
      * Called automatically after the FXML file is loaded.
@@ -104,31 +121,42 @@ public class LoginRegistrationController {
      * and navigates to the main menu upon success. Displays appropriate error messages otherwise.
      */
     @FXML
-    private void handleLogin() {
+    private void handleLogin() throws SQLException {
         String username = loginUsername.getText();
         String password = loginPassword.getText();
 
         if (username.isEmpty() || password.isEmpty()) {
-            loginMessage.setText("Fill in all fields!");
+            loginMessage.setText(bundle.getString("login.error.allfields"));
             return;
         }
         if (username.length() > 32) {
-            loginMessage.setText("The name must be less than 32 characters!");
+            loginMessage.setText(bundle.getString("login.error.usernmelong"));
             return;
         }
 
-        try {
+        if (!DatabaseWrapper.getInstance().getConnection().isClosed()) {
             LoginResult result = LoginRegistrationService.loginUser(username, password);
+
             if (result.getUser() != null) {
-                userUploaded(result, username);
+                UserSession.getInstance().setCurrentUser(result.getUser());
+
+                AuthUserDAO authUserDAO = new AuthUserDAO();
+                UserGameStateDAO userGameStateDAO = new UserGameStateDAO();
+                UserStatisticsDAO userStatisticsDAO = new UserStatisticsDAO();
+
+                UserGameState userGameState = userGameStateDAO.getUserGameStateByUsername(username);
+                AuthUser authUser = authUserDAO.getAuthUserByUsername(username);
+                UserStatistics userStatistics = userStatisticsDAO.getUserStatisticsByUsername(username);
+
+                if (authUser != null && userGameState != null && userStatistics != null) {
+                    UserState.init(authUser, userGameState, userStatistics);
+                }
+
+                pageSwitch.goMainMenu(loginRegistretion);
             } else {
                 loginMessage.setText(result.getMessage());
             }
-        } catch (Exception e) {
-            Stage stage = (Stage) loginUsername.getScene().getWindow();
-            CustomPopupUtil.showError(stage, "Check your internet connection");
         }
-
     }
     /**
      * Handles the user registration process triggered by the registration button.
@@ -147,31 +175,33 @@ public class LoginRegistrationController {
         String confirmPassword = registerConfirmPassword.getText();
 
         if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-            registerMessage.setText("Please fill in all fields.");
+            registerMessage.setText(bundle.getString("login.error.allfields"));
             return;
         }
 
         if (!password.equals(confirmPassword)) {
-            registerMessage.setText("Passwords do not match.");
+            registerMessage.setText(bundle.getString("registration.error.dontmatch"));
             return;
         }
 
         if (username.length() > 32) {
-            registerMessage.setText("Username must be less than 32 characters.");
+            registerMessage.setText(bundle.getString("login.error.usernmelong"));
             return;
         }
 
-        try {
+        if (!DatabaseWrapper.getInstance().getConnection().isClosed()) {
             LoginResult result = LoginRegistrationService.registerUser(username, password);
 
             if (result.getUser() != null) {
-                userUploaded(result, username);
+                registerMessage.setText(bundle.getString("registration.success"));
+
+                loginUsername.setText(username);
+                loginPassword.setText("");
             } else {
                 registerMessage.setText(result.getMessage());
             }
-        } catch (Exception e) {
-            Stage stage = (Stage) loginUsername.getScene().getWindow();
-            CustomPopupUtil.showError(stage, "Check your internet connection");
+        } else {
+            registerMessage.setText(bundle.getString("registration.error.internet"));
         }
     }
 

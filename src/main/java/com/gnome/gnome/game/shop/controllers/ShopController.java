@@ -1,11 +1,11 @@
-package com.gnome.gnome.shop.controllers;
+package com.gnome.gnome.game.shop.controllers;
 
 import com.gnome.gnome.MainApplication;
 import com.gnome.gnome.game.GameController;
 import com.gnome.gnome.game.component.CoinUIRenderer;
 import com.gnome.gnome.game.component.ItemUIRenderer;
-import com.gnome.gnome.shop.service.ShopItem;
-import com.gnome.gnome.shop.service.ShopService;
+import com.gnome.gnome.game.shop.service.ShopItem;
+import com.gnome.gnome.game.shop.service.ShopService;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import com.gnome.gnome.userState.UserState;
@@ -27,7 +27,6 @@ import lombok.Setter;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 /**

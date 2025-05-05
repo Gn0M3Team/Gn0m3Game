@@ -1,4 +1,4 @@
-package com.gnome.gnome.shop.service;
+package com.gnome.gnome.game.shop.service;
 import com.gnome.gnome.dao.ArmorDAO;
 import com.gnome.gnome.dao.PotionDAO;
 import com.gnome.gnome.dao.WeaponDAO;

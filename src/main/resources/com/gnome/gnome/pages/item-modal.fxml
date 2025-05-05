@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<StackPane prefHeight="530.0" prefWidth="850.0" styleClass="dialog-overlay" stylesheets="@./css/item-modal.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gnome.gnome.shop.controllers.ItemController">
+<StackPane prefHeight="530.0" prefWidth="850.0" styleClass="dialog-overlay" stylesheets="@./css/item-modal.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gnome.gnome.game.shop.controllers.ItemController">
 
     <VBox alignment="TOP_CENTER" prefHeight="535.0" spacing="20" styleClass="purchase-dialog">
         <HBox alignment="CENTER" prefHeight="360.0" prefWidth="800.0" spacing="40.0" styleClass="dialog-content">

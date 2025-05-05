@@ -1,26 +1,20 @@
-package com.gnome.gnome.camera;
-import com.gnome.gnome.game.component.Chest;
+package com.gnome.gnome.game.camera;
 import com.gnome.gnome.game.component.Coin;
 import com.gnome.gnome.editor.utils.TypeOfObjects;
 import com.gnome.gnome.models.Armor;
 import com.gnome.gnome.models.Potion;
 import com.gnome.gnome.models.Weapon;
-import com.gnome.gnome.player.Player;
+import com.gnome.gnome.game.player.Player;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.Stop;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import lombok.Data;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.logging.Logger;
 
 /**
  * The Camera class is responsible for rendering a 15x15 viewport of the map,
@@ -29,6 +23,8 @@ import java.util.Objects;
  */
 @Data
 public class Camera {
+    private Logger logger = Logger.getLogger(getClass().getName());
+
     public static final int VIEWPORT_SIZE = 15;
     private static final double ITEM_BOX_EXTRA_HEIGHT = 40;
     private static final double COIN_BOX_WIDTH_MULTIPLIER = 2.5;
@@ -152,7 +148,7 @@ public class Camera {
         return imageCache.computeIfAbsent(path, key -> {
             InputStream is = TypeOfObjects.class.getResourceAsStream(path);
             if (is == null) {
-                System.err.println("Tile image not found: " + path);
+                logger.warning("Tile image not found: " + path);
                 return null;
             }
             return new Image(is);

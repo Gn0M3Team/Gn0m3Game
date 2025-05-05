@@ -50,8 +50,8 @@ module com.gnome.gnome {
     opens com.gnome.gnome.inventory to javafx.fxml;
     exports com.gnome.gnome.inventory;
 
-    exports com.gnome.gnome.shop.service;
-    opens com.gnome.gnome.shop.service to javafx.fxml;
-    exports com.gnome.gnome.shop.controllers;
-    opens com.gnome.gnome.shop.controllers to javafx.fxml;
+    exports com.gnome.gnome.game.shop.service;
+    opens com.gnome.gnome.game.shop.service to javafx.fxml;
+    exports com.gnome.gnome.game.shop.controllers;
+    opens com.gnome.gnome.game.shop.controllers to javafx.fxml;
 }

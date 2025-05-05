@@ -1,7 +1,7 @@
-package com.gnome.gnome.monsters.movements;
+package com.gnome.gnome.game.monsters.movements;
 
 import com.gnome.gnome.game.GameController;
-import com.gnome.gnome.monsters.Monster;
+import com.gnome.gnome.game.monsters.GameMonster;
 
 import java.util.*;
 
@@ -42,7 +42,7 @@ public class FollowingMovement implements MovementStrategy {
 
 
     @Override
-    public void move(Monster monster) {
+    public void move(GameMonster gameMonster) {
         int playerX = 0, playerY = 0;
 
 
@@ -58,7 +58,7 @@ public class FollowingMovement implements MovementStrategy {
             return;
         }
         Pos target = new Pos(playerX, playerY); //GET FROM PLAYER
-        Pos current = new Pos(monster.getX(), monster.getY());
+        Pos current = new Pos(gameMonster.getX(), gameMonster.getY());
 
         List<Pos> path = findPath( current, target);
 
@@ -69,7 +69,7 @@ public class FollowingMovement implements MovementStrategy {
             return;
         }
 
-        monster.setPosition(next.x, next.y);
+        gameMonster.setPosition(next.x, next.y);
     }
 
     private static List<Pos> findPath(Pos start, Pos end ) {

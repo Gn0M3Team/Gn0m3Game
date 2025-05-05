@@ -1,7 +1,6 @@
 package com.gnome.gnome.game.component;
 
-import com.gnome.gnome.camera.Camera;
-import com.gnome.gnome.player.Player;
+import com.gnome.gnome.game.player.Player;
 import com.gnome.gnome.userState.UserState;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -13,10 +12,12 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
 import java.io.InputStream;
+import java.util.logging.Logger;
 
 import static com.gnome.gnome.game.component.ObjectsConstants.COIN_IMAGE;
 
 public class CoinUIRenderer {
+    private Logger logger = Logger.getLogger(CoinUIRenderer.class.getName());
 
     private final VBox uiPane;
     private final Player player;
@@ -45,7 +46,7 @@ public class CoinUIRenderer {
 
         Image coinImage = loadImage(COIN_IMAGE_PATH + COIN_IMAGE);
         if (coinImage == null) {
-            System.err.println("Coin image not found: " + COIN_IMAGE_PATH + COIN_IMAGE);
+            logger.warning("Coin image not found: " + COIN_IMAGE_PATH + COIN_IMAGE);
             return;
         }
 
@@ -71,7 +72,7 @@ public class CoinUIRenderer {
                         "-fx-background-radius: 8;" +
                         "-fx-padding: 12;"
         );
-        box.setMaxWidth(160);
+        box.setMaxWidth(120);
 
         coinBox = box;
         uiPane.getChildren().add(coinBox);

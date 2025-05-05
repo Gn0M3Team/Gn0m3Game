@@ -1,10 +1,10 @@
-package com.gnome.gnome.monsters.types;
+package com.gnome.gnome.game.monsters.types;
 
 import com.gnome.gnome.editor.utils.TypeOfObjects;
-import com.gnome.gnome.monsters.Monster;
-import com.gnome.gnome.monsters.movements.OmnidirectionalMovement;
+import com.gnome.gnome.game.monsters.GameMonster;
+import com.gnome.gnome.game.monsters.movements.OmnidirectionalMovement;
 
-public class Demon extends Monster {
+public class Demon extends GameMonster {
     public Demon(int startX, int startY, com.gnome.gnome.models.Monster dbMonster) {
         super(dbMonster.getAttack(),
                 dbMonster.getHealth(),

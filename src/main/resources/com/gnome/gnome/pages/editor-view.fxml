@@ -26,7 +26,7 @@
                                 onAction="#onCategoryButtonClick"
                                 userData="Start/Finish"/>
 
-                        <Button text="%editor.category.monsters"
+                        <Button text="%editor.category.gameMonsters"
                                 onAction="#onCategoryButtonClick"
                                 userData="Monsters"/>
 

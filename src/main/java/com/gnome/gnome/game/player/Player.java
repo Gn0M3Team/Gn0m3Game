@@ -1,15 +1,11 @@
-package com.gnome.gnome.player;
+package com.gnome.gnome.game.player;
 
 import com.gnome.gnome.game.GameController;
-import com.gnome.gnome.monsters.Monster;
+import com.gnome.gnome.game.monsters.GameMonster;
 import javafx.animation.TranslateTransition;
 import javafx.geometry.Bounds;
-import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 import lombok.Getter;
 import lombok.Setter;
@@ -158,21 +154,21 @@ public class Player {
         transition.play();
     }
 
-    public List<Monster> attack(List<Monster> monsters, int range, Consumer<Monster> onHitEffectFinished) {
-        List<Monster> eliminated = new ArrayList<>();
+    public List<GameMonster> attack(List<GameMonster> gameMonsters, int range, Consumer<GameMonster> onHitEffectFinished) {
+        List<GameMonster> eliminated = new ArrayList<>();
 
-        for (Monster monster : monsters) {
-            if (monster.getHealth() <= 0) continue;
-            int dx = Math.abs(monster.getX() - x);
-            int dy = Math.abs(monster.getY() - y);
+        for (GameMonster gameMonster : gameMonsters) {
+            if (gameMonster.getHealth() <= 0) continue;
+            int dx = Math.abs(gameMonster.getX() - x);
+            int dy = Math.abs(gameMonster.getY() - y);
 
-            if (dx <= range && dy <= range && !GameController.getGameController().isLineOfSightClear(x, y, monster.getX(), monster.getY())) {
-                monster.takeDamage(damage);
-                System.out.println("Damage: " + damage + " monster: " + monster.getNameEng());
-                if (monster.getHealth() <= 0) eliminated.add(monster);
+            if (dx <= range && dy <= range && !GameController.getGameController().isLineOfSightClear(x, y, gameMonster.getX(), gameMonster.getY())) {
+                gameMonster.takeDamage(damage);
+                System.out.println("Damage: " + damage + " monster: " + gameMonster.getNameEng());
+                if (gameMonster.getHealth() <= 0) eliminated.add(gameMonster);
 
-                monster.showHitEffect(() -> {
-                    if (eliminated.contains(monster)) onHitEffectFinished.accept(monster);
+                gameMonster.showHitEffect(() -> {
+                    if (eliminated.contains(gameMonster)) onHitEffectFinished.accept(gameMonster);
                 });
             }
         }

@@ -1,4 +1,4 @@
-package com.gnome.gnome.shop.utils;
+package com.gnome.gnome.game.shop.utils;
 
 import com.gnome.gnome.userState.UserState;
 import lombok.Getter;
