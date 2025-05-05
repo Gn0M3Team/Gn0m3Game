@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gnome.gnome.inventory.InventoryController"
+            fx:id="mainBorderPane"
+            stylesheets="@../pages/css/inventory.css"
+            styleClass="inventory-root">
+
+    <top>
+        <Label text="Inventory" styleClass="inventory-title" BorderPane.alignment="CENTER"/>
+    </top>
+
+    <center>
+        <HBox alignment="CENTER" spacing="20" styleClass="item-container">
+            <!-- Weapon Card -->
+            <VBox fx:id="weaponBox" styleClass="item-box" alignment="CENTER" spacing="10">
+                <ImageView fx:id="weaponImage" fitWidth="100" fitHeight="100" preserveRatio="true"/>
+                <VBox styleClass="item-details" spacing="8">
+                    <Label fx:id="weaponName" styleClass="item-name" wrapText="true"/>
+                    <Label fx:id="weaponDescription" styleClass="item-description" wrapText="true"/>
+                    <Label fx:id="weaponCost" styleClass="item-cost"/>
+                    <Label fx:id="weaponBoost" styleClass="item-boost"/>
+                    <Button fx:id="sellWeaponButton" text="Sell" onAction="#sellWeapon" styleClass="sell-button"/>
+                </VBox>
+            </VBox>
+
+            <!-- Armor Card -->
+            <VBox fx:id="armorBox" styleClass="item-box" alignment="CENTER" spacing="10">
+                <ImageView fx:id="armorImage" fitWidth="100" fitHeight="100" preserveRatio="true"/>
+                <VBox styleClass="item-details" spacing="8">
+                    <Label fx:id="armorName" styleClass="item-name" wrapText="true"/>
+                    <Label fx:id="armorDescription" styleClass="item-description" wrapText="true"/>
+                    <Label fx:id="armorCost" styleClass="item-cost"/>
+                    <Label fx:id="armorBoost" styleClass="item-boost"/>
+                    <Button fx:id="sellArmorButton" text="Sell" onAction="#sellArmor" styleClass="sell-button"/>
+                </VBox>
+            </VBox>
+
+            <!-- Potion Card -->
+            <VBox fx:id="potionBox" styleClass="item-box" alignment="CENTER" spacing="10">
+                <ImageView fx:id="potionImage" fitWidth="100" fitHeight="100" preserveRatio="true"/>
+                <VBox styleClass="item-details" spacing="8">
+                    <Label fx:id="potionName" styleClass="item-name" wrapText="true"/>
+                    <Label fx:id="potionDescription" styleClass="item-description" wrapText="true"/>
+                    <Label fx:id="potionCost" styleClass="item-cost"/>
+                    <Label fx:id="potionBoost" styleClass="item-boost"/>
+                    <Button fx:id="sellPotionButton" text="Sell" onAction="#sellPotion" styleClass="sell-button"/>
+                </VBox>
+            </VBox>
+        </HBox>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER" spacing="15" styleClass="button-container">
+            <Button fx:id="backButton" text="Back" onAction="#goBack" styleClass="action-button"/>
+        </HBox>
+    </bottom>
+
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+</BorderPane>

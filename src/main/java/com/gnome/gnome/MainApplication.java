@@ -69,11 +69,11 @@ public class MainApplication extends Application {
         stage.setScene(scene);
 
 
-        double fixedWidth = 1200;
-        double fixedHeight = 900;
+//        double fixedWidth = 1200;
+//        double fixedHeight = 900;
 
-        stage.setMinWidth(fixedWidth);
-        stage.setMinHeight(fixedHeight);
+//        stage.setMinWidth(fixedWidth);
+//        stage.setMinHeight(fixedHeight);
         stage.show();
     }
 

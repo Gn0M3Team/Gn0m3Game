@@ -204,6 +204,11 @@
     -fx-scale-y: 1.05;
 }
 
+.fxml-stats-buttons {
+    -fx-alignment: center;
+    -fx-spacing: 10px;
+}
+
 /* Maps container */
 .maps-container {
     -fx-background-color: rgba(74, 58, 74, 0.85);
