@@ -15,7 +15,7 @@
             styleClass="inventory-root">
 
     <top>
-        <Label text="Inventory" styleClass="inventory-title" BorderPane.alignment="CENTER"/>
+        <Label text="%label.inventory" styleClass="inventory-title" BorderPane.alignment="CENTER"/>
     </top>
 
     <center>
@@ -28,7 +28,7 @@
                     <Label fx:id="weaponDescription" styleClass="item-description" wrapText="true"/>
                     <Label fx:id="weaponCost" styleClass="item-cost"/>
                     <Label fx:id="weaponBoost" styleClass="item-boost"/>
-                    <Button fx:id="sellWeaponButton" text="Sell" onAction="#sellWeapon" styleClass="sell-button"/>
+                    <Button fx:id="sellWeaponButton" text="%button.sell" onAction="#sellWeapon" styleClass="sell-button"/>
                 </VBox>
             </VBox>
 
@@ -40,7 +40,7 @@
                     <Label fx:id="armorDescription" styleClass="item-description" wrapText="true"/>
                     <Label fx:id="armorCost" styleClass="item-cost"/>
                     <Label fx:id="armorBoost" styleClass="item-boost"/>
-                    <Button fx:id="sellArmorButton" text="Sell" onAction="#sellArmor" styleClass="sell-button"/>
+                    <Button fx:id="sellArmorButton" text="%button.sell" onAction="#sellArmor" styleClass="sell-button"/>
                 </VBox>
             </VBox>
 
@@ -52,7 +52,7 @@
                     <Label fx:id="potionDescription" styleClass="item-description" wrapText="true"/>
                     <Label fx:id="potionCost" styleClass="item-cost"/>
                     <Label fx:id="potionBoost" styleClass="item-boost"/>
-                    <Button fx:id="sellPotionButton" text="Sell" onAction="#sellPotion" styleClass="sell-button"/>
+                    <Button fx:id="sellPotionButton" text="%button.sell" onAction="#sellPotion" styleClass="sell-button"/>
                 </VBox>
             </VBox>
         </HBox>
@@ -60,7 +60,7 @@
 
     <bottom>
         <HBox alignment="CENTER" spacing="15" styleClass="button-container">
-            <Button fx:id="backButton" text="Back" onAction="#goBack" styleClass="action-button"/>
+            <Button fx:id="backButton" text="%editor.button.goback" onAction="#goBack" styleClass="action-button"/>
         </HBox>
     </bottom>
 

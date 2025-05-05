@@ -1,6 +1,7 @@
 package com.gnome.gnome.utils;
 
 import com.gnome.gnome.MainApplication;
+import com.gnome.gnome.db.DatabaseWrapper;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -15,6 +16,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.sql.SQLException;
 import java.time.Duration;
 import java.util.ResourceBundle;
 
@@ -22,6 +24,7 @@ public class InternetMonitor {
     private final PageSwitcherInterface pageSwitcher;
     private final long checkIntervalMs;
     private volatile boolean running = true;
+    private volatile boolean isEnd = false;
 
     private final HttpClient httpClient;
     private ResourceBundle bundle;
@@ -38,7 +41,7 @@ public class InternetMonitor {
 
     public void start() {
         new Thread(() -> {
-            while (running) {
+            while (!isEnd) {
                 boolean connected = hasInternetConnection();
                 if (!connected) {
                     running = false;
@@ -86,6 +89,28 @@ public class InternetMonitor {
                             popup.show(primaryStage);
                         }
                     });
+                    if (running) {
+                        Platform.runLater(() -> {
+                            DatabaseWrapper.getInstance().close();
+                            Alert alert = new Alert(Alert.AlertType.ERROR);
+                            alert.setTitle(bundle.getString("internet.lost.alert.title"));
+                            alert.setHeaderText(null);
+                            alert.setContentText(bundle.getString("internet.lost.alert.text"));
+                            alert.setOnHidden(e -> pageSwitcher.goToBeginning());
+                            alert.show();
+                        });
+                        running = false;
+                    }
+                } else {
+                    try {
+                        if (DatabaseWrapper.getInstance().getConnection().isClosed()) {
+                            running = true;
+                            DatabaseWrapper.getInstance().reconnect();
+                            System.out.println("Internet connection established");
+                        }
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
 
                 try {
@@ -99,7 +124,7 @@ public class InternetMonitor {
     }
 
     public void stop() {
-        running = false;
+        isEnd = true;
     }
 
     private boolean hasInternetConnection() {

@@ -28,7 +28,7 @@ public class ItemsSelector<T> {
                 items.add(new ShopItem(
                         a.getId(),
                         a.getCost(),
-                        a.getNameEng(),
+                        a.getName(),
                         a.getDetails(),
                         a.getImg(),
                         ItemCategory.ARMOR,
@@ -44,7 +44,7 @@ public class ItemsSelector<T> {
                 items.add(new ShopItem(
                         w.getId(),
                         w.getCost(),
-                        w.getNameEng(),
+                        w.getName(),
                         w.getDetails(),
                         w.getImg(),
                         ItemCategory.WEAPON,
@@ -59,7 +59,7 @@ public class ItemsSelector<T> {
                 items.add(new ShopItem(
                         p.getId(),
                         p.getCost(),
-                        p.getNameEng(),
+                        p.getName(),
                         p.getDetails(),
                         p.getImg1(),
                         ItemCategory.POTION,

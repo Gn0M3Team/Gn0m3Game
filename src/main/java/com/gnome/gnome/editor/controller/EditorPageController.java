@@ -612,7 +612,7 @@ public class EditorPageController {
             }
 
             List<String> mapNames = userMaps.stream()
-                    .map(map -> "ID: " + map.getId() + " - Name: " + map.getMapNameEng())
+                    .map(map -> "ID: " + map.getId() + " - Name: " + map.getName())
                     .collect(Collectors.toList());
 
             SelectorMapDialogBox mapDialog = new SelectorMapDialogBox(mapNames);
@@ -622,7 +622,7 @@ public class EditorPageController {
                 logger.info("Selected map: " + selectedItem);
 
                 Map selectedMap = userMaps.stream()
-                        .filter(map -> ("ID: " + map.getId() + " - Name: " + map.getMapNameEng()).equals(selectedItem))
+                        .filter(map -> ("ID: " + map.getId() + " - Name: " + map.getName()).equals(selectedItem))
                         .findFirst()
                         .orElse(null);
 
@@ -781,7 +781,7 @@ public class EditorPageController {
             }
 
             List<String> mapNames = userMaps.stream()
-                    .map(map -> "ID: " + map.getId() + " - Name: " + map.getMapNameEng())
+                    .map(map -> "ID: " + map.getId() + " - Name: " + map.getName())
                     .collect(Collectors.toList());
 
             SelectorMapDialogBox mapDialog = new SelectorMapDialogBox(mapNames);
@@ -791,7 +791,7 @@ public class EditorPageController {
                 logger.info("Selected map for update: " + selectedItem);
 
                 Map selectedMap = userMaps.stream()
-                        .filter(map -> ("ID: " + map.getId() + " - Name: " + map.getMapNameEng()).equals(selectedItem))
+                        .filter(map -> ("ID: " + map.getId() + " - Name: " + map.getName()).equals(selectedItem))
                         .findFirst()
                         .orElse(null);
 
@@ -925,7 +925,7 @@ public class EditorPageController {
             }
 
             List<String> mapDisplayList = userMaps.stream()
-                    .map(map -> "ID: " + map.getId() + " - Name: " + map.getMapNameEng())
+                    .map(map -> "ID: " + map.getId() + " - Name: " + map.getName())
                     .collect(Collectors.toList());
 
             SelectorMapDialogBox mapDialog = new SelectorMapDialogBox(mapDisplayList);
@@ -935,7 +935,7 @@ public class EditorPageController {
                 logger.info("Selected map for deletion: " + selectedItem);
 
                 Map selectedMap = userMaps.stream()
-                        .filter(map -> ("ID: " + map.getId() + " - Name: " + map.getMapNameEng()).equals(selectedItem))
+                        .filter(map -> ("ID: " + map.getId() + " - Name: " + map.getName()).equals(selectedItem))
                         .findFirst()
                         .orElse(null);
 

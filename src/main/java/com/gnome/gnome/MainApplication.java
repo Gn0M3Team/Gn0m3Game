@@ -40,7 +40,12 @@ public class MainApplication extends Application {
     private static ResourceBundle langBundle = ResourceBundle.getBundle("slovak");
 
     public void start(Stage stage) throws IOException {
+
         primaryStage = stage;
+
+
+        internetMonitor = new InternetMonitor(new SwitchPage(), 5000);
+
         MusicWizard.start_music_loop();
 
         Map<String, Boolean> properties = getProperties();
@@ -58,8 +63,6 @@ public class MainApplication extends Application {
             controller.setPrimaryStage(stage);
         }
 
-        internetMonitor = new InternetMonitor(new SwitchPage(), 5000);
-        internetMonitor.start();
 
         Scene scene = new Scene(root);
         stage.setFullScreen(true);
@@ -129,6 +132,7 @@ public class MainApplication extends Application {
                 Connection conn = DatabaseWrapper.getInstance().getConnection();
                 if (conn != null) {
                     System.out.println("✅ Database connection successful!");
+                    internetMonitor.start();
                 } else {
                     System.out.println("❌ Failed to connect to database.");
                 }

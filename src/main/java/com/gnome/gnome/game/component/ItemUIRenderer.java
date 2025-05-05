@@ -119,7 +119,7 @@ public class ItemUIRenderer {
         if (index >= 0) {
             potionBox = createItemBox(
                     potion != null ? (potion.getImg1() != null ? potion.getImg1() : potion.getImg2()) : null,
-                    potion != null ? potion.getNameEng() : "None",
+                    potion != null ? potion.getName() : "None",
                     potion != null ? "HP: +" + potion.getScoreVal() : ""
             );
             uiPane.getChildren().set(index, potionBox);
