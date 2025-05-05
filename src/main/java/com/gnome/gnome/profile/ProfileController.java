@@ -126,7 +126,7 @@ public class ProfileController {
         logger.info("Loading profile for: " + selectedUsername);
 
         // Load user data
-        user = userDAO.getAuthUserByUsername(selectedUsername);
+        user = userDAO.getAuthUserByUsername(selectedUsername.trim());
         if (user == null) {
             logger.warning("User not found: " + selectedUsername);
             return;

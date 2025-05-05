@@ -408,7 +408,7 @@ public class GameController {
         UserState userState = UserState.getInstance();
 
         if (userState != null) {
-            userState.setMapLevel(selectedMap.getLevel());
+            userState.setMapLevel(selectedMap.getLevel() + 1);
         }
     }
 
