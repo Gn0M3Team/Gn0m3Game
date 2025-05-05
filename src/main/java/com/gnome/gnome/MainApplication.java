@@ -138,7 +138,7 @@ public class MainApplication extends Application {
                 }
             } catch (Exception e) {
                 System.err.println("❌ Database error: " + e.getMessage());
-                e.printStackTrace();
+//                e.printStackTrace();
             }
         }
     }
