@@ -307,4 +307,26 @@ Caused by: org.postgresql.util.PSQLException: ERROR: column "id" does not exist
 [0m[33mMon May 05 16:33:40 CEST 2025 WARNING [javafx.scene.CssStyleHelper] - Failed to set css [-fx-progress-color] on [ObjectProperty [bean: javafx.scene.control.skin.ProgressIndicatorSkin@7940bd3c, name: progressColorProperty, value: null]] due to 'Only Color objects are supported'
 
 [0m[33mMon May 05 16:34:15 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
+[0m[33mMon May 05 17:46:44 CEST 2025 WARNING [javafx.scene.CssStyleHelper] - Failed to set css [-fx-progress-color] on [ObjectProperty [bean: javafx.scene.control.skin.ProgressIndicatorSkin@3b037bbb, name: progressColorProperty, value: null]] due to 'Only Color objects are supported'
+
+[0m[33mMon May 05 17:47:13 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
+[0m[33mMon May 05 17:47:29 CEST 2025 WARNING [javafx.scene.CssStyleHelper] - Failed to set css [-fx-progress-color] on [ObjectProperty [bean: javafx.scene.control.skin.ProgressIndicatorSkin@6eb76d56, name: progressColorProperty, value: null]] due to 'Only Color objects are supported'
+
+[0m[33mMon May 05 17:47:47 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
+[0m[33mMon May 05 17:51:02 CEST 2025 WARNING [javafx.scene.CssStyleHelper] - Failed to set css [-fx-progress-color] on [ObjectProperty [bean: javafx.scene.control.skin.ProgressIndicatorSkin@65140798, name: progressColorProperty, value: null]] due to 'Only Color objects are supported'
+
+[0m[33mMon May 05 17:51:18 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
+[0m[33mMon May 05 17:51:25 CEST 2025 WARNING [javafx.scene.CssStyleHelper] - Failed to set css [-fx-progress-color] on [ObjectProperty [bean: javafx.scene.control.skin.ProgressIndicatorSkin@3380b207, name: progressColorProperty, value: null]] due to 'Only Color objects are supported'
+
+[0m[33mMon May 05 17:52:14 CEST 2025 WARNING [javafx.fxml.FXMLLoader$ValueElement] - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 21
+[0m[33mMon May 05 17:52:25 CEST 2025 WARNING [javafx.scene.CssStyleHelper] - Failed to set css [-fx-progress-color] on [ObjectProperty [bean: javafx.scene.control.skin.ProgressIndicatorSkin@66696c24, name: progressColorProperty, value: null]] due to 'Only Color objects are supported'
+
+[0m[33mMon May 05 17:58:52 CEST 2025 WARNING [javafx.scene.CssStyleHelper] - Failed to set css [-fx-progress-color] on [ObjectProperty [bean: javafx.scene.control.skin.ProgressIndicatorSkin@6453b3ab, name: progressColorProperty, value: null]] due to 'Only Color objects are supported'
+
+[0m[33mMon May 05 18:01:21 CEST 2025 WARNING [javafx.scene.CssStyleHelper] - Failed to set css [-fx-progress-color] on [ObjectProperty [bean: javafx.scene.control.skin.ProgressIndicatorSkin@6453b3ab, name: progressColorProperty, value: null]] due to 'Only Color objects are supported'
+
+[0m[33mMon May 05 18:02:01 CEST 2025 WARNING [javafx.scene.CssStyleHelper] - Failed to set css [-fx-progress-color] on [ObjectProperty [bean: javafx.scene.control.skin.ProgressIndicatorSkin@4960907b, name: progressColorProperty, value: null]] due to 'Only Color objects are supported'
+
+[0m[33mMon May 05 18:04:19 CEST 2025 WARNING [javafx.scene.CssStyleHelper] - Failed to set css [-fx-progress-color] on [ObjectProperty [bean: javafx.scene.control.skin.ProgressIndicatorSkin@4960907b, name: progressColorProperty, value: null]] due to 'Only Color objects are supported'
+
 [0m
