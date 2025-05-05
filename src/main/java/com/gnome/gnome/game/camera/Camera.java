@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * The Camera class is responsible for rendering a 15x15 viewport of the map,
@@ -22,6 +23,8 @@ import java.util.Map;
  */
 @Data
 public class Camera {
+    private Logger logger = Logger.getLogger(getClass().getName());
+
     public static final int VIEWPORT_SIZE = 15;
     private static final double ITEM_BOX_EXTRA_HEIGHT = 40;
     private static final double COIN_BOX_WIDTH_MULTIPLIER = 2.5;
@@ -145,7 +148,7 @@ public class Camera {
         return imageCache.computeIfAbsent(path, key -> {
             InputStream is = TypeOfObjects.class.getResourceAsStream(path);
             if (is == null) {
-                System.err.println("Tile image not found: " + path);
+                logger.warning("Tile image not found: " + path);
                 return null;
             }
             return new Image(is);

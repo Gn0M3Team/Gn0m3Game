@@ -1,9 +1,11 @@
 package com.gnome.gnome.loginRegistration.controller;
 
+import com.gnome.gnome.MainApplication;
 import com.gnome.gnome.dao.UserStatisticsDAO;
 import com.gnome.gnome.dao.userDAO.AuthUserDAO;
 import com.gnome.gnome.dao.userDAO.UserGameStateDAO;
 import com.gnome.gnome.dao.userDAO.UserSession;
+import com.gnome.gnome.db.DatabaseWrapper;
 import com.gnome.gnome.models.UserStatistics;
 import com.gnome.gnome.userState.UserState;
 import com.gnome.gnome.loginRegistration.service.LoginRegistrationService;
@@ -18,6 +20,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+
+import java.sql.SQLException;
+import java.util.ResourceBundle;
 
 /**
  * Controller class for the Login and Registration view.
@@ -44,6 +49,18 @@ public class LoginRegistrationController {
     @FXML
     public BorderPane loginRegistretion;
     private PageSwitcherInterface pageSwitch;
+
+    private ResourceBundle bundle;
+
+    public LoginRegistrationController() {
+        if (MainApplication.getLang() == 'S'){
+            this.bundle = ResourceBundle.getBundle("slovak");
+        }
+        else {
+            this.bundle = ResourceBundle.getBundle("english");
+        }
+    }
+
     /**
      * Initializes the controller.
      * Called automatically after the FXML file is loaded.
@@ -100,41 +117,44 @@ public class LoginRegistrationController {
      * and navigates to the main menu upon success. Displays appropriate error messages otherwise.
      */
     @FXML
-    private void handleLogin() {
+    private void handleLogin() throws SQLException {
         String username = loginUsername.getText();
         String password = loginPassword.getText();
 
         if (username.isEmpty() || password.isEmpty()) {
-            loginMessage.setText("Fill in all fields!");
+            loginMessage.setText(bundle.getString("login.error.allfields"));
             return;
         }
         if (username.length() > 32) {
-            loginMessage.setText("The name must be less than 32 characters!");
+            loginMessage.setText(bundle.getString("login.error.usernmelong"));
             return;
         }
 
+        if (!DatabaseWrapper.getInstance().getConnection().isClosed()) {
+            LoginResult result = LoginRegistrationService.loginUser(username, password);
 
-        LoginResult result = LoginRegistrationService.loginUser(username, password);
+            if (result.getUser() != null) {
+                UserSession.getInstance().setCurrentUser(result.getUser());
 
-        if (result.getUser() != null) {
-            UserSession.getInstance().setCurrentUser(result.getUser());
+                AuthUserDAO authUserDAO = new AuthUserDAO();
+                UserGameStateDAO userGameStateDAO = new UserGameStateDAO();
+                UserStatisticsDAO userStatisticsDAO = new UserStatisticsDAO();
 
-            AuthUserDAO authUserDAO = new AuthUserDAO();
-            UserGameStateDAO userGameStateDAO = new UserGameStateDAO();
-            UserStatisticsDAO userStatisticsDAO = new UserStatisticsDAO();
+                UserGameState userGameState = userGameStateDAO.getUserGameStateByUsername(username);
+                AuthUser authUser = authUserDAO.getAuthUserByUsername(username);
+                UserStatistics userStatistics = userStatisticsDAO.getUserStatisticsByUsername(username);
 
-            UserGameState userGameState = userGameStateDAO.getUserGameStateByUsername(username);
-            AuthUser authUser = authUserDAO.getAuthUserByUsername(username);
-            UserStatistics userStatistics = userStatisticsDAO.getUserStatisticsByUsername(username);
+                if (authUser != null && userGameState != null && userStatistics != null) {
+                    UserState.init(authUser, userGameState, userStatistics);
+                }
 
-            if (authUser != null && userGameState != null && userStatistics != null) {
-                UserState.init(authUser, userGameState, userStatistics);
+                pageSwitch.goMainMenu(loginRegistretion);
+            } else {
+                loginMessage.setText(result.getMessage());
             }
-
-            pageSwitch.goMainMenu(loginRegistretion);
-        } else {
-            loginMessage.setText(result.getMessage());
         }
+
+
     }
     /**
      * Handles the user registration process triggered by the registration button.
@@ -147,34 +167,39 @@ public class LoginRegistrationController {
      * @param event the action event triggered by the register button
      */
     @FXML
-    public void handleRegister(ActionEvent event){
+    public void handleRegister(ActionEvent event) throws SQLException {
         String username= registerUsername.getText();
         String password=registerPassword.getText();
         String confirmPassword = registerConfirmPassword.getText();
 
         if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-            registerMessage.setText("Please fill in all fields.");
+            registerMessage.setText(bundle.getString("login.error.allfields"));
             return;
         }
 
         if (!password.equals(confirmPassword)) {
-            registerMessage.setText("Passwords do not match.");
+            registerMessage.setText(bundle.getString("registration.error.dontmatch"));
             return;
         }
 
         if (username.length() > 32) {
-            registerMessage.setText("Username must be less than 32 characters.");
+            registerMessage.setText(bundle.getString("login.error.usernmelong"));
             return;
         }
-        LoginResult result = LoginRegistrationService.registerUser(username, password);
 
-        if (result.getUser() != null) {
-            registerMessage.setText("Registration successful. You can now log in.");
+        if (!DatabaseWrapper.getInstance().getConnection().isClosed()) {
+            LoginResult result = LoginRegistrationService.registerUser(username, password);
 
-            loginUsername.setText(username);
-            loginPassword.setText("");
+            if (result.getUser() != null) {
+                registerMessage.setText(bundle.getString("registration.success"));
+
+                loginUsername.setText(username);
+                loginPassword.setText("");
+            } else {
+                registerMessage.setText(result.getMessage());
+            }
         } else {
-            registerMessage.setText(result.getMessage());
+            registerMessage.setText(bundle.getString("registration.error.internet"));
         }
     }
 
