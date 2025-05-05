@@ -42,7 +42,7 @@ public class LoginRegistrationService {
     /**
      *length ≥ 12, at least 1 capital letter, 1 number, 1 special character
      */
-    private static final String PASSWORD_REGEX="^(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+=\\[\\]{};:'\",.<>/?\\-]).{12,}$";
+    private static final String PASSWORD_REGEX="^(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+=\\[\\]{};:'\",.<>/?\\-]).{6,}$";
     private static final Pattern PASSWORD_PATTERN=Pattern.compile(PASSWORD_REGEX);
 
     /**
@@ -101,6 +101,10 @@ public class LoginRegistrationService {
         AuthUser existing =authUserDAO.getAuthUserByUsername(username);
         if (existing != null) {
             return new LoginResult(null, "User already exists.");
+        }
+        if (!isPasswordValid(password)){
+            return new LoginResult(null, "Password should contains at least one uppercase letter, one digit, one " +
+                    "special character, and is at least 6 characters long.");
         }
 
         AuthUser newUser = new AuthUser(username, PasswordUtils.hashPassword(password),PlayerRole.USER);

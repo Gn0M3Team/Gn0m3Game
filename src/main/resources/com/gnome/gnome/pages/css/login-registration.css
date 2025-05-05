@@ -88,6 +88,9 @@
     -fx-text-fill: #ff0000; /* Red as specified in FXML */
     -fx-font-family: "Press Start 2P", -apple-system;
     -fx-font-size: 12px;
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+    -fx-max-width: 400px;
 }
 
 

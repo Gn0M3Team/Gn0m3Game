@@ -59,7 +59,7 @@ public class MainController {
     private MapLoaderService mapLoaderService;
 
     public MainController() {
-        if (MainApplication.lang == 'S'){
+        if (MainApplication.getLang() == 'S'){
             this.bundle = ResourceBundle.getBundle("slovak");
         }
         else {
