@@ -16,6 +16,7 @@ import com.gnome.gnome.game.player.Player;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import com.gnome.gnome.userState.UserState;
 import com.gnome.gnome.utils.CustomPopupUtil;
+import com.gnome.gnome.utils.InternetMonitor;
 import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -42,12 +43,10 @@ import static java.lang.Math.max;
 @Getter
 @Setter
 public class GameController {
-
     @FXML private BorderPane rootBorder;
     @FXML private StackPane centerStack;
     @FXML private Button centerMenuButton;
     @FXML private StackPane healthBarContainer;
-//    @FXML private VBox rightUIBox;
 
     private Canvas viewportCanvas;
     private Weapon weapon;
@@ -197,7 +196,7 @@ public class GameController {
     }
 
     private void updateCenterStackSize() {
-        if (rootBorder.getScene() == null) return;
+        if (rootBorder.getScene() == null || viewportCanvas == null) return;
 
         double fullWidth = rootBorder.getScene().getWidth();
         double availableHeight = rootBorder.getScene().getHeight() - 100;
@@ -251,7 +250,7 @@ public class GameController {
             monsterView.getProperties().put("gridX", gameMonster.getX());
             monsterView.getProperties().put("gridY", gameMonster.getY());
             gameMonster.updateVisual(camera);
-            System.out.println("Adding monster view: " + gameMonster.getNameEng() +
+            logger.info("Adding monster view: " + gameMonster.getNameEng() +
                     ", visible=" + gameMonster.getRepresentation().isVisible() +
                     ", parent=" + gameMonster.getRepresentation().getParent());
             if (!gameObjectsPane.getChildren().contains(monsterView)) {
@@ -423,7 +422,7 @@ public class GameController {
      * The player takes damage equal to their current health, effectively killing them.
      */
     private void onRiverStepped() {
-        if (debugModGame) System.out.println("Player stepped on river at (" + player.getX() + ", " + player.getY() + ")");
+        logger.info("Player stepped on river at (" + player.getX() + ", " + player.getY() + ")");
         double damage = player.getMaxHealth() * 0.1;
         player.takeDamage(damage);
         updatePlayerHealthBar();

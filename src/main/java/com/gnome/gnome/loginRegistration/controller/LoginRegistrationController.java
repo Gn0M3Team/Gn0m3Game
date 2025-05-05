@@ -169,7 +169,7 @@ public class LoginRegistrationController {
      * @param event the action event triggered by the register button
      */
     @FXML
-    public void handleRegister(ActionEvent event){
+    public void handleRegister(ActionEvent event) throws SQLException {
         String username = registerUsername.getText();
         String password = registerPassword.getText();
         String confirmPassword = registerConfirmPassword.getText();
