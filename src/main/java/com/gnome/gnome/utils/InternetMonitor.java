@@ -2,6 +2,7 @@ package com.gnome.gnome.utils;
 
 import com.gnome.gnome.MainApplication;
 import com.gnome.gnome.db.DatabaseWrapper;
+import com.gnome.gnome.game.GameController;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -46,6 +47,10 @@ public class InternetMonitor {
                 if (!connected) {
                     if (running) {
                         Platform.runLater(() -> {
+                            DatabaseWrapper.getInstance().close();
+                            if (GameController.getGameController() != null) {
+                                GameController.getGameController().onSceneExit(false);
+                            }
                             // Get the current stage
                             Stage primaryStage = MainApplication.getPrimaryStage();
                             if (primaryStage == null) return;

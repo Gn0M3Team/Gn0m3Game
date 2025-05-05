@@ -260,7 +260,7 @@ public class GameController {
         }
     }
 
-    void onSceneExit(boolean isRestart) {
+    public void onSceneExit(boolean isRestart) {
         if (gameLoop != null) gameLoop.stop();
         gameLoop = null;
 
@@ -622,7 +622,7 @@ public class GameController {
         uiManager.updateHealthBar(healthBar);
     }
 
-    void restartGame() {
+    public void restartGame() {
         try {
             onSceneExit(true);
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/gnome/gnome/pages/game.fxml"));
