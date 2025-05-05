@@ -82,11 +82,12 @@ public class ItemUIRenderer {
         box.setAlignment(Pos.TOP_CENTER);
         box.setSpacing(5);
 
-        double size = 70;
+        double wSize = 70;
+        double hSize = 30;
 
         ImageView icon = new ImageView(loadImageOrDefault(imagePath));
-        icon.setFitWidth(size);
-        icon.setFitHeight(size);
+        icon.setFitWidth(wSize);
+        icon.setFitHeight(hSize);
         icon.setPreserveRatio(true);
 
         Label nameLabel = new Label(name);

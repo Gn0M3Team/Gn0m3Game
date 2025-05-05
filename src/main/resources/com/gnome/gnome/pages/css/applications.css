@@ -1,0 +1,53 @@
+@font-face {
+    font-family: 'Press Start 2P';
+    src: url('../fonts/PressStart2P-Regular.ttf') format('truetype');
+}
+
+.title-bar {
+    -fx-background-color: linear-gradient(to right, #1C121C, #2E1C26); /* Dark gradient */
+    -fx-padding: 10px 15px;
+    -fx-spacing: 10px;
+    -fx-effect: dropshadow(gaussian, rgba(244, 200, 212, 0.6), 10, 0, 0, 5); /* Pink shadow */
+    -fx-alignment: center-left;
+    -fx-cursor: hand;
+}
+
+.title-label {
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 20px;
+    -fx-text-fill: linear-gradient(to right, #F4C8D4, #C8A2C8); /* Pink to purple gradient */
+    -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 0.4), 5, 0, 0, 3); /* Glowing effect */
+    -fx-padding: 0 10px;
+}
+
+.title-button {
+    -fx-background-color: transparent;
+    -fx-background-image: url('../../images/button-background.png');
+    -fx-background-size: cover;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 14px;
+    -fx-padding: 5px 10px;
+    -fx-background-radius: 5px;
+    -fx-border-color: #2E1C26;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(255, 64, 64, 0.5), 5, 0, 0, 2); /* Red glow for close button */
+    -fx-min-width: 30px;
+    -fx-min-height: 30px;
+}
+
+.title-button:hover {
+    -fx-background-image: url('../../images/button-background-05.jpg');
+    -fx-text-fill: #F4C8D4;
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+}
+
+.title-button:pressed {
+    -fx-scale-x: 0.9;
+    -fx-scale-y: 0.9;
+}

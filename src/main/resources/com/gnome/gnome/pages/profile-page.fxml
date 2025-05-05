@@ -69,7 +69,8 @@
                     <!-- Bottom Section -->
                     <HBox alignment="CENTER" spacing="20" styleClass="fxml-stats-buttons">
                         <Button text="%editor.button.goback" onAction="#handleBack" styleClass="action-button"/>
-                        <Button fx:id="goToGameButton" text="%settings.button.backtogame" onAction="#handleGame" styleClass="action-button"/>
+<!--                        <Button fx:id="goToGameButton" text="Go To Game" onAction="#handleGame" styleClass="action-button"/>-->
+
                     </HBox>
                 </VBox>
             </content>
