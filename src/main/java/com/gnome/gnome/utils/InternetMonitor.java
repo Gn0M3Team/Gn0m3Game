@@ -89,18 +89,6 @@ public class InternetMonitor {
                             popup.show(primaryStage);
                         }
                     });
-                    if (running) {
-                        Platform.runLater(() -> {
-                            DatabaseWrapper.getInstance().close();
-                            Alert alert = new Alert(Alert.AlertType.ERROR);
-                            alert.setTitle(bundle.getString("internet.lost.alert.title"));
-                            alert.setHeaderText(null);
-                            alert.setContentText(bundle.getString("internet.lost.alert.text"));
-                            alert.setOnHidden(e -> pageSwitcher.goToBeginning());
-                            alert.show();
-                        });
-                        running = false;
-                    }
                 } else {
                     try {
                         if (DatabaseWrapper.getInstance().getConnection().isClosed()) {
