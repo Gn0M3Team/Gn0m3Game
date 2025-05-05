@@ -13,6 +13,7 @@ import com.gnome.gnome.dao.userDAO.UserSession;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
 import com.gnome.gnome.components.LeaderBoardView;
+import com.gnome.gnome.utils.CustomPopupUtil;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -25,7 +26,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.sql.SQLException;
 import java.util.Objects;
+import java.util.ResourceBundle;
 
 import static com.gnome.gnome.game.component.ObjectsConstants.COIN_IMAGE;
 
@@ -51,11 +54,18 @@ public class MainController {
     private LeaderBoardView leaderboard;
     private final AuthUserDAO userDAO = new AuthUserDAO();
     private final UserState userState = UserState.getInstance();
+    private ResourceBundle bundle;
+    private Stage primaryStage;
+    private MapLoaderService mapLoaderService;
 
-    Stage primaryStage;
-
-    MapLoaderService mapLoaderService;
-
+    public MainController() {
+        if (MainApplication.lang == 'S'){
+            this.bundle = ResourceBundle.getBundle("slovak");
+        }
+        else {
+            this.bundle = ResourceBundle.getBundle("english");
+        }
+    }
 
     /**
      * Initializes the controller and sets the music icon for the button.
@@ -102,11 +112,13 @@ public class MainController {
 
         this.mapLoaderService = new MapLoaderService(monsterDAO, armorDAO, weaponDAO, potionDAO);
 
-// TODO
         continueGameButton.setOnAction(e -> {
             if (mapLoaderService != null) {
                 Map selectedMap = mapDAO.getMapByLevel(UserState.getInstance().getMapLevel());
-                new MapLoaderUIHandler(mapLoaderService, primaryStage).showStartMap(selectedMap);
+                if (selectedMap != null)
+                    new MapLoaderUIHandler(mapLoaderService, primaryStage).showStartMap(selectedMap);
+                else
+                    CustomPopupUtil.showInfo(primaryStage, bundle.getString("continue.game.alert"));
             }
         });
     }
@@ -192,9 +204,6 @@ public class MainController {
         fadeIn.setToValue(1.0);
         fadeIn.play();
     }
-
-    @FXML
-    public void switchToShop() { pageSwitch.goShop(mainBorderPane); }
 
     /**
      * Closes the application.

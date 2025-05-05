@@ -67,6 +67,13 @@ public class MainApplication extends Application {
 //        stage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
         stage.setTitle("Dark Rifter");
         stage.setScene(scene);
+
+
+        double fixedWidth = 1200;
+        double fixedHeight = 900;
+
+        stage.setMinWidth(fixedWidth);
+        stage.setMinHeight(fixedHeight);
         stage.show();
     }
 
