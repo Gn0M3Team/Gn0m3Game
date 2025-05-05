@@ -89,3 +89,32 @@
     -fx-font-family: "Press Start 2P", -apple-system;
     -fx-font-size: 12px;
 }
+
+
+
+
+
+.radio-button {
+    -fx-font-family: "Press Start 2P", -apple-system;
+    -fx-font-size: 12px;
+    -fx-text-fill: #ffffff;
+    -fx-padding: 5 10;
+    -fx-background-color: transparent;
+    -fx-border-color: #6a5a6a;
+    -fx-border-width: 2;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-pref-width: 150px;
+    -fx-pref-height: 40px;
+    -fx-alignment: center;
+    -fx-cursor: hand;
+}
+
+.radio-button:selected {
+    -fx-background-color: #4a3a4a;
+    -fx-border-color: rgba(255, 0, 255, 0.37);
+}
+
+.radio-button:hover {
+    -fx-border-color: #8a6a8a;
+}
