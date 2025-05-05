@@ -47,6 +47,12 @@ public class SwitchPage implements PageSwitcherInterface {
     public void goNewGame(BorderPane anchorPane)  {
         new SceneSwitch(anchorPane, "/com/gnome/gnome/pages/main-new-game-page.fxml");
     }
+
+    @Override
+    public void goInventory(BorderPane anchorPane)  {
+        new SceneSwitch(anchorPane, "/com/gnome/gnome/pages/inventory-page.fxml");
+    }
+
     @Override
     public void goSetting(BorderPane anchorPane)  {
         new SceneSwitch(anchorPane, "/com/gnome/gnome/pages/setting.fxml");

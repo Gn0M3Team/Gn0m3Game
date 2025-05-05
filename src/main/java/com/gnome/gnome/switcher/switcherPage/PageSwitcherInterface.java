@@ -34,6 +34,13 @@ public interface PageSwitcherInterface {
     void goEditor(BorderPane anchorPane);
 
     /**
+     * Navigates to the Inventory page ().
+     *
+     * @param anchorPane the current root pane from which the scene will switch
+     */
+    void goInventory(BorderPane anchorPane);
+
+    /**
      * Navigates to the Login or Registration page.
      *
      * @param anchorPane the current root pane from which the scene will switch

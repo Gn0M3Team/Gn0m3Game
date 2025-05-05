@@ -17,6 +17,9 @@ public class UserStatistics {
     public UserStatistics(String username) {
         this.username = username;
     }
+
+    public UserStatistics() {
+    }
     public UserStatistics(String username, int totalMapsPlayed, int totalWins, int totalDeaths, int totalMonstersKilled, int totalChestsOpened) {
         this.username = username;
         this.totalMapsPlayed = totalMapsPlayed;

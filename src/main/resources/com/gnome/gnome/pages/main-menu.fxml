@@ -41,6 +41,7 @@
                 <Button fx:id="continueGameButton" maxWidth="Infinity" styleClass="menu-button" text="%continue.button" />
 
                 <Button fx:id="editorButton" maxWidth="Infinity" onAction="#onEditorButtonClick" styleClass="menu-button" text="%editor.button" />
+                <Button fx:id="inventoryButton" maxWidth="Infinity" onAction="#onInventoryButtonClick" styleClass="menu-button" text="%inventory.button" />
 
                 <HBox alignment="CENTER" maxWidth="400" spacing="10">
                     <Button maxWidth="Infinity" onAction="#onSettingsButtonClick" prefHeight="18.0" prefWidth="236.0" styleClass="menu-button" text="%settings.button" />

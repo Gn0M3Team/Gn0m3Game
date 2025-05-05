@@ -48,6 +48,8 @@ public class MainController {
     @FXML
     private Button continueGameButton;
     @FXML
+    private Button inventoryButton;
+    @FXML
     private Label nicknameLabel;
 
     private PageSwitcherInterface pageSwitch;
@@ -155,6 +157,10 @@ public class MainController {
         pageSwitch.goEditor(mainBorderPane);
     }
 
+    @FXML
+    protected void onInventoryButtonClick(ActionEvent event){
+        pageSwitch.goInventory(mainBorderPane);
+    }
     /**
      * Navigates to the registration/switcher page.
      */
