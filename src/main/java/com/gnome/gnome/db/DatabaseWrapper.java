@@ -22,7 +22,7 @@ public class DatabaseWrapper {
     private static final Logger logger = Logger.getLogger(DatabaseWrapper.class.getName());
 
     private static DatabaseWrapper instance;
-    private final Connection connection;
+    private Connection connection;
 
     /**
      * Constructs a new DatabaseWrapper with the specified database connection details.
@@ -159,6 +159,17 @@ public class DatabaseWrapper {
             }
         } catch (SQLException e) {
             throw new DataAccessException("Failed to close database connection", e);
+        }
+    }
+
+    /**
+     * Provide reconnection when we lose internet connection.
+     */
+    public void reconnect() {
+        try {
+            this.connection = DriverManager.getConnection(URL, USER, PASSWORD);
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to connect to database", e);
         }
     }
 }
