@@ -14,12 +14,16 @@ import com.gnome.gnome.models.user.AuthUser;
 import com.gnome.gnome.models.user.UserGameState;
 import com.gnome.gnome.switcher.switcherPage.PageSwitcherInterface;
 import com.gnome.gnome.switcher.switcherPage.SwitchPage;
+import com.gnome.gnome.utils.CustomPopupUtil;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
+import java.sql.SQLException;
 
 import java.sql.SQLException;
 import java.util.ResourceBundle;
@@ -153,8 +157,6 @@ public class LoginRegistrationController {
                 loginMessage.setText(result.getMessage());
             }
         }
-
-
     }
     /**
      * Handles the user registration process triggered by the registration button.
@@ -167,9 +169,9 @@ public class LoginRegistrationController {
      * @param event the action event triggered by the register button
      */
     @FXML
-    public void handleRegister(ActionEvent event) throws SQLException {
-        String username= registerUsername.getText();
-        String password=registerPassword.getText();
+    public void handleRegister(ActionEvent event){
+        String username = registerUsername.getText();
+        String password = registerPassword.getText();
         String confirmPassword = registerConfirmPassword.getText();
 
         if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
@@ -211,6 +213,24 @@ public class LoginRegistrationController {
     @FXML
     public void onExitButtonClick(ActionEvent event) {
         Platform.exit();
+    }
+
+    public void userUploaded(LoginResult result, String username) {
+        UserSession.getInstance().setCurrentUser(result.getUser());
+
+        AuthUserDAO authUserDAO = new AuthUserDAO();
+        UserGameStateDAO userGameStateDAO = new UserGameStateDAO();
+        UserStatisticsDAO userStatisticsDAO = new UserStatisticsDAO();
+
+        UserGameState userGameState = userGameStateDAO.getUserGameStateByUsername(username);
+        AuthUser authUser = authUserDAO.getAuthUserByUsername(username);
+        UserStatistics userStatistics = userStatisticsDAO.getUserStatisticsByUsername(username);
+
+        if (authUser != null && userGameState != null && userStatistics != null) {
+            UserState.init(authUser, userGameState, userStatistics);
+        }
+
+        pageSwitch.goMainMenu(loginRegistretion);
     }
 
 }

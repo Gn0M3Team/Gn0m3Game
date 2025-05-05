@@ -61,9 +61,14 @@ public class AuthUserDAO extends BaseDAO<AuthUser> {
      * @throws DataAccessException if retrieval fails
      */
     public AuthUser getAuthUserByUsername(String username) {
-        String sql = "SELECT username, password, role FROM \"Users\" WHERE username = ?";
-        List<AuthUser> authUsers = findAll(sql, username);
-        return authUsers.isEmpty() ? null : authUsers.get(0);
+        try {
+            String sql = "SELECT username, password, role FROM \"Users\" WHERE username = ?";
+            List<AuthUser> authUsers = findAll(sql, username);
+            return authUsers.isEmpty() ? null : authUsers.get(0);
+        } catch (Exception e) {
+            System.out.println("Error connection to DB");
+        }
+        return null;
     }
 
     /**
