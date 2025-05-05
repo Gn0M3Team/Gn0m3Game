@@ -29,7 +29,18 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
+import javafx.stage.FileChooser;
 import javafx.event.ActionEvent;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import java.io.File;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
@@ -54,6 +65,9 @@ public class ProfileController {
     @FXML private Label mapOwner;
     @FXML private ImageView avatarImage;
     @FXML private Button banUserButton;
+    @FXML private Button uploadStatsButton;
+    @FXML private Button downloadStatsButton;
+    @FXML private Button downloadFullProfileButton;
     @FXML private Button leftButton;
     @FXML private Button rightButton;
     @FXML private Button confirmRoleButton;
@@ -101,10 +115,6 @@ public class ProfileController {
         }
     }
 
-    /**
-     * Sets up the profile page with data for the selected player.
-     * @param playerData The player data string in the format "Score: username"
-     */
     public void setPlayer(String playerData) {
         if (playerData == null) {
             logger.warning("Invalid playerData: " + playerData);
@@ -143,27 +153,26 @@ public class ProfileController {
                 ? bundle.getString(mapsProp)
                 : String.format(bundle.getString(mapsProp), user.getUsername()));
 
-
         if (userStatistics != null) {
             totalMapsPlayed.setText(
                     String.format(bundle.getString("profile.stats.gamesplayed"),
-                    userStatistics.getTotalMapsPlayed()));
+                            userStatistics.getTotalMapsPlayed()));
 
             totalWins.setText(
                     String.format(bundle.getString("profile.stats.wins"),
-                    userStatistics.getTotalWins()));
+                            userStatistics.getTotalWins()));
 
             totalDeaths.setText(
                     String.format(bundle.getString("profile.stats.deaths"),
-                    userStatistics.getTotalDeaths()));
+                            userStatistics.getTotalDeaths()));
 
             totalMonsterKilled.setText(
                     String.format(bundle.getString("profile.stats.monsterskilled"),
-                    userStatistics.getTotalMonstersKilled()));
+                            userStatistics.getTotalMonstersKilled()));
 
             totalChestOpened.setText(
                     String.format(bundle.getString("profile.stats.chestsopened"),
-                    userStatistics.getTotalChestsOpened()));
+                            userStatistics.getTotalChestsOpened()));
 
             double ratio = userStatistics.getTotalMapsPlayed() > 0
                     ? (double) userStatistics.getTotalWins() / userStatistics.getTotalMapsPlayed()
@@ -171,10 +180,10 @@ public class ProfileController {
             double rounded = Math.round(ratio * 100.0) / 100.0;
             winningPercentage.setText(
                     String.format(bundle.getString("profile.stats.winrate"),
-                    rounded));
+                            rounded));
             deathCounter.setText(
                     String.format(bundle.getString("profile.stats.deathcount"),
-                    userStatistics.getTotalDeaths()));
+                            userStatistics.getTotalDeaths()));
 
         } else {
             logger.warning("User statistics not found for: " + selectedUsername);
@@ -225,9 +234,6 @@ public class ProfileController {
         }
     }
 
-    /**
-     * Resets stats labels to default values if user statistics are unavailable.
-     */
     private void resetStats() {
         totalMapsPlayed.setText(String.format(bundle.getString("profile.stats.gamesplayed"), 0));
         totalWins.setText(String.format(bundle.getString("profile.stats.wins"), 0));
@@ -238,15 +244,17 @@ public class ProfileController {
         deathCounter.setText(String.format(bundle.getString("profile.stats.deathcount"), 0));
     }
 
-    /**
-     * Updates visibility of admin buttons based on user permissions.
-     */
     private void updateButtonVisibility() {
         boolean isAdmin = userState.getRole().equals(PlayerRole.ADMIN);
         boolean isTargetAdmin = selectedUserRole.equals(PlayerRole.ADMIN);
-
-        System.out.println("ROLE: " + selectedUserRole);
-
+        if (!isAdmin) {
+            uploadStatsButton.setVisible(false);
+            uploadStatsButton.setManaged(false);
+            downloadStatsButton.setVisible(false);
+            downloadStatsButton.setManaged(false);
+            downloadFullProfileButton.setVisible(false);
+            downloadFullProfileButton.setManaged(false);
+        }
         if (!isAdmin || isTargetAdmin) {
             banUserButton.setVisible(false);
             banUserButton.setManaged(false);
@@ -260,6 +268,12 @@ public class ProfileController {
         } else {
             banUserButton.setVisible(true);
             banUserButton.setManaged(true);
+            uploadStatsButton.setVisible(true);
+            uploadStatsButton.setManaged(true);
+            downloadStatsButton.setVisible(true);
+            downloadStatsButton.setManaged(true);
+            downloadFullProfileButton.setVisible(true);
+            downloadFullProfileButton.setManaged(true);
             roleLabel.setDisable(false);
             leftButton.setVisible(true);
             leftButton.setManaged(true);
@@ -270,9 +284,6 @@ public class ProfileController {
         }
     }
 
-    /**
-     * Sets up lazy-loading pagination for the map ListView.
-     */
     private void setupScrollPagination() {
         mapListView.skinProperty().addListener((obs, oldSkin, newSkin) -> {
             if (newSkin != null) {
@@ -290,9 +301,6 @@ public class ProfileController {
         });
     }
 
-    /**
-     * Loads the next batch of maps into the ListView.
-     */
     private void loadAllMaps() {
         if (userMaps == null || userMaps.isEmpty()) return;
 
@@ -315,9 +323,6 @@ public class ProfileController {
         }
     }
 
-    /**
-     * Handles the "Back" button to return to the main menu.
-     */
     @FXML
     private void handleBack(ActionEvent event) {
         if (pageSwitch != null && profilePage != null) {
@@ -340,9 +345,6 @@ public class ProfileController {
         }
     }
 
-    /**
-     * Handles the "Ban User" button, showing a confirmation popup.
-     */
     @FXML
     private void handleBanUser(ActionEvent event) {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -354,7 +356,6 @@ public class ProfileController {
         menuBox.getStylesheets().add(getClass().getResource("/com/gnome/gnome/pages/css/profile-delete-user.css").toExternalForm());
         menuBox.setAlignment(Pos.CENTER);
         menuBox.getStyleClass().add("menu-popup");
-//        menuBox.setStyle("-fx-padding: 20; -fx-background-radius: 20;");
 
         Label title = new Label(bundle.getString("profile.delete.title"));
         title.getStyleClass().add("popup-title");
@@ -403,27 +404,271 @@ public class ProfileController {
             confirmPopup.setY(centerY - popupHeight / 2);
         }
     }
-    /**
-     * Moves to the previous role in the role list.
-     */
+
+    @FXML
+    private void handleUploadStats(ActionEvent event) {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select User Statistics FXML");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("FXML Files", "*.fxml"));
+        File file = fileChooser.showOpenDialog(stage);
+
+        if (file != null) {
+            try {
+                UserStatisticsDAO userStatisticsDAO = new UserStatisticsDAO();
+                UserStatistics stats = parseStatisticsFromFXML(file);
+                stats.setUsername(selectedUsername);
+                boolean updated = userStatisticsDAO.updateUserStatistics(stats);
+
+                if (updated) {
+                    CustomPopupUtil.showSuccess(stage, "Statistics successfully uploaded");
+                    setPlayer(selectedUsername); // Refresh profile page
+                } else {
+                    logger.warning("Failed to update statistics for user: " + selectedUsername);
+                    CustomPopupUtil.showError(stage, "Failed to update statistics in database");
+                }
+            } catch (Exception e) {
+                logger.warning("Error uploading statistics: " + e.getMessage());
+                CustomPopupUtil.showError(stage, "Error parsing FXML file: " + e.getMessage());
+            }
+        }
+    }
+
+    @FXML
+    private void handleDownloadStats(ActionEvent event) {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save User Statistics FXML");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("FXML Files", "*.fxml"));
+        fileChooser.setInitialFileName(selectedUsername + "_stats.fxml");
+        File file = fileChooser.showSaveDialog(stage);
+
+        if (file != null) {
+            try {
+                UserStatisticsDAO userStatisticsDAO = new UserStatisticsDAO();
+                UserStatistics stats = userStatisticsDAO.getUserStatisticsByUsername(selectedUsername);
+                saveStatisticsToFXML(stats, file);
+                CustomPopupUtil.showSuccess(stage, "Statistics successfully downloaded");
+            } catch (Exception e) {
+                logger.warning("Error downloading statistics: " + e.getMessage());
+                CustomPopupUtil.showError(stage, "Error saving FXML file");
+            }
+        }
+    }
+
+    @FXML
+    private void handleDownloadFullProfile(ActionEvent event) {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save Full User Profile FXML");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("FXML Files", "*.fxml"));
+        fileChooser.setInitialFileName(selectedUsername + "_full_profile.fxml");
+        File file = fileChooser.showSaveDialog(stage);
+
+        if (file != null) {
+            try {
+                UserStatisticsDAO userStatisticsDAO = new UserStatisticsDAO();
+                UserStatistics stats = userStatisticsDAO.getUserStatisticsByUsername(selectedUsername);
+                UserGameStateDAO gameStateDAO = new UserGameStateDAO();
+                UserGameState gameState = gameStateDAO.getUserGameStateByUsername(selectedUsername);
+                saveFullProfileToFXML(stats, user, gameState, userMaps, file);
+                CustomPopupUtil.showSuccess(stage, "Full profile successfully downloaded");
+            } catch (Exception e) {
+                logger.warning("Error downloading full profile: " + e.getMessage());
+                CustomPopupUtil.showError(stage, "Error saving FXML file");
+            }
+        }
+    }
+
+    private UserStatistics parseStatisticsFromFXML(File file) throws Exception {
+        UserStatistics stats = new UserStatistics();
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+        Document doc = dBuilder.parse(file);
+        doc.getDocumentElement().normalize();
+
+        Element root = doc.getDocumentElement();
+        Element statsElement;
+
+        if (root.getTagName().equals("UserStatistics")) {
+            statsElement = root;
+        } else if (root.getTagName().equals("UserProfile")) {
+            NodeList statsNodes = root.getElementsByTagName("statistics");
+            if (statsNodes.getLength() == 0) {
+                throw new Exception("No statistics element found in UserProfile FXML");
+            }
+            statsElement = (Element) statsNodes.item(0);
+        } else {
+            throw new Exception("Invalid root element: " + root.getTagName());
+        }
+
+        // Helper method to safely get and parse integer values
+        String[] requiredFields = {
+                "totalMapsPlayed", "totalWins", "totalDeaths",
+                "totalMonstersKilled", "totalChestsOpened"
+        };
+
+        for (String field : requiredFields) {
+            NodeList nodeList = statsElement.getElementsByTagName(field);
+            if (nodeList.getLength() == 0) {
+                throw new Exception("Missing required field: " + field);
+            }
+            String value = nodeList.item(0).getTextContent();
+            if (value == null || value.trim().isEmpty()) {
+                throw new Exception("Empty value for field: " + field);
+            }
+            try {
+                int intValue = Integer.parseInt(value);
+                switch (field) {
+                    case "totalMapsPlayed":
+                        stats.setTotalMapsPlayed(intValue);
+                        break;
+                    case "totalWins":
+                        stats.setTotalWins(intValue);
+                        break;
+                    case "totalDeaths":
+                        stats.setTotalDeaths(intValue);
+                        break;
+                    case "totalMonstersKilled":
+                        stats.setTotalMonstersKilled(intValue);
+                        break;
+                    case "totalChestsOpened":
+                        stats.setTotalChestsOpened(intValue);
+                        break;
+                }
+            } catch (NumberFormatException e) {
+                throw new Exception("Invalid integer value for field " + field + ": " + value);
+            }
+        }
+
+        logger.info("Successfully parsed statistics from FXML for user: " + selectedUsername);
+        return stats;
+    }
+
+    private void saveStatisticsToFXML(UserStatistics stats, File file) throws Exception {
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+        Document doc = dBuilder.newDocument();
+
+        Element rootElement = doc.createElement("UserStatistics");
+        doc.appendChild(rootElement);
+
+        Element mapsPlayed = doc.createElement("totalMapsPlayed");
+        mapsPlayed.appendChild(doc.createTextNode(String.valueOf(stats.getTotalMapsPlayed())));
+        rootElement.appendChild(mapsPlayed);
+
+        Element wins = doc.createElement("totalWins");
+        wins.appendChild(doc.createTextNode(String.valueOf(stats.getTotalWins())));
+        rootElement.appendChild(wins);
+
+        Element deaths = doc.createElement("totalDeaths");
+        deaths.appendChild(doc.createTextNode(String.valueOf(stats.getTotalDeaths())));
+        rootElement.appendChild(deaths);
+
+        Element monstersKilled = doc.createElement("totalMonstersKilled");
+        monstersKilled.appendChild(doc.createTextNode(String.valueOf(stats.getTotalMonstersKilled())));
+        rootElement.appendChild(monstersKilled);
+
+        Element chestsOpened = doc.createElement("totalChestsOpened");
+        chestsOpened.appendChild(doc.createTextNode(String.valueOf(stats.getTotalChestsOpened())));
+        rootElement.appendChild(chestsOpened);
+
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+        DOMSource source = new DOMSource(doc);
+        StreamResult result = new StreamResult(file);
+        transformer.transform(source, result);
+    }
+
+    private void saveFullProfileToFXML(UserStatistics stats, AuthUser user, UserGameState gameState, List<Map> maps, File file) throws Exception {
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+        Document doc = dBuilder.newDocument();
+
+        Element rootElement = doc.createElement("UserProfile");
+        doc.appendChild(rootElement);
+
+        // User Information
+        Element username = doc.createElement("username");
+        username.appendChild(doc.createTextNode(user.getUsername()));
+        rootElement.appendChild(username);
+
+        Element role = doc.createElement("role");
+        role.appendChild(doc.createTextNode(user.getRole().toString()));
+        rootElement.appendChild(role);
+
+        Element mapLevel = doc.createElement("mapLevel");
+        mapLevel.appendChild(doc.createTextNode(String.valueOf(gameState != null ? gameState.getMapLevel() : 0)));
+        rootElement.appendChild(mapLevel);
+
+        // Statistics
+        Element statistics = doc.createElement("statistics");
+        rootElement.appendChild(statistics);
+
+        Element mapsPlayed = doc.createElement("totalMapsPlayed");
+        mapsPlayed.appendChild(doc.createTextNode(String.valueOf(stats.getTotalMapsPlayed())));
+        statistics.appendChild(mapsPlayed);
+
+        Element wins = doc.createElement("totalWins");
+        wins.appendChild(doc.createTextNode(String.valueOf(stats.getTotalWins())));
+        statistics.appendChild(wins);
+
+        Element deaths = doc.createElement("totalDeaths");
+        deaths.appendChild(doc.createTextNode(String.valueOf(stats.getTotalDeaths())));
+        statistics.appendChild(deaths);
+
+        Element monstersKilled = doc.createElement("totalMonstersKilled");
+        monstersKilled.appendChild(doc.createTextNode(String.valueOf(stats.getTotalMonstersKilled())));
+        statistics.appendChild(monstersKilled);
+
+        Element chestsOpened = doc.createElement("totalChestsOpened");
+        chestsOpened.appendChild(doc.createTextNode(String.valueOf(stats.getTotalChestsOpened())));
+        statistics.appendChild(chestsOpened);
+
+        // Created Maps
+        Element createdMaps = doc.createElement("createdMaps");
+        rootElement.appendChild(createdMaps);
+
+        for (Map map : maps) {
+            Element mapElement = doc.createElement("map");
+            createdMaps.appendChild(mapElement);
+
+            Element mapName = doc.createElement("mapName");
+            mapName.appendChild(doc.createTextNode(map.getMapNameEng()));
+            mapElement.appendChild(mapName);
+
+            Element timesPlayed = doc.createElement("timesPlayed");
+            timesPlayed.appendChild(doc.createTextNode(String.valueOf(map.getTimesPlayed())));
+            mapElement.appendChild(timesPlayed);
+
+            Element timesCompleted = doc.createElement("timesCompleted");
+            timesCompleted.appendChild(doc.createTextNode(String.valueOf(map.getTimesCompleted())));
+            mapElement.appendChild(timesCompleted);
+
+            Element scoreVal = doc.createElement("scoreVal");
+            scoreVal.appendChild(doc.createTextNode(String.valueOf(map.getScoreVal())));
+            mapElement.appendChild(scoreVal);
+        }
+
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+        DOMSource source = new DOMSource(doc);
+        StreamResult result = new StreamResult(file);
+        transformer.transform(source, result);
+    }
+
     @FXML
     private void handleLeftRole() {
         currentRoleIndex = (currentRoleIndex > 0) ? currentRoleIndex - 1 : roles.size() - 1;
         roleLabel.setText("Role: " + roles.get(currentRoleIndex));
     }
 
-    /**
-     * Moves to the next role in the role list.
-     */
     @FXML
     private void handleRightRole() {
         currentRoleIndex = (currentRoleIndex < roles.size() - 1) ? currentRoleIndex + 1 : 0;
         roleLabel.setText("Role: " + roles.get(currentRoleIndex));
     }
 
-    /**
-     * Confirms and updates the selected role for the user.
-     */
     @FXML
     private void handleConfirmRole(ActionEvent event) {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -440,7 +685,7 @@ public class ProfileController {
             logger.info("Role updated to " + selectedRole + " for user " + selectedUsername);
             CustomPopupUtil.showSuccess(stage, String.format(
                     bundle.getString("popup.role.updated.success"),
-                    selectedRole.toString(),  // Преобразуем enum в строку
+                    selectedRole.toString(),
                     selectedUsername
             ));
             selectedUserRole = selectedRole;

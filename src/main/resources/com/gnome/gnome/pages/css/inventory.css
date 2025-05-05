@@ -1,0 +1,172 @@
+@font-face {
+    font-family: 'Press Start 2P';
+    src: url('../fonts/PressStart2P-Regular.ttf') format('truetype');
+}
+
+/* Root BorderPane styling */
+.inventory-root {
+    -fx-background-color: linear-gradient(to bottom, #1C121C, #2E1C26); /* Gentle dark gradient */
+    -fx-padding: 15px;
+}
+
+/* Inventory Title */
+.inventory-title {
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 32px;
+    -fx-text-fill: linear-gradient(to right, #F4C8D4, #C8A2C8); /* Pink to purple gradient */
+    -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 0.3), 5, 0, 0, 2); /* Subtle white glow */
+}
+
+/* Item Container */
+.item-container {
+    -fx-spacing: 20px;
+    -fx-alignment: center;
+    -fx-padding: 10px;
+}
+
+/* Item Box (Card) */
+.item-box {
+    -fx-background-color: rgba(46, 28, 38, 0.9); /* Semi-transparent dark background */
+    -fx-background-radius: 15px;
+    -fx-border-color: #4A3A4A;
+    -fx-border-width: 2px;
+    -fx-border-radius: 15px;
+    -fx-padding: 15px;
+    -fx-effect: dropshadow(gaussian, rgba(244, 200, 212, 0.6), 10, 0, 0, 5); /* Pink shadow */
+}
+
+/* Item Image with Magic Border */
+.item-box .image-view {
+    -fx-effect: dropshadow(three-pass-box, rgba(244, 200, 212, 0.8), 10, 0, 0, 0) inner-shadow(three-pass-box, rgba(200, 162, 200, 0.6), 5, 0, 0, 0); /* Magic glow */
+    -fx-background-color: linear-gradient(to bottom right, #F4C8D4, #C8A2C8); /* Gradient border */
+    -fx-background-radius: 10px;
+    -fx-padding: 6px;
+    -fx-alignment: center;
+}
+
+/* Item Details Container */
+.item-details {
+    -fx-spacing: 10px;
+    -fx-alignment: center;
+    -fx-padding: 0 8
+}
+
+/* Item Name */
+.item-name {
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 18px;
+    -fx-text-fill: linear-gradient(to right, #F4C8D4, #C8A2C8); /* Gradient text */
+    -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 0.4), 4, 0, 0, 2); /* Glow */
+    -fx-text-alignment: center;
+    -fx-wrap-text: true;
+    -fx-max-width: 260px;
+}
+
+/* Item Description */
+.item-description {
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 10px;
+    -fx-text-fill: #E0E0E0; /* Light gray for readability */
+    -fx-wrap-text: true;
+    -fx-max-width: 260px;
+    -fx-text-alignment: center;
+    -fx-padding: 0 5px;
+}
+
+/* Item Cost and Boost Container */
+.item-box .item-details .hbox {
+    -fx-spacing: 10px;
+    -fx-alignment: center;
+}
+
+/* Item Cost */
+.item-cost {
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 14px;
+    -fx-text-fill: #C8A2C8; /* Purple */
+    -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 0.3), 3, 0, 0, 1); /* Gentle glow */
+}
+
+/* Item Boost */
+.item-boost {
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 14px;
+    -fx-text-fill: #E0E0E0; /* Light gray */
+    -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 0.3), 3, 0, 0, 1); /* Gentle glow */
+}
+
+/* Sell Button */
+.sell-button {
+    -fx-background-color: transparent;
+    -fx-background-image: url('../../images/button-background.png');
+    -fx-background-size: cover;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+    -fx-text-fill: #ffffff;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 14px;
+    -fx-padding: 8px 15px;
+    -fx-background-radius: 10px;
+    -fx-border-color: #2E1C26;
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 5, 0, 0, 1);
+    -fx-min-width: 90px;
+}
+
+.sell-button:hover {
+    -fx-background-image: url('../../images/button-background-05.jpg');
+    -fx-text-fill: #F4C8D4;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.sell-button:pressed {
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+}
+
+.sell-button:disabled {
+    -fx-opacity: 0.5;
+    -fx-cursor: default;
+}
+
+/* Button Container */
+.button-container {
+    -fx-spacing: 15px;
+    -fx-alignment: center;
+    -fx-padding: 10px;
+}
+
+/* Action Buttons */
+.action-button {
+    -fx-background-color: transparent;
+    -fx-background-image: url('../../images/button-background.png');
+    -fx-background-size: cover;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+    -fx-text-fill: #ffffff;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 14px;
+    -fx-padding: 8px 20px;
+    -fx-background-radius: 10px;
+    -fx-border-color: #2E1C26;
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 5, 0, 0, 1);
+    -fx-min-width: 120px;
+}
+
+.action-button:hover {
+    -fx-background-image: url('../../images/button-background-05.jpg');
+    -fx-text-fill: #F4C8D4;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.action-button:pressed {
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+}

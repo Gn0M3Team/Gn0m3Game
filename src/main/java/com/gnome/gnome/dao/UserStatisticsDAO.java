@@ -93,7 +93,7 @@ public class UserStatisticsDAO extends BaseDAO<UserStatistics> {
      * @param userStatistics the UserStatistics object to update
      * @throws DataAccessException if the update fails
      */
-    public void updateUserStatistics(UserStatistics userStatistics) {
+    public boolean updateUserStatistics(UserStatistics userStatistics) {
         try {
             db.beginTransaction();
 
@@ -116,6 +116,7 @@ public class UserStatisticsDAO extends BaseDAO<UserStatistics> {
             db.rollBackTransaction();
             throw new DataAccessException("Failed to update user statistics", e);
         }
+        return true;
     }
 
     /**

@@ -53,6 +53,11 @@
 
                         <!-- Ban Button -->
                         <Button fx:id="banUserButton" text="%popup.button.delete" onAction="#handleBanUser" styleClass="profile-ban-button"/>
+                        <HBox spacing="10" alignment="CENTER">
+                            <Button fx:id="uploadStatsButton" text="%button.upload.stats" onAction="#handleUploadStats" styleClass="action-button" />
+                            <Button fx:id="downloadStatsButton" text="%button.download.stats" onAction="#handleDownloadStats" styleClass="action-button" />
+                        </HBox>
+                        <Button fx:id="downloadFullProfileButton" text="%button.download.full.profile" onAction="#handleDownloadFullProfile" styleClass="action-button"/>
                     </VBox>
 
                     <!-- Maps Section -->
@@ -62,7 +67,7 @@
                     </VBox>
 
                     <!-- Bottom Section -->
-                    <HBox alignment="CENTER" spacing="20" styleClass="bottom-container">
+                    <HBox alignment="CENTER" spacing="20" styleClass="fxml-stats-buttons">
                         <Button text="%editor.button.goback" onAction="#handleBack" styleClass="action-button"/>
                         <Button fx:id="goToGameButton" text="Go To Game" onAction="#handleGame" styleClass="action-button"/>
                     </HBox>

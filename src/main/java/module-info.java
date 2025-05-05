@@ -47,6 +47,9 @@ module com.gnome.gnome {
     opens com.gnome.gnome.storyMaps to javafx.fxml;
     exports com.gnome.gnome.storyMaps;
 
+    opens com.gnome.gnome.inventory to javafx.fxml;
+    exports com.gnome.gnome.inventory;
+
     exports com.gnome.gnome.shop.service;
     opens com.gnome.gnome.shop.service to javafx.fxml;
     exports com.gnome.gnome.shop.controllers;
