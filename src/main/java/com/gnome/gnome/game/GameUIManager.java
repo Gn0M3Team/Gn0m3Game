@@ -48,7 +48,12 @@ public class GameUIManager {
 
 
     public GameUIManager(GameController controller) {
-        this.bundle = MainApplication.getLangBundle();
+        if (MainApplication.getLang() == 'S'){
+            this.bundle = ResourceBundle.getBundle("slovak");
+        }
+        else {
+            this.bundle = ResourceBundle.getBundle("english");
+        }
 
         this.controller = controller;
         pageSwitch = new SwitchPage();
